@@ -1,0 +1,11 @@
+{
+  "name": "wats-access-client-cpp",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "gen-cpp": "node ./messages/generator/generateCPP"
+  },
+  "dependencies": {
+    "bendec": "0.43.0"
+  }
+}

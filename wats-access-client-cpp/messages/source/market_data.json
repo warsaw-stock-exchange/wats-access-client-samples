@@ -1,0 +1,5278 @@
+{
+  "$schema": "./schema.json",
+  "version": 2017,
+  "typeDefinitions": {
+    "marketData": [
+      {
+        "kind": "Primitive",
+        "name": "bool",
+        "size": 1,
+        "description": "Boolean"
+      },
+      {
+        "kind": "Primitive",
+        "name": "u8",
+        "size": 1,
+        "description": "Unsigned integer, 8-bit."
+      },
+      {
+        "kind": "Primitive",
+        "name": "u16",
+        "size": 2,
+        "description": "Unsigned integer, 8-bit."
+      },
+      {
+        "kind": "Primitive",
+        "name": "u32",
+        "size": 4,
+        "description": "Unsigned integer, 8-bit."
+      },
+      {
+        "kind": "Primitive",
+        "name": "u64",
+        "size": 8,
+        "description": "Unsigned integer, 64-bit."
+      },
+      {
+        "kind": "Primitive",
+        "name": "i64",
+        "size": 8,
+        "description": "Unsigned integer, 64-bit."
+      },
+      {
+        "kind": "Alias",
+        "name": "Precision",
+        "alias": "u8",
+        "description": "Number of significant digits."
+      },
+      {
+        "kind": "Alias",
+        "name": "AnsiChar",
+        "alias": "u8",
+        "description": "String."
+      },
+      {
+        "kind": "Alias",
+        "name": "ConnectionId",
+        "alias": "u16",
+        "description": "ID of the connection. Must fit into 14 bits, see OrderId for details."
+      },
+      {
+        "kind": "Alias",
+        "name": "MsgLength",
+        "alias": "u16",
+        "description": "Length of the message."
+      },
+      {
+        "kind": "Alias",
+        "name": "MsgVersion",
+        "alias": "u16",
+        "description": "Message version - used to differentiate between messages sent using different versions of the protocol."
+      },
+      {
+        "kind": "Alias",
+        "name": "SessionId",
+        "alias": "u16",
+        "description": "ID of the session. Must fit into 14 bits, see OrderId for details."
+      },
+      {
+        "kind": "Alias",
+        "name": "OrderCount",
+        "alias": "u16",
+        "description": "Order count (number of orders)."
+      },
+      {
+        "kind": "Alias",
+        "name": "Date",
+        "alias": "u32",
+        "description": "Date (YYYYMMDD) as integer value."
+      },
+      {
+        "kind": "Alias",
+        "name": "ElementId",
+        "alias": "u32",
+        "description": "Market structure element ID."
+      },
+      {
+        "kind": "Alias",
+        "name": "LotSize",
+        "alias": "u32",
+        "description": "Lot size."
+      },
+      {
+        "kind": "Alias",
+        "name": "SeqNum",
+        "alias": "u32",
+        "description": "Sequence number of the message. Must fit into 28 bits, see OrderId for details."
+      },
+      {
+        "kind": "Alias",
+        "name": "TradeId",
+        "alias": "u32",
+        "description": "ID of the trade (match between buy and sell orders)."
+      },
+      {
+        "kind": "Alias",
+        "name": "PublicOrderId",
+        "alias": "u64",
+        "description": "ID of a given order."
+      },
+      {
+        "kind": "Alias",
+        "name": "Timestamp",
+        "alias": "u64",
+        "description": "Timestamp (exact date and time of an event)."
+      },
+      {
+        "kind": "Alias",
+        "name": "Quantity",
+        "alias": "u64",
+        "description": "Quantity of an instrument."
+      },
+      {
+        "kind": "Alias",
+        "name": "Number",
+        "alias": "i64",
+        "description": "Number as decimal(18,8) without decimal separator."
+      },
+      {
+        "kind": "Alias",
+        "name": "Multiplier",
+        "alias": "Number",
+        "description": "Multiplier as decimal(18,8) without decimal separator."
+      },
+      {
+        "kind": "Alias",
+        "name": "Value",
+        "alias": "i64",
+        "description": "Value as decimal(18,2) without decimal separator."
+      },
+      {
+        "kind": "Alias",
+        "name": "Bound",
+        "alias": "Number",
+        "description": "Collar bound."
+      },
+      {
+        "kind": "Alias",
+        "name": "CollarValue",
+        "alias": "Number",
+        "description": "Collar value."
+      },
+      {
+        "kind": "Alias",
+        "name": "Price",
+        "alias": "Number",
+        "description": "Price of the instrument."
+      },
+      {
+        "kind": "Alias",
+        "name": "TickSize",
+        "alias": "Number",
+        "description": "Tick size."
+      },
+      {
+        "kind": "Array",
+        "name": "Weekdays",
+        "type": "bool",
+        "length": 7,
+        "description": "Weekdays counted from Monday, open for trading - true, close for trading  - false."
+      },
+      {
+        "kind": "Array",
+        "name": "MicCode",
+        "type": "AnsiChar",
+        "length": 4,
+        "description": "Market Identifier Code (MIC) as specified in ISO 10383."
+      },
+      {
+        "kind": "Array",
+        "name": "Name",
+        "type": "AnsiChar",
+        "length": 50,
+        "description": "Name."
+      },
+      {
+        "kind": "Array",
+        "name": "Code",
+        "type": "AnsiChar",
+        "length": 16,
+        "description": "Type for standard, 16-character long code for market structure messages."
+      },
+      {
+        "kind": "Array",
+        "name": "Token",
+        "type": "AnsiChar",
+        "length": 8,
+        "description": "Unique token."
+      },
+      {
+        "kind": "Array",
+        "name": "EncryptionGroupKey",
+        "type": "u8",
+        "length": 32,
+        "description": "Secret Key value."
+      },
+      {
+        "kind": "Array",
+        "name": "ProductIdentification",
+        "type": "AnsiChar",
+        "length": 30,
+        "description": "Product identification, for example its ISIN number."
+      },
+      {
+        "kind": "Array",
+        "name": "TextMessage",
+        "type": "AnsiChar",
+        "length": 50,
+        "description": "A text message."
+      },
+      {
+        "kind": "Array",
+        "name": "InstrumentCode",
+        "type": "AnsiChar",
+        "length": 64,
+        "description": "Type for long, 64-character long code for market structure messages."
+      },
+      {
+        "kind": "Alias",
+        "name": "PercentageChange",
+        "alias": "Price",
+        "description": "Change to an index expressed in percent."
+      },
+      {
+        "kind": "Alias",
+        "name": "IndexValue",
+        "alias": "Price",
+        "description": "Value of an index."
+      },
+      {
+        "kind": "Array",
+        "name": "IndexUnderlying",
+        "type": "PublicProductIdentification",
+        "length": 3,
+        "description": "List of underlying instruments for index."
+      },
+      {
+        "kind": "Array",
+        "name": "Issuer",
+        "type": "AnsiChar",
+        "length": 150,
+        "description": "Name of the issuer."
+      },
+      {
+        "kind": "Array",
+        "name": "CfiCode",
+        "type": "AnsiChar",
+        "length": 6,
+        "description": "Clarification of Financial Instruments as specified in ISO 18774."
+      },
+      {
+        "kind": "Array",
+        "name": "FisnCode",
+        "type": "AnsiChar",
+        "length": 35,
+        "description": "Financial Instrument Short Name as specified in ISO 10962."
+      },
+      {
+        "kind": "Enum",
+        "name": "AuctionType",
+        "description": "Type of auction.",
+        "underlying": "u8",
+        "variants": [
+          [
+            "NotApplicable",
+            1,
+            "NotApplicable."
+          ],
+          [
+            "OpeningAuction",
+            2,
+            "Opening auction."
+          ],
+          [
+            "ClosingAuction",
+            3,
+            "Closing auction."
+          ],
+          [
+            "IntradayAuction",
+            4,
+            "Intraday auction."
+          ],
+          [
+            "VolatilityAuctionStatic",
+            5,
+            "Volatility auction after static collars breach."
+          ],
+          [
+            "VolatilityAuctionDynamic",
+            6,
+            "Volatility auction after dynamic collars breach."
+          ],
+          [
+            "ExtendedVolatilityAuctionStatic",
+            7
+          ],
+          [
+            "ExtendedVolatilityAuctionDynamic",
+            8
+          ],
+          [
+            "UnsuspensionAuction",
+            9
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "CalendarExceptionType",
+        "description": "Calendar exception type.",
+        "underlying": "u8",
+        "variants": [
+          [
+            "Closed",
+            1,
+            "The day is closed for trading."
+          ],
+          [
+            "Open",
+            2,
+            "The day is open for trading."
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "ExpressionType",
+        "description": "Expression type (percentage or absolute value).",
+        "underlying": "u8",
+        "variants": [
+          [
+            "Percentage",
+            1,
+            "Percentage."
+          ],
+          [
+            "AbsoluteValue",
+            2,
+            "Absolute value."
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "CollarMode",
+        "description": "Collar mode (trade price collar or order price collar).",
+        "underlying": "u8",
+        "variants": [
+          [
+            "TradePriceCollar",
+            1,
+            "Trade price collar."
+          ],
+          [
+            "OrderPriceCollar",
+            2,
+            "Order price collar."
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "CouponType",
+        "description": "A bond's coupon type.",
+        "underlying": "u8",
+        "variants": [
+          [
+            "NotApplicable",
+            1,
+            "NotApplicable."
+          ],
+          [
+            "Zero",
+            2,
+            "Zero coupon."
+          ],
+          [
+            "Fixed",
+            3,
+            "Fixed coupon."
+          ],
+          [
+            "Floating",
+            4,
+            "Floating coupon."
+          ],
+          [
+            "Indexed",
+            5,
+            "Indexed coupon."
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "Currency",
+        "description": "Currency - ISO 4217 (2022/04/01) code (e.g. PLN)",
+        "underlying": "u16",
+        "variants": [
+          [
+            "ALL",
+            8,
+            "Lek"
+          ],
+          [
+            "DZD",
+            12,
+            "Algerian Dinar"
+          ],
+          [
+            "ARS",
+            32,
+            "Argentine Peso"
+          ],
+          [
+            "AUD",
+            36,
+            "Australian Dollar"
+          ],
+          [
+            "BSD",
+            44,
+            "Bahamian Dollar"
+          ],
+          [
+            "BHD",
+            48,
+            "Bahraini Dinar"
+          ],
+          [
+            "BDT",
+            50,
+            "Taka"
+          ],
+          [
+            "AMD",
+            51,
+            "Armenian Dram"
+          ],
+          [
+            "BBD",
+            52,
+            "Barbados Dollar"
+          ],
+          [
+            "BMD",
+            60,
+            "Bermudian Dollar"
+          ],
+          [
+            "BTN",
+            64,
+            "Ngultrum"
+          ],
+          [
+            "BOB",
+            68,
+            "Boliviano"
+          ],
+          [
+            "BWP",
+            72,
+            "Pula"
+          ],
+          [
+            "BZD",
+            84,
+            "Belize Dollar"
+          ],
+          [
+            "SBD",
+            90,
+            "Solomon Islands Dollar"
+          ],
+          [
+            "BND",
+            96,
+            "Brunei Dollar"
+          ],
+          [
+            "MMK",
+            104,
+            "Kyat"
+          ],
+          [
+            "BIF",
+            108,
+            "Burundi Franc"
+          ],
+          [
+            "KHR",
+            116,
+            "Riel"
+          ],
+          [
+            "CAD",
+            124,
+            "Canadian Dollar"
+          ],
+          [
+            "CVE",
+            132,
+            "Cabo Verde Escudo"
+          ],
+          [
+            "KYD",
+            136,
+            "Cayman Islands Dollar"
+          ],
+          [
+            "LKR",
+            144,
+            "Sri Lanka Rupee"
+          ],
+          [
+            "CLP",
+            152,
+            "Chilean Peso"
+          ],
+          [
+            "CNY",
+            156,
+            "Yuan Renminbi"
+          ],
+          [
+            "COP",
+            170,
+            "Colombian Peso"
+          ],
+          [
+            "KMF",
+            174,
+            "Comorian Franc "
+          ],
+          [
+            "CRC",
+            188,
+            "Costa Rican Colon"
+          ],
+          [
+            "HRK",
+            191,
+            "Kuna"
+          ],
+          [
+            "CUP",
+            192,
+            "Cuban Peso"
+          ],
+          [
+            "CZK",
+            203,
+            "Czech Koruna"
+          ],
+          [
+            "DKK",
+            208,
+            "Danish Krone"
+          ],
+          [
+            "DOP",
+            214,
+            "Dominican Peso"
+          ],
+          [
+            "SVC",
+            222,
+            "El Salvador Colon"
+          ],
+          [
+            "ETB",
+            230,
+            "Ethiopian Birr"
+          ],
+          [
+            "ERN",
+            232,
+            "Nakfa"
+          ],
+          [
+            "FKP",
+            238,
+            "Falkland Islands Pound"
+          ],
+          [
+            "FJD",
+            242,
+            "Fiji Dollar"
+          ],
+          [
+            "DJF",
+            262,
+            "Djibouti Franc"
+          ],
+          [
+            "GMD",
+            270,
+            "Dalasi"
+          ],
+          [
+            "GIP",
+            292,
+            "Gibraltar Pound"
+          ],
+          [
+            "GTQ",
+            320,
+            "Quetzal"
+          ],
+          [
+            "GNF",
+            324,
+            "Guinean Franc"
+          ],
+          [
+            "GYD",
+            328,
+            "Guyana Dollar"
+          ],
+          [
+            "HTG",
+            332,
+            "Gourde"
+          ],
+          [
+            "HNL",
+            340,
+            "Lempira"
+          ],
+          [
+            "HKD",
+            344,
+            "Hong Kong Dollar"
+          ],
+          [
+            "HUF",
+            348,
+            "Forint"
+          ],
+          [
+            "ISK",
+            352,
+            "Iceland Krona"
+          ],
+          [
+            "INR",
+            356,
+            "Indian Rupee"
+          ],
+          [
+            "IDR",
+            360,
+            "Rupiah"
+          ],
+          [
+            "IRR",
+            364,
+            "Iranian Rial"
+          ],
+          [
+            "IQD",
+            368,
+            "Iraqi Dinar"
+          ],
+          [
+            "ILS",
+            376,
+            "New Israeli Sheqel"
+          ],
+          [
+            "JMD",
+            388,
+            "Jamaican Dollar"
+          ],
+          [
+            "JPY",
+            392,
+            "Yen"
+          ],
+          [
+            "KZT",
+            398,
+            "Tenge"
+          ],
+          [
+            "JOD",
+            400,
+            "Jordanian Dinar"
+          ],
+          [
+            "KES",
+            404,
+            "Kenyan Shilling"
+          ],
+          [
+            "KPW",
+            408,
+            "North Korean Won"
+          ],
+          [
+            "KRW",
+            410,
+            "Won"
+          ],
+          [
+            "KWD",
+            414,
+            "Kuwaiti Dinar"
+          ],
+          [
+            "KGS",
+            417,
+            "Som"
+          ],
+          [
+            "LAK",
+            418,
+            "Lao Kip"
+          ],
+          [
+            "LBP",
+            422,
+            "Lebanese Pound"
+          ],
+          [
+            "LSL",
+            426,
+            "Loti"
+          ],
+          [
+            "LRD",
+            430,
+            "Liberian Dollar"
+          ],
+          [
+            "LYD",
+            434,
+            "Libyan Dinar"
+          ],
+          [
+            "MOP",
+            446,
+            "Pataca"
+          ],
+          [
+            "MWK",
+            454,
+            "Malawi Kwacha"
+          ],
+          [
+            "MYR",
+            458,
+            "Malaysian Ringgit"
+          ],
+          [
+            "MVR",
+            462,
+            "Rufiyaa"
+          ],
+          [
+            "MUR",
+            480,
+            "Mauritius Rupee"
+          ],
+          [
+            "MXN",
+            484,
+            "Mexican Peso"
+          ],
+          [
+            "MNT",
+            496,
+            "Tugrik"
+          ],
+          [
+            "MDL",
+            498,
+            "Moldovan Leu"
+          ],
+          [
+            "MAD",
+            504,
+            "Moroccan Dirham"
+          ],
+          [
+            "OMR",
+            512,
+            "Rial Omani"
+          ],
+          [
+            "NAD",
+            516,
+            "Namibia Dollar"
+          ],
+          [
+            "NPR",
+            524,
+            "Nepalese Rupee"
+          ],
+          [
+            "ANG",
+            532,
+            "Netherlands Antillean Guilder"
+          ],
+          [
+            "AWG",
+            533,
+            "Aruban Florin"
+          ],
+          [
+            "VUV",
+            548,
+            "Vatu"
+          ],
+          [
+            "NZD",
+            554,
+            "New Zealand Dollar"
+          ],
+          [
+            "NIO",
+            558,
+            "Cordoba Oro"
+          ],
+          [
+            "NGN",
+            566,
+            "Naira"
+          ],
+          [
+            "NOK",
+            578,
+            "Norwegian Krone"
+          ],
+          [
+            "PKR",
+            586,
+            "Pakistan Rupee"
+          ],
+          [
+            "PAB",
+            590,
+            "Balboa"
+          ],
+          [
+            "PGK",
+            598,
+            "Kina"
+          ],
+          [
+            "PYG",
+            600,
+            "Guarani"
+          ],
+          [
+            "PEN",
+            604,
+            "Sol"
+          ],
+          [
+            "PHP",
+            608,
+            "Philippine Peso"
+          ],
+          [
+            "QAR",
+            634,
+            "Qatari Rial"
+          ],
+          [
+            "RUB",
+            643,
+            "Russian Ruble"
+          ],
+          [
+            "RWF",
+            646,
+            "Rwanda Franc"
+          ],
+          [
+            "SHP",
+            654,
+            "Saint Helena Pound"
+          ],
+          [
+            "SAR",
+            682,
+            "Saudi Riyal"
+          ],
+          [
+            "SCR",
+            690,
+            "Seychelles Rupee"
+          ],
+          [
+            "SGD",
+            702,
+            "Singapore Dollar"
+          ],
+          [
+            "VND",
+            704,
+            "Dong"
+          ],
+          [
+            "SOS",
+            706,
+            "Somali Shilling"
+          ],
+          [
+            "ZAR",
+            710,
+            "Rand"
+          ],
+          [
+            "SSP",
+            728,
+            "South Sudanese Pound"
+          ],
+          [
+            "SZL",
+            748,
+            "Lilangeni"
+          ],
+          [
+            "SEK",
+            752,
+            "Swedish Krona"
+          ],
+          [
+            "CHF",
+            756,
+            "Swiss Franc"
+          ],
+          [
+            "SYP",
+            760,
+            "Syrian Pound"
+          ],
+          [
+            "THB",
+            764,
+            "Baht"
+          ],
+          [
+            "TOP",
+            776,
+            "Pa’anga"
+          ],
+          [
+            "TTD",
+            780,
+            "Trinidad and Tobago Dollar"
+          ],
+          [
+            "AED",
+            784,
+            "UAE Dirham"
+          ],
+          [
+            "TND",
+            788,
+            "Tunisian Dinar"
+          ],
+          [
+            "UGX",
+            800,
+            "Uganda Shilling"
+          ],
+          [
+            "MKD",
+            807,
+            "Denar"
+          ],
+          [
+            "EGP",
+            818,
+            "Egyptian Pound"
+          ],
+          [
+            "GBP",
+            826,
+            "Pound Sterling"
+          ],
+          [
+            "TZS",
+            834,
+            "Tanzanian Shilling"
+          ],
+          [
+            "USD",
+            840,
+            "US Dollar"
+          ],
+          [
+            "UYU",
+            858,
+            "Peso Uruguayo"
+          ],
+          [
+            "UZS",
+            860,
+            "Uzbekistan Sum"
+          ],
+          [
+            "WST",
+            882,
+            "Tala"
+          ],
+          [
+            "YER",
+            886,
+            "Yemeni Rial"
+          ],
+          [
+            "TWD",
+            901,
+            "New Taiwan Dollar"
+          ],
+          [
+            "SLE",
+            925,
+            "Leone"
+          ],
+          [
+            "VED",
+            926,
+            "Bolívar Soberano"
+          ],
+          [
+            "UYW",
+            927,
+            "Unidad Previsional"
+          ],
+          [
+            "VES",
+            928,
+            "Bolívar Soberano"
+          ],
+          [
+            "MRU",
+            929,
+            "Ouguiya"
+          ],
+          [
+            "STN",
+            930,
+            "Dobra"
+          ],
+          [
+            "CUC",
+            931,
+            "Peso Convertible"
+          ],
+          [
+            "ZWL",
+            932,
+            "Zimbabwe Dollar"
+          ],
+          [
+            "BYN",
+            933,
+            "Belarusian Ruble"
+          ],
+          [
+            "TMT",
+            934,
+            "Turkmenistan New Manat"
+          ],
+          [
+            "GHS",
+            936,
+            "Ghana Cedi"
+          ],
+          [
+            "SDG",
+            938,
+            "Sudanese Pound"
+          ],
+          [
+            "UYI",
+            940,
+            "[object Object]"
+          ],
+          [
+            "RSD",
+            941,
+            "Serbian Dinar"
+          ],
+          [
+            "MZN",
+            943,
+            "Mozambique Metical"
+          ],
+          [
+            "AZN",
+            944,
+            "Azerbaijan Manat"
+          ],
+          [
+            "RON",
+            946,
+            "Romanian Leu"
+          ],
+          [
+            "CHE",
+            947,
+            "[object Object]"
+          ],
+          [
+            "CHW",
+            948,
+            "[object Object]"
+          ],
+          [
+            "TRY",
+            949,
+            "Turkish Lira"
+          ],
+          [
+            "XAF",
+            950,
+            "CFA Franc BEAC"
+          ],
+          [
+            "XCD",
+            951,
+            "East Caribbean Dollar"
+          ],
+          [
+            "XOF",
+            952,
+            "CFA Franc BCEAO"
+          ],
+          [
+            "XPF",
+            953,
+            "CFP Franc"
+          ],
+          [
+            "XBA",
+            955,
+            "Bond Markets Unit European Composite Unit (EURCO)"
+          ],
+          [
+            "XBB",
+            956,
+            "Bond Markets Unit European Monetary Unit (E.M.U.-6)"
+          ],
+          [
+            "XBC",
+            957,
+            "Bond Markets Unit European Unit of Account 9 (E.U.A.-9)"
+          ],
+          [
+            "XBD",
+            958,
+            "Bond Markets Unit European Unit of Account 17 (E.U.A.-17)"
+          ],
+          [
+            "XAU",
+            959,
+            "Gold"
+          ],
+          [
+            "XDR",
+            960,
+            "SDR (Special Drawing Right)"
+          ],
+          [
+            "XAG",
+            961,
+            "Silver"
+          ],
+          [
+            "XPT",
+            962,
+            "Platinum"
+          ],
+          [
+            "XTS",
+            963,
+            "Codes specifically reserved for testing purposes"
+          ],
+          [
+            "XPD",
+            964,
+            "Palladium"
+          ],
+          [
+            "XUA",
+            965,
+            "ADB Unit of Account"
+          ],
+          [
+            "ZMW",
+            967,
+            "Zambian Kwacha"
+          ],
+          [
+            "SRD",
+            968,
+            "Surinam Dollar"
+          ],
+          [
+            "MGA",
+            969,
+            "Malagasy Ariary"
+          ],
+          [
+            "COU",
+            970,
+            "[object Object]"
+          ],
+          [
+            "AFN",
+            971,
+            "Afghani"
+          ],
+          [
+            "TJS",
+            972,
+            "Somoni"
+          ],
+          [
+            "AOA",
+            973,
+            "Kwanza"
+          ],
+          [
+            "BGN",
+            975,
+            "Bulgarian Lev"
+          ],
+          [
+            "CDF",
+            976,
+            "Congolese Franc"
+          ],
+          [
+            "BAM",
+            977,
+            "Convertible Mark"
+          ],
+          [
+            "EUR",
+            978,
+            "Euro"
+          ],
+          [
+            "MXV",
+            979,
+            "[object Object]"
+          ],
+          [
+            "UAH",
+            980,
+            "Hryvnia"
+          ],
+          [
+            "GEL",
+            981,
+            "Lari"
+          ],
+          [
+            "BOV",
+            984,
+            "[object Object]"
+          ],
+          [
+            "PLN",
+            985,
+            "Zloty"
+          ],
+          [
+            "BRL",
+            986,
+            "Brazilian Real"
+          ],
+          [
+            "CLF",
+            990,
+            "[object Object]"
+          ],
+          [
+            "XSU",
+            994,
+            "Sucre"
+          ],
+          [
+            "USN",
+            997,
+            "[object Object]"
+          ],
+          [
+            "XXX",
+            999,
+            "The codes assigned for transactions where no currency is involved"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "NominalValueType",
+        "description": "Type of the product's nominal value (no nominal, constant or unknown).",
+        "underlying": "u8",
+        "variants": [
+          [
+            "NotApplicable",
+            1,
+            "Not applicable."
+          ],
+          [
+            "Constant",
+            2,
+            "Indicates that the security has a constant nominal value."
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "OrderSide",
+        "description": "Indicates order side (buy or sell).",
+        "underlying": "u8",
+        "variants": [
+          [
+            "Buy",
+            1,
+            "Buy order."
+          ],
+          [
+            "Sell",
+            2,
+            "Sell order."
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "PriceExpressionType",
+        "description": "Price expression type for the financial instrument.",
+        "underlying": "u8",
+        "variants": [
+          [
+            "Price",
+            1,
+            "Price expressed as absolute value."
+          ],
+          [
+            "Percentage",
+            2,
+            "Price expressed as percentage."
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "PriorityFlag",
+        "description": "Priority loss flag.",
+        "underlying": "u8",
+        "variants": [
+          [
+            "Lost",
+            1,
+            "Order modification caused loss of priority."
+          ],
+          [
+            "Retained",
+            2,
+            "Order modification did not cause loss of priority."
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "ProductIdentificationType",
+        "description": "Type of product identification (for example ISIN or SEDOL).",
+        "underlying": "u8",
+        "variants": [
+          [
+            "ISIN",
+            1,
+            "Financial instrument's ISIN."
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "ProductType",
+        "underlying": "u8",
+        "variants": [
+          [
+            "FinancialProductShare",
+            1,
+            "Equity"
+          ],
+          [
+            "FinancialProductBond",
+            2,
+            "Fixed income"
+          ],
+          [
+            "FinancialProductDerivativeFutures",
+            3,
+            "Futures"
+          ],
+          [
+            "FinancialProductDerivativeOptions",
+            4,
+            "Options"
+          ],
+          [
+            "FinancialProductIndex",
+            5,
+            "Index"
+          ],
+          [
+            "FinancialProductCurrency",
+            6,
+            "Currency"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "InstrumentStatus",
+        "description": "Financial instrument status.",
+        "underlying": "u8",
+        "variants": [
+          [
+            "Active",
+            1,
+            "Financial instrument is active."
+          ],
+          [
+            "Inactive",
+            2,
+            "Financial instrument is inactive and is not trading."
+          ],
+          [
+            "MarketOperationsSuspension",
+            3,
+            "Manual suspension by Market Operations."
+          ],
+          [
+            "OutsideCollarsStatic",
+            4,
+            "Outside static trade price collars."
+          ],
+          [
+            "OutsideCollarsDynamic",
+            5,
+            "Outside dynamic trade price collars."
+          ],
+          [
+            "RegulatorySuspension",
+            6,
+            "Regulatory suspension"
+          ],
+          [
+            "TechnicalHalt",
+            7,
+            "TechnicalHalt."
+          ],
+          [
+            "HybridNoQuotes",
+            8,
+            "Hybrid no valid quotes."
+          ],
+          [
+            "HybridPause",
+            9,
+            "Hybrid pause."
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "TradingPhaseType",
+        "description": "Type of matching algorithm.",
+        "underlying": "u8",
+        "variants": [
+          [
+            "ContinuousPriceTime",
+            1,
+            "Continuous price and time."
+          ],
+          [
+            "ContinuousRefPriceTime",
+            2,
+            "Continuous time at reference price."
+          ],
+          [
+            "ContinuousLastAuctionTime",
+            3,
+            "Trade at last."
+          ],
+          [
+            "AuctionOpening",
+            4,
+            "Auction opening."
+          ],
+          [
+            "BlockExactMatching",
+            5,
+            "Block transaction, exact matching."
+          ],
+          [
+            "NoTradingClosed",
+            6,
+            "Trading disabled, no matching."
+          ],
+          [
+            "Uncrossing",
+            7,
+            "Uncrossing."
+          ],
+          [
+            "AuctionClosing",
+            8,
+            "Auction closing."
+          ],
+          [
+            "AuctionIntraday",
+            9,
+            "Auction intraday."
+          ],
+          [
+            "AuctionVolatilityStatic",
+            10,
+            "Auction volatility static."
+          ],
+          [
+            "AuctionVolatilityDynamic",
+            11,
+            "Auction volatility dynamic."
+          ],
+          [
+            "AuctionExtendedVolatilityStatic",
+            12,
+            "Auction extended volatility static."
+          ],
+          [
+            "AuctionExtendedVolatilityDynamic",
+            13,
+            "Auction extended volatility dynamic."
+          ],
+          [
+            "NoTradingEarlyMonitoring",
+            14,
+            "Early Monitoring"
+          ],
+          [
+            "NoTradingLateMonitoring",
+            15,
+            "Late Monitoring"
+          ],
+          [
+            "Hybrid",
+            16,
+            "Hybrid normal trading"
+          ],
+          [
+            "HybridBuyOnly",
+            17,
+            "Hybrid buy only phase"
+          ],
+          [
+            "HybridPreTrade",
+            18,
+            "Hybrid pre trade phase"
+          ],
+          [
+            "UnsuspensionAuction",
+            19,
+            "Auction after suspension"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "IndexLevelCode",
+        "description": "Enumeration of index levels.",
+        "underlying": "u8",
+        "variants": [
+          [
+            "PreviousClosingValue",
+            1,
+            "Closing index value from previous session (reference index)."
+          ],
+          [
+            "TheoreticalValueBeforeOpening",
+            2,
+            "Theoretical opening index before opening the session."
+          ],
+          [
+            "ValueBeforeOpening",
+            3,
+            "Theoretical value of the index before its opening."
+          ],
+          [
+            "OpeningValue",
+            4,
+            "Index opening value."
+          ],
+          [
+            "CurrentValue",
+            5,
+            "Current index value."
+          ],
+          [
+            "PreClosingValue",
+            6,
+            "Preliminary closing value."
+          ],
+          [
+            "ClosingValue",
+            7,
+            "Closing index value."
+          ],
+          [
+            "ValueWithoutOpening",
+            8,
+            "Index value without opening."
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "IndexPublicationSchedule",
+        "description": "Mode of index dissemination.",
+        "underlying": "u8",
+        "variants": [
+          [
+            "Continuous",
+            1,
+            "Index is quoted in determined time intervals."
+          ],
+          [
+            "Fixing",
+            2,
+            "Index is quoted on determined hours."
+          ],
+          [
+            "Closing",
+            3,
+            "Index is quoted on closing."
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "IndexType",
+        "description": "Type of index.",
+        "underlying": "u8",
+        "variants": [
+          [
+            "W",
+            1,
+            "WSE index from the main or alternative markets."
+          ],
+          [
+            "Z",
+            2,
+            "External index."
+          ],
+          [
+            "V",
+            3,
+            "Another WSE information product."
+          ],
+          [
+            "M",
+            4,
+            "WSE strategy dividend point index."
+          ],
+          [
+            "S",
+            5,
+            "WSE strategy index of short type."
+          ],
+          [
+            "L",
+            6,
+            "WSE strategy index of leverage type."
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "ClosingPriceType",
+        "description": "Closing Price Type",
+        "underlying": "u8",
+        "variants": [
+          [
+            "LTP",
+            1,
+            "0 = LTP"
+          ],
+          [
+            "LastACP",
+            2,
+            "1 = Last ACP"
+          ],
+          [
+            "FairValue",
+            3,
+            "2 = Fair Value"
+          ],
+          [
+            "DailySettlementPrice",
+            4,
+            "3 = Daily Settlement Price"
+          ],
+          [
+            "FinalSettlementPrice",
+            5,
+            "4 = Final Settlement Price"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "AdjustedClosingPriceReason",
+        "description": "Adjusted Closing Price Reason",
+        "underlying": "u8",
+        "variants": [
+          [
+            "Regular",
+            1,
+            "0 = Regular"
+          ],
+          [
+            "Dividend",
+            2,
+            "1 = Dividend"
+          ],
+          [
+            "IssueRight",
+            3,
+            "2 = Issue Right"
+          ],
+          [
+            "Split",
+            4,
+            "3 = Split"
+          ],
+          [
+            "ReverseSplit",
+            5,
+            "4 = Reverse Split"
+          ],
+          [
+            "Bonus",
+            6,
+            "5 = Bonus"
+          ],
+          [
+            "SpinOff",
+            7,
+            "6 = Spin-Off"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "Market",
+        "description": "Defines the market the instrument belongs to.",
+        "underlying": "u8",
+        "variants": [
+          [
+            "Primary",
+            1,
+            "Primary market."
+          ],
+          [
+            "Parallel",
+            2,
+            "Parallel market."
+          ],
+          [
+            "NewConnectPriceDriven",
+            3,
+            "New Connect Market (price driven market)."
+          ],
+          [
+            "NewConnectOrderDriven",
+            4,
+            "New Connect Market (order driven market)."
+          ],
+          [
+            "CatalystRegulated",
+            5,
+            "Catalyst Regulated Market."
+          ],
+          [
+            "CatalystAso",
+            6,
+            " Catalyst ASO."
+          ],
+          [
+            "Other",
+            7,
+            "Other market."
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "ChangeIndicator",
+        "description": "Defines a vaule change indicator (e.g. market price).",
+        "underlying": "u8",
+        "variants": [
+          [
+            "Increase",
+            1,
+            "Increase."
+          ],
+          [
+            "Decrease",
+            2,
+            "Decrease."
+          ],
+          [
+            "NoChange",
+            3,
+            "No change."
+          ],
+          [
+            "NotApplicable",
+            4,
+            "Not Applicable."
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "QuotationSystem",
+        "description": "Quotation system",
+        "underlying": "u8",
+        "variants": [
+          [
+            "SinglePriceSingleFixing",
+            1,
+            "Single price quotation system with a single fixing."
+          ],
+          [
+            "ContinuousTrading",
+            2,
+            "Continuous trading."
+          ],
+          [
+            "SinglePriceTwoFixings",
+            3,
+            "Single price quotation system with two fixings."
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "ExcerciseType",
+        "description": "Dictionary with option exercise styles",
+        "underlying": "u8",
+        "variants": [
+          [
+            "AMER",
+            1,
+            "AMER"
+          ],
+          [
+            "EURO",
+            2,
+            "EURO"
+          ],
+          [
+            "NA",
+            3,
+            "Not applicable"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "Country",
+        "description": "Coutry codes based on ISO 3166",
+        "underlying": "u16",
+        "variants": [
+          [
+            "AUS",
+            36,
+            "Australia"
+          ],
+          [
+            "AUT",
+            40,
+            "Austria"
+          ],
+          [
+            "BEL",
+            56,
+            "Belgium"
+          ],
+          [
+            "BGR",
+            100,
+            "Bulgaria"
+          ],
+          [
+            "CAN",
+            124,
+            "Canada"
+          ],
+          [
+            "CYP",
+            196,
+            "Cyprus"
+          ],
+          [
+            "CZE",
+            203,
+            "Czechia"
+          ],
+          [
+            "EST",
+            233,
+            "Estonia"
+          ],
+          [
+            "FRA",
+            250,
+            "France"
+          ],
+          [
+            "DEU",
+            276,
+            "Germany"
+          ],
+          [
+            "HUN",
+            348,
+            "Hungary"
+          ],
+          [
+            "IRL",
+            372,
+            "Ireland"
+          ],
+          [
+            "ISR",
+            376,
+            "Israel"
+          ],
+          [
+            "ITA",
+            380,
+            "Italy"
+          ],
+          [
+            "LTU",
+            440,
+            "Lithuania"
+          ],
+          [
+            "LUX",
+            442,
+            "Luxembourg"
+          ],
+          [
+            "NLD",
+            528,
+            "Netherlands (the)"
+          ],
+          [
+            "POL",
+            616,
+            "Poland"
+          ],
+          [
+            "PRT",
+            620,
+            "Portugal"
+          ],
+          [
+            "ROU",
+            642,
+            "Romania"
+          ],
+          [
+            "SVK",
+            703,
+            "Slovakia"
+          ],
+          [
+            "SVN",
+            705,
+            "Slovenia"
+          ],
+          [
+            "ESP",
+            724,
+            "Spain"
+          ],
+          [
+            "SWE",
+            752,
+            "Sweden"
+          ],
+          [
+            "UKR",
+            804,
+            "Ukraine"
+          ],
+          [
+            "GBR",
+            826,
+            "United Kingdom of Great Britain and Northern Ireland (the)"
+          ],
+          [
+            "USA",
+            840,
+            "United States of America (the)"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "UsIndicator",
+        "description": "US Regulation S indicator.",
+        "underlying": "u8",
+        "variants": [
+          [
+            "NotApplicable",
+            1,
+            "No trading restrictions."
+          ],
+          [
+            "RegulationS",
+            2,
+            "Trading restricted due to US Regulation S."
+          ],
+          [
+            "RegulationSPlusRule144A",
+            3,
+            "Trading restricted due to US Regulation S with Rule 144A."
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "SettlementType",
+        "description": "Indicates settlement type of the derivative.",
+        "underlying": "u8",
+        "variants": [
+          [
+            "NotApplicable",
+            1,
+            "Not applicable."
+          ],
+          [
+            "CashSettlement",
+            2,
+            "Derivatives are settled in cash."
+          ],
+          [
+            "PhysicalDelivery",
+            3,
+            "Derivatives are settled as physical delivery of the underlying."
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "OptionType",
+        "description": "Type of option.",
+        "underlying": "u8",
+        "variants": [
+          [
+            "NotApplicable",
+            1,
+            "Not applicable."
+          ],
+          [
+            "Call",
+            2,
+            "Call option."
+          ],
+          [
+            "Put",
+            3,
+            "Put option."
+          ]
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "PublicProductIdentification",
+        "description": "Product identification based on well known identification types, such as ISIN.",
+        "fields": [
+          {
+            "name": "productIdentification",
+            "type": "ProductIdentification",
+            "description": "Product identification, for example its ISIN code."
+          },
+          {
+            "name": "productIdentificationType",
+            "type": "ProductIdentificationType",
+            "description": "Type of product identification."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "Header",
+        "description": "Market Data message header.",
+        "fields": [
+          {
+            "name": "length",
+            "type": "MsgLength",
+            "description": "Message length."
+          },
+          {
+            "name": "msgType",
+            "type": "MsgType",
+            "description": "Type of message (e.g. OrderExecute)."
+          },
+          {
+            "name": "version",
+            "type": "MsgVersion",
+            "description": "Version of the Market Data protocol."
+          },
+          {
+            "name": "seqNum",
+            "type": "SeqNum",
+            "description": "Sequence number of the message added by the Market Data Sequencer."
+          },
+          {
+            "name": "timestamp",
+            "type": "Timestamp",
+            "description": "Timestamp indicating when the message was sequenced."
+          },
+          {
+            "name": "sourceTimestamp",
+            "type": "Timestamp",
+            "description": "Timestamp added by the service which sent the message."
+          },
+          {
+            "name": "isEncrypted",
+            "type": "bool",
+            "description": "True if message is encrypted."
+          },
+          {
+            "name": "encryptionOffset",
+            "type": "u64",
+            "description": "Encryption byte offset."
+          },
+          {
+            "name": "encryptionKeyId",
+            "type": "ElementId",
+            "description": "Reference to an EncryptionKey message."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "AccruedInterestTableEntry",
+        "description": "Message describing an accrued interest table entry.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "productId",
+            "type": "ElementId"
+          },
+          {
+            "name": "accruedInterestTableEntryDate",
+            "type": "Date",
+            "description": "Accrued interest table entry date."
+          },
+          {
+            "name": "accruedInterestTableEntryValue",
+            "type": "Number",
+            "description": "Accrued interest table entry value."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "AuctionUpdate",
+        "description": "Updates IMP/IMV and BBO during an auction.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "instrumentId",
+            "type": "ElementId",
+            "description": "ID of financial instrument."
+          },
+          {
+            "name": "indicativeMatchingPrice",
+            "type": "Price",
+            "description": "Indicative Matching Price (IMP)."
+          },
+          {
+            "name": "indicativeMatchingVolume",
+            "type": "Quantity",
+            "description": "Indicative Matching Volume (IMV)."
+          },
+          {
+            "name": "totalSellQuantityAtImp",
+            "type": "Quantity",
+            "description": "Total sell quantity at IMP."
+          },
+          {
+            "name": "totalBuyQuantityAtImp",
+            "type": "Quantity",
+            "description": "Total buy quantity at IMP."
+          },
+          {
+            "name": "bestSellLevel",
+            "type": "Price",
+            "description": "Best sell price level (1st BBO level)."
+          },
+          {
+            "name": "bestSellLevelQuantity",
+            "type": "Quantity",
+            "description": "Quantity at the best sell price level."
+          },
+          {
+            "name": "bestBuyLevel",
+            "type": "Price",
+            "description": "Best buy price level (1st BBO level)."
+          },
+          {
+            "name": "bestBuyLevelQuantity",
+            "type": "Quantity",
+            "description": "Quantity at the best buy price level."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "CalendarException",
+        "description": "Upcoming calendar day exception.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "calendarId",
+            "type": "ElementId",
+            "description": "Calendar ID."
+          },
+          {
+            "name": "calendarExceptionDate",
+            "type": "Date",
+            "description": "Calendar exception date."
+          },
+          {
+            "name": "calendarExceptionRecurrent",
+            "type": "bool",
+            "description": "True if the calendar exception is recurring."
+          },
+          {
+            "name": "calendarExceptionType",
+            "type": "CalendarExceptionType",
+            "description": "Calendar exception type."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "CollarGroup",
+        "description": "Message defining a collar group.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "id",
+            "type": "ElementId",
+            "description": "Collar group ID."
+          },
+          {
+            "name": "orderStaticCollarTableId",
+            "type": "ElementId",
+            "description": "Collar table ID."
+          },
+          {
+            "name": "orderDynamicCollarTableId",
+            "type": "ElementId",
+            "description": "Collar table ID."
+          },
+          {
+            "name": "tradeStaticCollarTableId",
+            "type": "ElementId",
+            "description": "Collar table ID."
+          },
+          {
+            "name": "tradeDynamicCollarTableId",
+            "type": "ElementId",
+            "description": "Collar table ID."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "CollarTableEntry",
+        "description": "Collar table definition.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "collarTableId",
+            "type": "ElementId",
+            "description": "Collar table ID."
+          },
+          {
+            "name": "collarMode",
+            "type": "CollarMode",
+            "description": "Collar mode (trade price collar or order price collar)."
+          },
+          {
+            "name": "collarExpression",
+            "type": "ExpressionType",
+            "description": "Collar expression (percentage or absolute value in reference price)."
+          },
+          {
+            "name": "collarLowerBound",
+            "type": "Bound",
+            "description": "Collar lower bound."
+          },
+          {
+            "name": "collarValue",
+            "type": "CollarValue",
+            "description": "Collar value."
+          },
+          {
+            "name": "collarLowerBid",
+            "type": "Bound",
+            "description": "Lower bid collar."
+          },
+          {
+            "name": "collarUpperBid",
+            "type": "Bound",
+            "description": "Upper bid collar."
+          },
+          {
+            "name": "collarUpperAsk",
+            "type": "Bound",
+            "description": "Upper ask collar."
+          },
+          {
+            "name": "collarLowerAsk",
+            "type": "Bound",
+            "description": "Lower ask collar."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "EncryptionKey",
+        "description": "Encryption key and ID.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "id",
+            "type": "ElementId",
+            "description": "Encryption key ID."
+          },
+          {
+            "name": "secretKey",
+            "type": "EncryptionGroupKey",
+            "description": "Secret Key value."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "EndOfTechnicalSession",
+        "description": "End of a technical session.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "sessionId",
+            "type": "SessionId",
+            "description": "ID of the session."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "Heartbeat",
+        "description": "A message type used to check connectivity.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "IndexationTableEntry",
+        "description": "Message describing an indexation table entry.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "productId",
+            "type": "ElementId",
+            "description": "Product ID."
+          },
+          {
+            "name": "indexationTableEntryDate",
+            "type": "Date",
+            "description": "Indexation table entry date."
+          },
+          {
+            "name": "indexationTableEntryValue",
+            "type": "Number",
+            "description": "Indexation table entry value."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "MarketStructure",
+        "description": "Messages defining the Trading Venue’s market structure.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "id",
+            "type": "ElementId",
+            "description": "ID of the market structure."
+          },
+          {
+            "name": "parentId",
+            "type": "ElementId",
+            "description": "ID of the market structure's parent market structure if the market structure is a sub-structure. Set to '0' (zero) if no parent market structure."
+          },
+          {
+            "name": "mic",
+            "type": "MicCode",
+            "description": "Market structure's Market Identifier Code (MIC) as specified in ISO 10383."
+          },
+          {
+            "name": "name",
+            "type": "Name",
+            "description": "Market structure name assigned by market operator."
+          },
+          {
+            "name": "marketModelType",
+            "type": "MarketModelType",
+            "description": "Market model type."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "OrderAdd",
+        "description": "New (limit) order added to order book.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "publicOrderId",
+            "type": "PublicOrderId",
+            "description": "Order identifier (ID). "
+          },
+          {
+            "name": "instrumentId",
+            "type": "ElementId",
+            "description": "ID of financial instrument."
+          },
+          {
+            "name": "side",
+            "type": "OrderSide",
+            "description": "Order side (buy or sell)."
+          },
+          {
+            "name": "price",
+            "type": "Price",
+            "description": "Order (limit) price."
+          },
+          {
+            "name": "quantity",
+            "type": "Quantity",
+            "description": "Order quantity."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "OrderDelete",
+        "description": "Order deleted.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "instrumentId",
+            "type": "ElementId",
+            "description": "ID of financial instrument."
+          },
+          {
+            "name": "publicOrderId",
+            "type": "PublicOrderId",
+            "description": "Order identifier (ID)."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "OrderExecute",
+        "description": "Execution report.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "quantity",
+            "type": "Quantity",
+            "description": "Remaining un-executed order quantity."
+          },
+          {
+            "name": "instrumentId",
+            "type": "ElementId",
+            "description": "ID of financial instrument."
+          },
+          {
+            "name": "publicOrderId",
+            "type": "PublicOrderId",
+            "description": "Order identifier (ID)."
+          },
+          {
+            "name": "executionId",
+            "type": "TradeId",
+            "description": "ID of the underlying trade (equal to TradeID in Trade.)"
+          },
+          {
+            "name": "executionPrice",
+            "type": "Price",
+            "description": "Price at which the order was executed."
+          },
+          {
+            "name": "executionQuantity",
+            "type": "Quantity",
+            "description": "The order’s executed quantity."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "OrderModify",
+        "description": "Order modified.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "instrumentId",
+            "type": "ElementId",
+            "description": "ID of financial instrument."
+          },
+          {
+            "name": "publicOrderId",
+            "type": "PublicOrderId",
+            "description": "Order identifier (ID)."
+          },
+          {
+            "name": "price",
+            "type": "Price",
+            "description": "New order price."
+          },
+          {
+            "name": "quantity",
+            "type": "Quantity",
+            "description": "New order quantity."
+          },
+          {
+            "name": "priorityFlag",
+            "type": "PriorityFlag",
+            "description": "Priority loss flag."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "TopPriceLevelUpdate",
+        "description": "BBO Level 1.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "instrumentId",
+            "type": "ElementId",
+            "description": "ID of financial instrument."
+          },
+          {
+            "name": "price",
+            "type": "Price",
+            "description": "BBO level 1 price level in currency units."
+          },
+          {
+            "name": "quantity",
+            "type": "Quantity",
+            "description": "BBO level 1 quantity at price level."
+          },
+          {
+            "name": "side",
+            "type": "OrderSide",
+            "description": "Side (buy or sell)."
+          },
+          {
+            "name": "orderCount",
+            "type": "OrderCount",
+            "description": "Number of open orders at BBO level 1."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "PriceLevelSnapshot",
+        "description": "BBO price levels and volumes.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "instrumentId",
+            "type": "ElementId",
+            "description": "ID of financial instrument."
+          },
+          {
+            "name": "maxDepth",
+            "type": "u8",
+            "description": "The number of BBO levels contained in the message."
+          },
+          {
+            "name": "buy",
+            "type": "PriceLevels",
+            "description": "Price levels for buy side."
+          },
+          {
+            "name": "sell",
+            "type": "PriceLevels",
+            "description": "Price levels for sell side."
+          }
+        ]
+      },
+      {
+        "kind": "Array",
+        "name": "PriceLevels",
+        "type": "PriceLevel",
+        "length": 10,
+        "description": "PriceLevel table. Array size refers to BBO levels."
+      },
+      {
+        "kind": "Struct",
+        "name": "PriceLevel",
+        "description": "Data type for storing snapshot price level.",
+        "fields": [
+          {
+            "name": "isEncrypted",
+            "type": "bool",
+            "description": "A boolean value specifying whether the level is encrypted."
+          },
+          {
+            "name": "encryptionOffset",
+            "type": "u64",
+            "description": "Encryption byte offset."
+          },
+          {
+            "name": "encryptionKeyId",
+            "type": "ElementId",
+            "description": "Encryption Key ID - reference to a EncryptionKey message."
+          },
+          {
+            "name": "price",
+            "type": "Price",
+            "description": "Price level in currency units."
+          },
+          {
+            "name": "quantity",
+            "type": "Quantity",
+            "description": "Quantity of securities available at a given price level."
+          },
+          {
+            "name": "orderCount",
+            "type": "OrderCount",
+            "description": "Number of open orders at a given price level."
+          }
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "PriceType",
+        "underlying": "u8",
+        "description": "Price type.",
+        "variants": [
+          [
+            "ReferencePrice",
+            1
+          ],
+          [
+            "MidPoint",
+            2
+          ]
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "PriceUpdate",
+        "description": "Message indicating a price update",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "instrumentId",
+            "type": "ElementId",
+            "description": "Instrument to which the price update refers."
+          },
+          {
+            "name": "priceType",
+            "type": "PriceType",
+            "description": "Price type."
+          },
+          {
+            "name": "price",
+            "type": "Price",
+            "description": "Indicates the updated price."
+          }
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "CollarType",
+        "underlying": "u8",
+        "description": "Collar type can be dynamic or static.",
+        "variants": [
+          [
+            "Static",
+            1
+          ],
+          [
+            "Dynamic",
+            2
+          ]
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "OrderCollars",
+        "description": "New order price collars.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "instrumentId",
+            "type": "ElementId",
+            "description": "ID of financial instrument."
+          },
+          {
+            "name": "collarType",
+            "type": "CollarType",
+            "description": "Collars type."
+          },
+          {
+            "name": "price",
+            "type": "Price",
+            "description": "The reference price."
+          },
+          {
+            "name": "lowerBid",
+            "type": "Bound",
+            "description": "Value of the lower bid Price collar."
+          },
+          {
+            "name": "upperBid",
+            "type": "Bound",
+            "description": "Value of the upper bid Price collar."
+          },
+          {
+            "name": "lowerAsk",
+            "type": "Bound",
+            "description": "Value of the lower ask Price collar."
+          },
+          {
+            "name": "upperAsk",
+            "type": "Bound",
+            "description": "Value of the upper ask Price collar."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "TradeCollars",
+        "description": "New trade price collars.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "instrumentId",
+            "type": "ElementId",
+            "description": "ID of financial instrument."
+          },
+          {
+            "name": "collarType",
+            "type": "CollarType",
+            "description": "Collar type."
+          },
+          {
+            "name": "price",
+            "type": "Price",
+            "description": "The reference price."
+          },
+          {
+            "name": "lower",
+            "type": "Bound",
+            "description": "Value of the lower Price collar."
+          },
+          {
+            "name": "upper",
+            "type": "Bound",
+            "description": "Value of the upper Price collar."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "ReferenceDataEnd",
+        "description": "Marks the end of the reference data.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "ReferenceDataStart",
+        "description": "Marks the start of the reference data.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "StartOfTechnicalSession",
+        "description": "Start of a technical session.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "sessionId",
+            "type": "SessionId",
+            "description": "ID of the session."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "Test",
+        "description": "A message used to test system operation.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "timestampA",
+            "type": "Timestamp",
+            "description": "First Core Bus timestamp."
+          },
+          {
+            "name": "timestampB",
+            "type": "Timestamp",
+            "description": "Sequencer timestamp."
+          },
+          {
+            "name": "timestampC",
+            "type": "Timestamp",
+            "description": "Market Data timestamp."
+          },
+          {
+            "name": "timestampD",
+            "type": "Timestamp",
+            "description": "Consumer timestamp."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "Text",
+        "description": "A text message.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "text",
+            "type": "TextMessage",
+            "description": "Arbitrary text."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "TickTableEntry",
+        "description": "Tick size definition.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "tickSize",
+            "type": "TickSize",
+            "description": "Size of the tick."
+          },
+          {
+            "name": "lowerBound",
+            "type": "Bound",
+            "description": "Tick size lower bound."
+          },
+          {
+            "name": "tickTableId",
+            "type": "ElementId",
+            "description": "Tick table ID."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "Instrument",
+        "description": "Definition of a financial instrument.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "instrumentId",
+            "type": "ElementId",
+            "description": "ID of financial instrument."
+          },
+          {
+            "name": "productType",
+            "type": "ProductType",
+            "description": "Type of the product."
+          },
+          {
+            "name": "firstTradingDate",
+            "type": "Date",
+            "description": "First trading day of the financial instrument."
+          },
+          {
+            "name": "lastTradingDate",
+            "type": "Date",
+            "description": "Last trading day of the financial instrument."
+          },
+          {
+            "name": "productId",
+            "type": "ElementId",
+            "description": "Reference to financial product definition."
+          },
+          {
+            "name": "currency",
+            "type": "Currency",
+            "description": "Trading currency (e.g. USD)."
+          },
+          {
+            "name": "lotSize",
+            "type": "LotSize",
+            "description": "Lot size for the instrument."
+          },
+          {
+            "name": "priceExpressionType",
+            "type": "PriceExpressionType",
+            "description": "Price expression type for the financial instrument."
+          },
+          {
+            "name": "calendarId",
+            "type": "ElementId",
+            "description": "ID of trading calendar for the financial instrument."
+          },
+          {
+            "name": "marketStructureId",
+            "type": "ElementId",
+            "description": "ID of the financial instrument’s market segment."
+          },
+          {
+            "name": "tickTableId",
+            "type": "ElementId",
+            "description": "ID of the tick table used for the financial instrument."
+          },
+          {
+            "name": "collarGroupId",
+            "type": "ElementId",
+            "description": "Collar group ID."
+          },
+          {
+            "name": "tradingScheduleId",
+            "type": "ElementId",
+            "description": "Trading schedule ID."
+          },
+          {
+            "name": "code",
+            "type": "InstrumentCode",
+            "description": "Financial instrument code."
+          },
+          {
+            "name": "mic",
+            "type": "MicCode",
+            "description": "Market structure's Market Identifier Code (MIC) as specified in ISO 10383."
+          },
+          {
+            "name": "nominalValue",
+            "type": "Price",
+            "description": "Nominal value of the financial instrument."
+          },
+          {
+            "name": "nominalValueType",
+            "type": "NominalValueType",
+            "description": "Type of the product's nominal value (no nominal, constant or unknown)."
+          },
+          {
+            "name": "multiplier",
+            "type": "Multiplier",
+            "description": "Product value multiplier."
+          },
+          {
+            "name": "strikePrice",
+            "type": "Price",
+            "description": "Product strike price."
+          },
+          {
+            "name": "productIdentification",
+            "type": "ProductIdentification",
+            "description": "Product identification, e.g. ISIN number."
+          },
+          {
+            "name": "productIdentificationType",
+            "type": "ProductIdentificationType",
+            "description": "Type of product identification."
+          },
+          {
+            "name": "settlementCalendarId",
+            "type": "ElementId",
+            "description": "Settlement calendar ID."
+          },
+          {
+            "name": "bondCouponType",
+            "type": "CouponType",
+            "description": "Coupon type for a bond."
+          },
+          {
+            "name": "preTradeCheckMinPrice",
+            "type": "Price",
+            "description": "Minimum order price for pre-trade check."
+          },
+          {
+            "name": "preTradeCheckMaxPrice",
+            "type": "Price",
+            "description": "Maximum order price for pre-trade check."
+          },
+          {
+            "name": "preTradeCheckMinQuantity",
+            "type": "Quantity",
+            "description": "Minimum volume for pre-trade check."
+          },
+          {
+            "name": "preTradeCheckMaxQuantity",
+            "type": "Quantity",
+            "description": "Maximum volume for pre-trade check."
+          },
+          {
+            "name": "preTradeCheckMaxValue",
+            "type": "Value",
+            "description": "Maximum value for pre-trade check."
+          },
+          {
+            "name": "preTradeCheckMinValue",
+            "type": "Value",
+            "description": "Minimum value for pre-trade check."
+          },
+          {
+            "name": "liquidity",
+            "type": "bool",
+            "description": "Liquidity flag, true - liquid, false - Illiquid."
+          },
+          {
+            "name": "marketModelType",
+            "type": "MarketModelType",
+            "description": "Market Model."
+          },
+          {
+            "name": "issuer",
+            "type": "Issuer",
+            "description": "Name of the issuer."
+          },
+          {
+            "name": "issuerRegCountry",
+            "type": "Country",
+            "description": "Identifier of the country of the registration."
+          },
+          {
+            "name": "underlyingInstrumentId",
+            "type": "ElementId",
+            "description": "Identifier of the underlying instrument."
+          },
+          {
+            "name": "productCode",
+            "type": "Code",
+            "description": "Unique code of the product."
+          },
+          {
+            "name": "cfi",
+            "type": "CfiCode",
+            "description": "CFI (Classification of Financial Instrument) code."
+          },
+          {
+            "name": "fisn",
+            "type": "FisnCode",
+            "description": "Product FISN (Financial Instrument Short Name) code."
+          },
+          {
+            "name": "issueSize",
+            "type": "u64",
+            "description": "Size of the issue (depends on the issue size type)"
+          },
+          {
+            "name": "nominalCurrency",
+            "type": "Currency",
+            "description": "Identifier of the nominal currency (ISO-4217)."
+          },
+          {
+            "name": "usIndicator",
+            "type": "UsIndicator",
+            "description": "Identifier of the us indicator."
+          },
+          {
+            "name": "expiryDate",
+            "type": "Date",
+            "description": "Expiration date."
+          },
+          {
+            "name": "versionNumber",
+            "type": "u8",
+            "description": "Version of the derivative. Version is incremented when corporate event adjusting underlying closing price occurs."
+          },
+          {
+            "name": "settlementType",
+            "type": "SettlementType",
+            "description": "Identifier of settlement type."
+          },
+          {
+            "name": "optionType",
+            "type": "OptionType",
+            "description": "Identifier of option type."
+          },
+          {
+            "name": "excerciseType",
+            "type": "ExcerciseType",
+            "description": "Identifier of exercise style."
+          },
+          {
+            "name": "productName",
+            "type": "Name",
+            "description": "Name of the product."
+          },
+          {
+            "name": "referencePrice",
+            "type": "Price",
+            "description": "Reference price"
+          },
+          {
+            "name": "status",
+            "type": "InstrumentStatus",
+            "description": "Instrument status."
+          },
+          {
+            "name": "initialPhaseId",
+            "type": "ElementId",
+            "description": "Id of starting phase for the instrument"
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "InstrumentStatusChange",
+        "description": "Start of a new trading phase.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "instrumentId",
+            "type": "ElementId",
+            "description": "ID of financial instrument."
+          },
+          {
+            "name": "tradingPhaseId",
+            "type": "ElementId",
+            "description": "Trading phase ID."
+          },
+          {
+            "name": "status",
+            "type": "InstrumentStatus",
+            "description": "Financial instrument status."
+          },
+          {
+            "name": "stressedMarket",
+            "type": "bool",
+            "description": "Stressed market conditions is called for when instrument experience high and short term intraday volatility."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "Trade",
+        "description": "Enriched trade report.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "instrumentId",
+            "type": "ElementId",
+            "description": "ID of financial instrument."
+          },
+          {
+            "name": "settlementValue",
+            "type": "Value",
+            "description": "Settlement value."
+          },
+          {
+            "name": "settlementDate",
+            "type": "Date",
+            "description": "Settlement date."
+          },
+          {
+            "name": "tradingTimestamp",
+            "type": "Timestamp",
+            "description": "Date and time when the transaction was executed."
+          },
+          {
+            "name": "publicProductIdentification",
+            "type": "PublicProductIdentification",
+            "description": "Product identification type and code."
+          },
+          {
+            "name": "price",
+            "type": "Price",
+            "description": "Trade price."
+          },
+          {
+            "name": "priceCurrency",
+            "type": "Currency",
+            "description": "Currency in which the price is expressed (applicable if the price is expressed as monetary value)."
+          },
+          {
+            "name": "priceNotation",
+            "type": "PriceExpressionType",
+            "description": "Indication as to whether the price is expressed in monetary value, in percentage or in yield."
+          },
+          {
+            "name": "quantity",
+            "type": "Quantity",
+            "description": "Trade quantity."
+          },
+          {
+            "name": "nominalValue",
+            "type": "Value",
+            "description": "Nominal value."
+          },
+          {
+            "name": "nominalCurrency",
+            "type": "Currency",
+            "description": "Currency in which the notional is denominated."
+          },
+          {
+            "name": "mic",
+            "type": "MicCode",
+            "description": "Identification of the venue where the transaction was executed."
+          },
+          {
+            "name": "publicationTimestamp",
+            "type": "Timestamp",
+            "description": "Date and time when the transaction was published by a trading venue."
+          },
+          {
+            "name": "tradeId",
+            "type": "TradeId",
+            "description": "ID of the trade."
+          },
+          {
+            "name": "tradeToBeCleared",
+            "type": "bool",
+            "description": "Code to identify whether the transaction will be cleared."
+          },
+          {
+            "name": "mmtMarketMechanism",
+            "type": "MmtMarketMechanism",
+            "description": "MMT Market Mechanism"
+          },
+          {
+            "name": "mmtTradingMode",
+            "type": "MmtTradingMode",
+            "description": "MMT Trading Mode"
+          },
+          {
+            "name": "mmtTransationCategory",
+            "type": "MmtTransationCategory",
+            "description": "MMT Transaction Category"
+          },
+          {
+            "name": "mmtNegotitationIndicator",
+            "type": "MmtNegotitationIndicator",
+            "description": "MMT Negotitation Indicator"
+          },
+          {
+            "name": "mmtAgencyCrossTradeIndicator",
+            "type": "MmtAgencyCrossTradeIndicator",
+            "description": "MMT Agency Cross Trade Indicator"
+          },
+          {
+            "name": "mmtModificationIndicator",
+            "type": "MmtModificationIndicator",
+            "description": "MMT Modification Indicator"
+          },
+          {
+            "name": "mmtBenchmarkReferencePriceIndicator",
+            "type": "MmtBenchmarkReferencePriceIndicator",
+            "description": "MMT Benchmark / Reference Price Indicator"
+          },
+          {
+            "name": "mmtSpecialDividendIndicator",
+            "type": "MmtSpecialDividendIndicator",
+            "description": "MMT Special Dividend Indicator"
+          },
+          {
+            "name": "mmtOffBookAutomatedIndicator",
+            "type": "MmtOffBookAutomatedIndicator",
+            "description": "MMT Off Book Automated Indicator"
+          },
+          {
+            "name": "mmtOrdinaryTradeIndicator",
+            "type": "MmtOrdinaryTradeIndicator",
+            "description": "MMT Ordinary Trade Indicator"
+          },
+          {
+            "name": "mmtAlgorithmicIndicator",
+            "type": "MmtAlgorithmicIndicator",
+            "description": "MMT Algorithmic Indicator"
+          },
+          {
+            "name": "mmtPostTradeDeferralReason",
+            "type": "MmtPostTradeDeferralReason",
+            "description": "MMT Post-Trade Deferral Reason"
+          },
+          {
+            "name": "mmtPostTradeDeferralType",
+            "type": "MmtPostTradeDeferralType",
+            "description": "MMT Post-Trade Deferral Type"
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "TradingPhaseScheduleEntry",
+        "description": "Trading phase definition.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "tradingScheduleId",
+            "type": "ElementId",
+            "description": "Trading schedule ID."
+          },
+          {
+            "name": "tradingPhaseId",
+            "type": "ElementId",
+            "description": "Trading phase ID."
+          },
+          {
+            "name": "tradingPhaseSettlementCycle",
+            "type": "u8",
+            "description": "Settlement cycle for transactions made during a continuous phase."
+          },
+          {
+            "name": "tradingPhaseMaxBlockSettlementCycle",
+            "type": "u8",
+            "description": "Max settlement cycle for block transactions."
+          },
+          {
+            "name": "staticCollarVolatilityAuctionId",
+            "type": "ElementId",
+            "description": "Static collar volatility auction ID."
+          },
+          {
+            "name": "dynamicCollarVolatilityAuctionId",
+            "type": "ElementId",
+            "description": "Dynamic collar volatility auction ID."
+          },
+          {
+            "name": "tradingPhaseStartTime",
+            "type": "Timestamp",
+            "description": "Trading phase start time."
+          },
+          {
+            "name": "tradingPhaseStopTime",
+            "type": "Timestamp",
+            "description": "Trading phase stop time."
+          },
+          {
+            "name": "tradingPhaseType",
+            "type": "TradingPhaseType",
+            "description": "Type of matching algorithm."
+          },
+          {
+            "name": "auctionType",
+            "type": "AuctionType",
+            "description": "Type of auction."
+          },
+          {
+            "name": "auctionUncrossing",
+            "type": "bool",
+            "description": "True if the auction includes an uncrossing."
+          },
+          {
+            "name": "extStaticCollarVolatilityAuctionId",
+            "type": "ElementId",
+            "description": "ID of Static Collar Volatility Auction."
+          },
+          {
+            "name": "extDynamicCollarVolatilityAuctionId",
+            "type": "ElementId",
+            "description": "ID of Dynamic Collar Volatility Auction."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "WeekPlan",
+        "description": "Trading week plan.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "calendarId",
+            "type": "ElementId",
+            "description": "Calendar ID."
+          },
+          {
+            "name": "weekdays",
+            "type": "Weekdays",
+            "description": "Boolean array of weekdays (Monday to Sunday) open or closed for trading; true – weekday open for trading, false – weekday closed for trading."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "Login",
+        "description": "Login message to the Snapshot service.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "connectionId",
+            "type": "ConnectionId",
+            "description": "ID of the connection."
+          },
+          {
+            "name": "token",
+            "type": "Token",
+            "description": "Client token."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "LoginResponse",
+        "description": "Response to a Login message.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "result",
+            "type": "LoginResult",
+            "description": "see the LoginResult description."
+          }
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "LoginResult",
+        "description": "Login  response code of a BIN session.",
+        "underlying": "u8",
+        "variants": [
+          [
+            "Ok",
+            1,
+            "Successful login."
+          ],
+          [
+            "InvalidToken",
+            2,
+            "Authorization failure."
+          ],
+          [
+            "AlreadyLoggedIn",
+            3,
+            "Already logged in."
+          ]
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "Logout",
+        "description": "A Logout message is sent by the client to initiate disconnection from the service.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "EndOfSnapshot",
+        "description": "Marks the end of a snapshot.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "lastSeqNum",
+            "type": "SeqNum",
+            "description": "Sequence number of the last Market Data message transmitted by the Snapshot."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "AuctionSummary",
+        "description": "Auction summary, including auction price and quantity.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "instrumentId",
+            "type": "ElementId",
+            "description": "ID of financial instrument."
+          },
+          {
+            "name": "price",
+            "type": "Price",
+            "description": "Auction price (final auction price)."
+          },
+          {
+            "name": "quantity",
+            "type": "Quantity",
+            "description": "Auction quantity (final auction volume)."
+          },
+          {
+            "name": "auctionType",
+            "type": "AuctionType",
+            "description": "Type of auction."
+          }
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "OrderBookEventType",
+        "description": "Book event for given instrument",
+        "underlying": "u8",
+        "variants": [
+          [
+            "Clear",
+            1,
+            "Clear order book"
+          ],
+          [
+            "ResendStart",
+            2,
+            "Order book resend start (resend will begin shortly)"
+          ],
+          [
+            "ResendEnd",
+            3,
+            "Order book resend end (resend is done)"
+          ]
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "OrderBookEvent",
+        "description": "Order book event for given instrument",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "instrumentId",
+            "type": "ElementId",
+            "description": "ID of the instrument."
+          },
+          {
+            "name": "eventType",
+            "type": "OrderBookEventType",
+            "description": "Type/Kind of book event"
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "RealTimeIndex",
+        "description": "Message providing real-time index values for instruments.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "instrumentId",
+            "type": "ElementId",
+            "description": "ID of the instrument."
+          },
+          {
+            "name": "indexLevelCode",
+            "type": "IndexLevelCode",
+            "description": "Level of the index."
+          },
+          {
+            "name": "numOfActiveInstruments",
+            "type": "u16",
+            "description": "Number of instruments – participants of the index, for which the quotation was set during the session."
+          },
+          {
+            "name": "indIndexOpeningPortfolio",
+            "type": "PercentageChange",
+            "description": "Indicator of the index opening portfolio W(t). Percentage share of instruments with at least one trade during the session."
+          },
+          {
+            "name": "indexValue",
+            "type": "IndexValue",
+            "description": "The value of the last level for the index according to the definition provided in the indexLevelCode."
+          },
+          {
+            "name": "pctChangeIndexValPrevSession",
+            "type": "PercentageChange",
+            "description": "Percentage change of the index value in relation to the value of the closing index from the previous session."
+          },
+          {
+            "name": "tradingValue",
+            "type": "Value",
+            "description": "Value of trading in the instruments from the given index."
+          },
+          {
+            "name": "sessionLow",
+            "type": "IndexValue",
+            "description": "Lowest value of the day."
+          },
+          {
+            "name": "sessionHigh",
+            "type": "IndexValue",
+            "description": "Highest value of the day."
+          },
+          {
+            "name": "indexValueBid",
+            "type": "IndexValue",
+            "description": "Value of the buy index based on the best sell offers of instruments."
+          },
+          {
+            "name": "indexValueAsk",
+            "type": "IndexValue",
+            "description": "Value of the sell index based on the best sell offers of instruments."
+          },
+          {
+            "name": "midSpreadIndex",
+            "type": "IndexValue",
+            "description": "Mean of indexValueBid and indexValueAsk."
+          },
+          {
+            "name": "differenceCentralSpread",
+            "type": "IndexValue",
+            "description": "The point difference between midSpreadIndex and indexValue."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "IndexSummary",
+        "description": "The index summary message provides a summary of the data calculated in a stock index for a given day.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "instrumentId",
+            "type": "ElementId",
+            "description": "ID of the instrument."
+          },
+          {
+            "name": "openingIndexValue",
+            "type": "IndexValue",
+            "description": "Opening index value"
+          },
+          {
+            "name": "sessionLow",
+            "type": "IndexValue",
+            "description": "Lowest value of the day."
+          },
+          {
+            "name": "sessionHigh",
+            "type": "IndexValue",
+            "description": "Highest value of the day."
+          },
+          {
+            "name": "closingIndexValue",
+            "type": "IndexValue",
+            "description": "Closing index value."
+          },
+          {
+            "name": "sessionAvg",
+            "type": "IndexValue",
+            "description": "Average value of the day."
+          },
+          {
+            "name": "pctChangeIndexValPrevSession",
+            "type": "PercentageChange",
+            "description": "Percentage change of the index value in relation to the value of the closing index from the previous session."
+          },
+          {
+            "name": "pctChangeIndexValPrevYear",
+            "type": "PercentageChange",
+            "description": "Percentage change of the index value in relation to its value at the end of the previous year"
+          },
+          {
+            "name": "closingCapitalisationPortfolio",
+            "type": "Value",
+            "description": "Capitalisation of the portfolio for the closing index expressed in the currency of the index, on basis of which the closing index is calculated."
+          },
+          {
+            "name": "indIndexOpeningPortfolio",
+            "type": "PercentageChange",
+            "description": "Indicator of the index opening portfolio W(t). Percentage share of instruments with at least one trade during the session."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "IndexPortfolioEntry",
+        "description": "The message contains information about a product providing the index portfolio. The entire index portfolio is sent as successive IndexPortfolioEntry messages.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "id",
+            "type": "ElementId",
+            "description": "The identifier of the entry within the given index."
+          },
+          {
+            "name": "instrumentId",
+            "type": "ElementId",
+            "description": "ID of the instrument."
+          },
+          {
+            "name": "publicProductIdentification",
+            "type": "PublicProductIdentification",
+            "description": "Product identification type and code."
+          },
+          {
+            "name": "mic",
+            "type": "MicCode",
+            "description": "Market structure's Market Identifier Code (MIC) as specified in ISO 10383."
+          },
+          {
+            "name": "currency",
+            "type": "Currency",
+            "description": "Currency (e.g. USD)."
+          },
+          {
+            "name": "instrumentPacket",
+            "type": "u64",
+            "description": "Instrument packet in index portfolio / of information product. Number of units (usually stocks/shares) of a given instrument in the index portfolio or in the information product."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "IndexParams",
+        "description": "The metadata message for the given index.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "instrumentId",
+            "type": "ElementId",
+            "description": "ID of financial instrument."
+          },
+          {
+            "name": "indexBaseValue",
+            "type": "IndexValue",
+            "description": "Index base value."
+          },
+          {
+            "name": "indexBaseCapitalisation",
+            "type": "Value",
+            "description": "Index base capitalisation"
+          },
+          {
+            "name": "indexBaseDate",
+            "type": "Date",
+            "description": "Index base date."
+          },
+          {
+            "name": "correctionCoefficient",
+            "type": "Number",
+            "description": "Index adjustment coefficient K(t)"
+          },
+          {
+            "name": "numOfComponents",
+            "type": "u16",
+            "description": "Total number of instruments in the portfolio."
+          },
+          {
+            "name": "indexPublicationSchedule",
+            "type": "IndexPublicationSchedule",
+            "description": "Mode of index dissemination."
+          },
+          {
+            "name": "indexType",
+            "type": "IndexType",
+            "description": "Index product classification"
+          },
+          {
+            "name": "daysSinceLastPublication",
+            "type": "u8",
+            "description": "Number of calendar days between current session and the previous session day."
+          },
+          {
+            "name": "numberOfDividends",
+            "type": "u16",
+            "description": "Number of dividends included in the index calculation."
+          },
+          {
+            "name": "indexUnderlying",
+            "type": "IndexUnderlying",
+            "description": "List of underlying instruments for index."
+          },
+          {
+            "name": "publicationOrder",
+            "type": "u16",
+            "description": "Index publication presentation order."
+          },
+          {
+            "name": "currency",
+            "type": "Currency",
+            "description": "Currency (e.g. USD)."
+          },
+          {
+            "name": "dateValidity",
+            "type": "Date",
+            "description": "Date of validity of index."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "InstrumentSummary",
+        "description": "Provides brief instrument summary.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "instrumentId",
+            "type": "ElementId",
+            "description": "Identifier of the CLOB instrument."
+          },
+          {
+            "name": "lastTradedPrice",
+            "type": "Price",
+            "description": "Last Traded Price (LTP)."
+          },
+          {
+            "name": "closingPrice",
+            "type": "Price",
+            "description": "Closing Price (CP)."
+          },
+          {
+            "name": "closingPriceType",
+            "type": "ClosingPriceType",
+            "description": "Closing Price Type."
+          },
+          {
+            "name": "adjustedClosingPrice",
+            "type": "Price",
+            "description": "Adjusted Closing Price (ACP)."
+          },
+          {
+            "name": "adjustedClosingPriceReason",
+            "type": "AdjustedClosingPriceReason",
+            "description": "Adjusted Closing Price Reason."
+          },
+          {
+            "name": "pctChange",
+            "type": "PercentageChange",
+            "description": "Percentage change."
+          },
+          {
+            "name": "VWAP",
+            "type": "Price",
+            "description": "Volume-weighted average price."
+          },
+          {
+            "name": "noTrades",
+            "type": "u64",
+            "description": "Total number of transations on the current trading day."
+          },
+          {
+            "name": "totalVolume",
+            "type": "Quantity",
+            "description": "Total transaction volume."
+          },
+          {
+            "name": "totalValue",
+            "type": "Value",
+            "description": "Total transaction value."
+          },
+          {
+            "name": "openingPrice",
+            "type": "Price",
+            "description": "The price of the first trade on the current trading day."
+          },
+          {
+            "name": "maxPrice",
+            "type": "Price",
+            "description": "Highest price of the instrument on the current trading day"
+          },
+          {
+            "name": "minPrice",
+            "type": "Price",
+            "description": "Lowest price of the instrument on the current trading day"
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "SessionSummary",
+        "description": "Session day instrument summary.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "instrumentId",
+            "type": "ElementId",
+            "description": "Identifier of the CLOB instrument."
+          },
+          {
+            "name": "lastTradedPrice",
+            "type": "Price",
+            "description": "Last Traded Price (LTP)."
+          },
+          {
+            "name": "closingPrice",
+            "type": "Price",
+            "description": "Closing Price (CP)."
+          },
+          {
+            "name": "closingPriceType",
+            "type": "ClosingPriceType",
+            "description": "Closing Price Type."
+          },
+          {
+            "name": "pctChange",
+            "type": "PercentageChange",
+            "description": "Percentage change."
+          },
+          {
+            "name": "vwap",
+            "type": "Price",
+            "description": "Volume-weighted average price."
+          },
+          {
+            "name": "noTrades",
+            "type": "u64",
+            "description": "Total number of transations on the current trading day."
+          },
+          {
+            "name": "totalVolume",
+            "type": "Quantity",
+            "description": "Total transaction volume."
+          },
+          {
+            "name": "totalValue",
+            "type": "Value",
+            "description": "Total transaction value."
+          },
+          {
+            "name": "openingPrice",
+            "type": "Price",
+            "description": "The price of the first trade on the current trading day."
+          },
+          {
+            "name": "maxPrice",
+            "type": "Price",
+            "description": "Highest price of the instrument on the current trading day"
+          },
+          {
+            "name": "minPrice",
+            "type": "Price",
+            "description": "Lowest price of the instrument on the current trading day"
+          },
+          {
+            "name": "productIdentificationType",
+            "type": "ProductIdentificationType",
+            "description": "Type of product identification."
+          },
+          {
+            "name": "productIdentification",
+            "type": "ProductIdentification",
+            "description": "Product identification, e.g. ISIN number."
+          },
+          {
+            "name": "AccumulatedInterest",
+            "type": "Number",
+            "description": "Accumulated interest on the bonds or for mortgage-backed bonds on the day of settling the transaction."
+          },
+          {
+            "name": "interestRate",
+            "type": "Number",
+            "description": "Interest rate is determined on the basis of WIBOR/WIBID/WIRON rates for each expiration date of options and futures."
+          },
+          {
+            "name": "referencePrice",
+            "type": "Price",
+            "description": "Initial reference price (at the start of session day)."
+          },
+          {
+            "name": "settlementPrice",
+            "type": "Price",
+            "description": "Settlement price."
+          },
+          {
+            "name": "settlementValue",
+            "type": "Price",
+            "description": "Settlement value."
+          },
+          {
+            "name": "currency",
+            "type": "Currency",
+            "description": "Price currency (e.g. USD)."
+          },
+          {
+            "name": "openPositions",
+            "type": "u32",
+            "description": "Number of open positions after the end of the session."
+          },
+          {
+            "name": "sessionDate",
+            "type": "Date",
+            "description": "Stock Exchange session date."
+          },
+          {
+            "name": "endTradingDate",
+            "type": "Date",
+            "description": "End of trading date."
+          },
+          {
+            "name": "lastTradeDate",
+            "type": "Date",
+            "description": "The date of execution of the last trade for the given instrument."
+          },
+          {
+            "name": "numberOfInstruments",
+            "type": "u64",
+            "description": "Number of instruments admitted to trading."
+          },
+          {
+            "name": "tradingValueCurrency",
+            "type": "Value",
+            "description": "The field comprises the trading value expressed in trading currency."
+          },
+          {
+            "name": "blockNoTrades",
+            "type": "u64",
+            "description": "The total number of block trades concluded on a particular instrument during the current trading session."
+          },
+          {
+            "name": "blockVolume",
+            "type": "Quantity",
+            "description": "The total turnover volume of block trades concluded on a particular instrument during the current trading session."
+          },
+          {
+            "name": "blockValue",
+            "type": "Value",
+            "description": "The total turnover value of block trades concluded on a particular instrument during the current trading session."
+          },
+          {
+            "name": "blockMinPrice",
+            "type": "Price",
+            "description": "Minimum price of block trades in the instrument during the current trading session. If no block trades were concluded during the trading session, the field is completed with zeros."
+          },
+          {
+            "name": "blockMaxPrice",
+            "type": "Price",
+            "description": "Maximum price of block trades in the instrument during the current trading session. If no block trades were concluded during the trading session, the field is completed with zeros."
+          },
+          {
+            "name": "vwapBlockTrade",
+            "type": "Price",
+            "description": "Volume weighted average price of block trades for a particular instrument during a particular trading session."
+          },
+          {
+            "name": "status",
+            "type": "InstrumentStatus",
+            "description": "Financial instrument status."
+          },
+          {
+            "name": "sector",
+            "type": "u16",
+            "description": "Defines the sector of the economy that the company belongs to. Possible values for shares, the field assumes were described in the WATS Market Data documetation."
+          },
+          {
+            "name": "market",
+            "type": "Market",
+            "description": "Defines the market the instrument belongs to."
+          },
+          {
+            "name": "markerPriceChange",
+            "type": "ChangeIndicator",
+            "description": "The field contains the market of the percentage change of the instrument closing price from the current session in relation to the reference price."
+          },
+          {
+            "name": "marketStructureId",
+            "type": "ElementId",
+            "description": "ID of the financial instrument’s market segment."
+          },
+          {
+            "name": "lowerLiquidity",
+            "type": "bool",
+            "description": "The positive field value (true) informs if the company was qualified to Lower Liquidity Space. A negative value has the opposite meaning."
+          },
+          {
+            "name": "multiplier",
+            "type": "Number",
+            "description": "Instrument multiplier."
+          },
+          {
+            "name": "impliedVolatility",
+            "type": "Number",
+            "description": "Implied volatility."
+          },
+          {
+            "name": "dividendRate",
+            "type": "Number",
+            "description": "Dividend rate for the company is given on the basis of dividends paid by companies being the base instrument for futures and options."
+          },
+          {
+            "name": "delta",
+            "type": "Number",
+            "description": "Value of Delta indicator from the current session."
+          },
+          {
+            "name": "gamma",
+            "type": "Number",
+            "description": "Value of Gamma indicator from the current session."
+          },
+          {
+            "name": "rho",
+            "type": "Number",
+            "description": "Value of Rho indicator from the current session."
+          },
+          {
+            "name": "theta",
+            "type": "Number",
+            "description": "Value of Theta indicator from the current session."
+          },
+          {
+            "name": "vega",
+            "type": "Number",
+            "description": "Value of Vega indicator from the current session."
+          },
+          {
+            "name": "volatility",
+            "type": "Number",
+            "description": "Volatility to be calculated is based on the implied volatility (provided in field ImpliedVolatility) according to algorithm worked out by the WSE, which is available on the website: www.opcje.gpw.pl."
+          },
+          {
+            "name": "optionsStrikePrice",
+            "type": "Price",
+            "description": "Option product strike price."
+          },
+          {
+            "name": "dividend",
+            "type": "bool",
+            "description": "The positive field value (true) informs that the instruments are traded the first time after determining the right to dividend. A negative value has the opposite meaning."
+          },
+          {
+            "name": "subscriptionRight",
+            "type": "bool",
+            "description": "The positive field value (true) informs that the instruments are traded the first time after determining the subscription right. A negative value has the opposite meaning."
+          },
+          {
+            "name": "interimDividendRight",
+            "type": "bool",
+            "description": "The positive field value (true) informs that the instruments are traded the first time after determining the interim dividend right. A negative value has the opposite meaning."
+          },
+          {
+            "name": "split",
+            "type": "bool",
+            "description": "The positive field value (true) informs that the instruments are traded the first time after the change of the nominal value of shares. A negative value has the opposite meaning."
+          },
+          {
+            "name": "quotationSystem",
+            "type": "QuotationSystem",
+            "description": "The field informing about the system of listing the instrument."
+          },
+          {
+            "name": "liquiditySupportPge",
+            "type": "bool",
+            "description": "The field informs if the company entered to Liquidity Support Programme. True - participation in the liquidity Programme, false - no participation in the liquidity Programme."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "News",
+        "description": "News message.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header"
+          },
+          {
+            "name": "marketStructureId",
+            "type": "ElementId",
+            "description": "ID of the instrument's market structure."
+          },
+          {
+            "name": "title",
+            "type": "AnsiChar",
+            "length": 80,
+            "description": "News title, unique per message."
+          },
+          {
+            "name": "entryNumber",
+            "type": "u8",
+            "description": "News entry number."
+          },
+          {
+            "name": "total",
+            "type": "u8",
+            "description": "Total number of news entries."
+          },
+          {
+            "name": "text",
+            "type": "AnsiChar",
+            "length": 800,
+            "description": "News text."
+          }
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "MmtMarketMechanism",
+        "description": "MMT Market Mechanism",
+        "underlying": "u8",
+        "variants": [
+          [
+            "CentralLimitOrderBook",
+            1,
+            "1 = Central Limit Order Book"
+          ],
+          [
+            "QuoteDrivenMarket",
+            2,
+            "2 = Quote Driven Market"
+          ],
+          [
+            "DarkOrderBook",
+            3,
+            "3 = Dark Order Book"
+          ],
+          [
+            "OffBook",
+            4,
+            "4 = Off Book"
+          ],
+          [
+            "PeriodicAuction",
+            5,
+            "5 = Periodic Auction"
+          ],
+          [
+            "RequestForQuotes",
+            6,
+            "6 = Request For Quotes"
+          ],
+          [
+            "Other",
+            7,
+            "7 = Any other including Hybrid"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "MmtTradingMode",
+        "description": "MMT Trading Mode",
+        "underlying": "u8",
+        "variants": [
+          [
+            "UndefinedAuction",
+            1,
+            "1 = Undefined Auction"
+          ],
+          [
+            "ScheduledOpeningAuction",
+            2,
+            "O = Scheduled Opening Auction"
+          ],
+          [
+            "ScheduledClosingAuction",
+            3,
+            "K = Scheduled Closing Auction"
+          ],
+          [
+            "ScheduledIntradayAuction",
+            4,
+            "I = Scheduled Intraday Auction"
+          ],
+          [
+            "UnscheduledAuction",
+            5,
+            "U = Unscheduled Auction"
+          ],
+          [
+            "ContinuousTrading",
+            6,
+            "2 = Continuous Trading"
+          ],
+          [
+            "AtMarketCloseTrading",
+            7,
+            "3 = At Market Close Trading"
+          ],
+          [
+            "OutOfMainSessionTrading",
+            8,
+            "4 = Out Of Main Session Trading"
+          ],
+          [
+            "TradeReportingOnExchange",
+            9,
+            "5 = Trade Reporting (On Exchange)"
+          ],
+          [
+            "TradeReportingOffExchange",
+            10,
+            "6 = Trade Reporting (Off Exchange)"
+          ],
+          [
+            "TradeReportingSystematicInternaliser",
+            11,
+            "7 = Trade Reporting (Systematic Internaliser)"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "MmtTransationCategory",
+        "description": "MMT Transaction Category",
+        "underlying": "u8",
+        "variants": [
+          [
+            "DarkTrade",
+            1,
+            "D = Dark Trade"
+          ],
+          [
+            "TradePriceImprovement ",
+            2,
+            "R = Trade that has received price improvement"
+          ],
+          [
+            "PackageTrade",
+            3,
+            "Z = Package Trade (excluding Exchange For Physicals)"
+          ],
+          [
+            "ExchangeForPhysicalsTrade",
+            4,
+            "Y = Exchange For Physicals Trade"
+          ],
+          [
+            "None",
+            5,
+            "- = None apply (a standard trade for the Market Mechanism and Trading Mode)"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "MmtNegotitationIndicator",
+        "description": "MMT Negotitation Indicator",
+        "underlying": "u8",
+        "variants": [
+          [
+            "NegotiatedTrade",
+            1,
+            "N = Negotiated Trade"
+          ],
+          [
+            "NegotiatedTradeLiquidFinancialInstruments",
+            2,
+            "1 = Negotiated Trade in Liquid Financial Instruments"
+          ],
+          [
+            "NegotiatedTradeIlliquidFinancialInstruments",
+            3,
+            "2 = Negotiated Trade in Illiquid Financial Instruments"
+          ],
+          [
+            "NegotiatedTradeOther",
+            4,
+            "3 = Negotiated Trade subject to conditions other than the current market price"
+          ],
+          [
+            "NoNegotiatedTrade",
+            5,
+            "- = No Negotiated Trade"
+          ],
+          [
+            "PreTradeTransparencyWaiverIlliquidInstrument",
+            6,
+            "4 = Pre-Trade Transparency Waiver for Illiquid Instrument on an SI (for RTS 1 only)"
+          ],
+          [
+            "PreTradeTransparencyWaiverStandardMarketSize",
+            7,
+            "5 = Pre-Trade Transparency Waiver for above Standard Market Size on an SI (for RTS 1 only)"
+          ],
+          [
+            "PreTradeTransparencyWaiversIlqdAndSize",
+            8,
+            "6 = Pre-Trade Transparency Waivers of ILQD and SIZE (for RTS 1 only)"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "MmtAgencyCrossTradeIndicator",
+        "description": "MMT Agency Cross Trade Indicator",
+        "underlying": "u8",
+        "variants": [
+          [
+            "AgencyCrossTrade",
+            1,
+            "X = Agency Cross Trade"
+          ],
+          [
+            "NoAgencyCrossTrade",
+            2,
+            "- = No Agency Cross Trade"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "MmtModificationIndicator",
+        "description": "MMT Modification Indicator",
+        "underlying": "u8",
+        "variants": [
+          [
+            "TradeCancellation",
+            1,
+            "C = Trade Cancellation"
+          ],
+          [
+            "TradeAmendment",
+            2,
+            "A = Trade Amendment"
+          ],
+          [
+            "NewTrade",
+            3,
+            "- = New Trade"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "MmtBenchmarkReferencePriceIndicator",
+        "description": "MMT Benchmark / Reference Price Indicator",
+        "underlying": "u8",
+        "variants": [
+          [
+            "BenchmarkTrade",
+            1,
+            "B = Benchmark Trade"
+          ],
+          [
+            "ReferencePriceTrade",
+            2,
+            "S = Reference Price Trade"
+          ],
+          [
+            "NoBenchmarkorReferencePriceTrade",
+            3,
+            "- = No Benchmark or Reference Price Trade"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "MmtSpecialDividendIndicator",
+        "description": "MMT Special Dividend Indicator",
+        "underlying": "u8",
+        "variants": [
+          [
+            "SpecialDividendTrade",
+            1,
+            "E = Special Dividend Trade"
+          ],
+          [
+            "NoSpecialDividendTrade",
+            2,
+            "- = No Special Dividend Trade"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "MmtOffBookAutomatedIndicator",
+        "description": "MMT Off Book Automated Indicator",
+        "underlying": "u8",
+        "variants": [
+          [
+            "UnspecifiedOrNotApply",
+            1,
+            "'- = Unspecified or does not apply"
+          ],
+          [
+            "OffBookNonAutomated",
+            2,
+            "M = Off Book Non-Automated"
+          ],
+          [
+            "OffBookAutomated",
+            3,
+            "Q = Off Book Automated"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "MmtOrdinaryTradeIndicator",
+        "description": "MMT Ordinary Trade Indicator",
+        "underlying": "u8",
+        "variants": [
+          [
+            "PlainVanillaTrade",
+            1,
+            "P = Plain-Vanilla Trade"
+          ],
+          [
+            "NonPriceFormingTrade",
+            2,
+            "I = Non-Price Forming Trade (formerly defined as a Technical Trade)"
+          ],
+          [
+            "TradeNotContributingToPriceDiscovery",
+            3,
+            "J = Trade not contributing to the price discovery process (formerly defined as a Technical Trade)"
+          ],
+          [
+            "PricePending",
+            4,
+            "N = Price is currently not available but pending"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "MmtAlgorithmicIndicator",
+        "description": "MMT Algorithmic Indicator",
+        "underlying": "u8",
+        "variants": [
+          [
+            "AlgorithmicTrade",
+            1,
+            "H = Algorithmic Trade"
+          ],
+          [
+            "NoAlgorithmicTrade",
+            2,
+            "- = No Algorithmic Trade"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "MmtPostTradeDeferralReason",
+        "description": "MMT Post-Trade Deferral Reason",
+        "underlying": "u8",
+        "variants": [
+          [
+            "ImmediatePublication",
+            1,
+            "- = Immediate Publication"
+          ],
+          [
+            "NonImmediatePublication",
+            2,
+            "1 = Non-Immediate Publication"
+          ],
+          [
+            "NonImmediatePublicationLargeInScale",
+            3,
+            "2 = Non-Immediate Publication : Deferral for 'Large in Scale'"
+          ],
+          [
+            "NonImmediatePublicationIlliquidInstrument",
+            4,
+            "3 = Non-Immediate Publication : Deferral for 'Illiquid Instrument' (for RTS 2 only)"
+          ],
+          [
+            "NonImmediatePublicationSizeSpecific",
+            5,
+            "4 = Non-Immediate Publication : Deferral for 'Size Specific' (for RTS 2 only)"
+          ],
+          [
+            "NonImmediatePublicationIlqdAndSize",
+            6,
+            "5 = Non-Immediate Publication : Deferrals of ILQD and SIZE (for RTS 2 use only)"
+          ],
+          [
+            "NonImmediatePublicationIlqdAndLrgs",
+            7,
+            "6 = Non-Immediate Publication : Deferrals of ILQD and LRGS (for RTS 2 use only)"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "MmtPostTradeDeferralType",
+        "description": "MMT Post-Trade Deferral Type",
+        "underlying": "u8",
+        "variants": [
+          [
+            "LimitedDetailsTrade",
+            1,
+            "1 = Limited Details Trade"
+          ],
+          [
+            "DailyAggregatedTrade",
+            2,
+            "2 = Daily Aggregated Trade"
+          ],
+          [
+            "VolumeOmissionTrade",
+            3,
+            "3 = Volume Omission Trade"
+          ],
+          [
+            "FourWeeksAggregationTrade",
+            4,
+            "4 = Four Weeks Aggregation Trade"
+          ],
+          [
+            "IndefiniteAggregationTrade",
+            5,
+            "5 = Indefinite Aggregation Trade"
+          ],
+          [
+            "VolumeOmissionTradeAggregated",
+            6,
+            "6 = Volume Omission Trade, eligible for subsequent enrichment in aggregated form"
+          ],
+          [
+            "NotApplicable",
+            7,
+            "- = Not applicable / No relevant deferral or enrichment type"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "MsgType",
+        "underlying": "u16",
+        "variants": [
+          [
+            "Heartbeat",
+            1,
+            "A message type used to check connectivity."
+          ],
+          [
+            "Text",
+            2,
+            "A text message."
+          ],
+          [
+            "Test",
+            3,
+            "A message used to test system operation."
+          ],
+          [
+            "OrderAdd",
+            9,
+            "New (limit) order added to order book."
+          ],
+          [
+            "OrderModify",
+            10,
+            "Order modified."
+          ],
+          [
+            "OrderDelete",
+            11,
+            "Order deleted."
+          ],
+          [
+            "OrderExecute",
+            12,
+            "Execution report."
+          ],
+          [
+            "StartOfTechnicalSession",
+            20,
+            "Start of a technical session."
+          ],
+          [
+            "EndOfTechnicalSession",
+            21,
+            "End of a technical session."
+          ],
+          [
+            "ReferenceDataStart",
+            22,
+            "Marks the start of the reference data."
+          ],
+          [
+            "ReferenceDataEnd",
+            23,
+            "Marks the end of the reference data."
+          ],
+          [
+            "EncryptionKey",
+            24,
+            "Encryption key and ID."
+          ],
+          [
+            "InstrumentStatusChange",
+            26,
+            "Start of a new trading phase."
+          ],
+          [
+            "TradingPhaseScheduleEntry",
+            27,
+            "Trading phase definition."
+          ],
+          [
+            "TickTableEntry",
+            32,
+            "Tick size definition."
+          ],
+          [
+            "WeekPlan",
+            33,
+            "Trading week plan."
+          ],
+          [
+            "CalendarException",
+            35,
+            "Upcoming calendar day exception."
+          ],
+          [
+            "AccruedInterestTableEntry",
+            36,
+            "Message describing an accrued interest table entry."
+          ],
+          [
+            "IndexationTableEntry",
+            37,
+            "Message describing an indexation table entry."
+          ],
+          [
+            "Trade",
+            38,
+            "Enriched trade report."
+          ],
+          [
+            "CollarTableEntry",
+            108,
+            "Collar table definition."
+          ],
+          [
+            "TopPriceLevelUpdate",
+            256,
+            "BBO Level 1."
+          ],
+          [
+            "PriceLevelSnapshot",
+            257,
+            "BBO price levels and volumes."
+          ],
+          [
+            "AuctionUpdate",
+            268,
+            "Updates IMP/IMV and BBO during an auction."
+          ],
+          [
+            "AuctionSummary",
+            270,
+            "Auction summary, including auction price and quantity."
+          ],
+          [
+            "PriceUpdate",
+            271,
+            "Message notifying about reference price changes."
+          ],
+          [
+            "OrderCollars",
+            272,
+            "New order price collars."
+          ],
+          [
+            "TradeCollars",
+            273,
+            "New trade price collars."
+          ],
+          [
+            "MarketStructure",
+            275,
+            "Messages defining the Trading Venue’s market structure."
+          ],
+          [
+            "Instrument",
+            279,
+            "Definition of a financial instrument."
+          ],
+          [
+            "CollarGroup",
+            299,
+            "Message defining a collar group."
+          ],
+          [
+            "OrderBookEvent",
+            410,
+            "Signal to clear the order book for upcoming auction."
+          ],
+          [
+            "RealTimeIndex",
+            500,
+            "The message handles the real-time characteristics of an index."
+          ],
+          [
+            "IndexSummary",
+            501,
+            "The message provides a summary of the data calculated in a stock index for a given day."
+          ],
+          [
+            "IndexPortfolioEntry",
+            502,
+            "The message contains information about a product providing the index portfolio. The entire index portfolio is sent as successive IndexPortfolioEntry messages."
+          ],
+          [
+            "IndexParams",
+            503,
+            "The metadata message for the given index."
+          ],
+          [
+            "News",
+            517,
+            "News message."
+          ],
+          [
+            "Login",
+            667,
+            "Login message to the Snapshot service."
+          ],
+          [
+            "LoginResponse",
+            668,
+            "Response to a Login message."
+          ],
+          [
+            "Logout",
+            669,
+            "A Logout message is sent by the client to initiate disconnection from the Replay Server side."
+          ],
+          [
+            "EndOfSnapshot",
+            670,
+            "Marks the end of a snapshot."
+          ],
+          [
+            "InstrumentSummary",
+            671,
+            "Instrument summary."
+          ],
+          [
+            "SessionSummary",
+            672,
+            "Session summary."
+          ],
+          [
+            "TestEvent",
+            8192,
+            "A message to relay test scenario information"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "MarketModelType",
+        "description": "Market Model.",
+        "underlying": "u8",
+        "variants": [
+          [
+            "CLOB",
+            1,
+            "A Central Limit Order Book (CLOB)"
+          ],
+          [
+            "BLOCK",
+            2,
+            "BLOCK"
+          ],
+          [
+            "HYBRID",
+            3,
+            "HYBRID market model"
+          ],
+          [
+            "CROSS",
+            4,
+            "CROSS"
+          ],
+          [
+            "NotApplicable",
+            5,
+            "Not applicable"
+          ]
+        ]
+      },
+      {
+        "kind": "Array",
+        "name": "ScenarioName",
+        "type": "AnsiChar",
+        "length": 200,
+        "description": "Test scenario name"
+      },
+      {
+        "kind": "Enum",
+        "name": "EventType",
+        "description": "Test event type",
+        "underlying": "u8",
+        "variants": [
+          [
+            "Flush",
+            1,
+            "Flush the test scenario"
+          ],
+          [
+            "ScenarioStart",
+            2,
+            "Start of test scenario"
+          ],
+          [
+            "ScenarioEnd",
+            3,
+            "End of test scenario"
+          ]
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "TestEvent",
+        "description": "Test event",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "scenarioName",
+            "type": "ScenarioName",
+            "description": "Test scenario name"
+          },
+          {
+            "name": "eventType",
+            "type": "EventType",
+            "description": "Test event type"
+          }
+        ]
+      },
+      {
+        "kind": "Union",
+        "name": "Message",
+        "members": [
+          "Heartbeat",
+          "Text",
+          "Test",
+          "OrderAdd",
+          "OrderModify",
+          "OrderDelete",
+          "OrderExecute",
+          "StartOfTechnicalSession",
+          "EndOfTechnicalSession",
+          "ReferenceDataStart",
+          "ReferenceDataEnd",
+          "EncryptionKey",
+          "InstrumentStatusChange",
+          "TradingPhaseScheduleEntry",
+          "TickTableEntry",
+          "WeekPlan",
+          "CalendarException",
+          "AccruedInterestTableEntry",
+          "IndexationTableEntry",
+          "Trade",
+          "CollarTableEntry",
+          "TopPriceLevelUpdate",
+          "PriceLevelSnapshot",
+          "AuctionUpdate",
+          "PriceUpdate",
+          "TradeCollars",
+          "OrderCollars",
+          "AuctionSummary",
+          "MarketStructure",
+          "Instrument",
+          "CollarGroup",
+          "Login",
+          "LoginResponse",
+          "Logout",
+          "EndOfSnapshot",
+          "OrderBookEvent",
+          "RealTimeIndex",
+          "IndexSummary",
+          "IndexPortfolioEntry",
+          "IndexParams",
+          "InstrumentSummary",
+          "SessionSummary",
+          "News",
+          "TestEvent"
+        ],
+        "discriminator": [
+          "header",
+          "msgType"
+        ]
+      }
+    ],
+    "replay": [
+      {
+        "kind": "Primitive",
+        "name": "u8",
+        "size": 1,
+        "description": "Unsigned integer, 8-bit."
+      },
+      {
+        "kind": "Primitive",
+        "name": "u16",
+        "size": 2,
+        "description": "Unsigned integer, 16-bit."
+      },
+      {
+        "kind": "Primitive",
+        "name": "u32",
+        "size": 4,
+        "description": "Unsigned integer, 32-bit."
+      },
+      {
+        "kind": "Alias",
+        "name": "SeqNum",
+        "alias": "u32",
+        "description": "Sequence number of the message. Must fit into 28 bits, see OrderId for details."
+      },
+      {
+        "kind": "Alias",
+        "name": "MsgLength",
+        "alias": "u16",
+        "description": "Length of the message."
+      },
+      {
+        "kind": "Struct",
+        "name": "ReplayHeader",
+        "description": "Market Data message header.",
+        "fields": [
+          {
+            "name": "length",
+            "type": "MsgLength",
+            "description": "Message length."
+          },
+          {
+            "name": "replayMsgType",
+            "type": "ReplayMsgType",
+            "description": "Type of the message."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "ReplayRequest",
+        "description": "Message replay request.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "ReplayHeader",
+            "description": "Message header."
+          },
+          {
+            "name": "seqNum",
+            "type": "SeqNum",
+            "description": "Initial sequence number for the requested range."
+          },
+          {
+            "name": "endSeqNum",
+            "type": "SeqNum",
+            "description": "Final sequence number for the requested range."
+          }
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "ReplayMsgType",
+        "underlying": "u16",
+        "variants": [
+          [
+            "ReplayRequest",
+            1,
+            "Replay service request"
+          ]
+        ]
+      },
+      {
+        "kind": "Union",
+        "name": "ReplayMessage",
+        "members": [
+          "ReplayRequest"
+        ],
+        "discriminator": [
+          "header",
+          "replayMsgType"
+        ]
+      }
+    ]
+  }
+}

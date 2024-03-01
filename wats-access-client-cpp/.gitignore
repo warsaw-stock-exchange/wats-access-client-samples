@@ -1,0 +1,5 @@
+.vscode
+bin/**
+build/**
+!bin/wats.yml
+node_modules/**

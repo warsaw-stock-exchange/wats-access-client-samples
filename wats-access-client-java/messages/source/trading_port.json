@@ -1,0 +1,4275 @@
+{
+  "version": 1027,
+  "typeDefinitions": [
+    {
+      "kind": "Alias",
+      "name": "Percentage",
+      "alias": "i64",
+      "description": "Percentage number/ratio."
+    },
+    {
+      "kind": "Primitive",
+      "name": "bool",
+      "size": 1,
+      "description": "Boolean"
+    },
+    {
+      "kind": "Alias",
+      "name": "ParticipantId",
+      "alias": "u32",
+      "description": "Participant ID."
+    },
+    {
+      "kind": "Primitive",
+      "name": "u8",
+      "size": 1,
+      "description": "Unsigned integer, 8-bit."
+    },
+    {
+      "kind": "Primitive",
+      "name": "u16",
+      "size": 2,
+      "description": "Unsigned integer, 16-bit."
+    },
+    {
+      "kind": "Primitive",
+      "name": "u32",
+      "size": 4,
+      "description": "Unsigned integer, 32-bit."
+    },
+    {
+      "kind": "Primitive",
+      "name": "i64",
+      "size": 8,
+      "description": "Signed integer, 64-bit."
+    },
+    {
+      "kind": "Primitive",
+      "name": "u64",
+      "size": 8,
+      "description": "Unsigned integer, 64-bit."
+    },
+    {
+      "kind": "Alias",
+      "name": "AnsiChar",
+      "alias": "u8",
+      "description": "String."
+    },
+    {
+      "kind": "Alias",
+      "name": "BulkSeqNum",
+      "alias": "u8",
+      "description": "Bulk sequence number of the message."
+    },
+    {
+      "kind": "Alias",
+      "name": "ConnectionId",
+      "alias": "u16",
+      "description": "ID of the connection. Must fit into 14 bits, see OrderId for details."
+    },
+    {
+      "kind": "Alias",
+      "name": "ElementId",
+      "alias": "u32",
+      "description": "Element id."
+    },
+    {
+      "kind": "Enum",
+      "name": "RiskWarningLevelAction",
+      "description": "Action that was take because warning level was exceeded.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "Reject",
+          3,
+          "Reject."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "MifidFlags",
+      "underlying": "u8",
+      "description": "Mifid related flags.",
+      "bitflags": true,
+      "variants": [
+        [
+          "None",
+          "0b0000"
+        ],
+        [
+          "LiquidityProvisionActivity",
+          "0b0001"
+        ],
+        [
+          "DirectOrSponsoredAccess",
+          "0b0010"
+        ],
+        [
+          "AlgorithmicTrade",
+          "0b0100"
+        ],
+        [
+          "MarketMakerOrSpecialist",
+          "0b1000"
+        ]
+      ]
+    },
+    {
+      "kind": "Alias",
+      "name": "MsgLength",
+      "alias": "u16",
+      "description": "Length of the message."
+    },
+    {
+      "kind": "Alias",
+      "name": "MsgVersion",
+      "alias": "u16",
+      "description": "Message version - used to differentiate between messages sent using different versions of the protocol."
+    },
+    {
+      "kind": "Alias",
+      "name": "Number",
+      "alias": "i64",
+      "description": "Number."
+    },
+    {
+      "kind": "Alias",
+      "name": "OnBehalfOf",
+      "alias": "u16",
+      "description": "ID of the client party on behalf which order is requested."
+    },
+    {
+      "kind": "Alias",
+      "name": "STPId",
+      "alias": "u16",
+      "description": "An ID assigned by the client used in Self Trade Prevention mechanism."
+    },
+    {
+      "kind": "Alias",
+      "name": "PublicOrderId",
+      "alias": "u64",
+      "description": "Unique for single trading day order identifier assigned by the trading system and shared publicly in market data (public information)."
+    },
+    {
+      "kind": "Alias",
+      "name": "OrderId",
+      "alias": "u64",
+      "description": "Unique for each trading day order identifier based on the sequence number of order message, bulk sequence number, session ID and connection ID."
+    },
+    {
+      "kind": "Alias",
+      "name": "Price",
+      "alias": "Number",
+      "description": "Price."
+    },
+    {
+      "kind": "Alias",
+      "name": "Quantity",
+      "alias": "u64",
+      "description": "Quantity."
+    },
+    {
+      "kind": "Alias",
+      "name": "SeqNum",
+      "alias": "u32",
+      "description": "Sequence number of the message. Must fit into 28 bits, see OrderId for details."
+    },
+    {
+      "kind": "Alias",
+      "name": "SessionId",
+      "alias": "u16",
+      "description": "ID of the session. Must fit into 14 bits, see OrderId for details."
+    },
+    {
+      "kind": "Alias",
+      "name": "ShortCode",
+      "alias": "u32",
+      "description": "Short code (participant or clinet identifier)."
+    },
+    {
+      "kind": "Alias",
+      "name": "Timestamp",
+      "alias": "u64",
+      "description": "Timestamp in nanoseconds that has elapsed from the UNIX epoch (exact date and time of an event)."
+    },
+    {
+      "kind": "Alias",
+      "name": "TradeId",
+      "alias": "u32",
+      "description": "Unique trade id."
+    },
+    {
+      "kind": "Array",
+      "name": "Account",
+      "type": "AnsiChar",
+      "length": 16,
+      "description": "Account numer."
+    },
+    {
+      "kind": "Array",
+      "name": "CcpCode",
+      "type": "AnsiChar",
+      "length": 16,
+      "description": "CCP code."
+    },
+    {
+      "kind": "Array",
+      "name": "Token",
+      "type": "AnsiChar",
+      "length": 8,
+      "description": "The token required for authentication."
+    },
+    {
+      "kind": "Array",
+      "name": "Memo",
+      "type": "AnsiChar",
+      "length": 18,
+      "description": "Free format text string."
+    },
+    {
+      "kind": "Array",
+      "name": "Quotes",
+      "type": "Quote",
+      "length": 30,
+      "description": "An array of quotes."
+    },
+    {
+      "kind": "Enum",
+      "name": "AccountType",
+      "description": "Account type.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "Missing",
+          1,
+          "Account is missing. Account is expected to be filled with 0x00."
+        ],
+        [
+          "Customer",
+          2,
+          "Account is carried on customer side of the books."
+        ],
+        [
+          "House",
+          3,
+          "House trader."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "Capacity",
+      "description": "Designates the capacity of the firm placing the order.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "Agency",
+          1,
+          "Agency (mapped to AOTC)."
+        ],
+        [
+          "Principal",
+          2,
+          "Principal (mapped to DEAL)."
+        ],
+        [
+          "RisklessPrincipal",
+          3,
+          "Riskless Principal (mapped to MTCH)"
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "ConnectionCloseReason",
+      "description": "Reasons of the logout.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "ProtocolError",
+          1,
+          "Invalid message or frame length."
+        ],
+        [
+          "InvalidSeqNum",
+          2,
+          "Message came with an incorrect sequence number."
+        ],
+        [
+          "EndOfDay",
+          3,
+          "The session day has come to an end."
+        ],
+        [
+          "SyncFail",
+          4,
+          "The synchronization of messages has failed."
+        ],
+        [
+          "AntiFloodingThresholdExceeded",
+          5,
+          "The second level of the throttling limit has been exceeded."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "LoginResult",
+      "description": "Login response status code.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "Ok",
+          1,
+          "Successful login."
+        ],
+        [
+          "NotFound",
+          2,
+          "User not found."
+        ],
+        [
+          "InvalidToken",
+          3,
+          "Authorization failure."
+        ],
+        [
+          "AlreadyLoggedIn",
+          4,
+          "Already logged in."
+        ],
+        [
+          "AccountLocked",
+          5,
+          "Account locked."
+        ],
+        [
+          "LoginNotAllowed",
+          6,
+          "Login is currently unavailable due to reasons such as service unavailability."
+        ],
+        [
+          "InvalidLoginParameters",
+          7,
+          "The login parameters, such as the connection ID, are invalid."
+        ],
+        [
+          "ThrottlingTemporaryLock",
+          8,
+          "The login attempt failed due to exceeding the anti-flooding threshold."
+        ],
+        [
+          "Other",
+          9,
+          "Other errors."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "OrderSide",
+      "description": "Trading Port - indicates order side (buy or sell).",
+      "underlying": "u8",
+      "variants": [
+        [
+          "Buy",
+          1,
+          "Indicates a buy-side order."
+        ],
+        [
+          "Sell",
+          2,
+          "Indicates a sell-side order."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "OrderStatus",
+      "description": "Indicates the status of the order.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "Ack",
+          1,
+          "Order acknowledged by system."
+        ],
+        [
+          "Cancelled",
+          2,
+          "Order canceled."
+        ],
+        [
+          "Rejected",
+          3,
+          "Order rejected."
+        ],
+        [
+          "Filled",
+          4,
+          "Order filled."
+        ],
+        [
+          "Modified",
+          5,
+          "Order modified."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "OrderType",
+      "description": "Indicates the type of a given order.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "Limit",
+          1,
+          "Limit order type."
+        ],
+        [
+          "Market",
+          2,
+          "Market order type."
+        ],
+        [
+          "MarketToLimit",
+          3,
+          "Market to limit order type."
+        ],
+        [
+          "Iceberg",
+          4,
+          "Iceberg order type."
+        ],
+        [
+          "StopLimit",
+          5,
+          "Stop limit order type."
+        ],
+        [
+          "StopLoss",
+          6,
+          "Stop loss order type."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "PriorityFlag",
+      "description": "Indicates whether the priority flag was lost or retained.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "Lost",
+          1,
+          "The priority flag was lost."
+        ],
+        [
+          "Retained",
+          2,
+          "The priority flag was retained."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "OrderRejectionReason",
+      "description": "A code used to identify the reason for order rejection.",
+      "underlying": "u16",
+      "variants": [
+        [
+          "NA",
+          1,
+          "Not applicable."
+        ],
+        [
+          "ExchangeClosed",
+          2,
+          "Exchange closed."
+        ],
+        [
+          "InvalidPriceIncrement",
+          18,
+          "Invalid price increment."
+        ],
+        [
+          "Other",
+          99,
+          "Other."
+        ],
+        [
+          "UnknownInstrumentId",
+          100,
+          "Unknown instrument."
+        ],
+        [
+          "InstrumentPhaseNoTrading",
+          106,
+          "Trading is not available for the instrument in its current phase."
+        ],
+        [
+          "UnknownOrder",
+          1001,
+          "The order id is unrecognized."
+        ],
+        [
+          "InvalidExecutionTrader",
+          1005,
+          "Invalid execution trader."
+        ],
+        [
+          "InvalidDecisionMaker",
+          1006,
+          "Invalid decision maker."
+        ],
+        [
+          "InvalidClientId",
+          1007,
+          "Invalid client."
+        ],
+        [
+          "InvalidPartyRoleQualifierForClientId",
+          1008,
+          "Invalid Party Role Qualifier for Client Id Party group"
+        ],
+        [
+          "InvalidPartyRoleQualifierForExecutingTrader",
+          1009,
+          "Invalid Party Role Qualifier for Executing Trader Party group"
+        ],
+        [
+          "InvalidPartyRoleQualifierForInvestmentDecisionMaker",
+          1010,
+          "Invalid Party Role Qualifier for Investment Decision Maker Party group"
+        ],
+        [
+          "WrongDisplayQtyValue",
+          1013,
+          "The display quantity (displayQty) cannot exceed the order quantity."
+        ],
+        [
+          "InvalidDisplayQty",
+          1014,
+          "The Display quantity (displayQty) not allowed for specified order type - only for Iceberg."
+        ],
+        [
+          "WrongIcebergOrderValue",
+          1015,
+          "The value of the iceberg order is less than the required."
+        ],
+        [
+          "OrderQuantityMustBeGreaterThanMinimumQuantity",
+          1025,
+          "The order quantity must be greater than the minimum quanity."
+        ],
+        [
+          "OrderQuantityMustBeLowerThanMaximumQuantity",
+          1026,
+          "The order quantity must be lower than the maximum quantity."
+        ],
+        [
+          "OrderPriceMustBeGreaterThanMinimumPrice",
+          1027,
+          "The order price must be greater than minimum price."
+        ],
+        [
+          "OrderPriceMustBeLowerThanMaximumPrice",
+          1028,
+          "The order price must be greater than maximum price."
+        ],
+        [
+          "OrderPriceMustBeNonzero",
+          1029,
+          "The order price must be non-zero."
+        ],
+        [
+          "OrderValueMustBeGreaterThanMinimumValue",
+          1030,
+          "The order value must be greater than minimum value."
+        ],
+        [
+          "OrderValueMustBeLowerThanMaximumValue",
+          1031,
+          "The order value must be lower than maximum value."
+        ],
+        [
+          "MarketOrderNotAllowedInAuction",
+          1032,
+          "Market orders are not permitted during the auction."
+        ],
+        [
+          "LeavesQuantityMustBeGreaterThanZeroAfterModification",
+          1034,
+          "The remaining quantity (LeavesQty) must be greater than 0 after the modification."
+        ],
+        [
+          "PriceNotAllowed",
+          1035,
+          "The price is not allowed for a market order. In the binary protocol, the price field should have a value of 0."
+        ],
+        [
+          "InvalidMarketOrderTimeInForce",
+          1039,
+          "A market order can only have a TimeInForce value of 3 (IOC - Immediate or Cancel) or 4 (FOK - Fill or Kill)."
+        ],
+        [
+          "InvalidAuctionTimeInForce",
+          1040,
+          "The TimeInForce value of 3 (IOC - Immediate or Cancel) or 4 (FOK - Fill or Kill) is not allowed during the auction."
+        ],
+        [
+          "InvalidIcebergAndStopOrderTimeInForce",
+          1041,
+          "Iceberg and Stop orders can only have a TimeInForce value of DAY, GTC (Good Till Cancel), GTD (Good Till Date), or GTT (Good Till Time)."
+        ],
+        [
+          "ExpireDateInPast",
+          1045,
+          "The expiration date is earlier than the current date."
+        ],
+        [
+          "ExpireTimeInPast",
+          1047,
+          "The expiration time is earlier than the current time."
+        ],
+        [
+          "AmbigousExpire",
+          1048,
+          "Please provide either a time or a date, but not both."
+        ],
+        [
+          "ExpireDateExceedsLimit",
+          1049,
+          "The expiration date exceeds the allowed limit."
+        ],
+        [
+          "PriceBelowLowCollar",
+          1037,
+          "The validation for collars has failed. The price is too low."
+        ],
+        [
+          "PriceAboveHighCollar",
+          1038,
+          "The validation for collars has failed. The price is too high."
+        ],
+        [
+          "TriggerPriceNotAllowed",
+          1063,
+          "The trigger price not allowed for a specified order type."
+        ],
+        [
+          "TriggerPriceNotHigherThanLTP",
+          1064,
+          "The trigger price is not higher than the last trade price."
+        ],
+        [
+          "TriggerPriceNotLowerThanLTP",
+          1065,
+          "The trigger price is not lower than the last trade price."
+        ],
+        [
+          "TriggerPriceLowerThanPrice",
+          1066,
+          "The trigger price is lower than the limit price."
+        ],
+        [
+          "TriggerPriceHigherThanPrice",
+          1067,
+          "The trigger price is higher than the limit price."
+        ],
+        [
+          "TriggerPriceModifiedForActivatedOrder",
+          1068,
+          "The trigger price has been modified for the activated order."
+        ],
+        [
+          "InvalidPartyIdForClientId",
+          1070,
+          "Invalid PartyID (448) for Client ID"
+        ],
+        [
+          "InvalidPartyIdForExecutingTrader",
+          1071,
+          "Invalid PartyID (448) for Executing Trader"
+        ],
+        [
+          "InvalidPartyIdForInvestmentDecisionMaker",
+          1072,
+          "Invalid PartyID (448) for Investment Decision Maker"
+        ],
+        [
+          "InvalidPartyRoleQualifierForPartyId",
+          1075,
+          "Invalid PartyRoleQualifier (2376) for PartyID (448)"
+        ],
+        [
+          "InvalidBidAskSpread",
+          1208,
+          "OfferPx (133) must be greater than BidPx (132)."
+        ],
+        [
+          "RequestNotAllowedForBlockInstrument",
+          2026,
+          "Request not allowed for BLOCK instrument"
+        ],
+        [
+          "RequestNotAllowedForCrossInstrument",
+          2028,
+          "Request not allowed for CROSS instrument"
+        ],
+        [
+          "RiskLimitNotDefined",
+          7000,
+          "The risk limit has not been defined."
+        ],
+        [
+          "RiskMaximumOrderVolumeExceeded",
+          7001,
+          "The maximum order volume for the risk limit has been exceeded."
+        ],
+        [
+          "RiskMaximumOrderValueExceeded",
+          7002,
+          "The maximum order value for the risk limit has been exceeded."
+        ],
+        [
+          "RiskOrderPriceCollarExceeded",
+          7003,
+          "The order price has exceeded the risk limit."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "TimeInForce",
+      "description": "Indicates the order's time in force (e.g. GTC).",
+      "underlying": "u8",
+      "variants": [
+        [
+          "Day",
+          1,
+          "A day order is valid until the end of the trading day."
+        ],
+        [
+          "GTC",
+          2,
+          "A GTC order is good till canceled."
+        ],
+        [
+          "IOC",
+          3,
+          "An Immediate or Cancel order must be filled immediately or canceled."
+        ],
+        [
+          "FOK",
+          4,
+          "A Fill or Kill order must be filled or canceled."
+        ],
+        [
+          "VFA",
+          5,
+          "A market or limit-price order to be executed at the opening of the stock or not at all; all or part of any order not executed at the opening is treated as canceled."
+        ],
+        [
+          "GTD",
+          6,
+          "A Good Till Date order must be filled before timestamp provided in `Expire` field or canceled."
+        ],
+        [
+          "VFC",
+          7,
+          "Indicated price is to be around the closing price, however, not held to the closing price."
+        ],
+        [
+          "GTT",
+          8,
+          "A Good Till Time order must be filled before timestamp provided in `Expire` field or canceled within the day of submission."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "RejectReason",
+      "description": "Code to identify reason for a Reject message.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "NA",
+          0,
+          "Not applicable"
+        ],
+        [
+          "MaxThroughputExceeded",
+          1,
+          "Max throughput exceeded."
+        ],
+        [
+          "InvalidMsgType",
+          2,
+          "Invalid message type."
+        ],
+        [
+          "InvalidExpireTimePrecision",
+          3,
+          "Invalid expire time precision."
+        ],
+        [
+          "InvalidSettlementDate",
+          4,
+          "Invalid settlement date."
+        ],
+        [
+          "SettlementDateRequired",
+          5,
+          "Settlement date required."
+        ],
+        [
+          "TradeReportIdRequired",
+          6,
+          "Trade report ID required."
+        ],
+        [
+          "MissingReportIdSecondaryTradeReportIdOrTradeReportRefId",
+          7,
+          "Missing report id (SecondaryTradeReportId or TradeReportRefId)."
+        ]
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "Header",
+      "description": "Header used in trading port messages.",
+      "fields": [
+        {
+          "name": "length",
+          "type": "MsgLength",
+          "description": "Total length of the message."
+        },
+        {
+          "name": "msgType",
+          "type": "MsgType",
+          "description": "Type of the message (e.g. Login)."
+        },
+        {
+          "name": "seqNum",
+          "type": "SeqNum",
+          "description": "Sequence number of the message added by the sender."
+        },
+        {
+          "name": "timestamp",
+          "type": "Timestamp",
+          "description": "Sending time."
+        }
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "PartyRoleQualifier",
+      "description": "Party role qualifier.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "NA",
+          1
+        ],
+        [
+          "Algorithm",
+          2
+        ],
+        [
+          "FirmOrLegalEntity",
+          3
+        ],
+        [
+          "NaturalPerson",
+          4
+        ]
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "MifidField",
+      "description": "Field related to the MiFID directive.",
+      "fields": [
+        {
+          "name": "shortCode",
+          "type": "ShortCode",
+          "description": "Short code of MiFID participant."
+        },
+        {
+          "name": "qualifier",
+          "type": "PartyRoleQualifier",
+          "description": "Qualifier of MiFID participant."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "MifidFields",
+      "description": "Fields related to the MiFID directive.",
+      "fields": [
+        {
+          "name": "flags",
+          "type": "MifidFlags",
+          "description": "Flags raised on an order in compliance with the MiFID directive."
+        },
+        {
+          "name": "client",
+          "type": "MifidField",
+          "description": "MifidField of Client."
+        },
+        {
+          "name": "executingTrader",
+          "type": "MifidField",
+          "description": "MifidField of Executing Trader."
+        },
+        {
+          "name": "investmentDecisionMaker",
+          "type": "MifidField",
+          "description": "MifidField of Investment decision maker."
+        }
+      ]
+    },
+    {
+      "kind": "Array",
+      "name": "ClearingCode",
+      "type": "AnsiChar",
+      "length": 20,
+      "description": "Clearing member identifier."
+    },
+    {
+      "kind": "Enum",
+      "name": "ClearingIdentifier",
+      "description": "Clearing member identifier type.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "NotApplicable",
+          33,
+          "Not Applicable."
+        ],
+        [
+          "Lei",
+          78,
+          "Legal Entity Identifier."
+        ],
+        [
+          "Bic",
+          66,
+          "Business Identifier Code."
+        ],
+        [
+          "Custom",
+          68,
+          "Custom clearing identifier."
+        ]
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "ConnectionClose",
+      "description": "The ConnectionClose message confirms the termination of a session through the trading port service.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        },
+        {
+          "name": "reason",
+          "type": "ConnectionCloseReason",
+          "description": "Connection close reason."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "Heartbeat",
+      "description": "Heartbeat message",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "Login",
+      "description": "The login message authenticates a user establishing a connection to the trading port service. The login message must be the first message sent by the client application to request the initiation of a trading port session.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        },
+        {
+          "name": "version",
+          "type": "MsgVersion",
+          "description": "Indicates the version of the protocol in which the message is defined."
+        },
+        {
+          "name": "token",
+          "type": "Token",
+          "description": "The security data required for authentication, which is a token received by the exchange member during the registration process."
+        },
+        {
+          "name": "connectionId",
+          "type": "ConnectionId",
+          "description": "ID of the connection."
+        },
+        {
+          "name": "nextExpectedSeqNum",
+          "type": "SeqNum",
+          "description": "Next expected message sequence number value to be received."
+        },
+        {
+          "name": "lastSentSeqNum",
+          "type": "SeqNum",
+          "description": "Last sent sequence number."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "LoginResponse",
+      "description": "The login response message. The result field describes the login status, indicating whether the login was successful or not (i.e. successful login).",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        },
+        {
+          "name": "result",
+          "type": "LoginResult",
+          "description": "Login response status code."
+        },
+        {
+          "name": "nextExpectedSeqNum",
+          "type": "SeqNum",
+          "description": "Next expected message sequence number value to be received."
+        },
+        {
+          "name": "lastReplaySeqNum",
+          "type": "SeqNum",
+          "description": "Last replay sequence number."
+        },
+        {
+          "name": "sessionId",
+          "type": "SessionId",
+          "description": "ID of the session."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "Logout",
+      "description": "The logout message is sent from the client application to terminate the communication session with the trading port.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "LogoutResponse",
+      "description": "The logout response message confirms the client logout message.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "OrderAdd",
+      "description": "Message used to add new orders to the system.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        },
+        {
+          "name": "onBehalfOf",
+          "type": "OnBehalfOf",
+          "description": "ID of the client party on behalf which order is submitted. The default value is 0."
+        },
+        {
+          "name": "stpId",
+          "type": "STPId",
+          "description": "ID assigned by the client used in the Self Trade Prevention mechanism."
+        },
+        {
+          "name": "instrumentId",
+          "type": "ElementId",
+          "description": "ID of the instrument being traded."
+        },
+        {
+          "name": "orderType",
+          "type": "OrderType",
+          "description": "Indicates the order type."
+        },
+        {
+          "name": "timeInForce",
+          "type": "TimeInForce",
+          "description": "Indicates the order's time in force (e.g. GTC)."
+        },
+        {
+          "name": "side",
+          "type": "OrderSide",
+          "description": "Indicates the order's side (buy or sell)."
+        },
+        {
+          "name": "price",
+          "type": "Price",
+          "description": "Indicates the price of the order."
+        },
+        {
+          "name": "triggerPrice",
+          "type": "Price",
+          "description": "Indicates the trigger price (Last Trade Price - LTP) after which the order should be added to the order book."
+        },
+        {
+          "name": "quantity",
+          "type": "Quantity",
+          "description": "Indicates the quantity of the instrument included in the order."
+        },
+        {
+          "name": "displayQty",
+          "type": "Quantity",
+          "description": "Used only for iceberg order. The quantity to be displayed."
+        },
+        {
+          "name": "capacity",
+          "type": "Capacity",
+          "description": "Capacity of the party making the order (either principal or agency)."
+        },
+        {
+          "name": "account",
+          "type": "Account",
+          "description": "Account number."
+        },
+        {
+          "name": "accountType",
+          "type": "AccountType",
+          "description": "Type of account associated with the order."
+        },
+        {
+          "name": "mifidFields",
+          "type": "MifidFields",
+          "description": "Fields related to the MiFID directive."
+        },
+        {
+          "name": "expire",
+          "type": "Timestamp",
+          "description": "Expiration time indicating the validity of the order - relevant only when TimeInForce is set to GTD (Good Till Date) or GTT (Good Till Time)."
+        },
+        {
+          "name": "memo",
+          "type": "Memo",
+          "description": "Free text."
+        },
+        {
+          "name": "clearingMemberCode",
+          "type": "ClearingCode",
+          "description": "Clearing member code."
+        },
+        {
+          "name": "clearingMemberClearingIdentifier",
+          "type": "ClearingIdentifier",
+          "description": "Clearing member's clearing identifier."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "OrderAddResponse",
+      "description": "The message is a response to an OrderAdd message and includes the order execution status.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        },
+        {
+          "name": "orderId",
+          "type": "OrderId",
+          "description": "Unique for each trading day order identifier based on the sequence number of order message, bulk sequence number, session ID and connection ID."
+        },
+        {
+          "name": "publicOrderId",
+          "type": "PublicOrderId",
+          "description": "Unique for single trading day order identifier assigned by the trading system and shared publicly in market data (public information)."
+        },
+        {
+          "name": "status",
+          "type": "OrderStatus",
+          "description": "Status of the given order."
+        },
+        {
+          "name": "reason",
+          "type": "OrderRejectionReason",
+          "description": "Reason for rejecting the given order."
+        },
+        {
+          "name": "source",
+          "type": "OrderSource",
+          "description": "Response message sources can include trading ports, order cancellation mechanisms, and more."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "OrderCancel",
+      "description": "Message used to cancel the previously submitted order.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        },
+        {
+          "name": "orderId",
+          "type": "OrderId",
+          "description": "Unique for each trading day order identifier based on the sequence number of order message, bulk sequence number, session ID and connection ID."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "OrderCancelResponse",
+      "description": "The message is a response to an order cancel request and contains information about its execution, in particular whether the order to cancel was found or not.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        },
+        {
+          "name": "orderId",
+          "type": "OrderId",
+          "description": "Unique for each trading day order identifier based on the sequence number of order message, bulk sequence number, session ID and connection ID."
+        },
+        {
+          "name": "reason",
+          "type": "OrderRejectionReason",
+          "description": "Reason for rejecting the given order."
+        },
+        {
+          "name": "source",
+          "type": "OrderSource",
+          "description": "Response message sources can include trading ports, order cancellation mechanisms, and more."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "OrderModify",
+      "description": "Message used to modify the submitted order.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        },
+        {
+          "name": "orderId",
+          "type": "OrderId",
+          "description": "Unique for each trading day order identifier based on the sequence number of order message, bulk sequence number, session ID and connection ID."
+        },
+        {
+          "name": "price",
+          "type": "Price",
+          "description": "Indicates the price of the given order."
+        },
+        {
+          "name": "triggerPrice",
+          "type": "Price",
+          "description": "Indicates the trigger price (Last Trade Price - LTP) after which the order should be added to the order book."
+        },
+        {
+          "name": "quantity",
+          "type": "Quantity",
+          "description": "Indicates the quantity of the instrument included in the order."
+        },
+        {
+          "name": "displayQty",
+          "type": "Quantity",
+          "description": "Used only for iceberg order. The quantity to be displayed."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "OrderModifyResponse",
+      "description": "The response message for an OrderModify.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        },
+        {
+          "name": "orderId",
+          "type": "OrderId",
+          "description": "Unique for each trading day order identifier based on the sequence number of order message, bulk sequence number, session ID and connection ID."
+        },
+        {
+          "name": "status",
+          "type": "OrderStatus",
+          "description": "Status of the given order."
+        },
+        {
+          "name": "priorityFlag",
+          "type": "PriorityFlag",
+          "description": "Indicates whether the priority flag is lost or retained after modification."
+        },
+        {
+          "name": "reason",
+          "type": "OrderRejectionReason",
+          "description": "Reason for rejecting the given order."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "Test",
+      "description": "The internal message for a test purpose.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        },
+        {
+          "name": "targetTimestamp",
+          "type": "Timestamp",
+          "description": "Test timestamp (e.g. the send time of a message)."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "Trade",
+      "description": "The message used to report trades between counterparties (i.e. generated when two or more orders are matched).",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        },
+        {
+          "name": "orderId",
+          "type": "OrderId",
+          "description": "Unique for each trading day order identifier based on the sequence number of order message, bulk sequence number, session ID and connection ID."
+        },
+        {
+          "name": "id",
+          "type": "TradeId",
+          "description": "ID of the trade."
+        },
+        {
+          "name": "price",
+          "type": "Price",
+          "description": "Price of the given trade."
+        },
+        {
+          "name": "quantity",
+          "type": "Quantity",
+          "description": "Quantity of the instrument involved in the given trade."
+        },
+        {
+          "name": "leavesQty",
+          "type": "Quantity",
+          "description": "How much of the given security is left on the market after the trade is concluded."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "Reject",
+      "description": "The reject message is sent by the trading port service when receiving an erroneous message that cannot be further processed.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        },
+        {
+          "name": "refSeqNum",
+          "type": "SeqNum",
+          "description": "Sequence number of the rejected message."
+        },
+        {
+          "name": "rejectReason",
+          "type": "RejectReason",
+          "description": "Reject reason."
+        }
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "TradeReportType",
+      "description": "Type of Trade Report.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "Submit",
+          1,
+          "Submit"
+        ],
+        [
+          "Alleged",
+          2,
+          "Alleged"
+        ],
+        [
+          "Accept",
+          3,
+          "Accept"
+        ],
+        [
+          "Decline",
+          4,
+          "Decline"
+        ],
+        [
+          "TradeReportCancel",
+          7,
+          "Trade Report Cancel"
+        ]
+      ]
+    },
+    {
+      "kind": "Alias",
+      "name": "Date",
+      "alias": "u32",
+      "description": "Date (YYYYMMDD) as integer value. In case of undefined date value of '0' (zero) is used."
+    },
+    {
+      "kind": "Array",
+      "name": "MicCode",
+      "type": "AnsiChar",
+      "length": 4,
+      "description": "Market Identifier Code (MIC) as specified in ISO 10383."
+    },
+    {
+      "kind": "Enum",
+      "name": "TradeReportTransType",
+      "description": "Identifies Trade Report message transaction type.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "New",
+          1,
+          "New."
+        ],
+        [
+          "Cancel",
+          2,
+          "Cancel."
+        ],
+        [
+          "Replace",
+          3,
+          "Replace."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "TradeType",
+      "description": "Type of trade.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "PrivatelyNegotiatedTrade",
+          22,
+          "Privately negotiated trade."
+        ],
+        [
+          "BlockTrade",
+          38,
+          "Block trade."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "TcrStatus",
+      "description": "Trade Report status.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "New",
+          1,
+          "New."
+        ],
+        [
+          "Accepted",
+          2,
+          "Accepted."
+        ],
+        [
+          "Rejected",
+          3,
+          "Rejected."
+        ],
+        [
+          "Cancelled",
+          4,
+          "Cancelled."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "TcrRejectionReason",
+      "description": "Code to identify the reason for TCR rejection",
+      "underlying": "u16",
+      "variants": [
+        [
+          "NA",
+          1,
+          "Not applicable."
+        ],
+        [
+          "ExchangeClosed",
+          2,
+          "Exchange closed."
+        ],
+        [
+          "InvalidPriceIncrement",
+          18,
+          "Invalid price increment."
+        ],
+        [
+          "Other",
+          99,
+          "Other."
+        ],
+        [
+          "UnknownInstrumentId",
+          100,
+          "Unknown instrument."
+        ],
+        [
+          "InstrumentPhaseNoTrading",
+          106,
+          "Trading is not available for the instrument in its current phase."
+        ],
+        [
+          "InvalidExecutionTrader",
+          1005,
+          "Invalid execution trader."
+        ],
+        [
+          "InvalidDecisionMaker",
+          1006,
+          "Invalid decision maker."
+        ],
+        [
+          "InvalidClientId",
+          1007,
+          "Invalid client."
+        ],
+        [
+          "InvalidPartyRoleQualifierForClientId",
+          1008,
+          "Invalid Party Role Qualifier for Client Id Party group"
+        ],
+        [
+          "InvalidPartyRoleQualifierForExecutingTrader",
+          1009,
+          "Invalid Party Role Qualifier for Executing Trader Party group"
+        ],
+        [
+          "InvalidPartyRoleQualifierForInvestmentDecisionMaker",
+          1010,
+          "Invalid Party Role Qualifier for Investment Decision Maker Party group"
+        ],
+        [
+          "OrderQuantityMustBeGreaterThanMinimumQuantity",
+          1025,
+          "The order quantity must be greater than the minimum quanity."
+        ],
+        [
+          "OrderQuantityMustBeLowerThanMaximumQuantity",
+          1026,
+          "The order quantity must be lower than the maximum quantity."
+        ],
+        [
+          "OrderPriceMustBeGreaterThanMinimumPrice",
+          1027,
+          "The order price must be greater than minimum price."
+        ],
+        [
+          "OrderPriceMustBeLowerThanMaximumPrice",
+          1028,
+          "The order price must be greater than maximum price."
+        ],
+        [
+          "OrderPriceMustBeNonzero",
+          1029,
+          "The order price must be non-zero."
+        ],
+        [
+          "OrderValueMustBeGreaterThanMinimumValue",
+          1030,
+          "The order value must be greater than minimum value."
+        ],
+        [
+          "OrderValueMustBeLowerThanMaximumValue",
+          1031,
+          "The order value must be lower than maximum value."
+        ],
+        [
+          "PriceBelowLowCollar",
+          1037,
+          "The validation for collars has failed. The price is too low."
+        ],
+        [
+          "PriceAboveHighCollar",
+          1038,
+          "The validation for collars has failed. The price is too high."
+        ],
+        [
+          "InvalidPartyIdForClientId",
+          1070,
+          "Invalid PartyID (448) for Client ID"
+        ],
+        [
+          "InvalidPartyIdForExecutingTrader",
+          1071,
+          "Invalid PartyID (448) for Executing Trader"
+        ],
+        [
+          "InvalidPartyIdForInvestmentDecisionMaker",
+          1072,
+          "Invalid PartyID (448) for Investment Decision Maker"
+        ],
+        [
+          "InvalidPartyRoleQualifierForPartyId",
+          1075,
+          "Invalid PartyRoleQualifier (2376) for PartyID (448)"
+        ],
+        [
+          "UnknownTradeReport",
+          2001,
+          "Unknown trade report"
+        ],
+        [
+          "DuplicateTradeReportId",
+          2002,
+          "Duplicate TradeReportId"
+        ],
+        [
+          "TradeReportTypeNotCompatibleWithTradeReportTransType",
+          2005,
+          "TradeReportType not compatible with TradeReportTransType"
+        ],
+        [
+          "InvalidExecType",
+          2008,
+          "Invalid ExecType"
+        ],
+        [
+          "TradeReportRefIdNotAllowed",
+          2009,
+          "TradeReportRefId not allowed"
+        ],
+        [
+          "SettlementDateCannotBeEarlierThanMinimumSettlementDate",
+          2015,
+          "Settlement date cannot be earlier than minimum settlement date"
+        ],
+        [
+          "SettlementDateCannotBeLaterThanMaximumSettlementDate",
+          2016,
+          "Settlement date cannot be later than maximum settlement date"
+        ],
+        [
+          "UnknownContraFirm",
+          2022,
+          "Unknown contra firm."
+        ],
+        [
+          "SentAttributeDoesNotMatchOriginalValue",
+          2024,
+          "Sent attribute does not match original value"
+        ],
+        [
+          "RequestNotAllowedForBlockInstrument",
+          2026,
+          "Request not allowed for BLOCK instrument"
+        ],
+        [
+          "RequestNotAllowedForClobInstrument",
+          2027,
+          "Request not allowed for CLOB instrument"
+        ],
+        [
+          "RequestNotAllowedForCrossInstrument",
+          2028,
+          "Request not allowed for CROSS instrument"
+        ],
+        [
+          "InvalidMatchStatus",
+          2029,
+          "Invalid MatchStatus"
+        ],
+        [
+          "CrossNotAllowedOutsideOfClobInstrumentSpread",
+          2030,
+          "Cross not allowed outside of CLOB instrument spread"
+        ],
+        [
+          "CrossPriceNotEqualToTheReferencePrice",
+          2031,
+          "Cross price not equal to the reference price"
+        ],
+        [
+          "CrossNotAllowedDuringClobInstrumentAuctionOrSuspension",
+          2032,
+          "Cross not allowed during CLOB instrument Auction or Suspension"
+        ],
+        [
+          "ForbiddenSecondaryTradereportId",
+          2033,
+          "Forbidden SecondaryTradeReportID"
+        ],
+        [
+          "UnknownSecondaryTradereportId",
+          2034,
+          "Unknown SecondaryTradeReportID"
+        ]
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "TcrParty",
+      "description": "Information about Trade Capture Report party.",
+      "fields": [
+        {
+          "name": "mifidFields",
+          "type": "MifidFields",
+          "description": "Fields related to the MiFID directive."
+        },
+        {
+          "name": "account",
+          "type": "Account",
+          "description": "Account number."
+        },
+        {
+          "name": "accountType",
+          "type": "AccountType",
+          "description": "Type of account associated with the order."
+        },
+        {
+          "name": "orderCapacity",
+          "type": "Capacity",
+          "description": "Designates the capacity of the firm placing the order."
+        },
+        {
+          "name": "orderRestrictions",
+          "type": "ElementId",
+          "description": "Restrictions associated with an order."
+        },
+        {
+          "name": "orderOrigination",
+          "type": "ElementId",
+          "description": "Identifies the origin of the order."
+        },
+        {
+          "name": "memo",
+          "type": "Memo",
+          "description": "Free text."
+        }
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "Currency",
+      "description": "Currency - ISO 4217 (2022/04/01) code (e.g. PLN).",
+      "underlying": "u16",
+      "variants": [
+        [
+          "ALL",
+          8,
+          "Lek"
+        ],
+        [
+          "DZD",
+          12,
+          "Algerian Dinar"
+        ],
+        [
+          "ARS",
+          32,
+          "Argentine Peso"
+        ],
+        [
+          "AUD",
+          36,
+          "Australian Dollar"
+        ],
+        [
+          "BSD",
+          44,
+          "Bahamian Dollar"
+        ],
+        [
+          "BHD",
+          48,
+          "Bahraini Dinar"
+        ],
+        [
+          "BDT",
+          50,
+          "Taka"
+        ],
+        [
+          "AMD",
+          51,
+          "Armenian Dram"
+        ],
+        [
+          "BBD",
+          52,
+          "Barbados Dollar"
+        ],
+        [
+          "BMD",
+          60,
+          "Bermudian Dollar"
+        ],
+        [
+          "BTN",
+          64,
+          "Ngultrum"
+        ],
+        [
+          "BOB",
+          68,
+          "Boliviano"
+        ],
+        [
+          "BWP",
+          72,
+          "Pula"
+        ],
+        [
+          "BZD",
+          84,
+          "Belize Dollar"
+        ],
+        [
+          "SBD",
+          90,
+          "Solomon Islands Dollar"
+        ],
+        [
+          "BND",
+          96,
+          "Brunei Dollar"
+        ],
+        [
+          "MMK",
+          104,
+          "Kyat"
+        ],
+        [
+          "BIF",
+          108,
+          "Burundi Franc"
+        ],
+        [
+          "KHR",
+          116,
+          "Riel"
+        ],
+        [
+          "CAD",
+          124,
+          "Canadian Dollar"
+        ],
+        [
+          "CVE",
+          132,
+          "Cabo Verde Escudo"
+        ],
+        [
+          "KYD",
+          136,
+          "Cayman Islands Dollar"
+        ],
+        [
+          "LKR",
+          144,
+          "Sri Lanka Rupee"
+        ],
+        [
+          "CLP",
+          152,
+          "Chilean Peso"
+        ],
+        [
+          "CNY",
+          156,
+          "Yuan Renminbi"
+        ],
+        [
+          "COP",
+          170,
+          "Colombian Peso"
+        ],
+        [
+          "KMF",
+          174,
+          "Comorian Franc "
+        ],
+        [
+          "CRC",
+          188,
+          "Costa Rican Colon"
+        ],
+        [
+          "HRK",
+          191,
+          "Kuna"
+        ],
+        [
+          "CUP",
+          192,
+          "Cuban Peso"
+        ],
+        [
+          "CZK",
+          203,
+          "Czech Koruna"
+        ],
+        [
+          "DKK",
+          208,
+          "Danish Krone"
+        ],
+        [
+          "DOP",
+          214,
+          "Dominican Peso"
+        ],
+        [
+          "SVC",
+          222,
+          "El Salvador Colon"
+        ],
+        [
+          "ETB",
+          230,
+          "Ethiopian Birr"
+        ],
+        [
+          "ERN",
+          232,
+          "Nakfa"
+        ],
+        [
+          "FKP",
+          238,
+          "Falkland Islands Pound"
+        ],
+        [
+          "FJD",
+          242,
+          "Fiji Dollar"
+        ],
+        [
+          "DJF",
+          262,
+          "Djibouti Franc"
+        ],
+        [
+          "GMD",
+          270,
+          "Dalasi"
+        ],
+        [
+          "GIP",
+          292,
+          "Gibraltar Pound"
+        ],
+        [
+          "GTQ",
+          320,
+          "Quetzal"
+        ],
+        [
+          "GNF",
+          324,
+          "Guinean Franc"
+        ],
+        [
+          "GYD",
+          328,
+          "Guyana Dollar"
+        ],
+        [
+          "HTG",
+          332,
+          "Gourde"
+        ],
+        [
+          "HNL",
+          340,
+          "Lempira"
+        ],
+        [
+          "HKD",
+          344,
+          "Hong Kong Dollar"
+        ],
+        [
+          "HUF",
+          348,
+          "Forint"
+        ],
+        [
+          "ISK",
+          352,
+          "Iceland Krona"
+        ],
+        [
+          "INR",
+          356,
+          "Indian Rupee"
+        ],
+        [
+          "IDR",
+          360,
+          "Rupiah"
+        ],
+        [
+          "IRR",
+          364,
+          "Iranian Rial"
+        ],
+        [
+          "IQD",
+          368,
+          "Iraqi Dinar"
+        ],
+        [
+          "ILS",
+          376,
+          "New Israeli Sheqel"
+        ],
+        [
+          "JMD",
+          388,
+          "Jamaican Dollar"
+        ],
+        [
+          "JPY",
+          392,
+          "Yen"
+        ],
+        [
+          "KZT",
+          398,
+          "Tenge"
+        ],
+        [
+          "JOD",
+          400,
+          "Jordanian Dinar"
+        ],
+        [
+          "KES",
+          404,
+          "Kenyan Shilling"
+        ],
+        [
+          "KPW",
+          408,
+          "North Korean Won"
+        ],
+        [
+          "KRW",
+          410,
+          "Won"
+        ],
+        [
+          "KWD",
+          414,
+          "Kuwaiti Dinar"
+        ],
+        [
+          "KGS",
+          417,
+          "Som"
+        ],
+        [
+          "LAK",
+          418,
+          "Lao Kip"
+        ],
+        [
+          "LBP",
+          422,
+          "Lebanese Pound"
+        ],
+        [
+          "LSL",
+          426,
+          "Loti"
+        ],
+        [
+          "LRD",
+          430,
+          "Liberian Dollar"
+        ],
+        [
+          "LYD",
+          434,
+          "Libyan Dinar"
+        ],
+        [
+          "MOP",
+          446,
+          "Pataca"
+        ],
+        [
+          "MWK",
+          454,
+          "Malawi Kwacha"
+        ],
+        [
+          "MYR",
+          458,
+          "Malaysian Ringgit"
+        ],
+        [
+          "MVR",
+          462,
+          "Rufiyaa"
+        ],
+        [
+          "MUR",
+          480,
+          "Mauritius Rupee"
+        ],
+        [
+          "MXN",
+          484,
+          "Mexican Peso"
+        ],
+        [
+          "MNT",
+          496,
+          "Tugrik"
+        ],
+        [
+          "MDL",
+          498,
+          "Moldovan Leu"
+        ],
+        [
+          "MAD",
+          504,
+          "Moroccan Dirham"
+        ],
+        [
+          "OMR",
+          512,
+          "Rial Omani"
+        ],
+        [
+          "NAD",
+          516,
+          "Namibia Dollar"
+        ],
+        [
+          "NPR",
+          524,
+          "Nepalese Rupee"
+        ],
+        [
+          "ANG",
+          532,
+          "Netherlands Antillean Guilder"
+        ],
+        [
+          "AWG",
+          533,
+          "Aruban Florin"
+        ],
+        [
+          "VUV",
+          548,
+          "Vatu"
+        ],
+        [
+          "NZD",
+          554,
+          "New Zealand Dollar"
+        ],
+        [
+          "NIO",
+          558,
+          "Cordoba Oro"
+        ],
+        [
+          "NGN",
+          566,
+          "Naira"
+        ],
+        [
+          "NOK",
+          578,
+          "Norwegian Krone"
+        ],
+        [
+          "PKR",
+          586,
+          "Pakistan Rupee"
+        ],
+        [
+          "PAB",
+          590,
+          "Balboa"
+        ],
+        [
+          "PGK",
+          598,
+          "Kina"
+        ],
+        [
+          "PYG",
+          600,
+          "Guarani"
+        ],
+        [
+          "PEN",
+          604,
+          "Sol"
+        ],
+        [
+          "PHP",
+          608,
+          "Philippine Peso"
+        ],
+        [
+          "QAR",
+          634,
+          "Qatari Rial"
+        ],
+        [
+          "RUB",
+          643,
+          "Russian Ruble"
+        ],
+        [
+          "RWF",
+          646,
+          "Rwanda Franc"
+        ],
+        [
+          "SHP",
+          654,
+          "Saint Helena Pound"
+        ],
+        [
+          "SAR",
+          682,
+          "Saudi Riyal"
+        ],
+        [
+          "SCR",
+          690,
+          "Seychelles Rupee"
+        ],
+        [
+          "SGD",
+          702,
+          "Singapore Dollar"
+        ],
+        [
+          "VND",
+          704,
+          "Dong"
+        ],
+        [
+          "SOS",
+          706,
+          "Somali Shilling"
+        ],
+        [
+          "ZAR",
+          710,
+          "Rand"
+        ],
+        [
+          "SSP",
+          728,
+          "South Sudanese Pound"
+        ],
+        [
+          "SZL",
+          748,
+          "Lilangeni"
+        ],
+        [
+          "SEK",
+          752,
+          "Swedish Krona"
+        ],
+        [
+          "CHF",
+          756,
+          "Swiss Franc"
+        ],
+        [
+          "SYP",
+          760,
+          "Syrian Pound"
+        ],
+        [
+          "THB",
+          764,
+          "Baht"
+        ],
+        [
+          "TOP",
+          776,
+          "Pa’anga"
+        ],
+        [
+          "TTD",
+          780,
+          "Trinidad and Tobago Dollar"
+        ],
+        [
+          "AED",
+          784,
+          "UAE Dirham"
+        ],
+        [
+          "TND",
+          788,
+          "Tunisian Dinar"
+        ],
+        [
+          "UGX",
+          800,
+          "Uganda Shilling"
+        ],
+        [
+          "MKD",
+          807,
+          "Denar"
+        ],
+        [
+          "EGP",
+          818,
+          "Egyptian Pound"
+        ],
+        [
+          "GBP",
+          826,
+          "Pound Sterling"
+        ],
+        [
+          "TZS",
+          834,
+          "Tanzanian Shilling"
+        ],
+        [
+          "USD",
+          840,
+          "US Dollar"
+        ],
+        [
+          "UYU",
+          858,
+          "Peso Uruguayo"
+        ],
+        [
+          "UZS",
+          860,
+          "Uzbekistan Sum"
+        ],
+        [
+          "WST",
+          882,
+          "Tala"
+        ],
+        [
+          "YER",
+          886,
+          "Yemeni Rial"
+        ],
+        [
+          "TWD",
+          901,
+          "New Taiwan Dollar"
+        ],
+        [
+          "SLE",
+          925,
+          "Leone"
+        ],
+        [
+          "VED",
+          926,
+          "Bolívar Soberano"
+        ],
+        [
+          "UYW",
+          927,
+          "Unidad Previsional"
+        ],
+        [
+          "VES",
+          928,
+          "Bolívar Soberano"
+        ],
+        [
+          "MRU",
+          929,
+          "Ouguiya"
+        ],
+        [
+          "STN",
+          930,
+          "Dobra"
+        ],
+        [
+          "CUC",
+          931,
+          "Peso Convertible"
+        ],
+        [
+          "ZWL",
+          932,
+          "Zimbabwe Dollar"
+        ],
+        [
+          "BYN",
+          933,
+          "Belarusian Ruble"
+        ],
+        [
+          "TMT",
+          934,
+          "Turkmenistan New Manat"
+        ],
+        [
+          "GHS",
+          936,
+          "Ghana Cedi"
+        ],
+        [
+          "SDG",
+          938,
+          "Sudanese Pound"
+        ],
+        [
+          "UYI",
+          940,
+          "[object Object]"
+        ],
+        [
+          "RSD",
+          941,
+          "Serbian Dinar"
+        ],
+        [
+          "MZN",
+          943,
+          "Mozambique Metical"
+        ],
+        [
+          "AZN",
+          944,
+          "Azerbaijan Manat"
+        ],
+        [
+          "RON",
+          946,
+          "Romanian Leu"
+        ],
+        [
+          "CHE",
+          947,
+          "[object Object]"
+        ],
+        [
+          "CHW",
+          948,
+          "[object Object]"
+        ],
+        [
+          "TRY",
+          949,
+          "Turkish Lira"
+        ],
+        [
+          "XAF",
+          950,
+          "CFA Franc BEAC"
+        ],
+        [
+          "XCD",
+          951,
+          "East Caribbean Dollar"
+        ],
+        [
+          "XOF",
+          952,
+          "CFA Franc BCEAO"
+        ],
+        [
+          "XPF",
+          953,
+          "CFP Franc"
+        ],
+        [
+          "XBA",
+          955,
+          "Bond Markets Unit European Composite Unit (EURCO)"
+        ],
+        [
+          "XBB",
+          956,
+          "Bond Markets Unit European Monetary Unit (E.M.U.-6)"
+        ],
+        [
+          "XBC",
+          957,
+          "Bond Markets Unit European Unit of Account 9 (E.U.A.-9)"
+        ],
+        [
+          "XBD",
+          958,
+          "Bond Markets Unit European Unit of Account 17 (E.U.A.-17)"
+        ],
+        [
+          "XAU",
+          959,
+          "Gold"
+        ],
+        [
+          "XDR",
+          960,
+          "SDR (Special Drawing Right)"
+        ],
+        [
+          "XAG",
+          961,
+          "Silver"
+        ],
+        [
+          "XPT",
+          962,
+          "Platinum"
+        ],
+        [
+          "XTS",
+          963,
+          "Codes specifically reserved for testing purposes"
+        ],
+        [
+          "XPD",
+          964,
+          "Palladium"
+        ],
+        [
+          "XUA",
+          965,
+          "ADB Unit of Account"
+        ],
+        [
+          "ZMW",
+          967,
+          "Zambian Kwacha"
+        ],
+        [
+          "SRD",
+          968,
+          "Surinam Dollar"
+        ],
+        [
+          "MGA",
+          969,
+          "Malagasy Ariary"
+        ],
+        [
+          "COU",
+          970,
+          "[object Object]"
+        ],
+        [
+          "AFN",
+          971,
+          "Afghani"
+        ],
+        [
+          "TJS",
+          972,
+          "Somoni"
+        ],
+        [
+          "AOA",
+          973,
+          "Kwanza"
+        ],
+        [
+          "BGN",
+          975,
+          "Bulgarian Lev"
+        ],
+        [
+          "CDF",
+          976,
+          "Congolese Franc"
+        ],
+        [
+          "BAM",
+          977,
+          "Convertible Mark"
+        ],
+        [
+          "EUR",
+          978,
+          "Euro"
+        ],
+        [
+          "MXV",
+          979,
+          "[object Object]"
+        ],
+        [
+          "UAH",
+          980,
+          "Hryvnia"
+        ],
+        [
+          "GEL",
+          981,
+          "Lari"
+        ],
+        [
+          "BOV",
+          984,
+          "[object Object]"
+        ],
+        [
+          "PLN",
+          985,
+          "Zloty"
+        ],
+        [
+          "BRL",
+          986,
+          "Brazilian Real"
+        ],
+        [
+          "CLF",
+          990,
+          "[object Object]"
+        ],
+        [
+          "XSU",
+          994,
+          "Sucre"
+        ],
+        [
+          "USN",
+          997,
+          "[object Object]"
+        ],
+        [
+          "XXX",
+          999,
+          "The codes assigned for transactions where no currency is involved"
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "AlgorithmicTradeIndicator",
+      "description": "Indicates algorithmic trade.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "NA",
+          1,
+          "Not applicable."
+        ],
+        [
+          "NonAlgorithmicTrade",
+          2,
+          "Non-algorithmic trade."
+        ],
+        [
+          "AlgorithmicTrade",
+          3,
+          "Algorithmic trade."
+        ]
+      ]
+    },
+    {
+      "kind": "Array",
+      "name": "TradeReportId",
+      "type": "AnsiChar",
+      "length": 20,
+      "description": "Unique identifier of trade capture report."
+    },
+    {
+      "kind": "Array",
+      "name": "TradeReportRefID",
+      "type": "AnsiChar",
+      "length": 20,
+      "description": "Reference identifier used with Cancel and Replace transaction types. The TradeReportID that is being referenced for trade correction or cancelation."
+    },
+    {
+      "kind": "Array",
+      "name": "MarketSegmentID",
+      "type": "AnsiChar",
+      "length": 2,
+      "description": "Identifies the market segment."
+    },
+    {
+      "kind": "Array",
+      "name": "SecurityAltID",
+      "type": "AnsiChar",
+      "length": 12,
+      "description": "Alternate Security identifier value for this security of SecurityAltIDSource type (e.g. CUSIP, SEDOL, ISIN, etc)."
+    },
+    {
+      "kind": "Enum",
+      "name": "SecurityIdSource",
+      "description": "Identifies class or source of the SecurityID value.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "CUSIP",
+          1,
+          "CUSIP."
+        ],
+        [
+          "SEDOL",
+          2,
+          "SEDOL."
+        ],
+        [
+          "ISIN",
+          4,
+          "ISIN."
+        ],
+        [
+          "ExchangeSymbol",
+          8,
+          "Exchange Symbol."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "NoSides",
+      "description": "Number of sides.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "OneSide",
+          1,
+          "One Side."
+        ],
+        [
+          "BothSides",
+          2,
+          "Both Sides."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "PartyId",
+      "description": "Identification of the party.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "NONE",
+          1,
+          "No client for this order."
+        ],
+        [
+          "AGGR",
+          2,
+          "An aggregation of multiple client orders."
+        ],
+        [
+          "PNAL",
+          3,
+          "Clients are pending allocation."
+        ],
+        [
+          "NORE",
+          4,
+          "Timing and location of the execution determined by the client of the participant."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "PartyIdSource",
+      "description": "Used to identify classification source of the party id.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "Proprietary",
+          68,
+          "Proprietary / Custom code."
+        ],
+        [
+          "ShortCode",
+          80,
+          "Short code identifier."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "ExecType",
+      "description": "Type of execution being reported. Uses subset of ExecType for trade capture reports.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "New",
+          1,
+          "New."
+        ],
+        [
+          "Rejected",
+          8,
+          "Rejected."
+        ],
+        [
+          "Trade",
+          15,
+          "Trade."
+        ],
+        [
+          "TradeCorrect",
+          16,
+          "Trade Correct."
+        ],
+        [
+          "TradeCancel",
+          17,
+          "Trade Cancel."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "MatchStatus",
+      "description": "The status of this trade with respect to matching or comparison.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "NA",
+          0,
+          "Not applicable."
+        ],
+        [
+          "Matched",
+          1,
+          "Compared, matched or affirmed."
+        ],
+        [
+          "Unmatched",
+          2,
+          "Uncompared, unmatched, or unaffirmed."
+        ]
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "TradeBust",
+      "description": "Message used to cancel previously accepted Trade Capture Report.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        },
+        {
+          "name": "tradeId",
+          "type": "TradeId",
+          "description": "The unique ID assigned to the trade entity once it is received or matched by the exchange or central counterparty."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "TradeCaptureReportSingle",
+      "description": "Trade Capture Report - single side.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        },
+        {
+          "name": "instrumentId",
+          "type": "ElementId",
+          "description": "ID of the instrument included in the order."
+        },
+        {
+          "name": "tradeReportId",
+          "type": "TradeReportId",
+          "description": "Unique identifier of the trade capture report."
+        },
+        {
+          "name": "secondaryTradeReportId",
+          "type": "OrderId",
+          "description": "ID of the trade capture report."
+        },
+        {
+          "name": "tradeId",
+          "type": "TradeId",
+          "description": "The unique ID assigned to the trade entity once it is received or matched by the exchange or central counterparty."
+        },
+        {
+          "name": "tradeReportTransType",
+          "type": "TradeReportTransType",
+          "description": "Identifies Trade Report message transaction type."
+        },
+        {
+          "name": "tradeReportType",
+          "type": "TradeReportType",
+          "description": "Type of Trade Report."
+        },
+        {
+          "name": "tradeType",
+          "type": "TradeType",
+          "description": "Type of trade."
+        },
+        {
+          "name": "algorithmicTradeIndicator",
+          "type": "AlgorithmicTradeIndicator",
+          "description": "Indicates algorithmic trader."
+        },
+        {
+          "name": "execType",
+          "type": "ExecType",
+          "description": "Type of execution being reported. Uses subset of ExecType for trade capture reports."
+        },
+        {
+          "name": "tradeReportRefId",
+          "type": "TradeReportRefID",
+          "description": "Reference identifier used with Cancel and Replace transaction types. The TradeReportID that is being referenced for trade correction or cancelation."
+        },
+        {
+          "name": "lastQty",
+          "type": "Quantity",
+          "description": "Quantity (e.g. shares) bought/sold on this (last) fill."
+        },
+        {
+          "name": "lastPx",
+          "type": "Price",
+          "description": "Price of this (last) fill."
+        },
+        {
+          "name": "settlementDate",
+          "type": "Date",
+          "description": "Settlement date of the trade is equal to current date plus actual settlement offset calendar days."
+        },
+        {
+          "name": "matchStatus",
+          "type": "MatchStatus",
+          "description": "The status of this trade with respect to matching or comparison."
+        },
+        {
+          "name": "side",
+          "type": "OrderSide",
+          "description": "Side of order."
+        },
+        {
+          "name": "counterpartyCode",
+          "type": "CcpCode",
+          "description": "CCP code of the counterparty."
+        },
+        {
+          "name": "tcrParty",
+          "type": "TcrParty",
+          "description": "TCR party."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "TradeCaptureReportDual",
+      "description": "Trade Capture Report - dual sided.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        },
+        {
+          "name": "instrumentId",
+          "type": "ElementId",
+          "description": "ID of the instrument included in the order."
+        },
+        {
+          "name": "tradeReportId",
+          "type": "TradeReportId",
+          "description": "Unique identifier of trade capture report."
+        },
+        {
+          "name": "tradeId",
+          "type": "TradeId",
+          "description": "The unique ID assigned to the trade entity once it is received or matched by the exchange or central counterparty."
+        },
+        {
+          "name": "tradeReportTransType",
+          "type": "TradeReportTransType",
+          "description": "Identifies Trade Report message transaction type."
+        },
+        {
+          "name": "tradeReportType",
+          "type": "TradeReportType",
+          "description": "Type of Trade Report."
+        },
+        {
+          "name": "tradeType",
+          "type": "TradeType",
+          "description": "Type of trade."
+        },
+        {
+          "name": "algorithmicTradeIndicator",
+          "type": "AlgorithmicTradeIndicator",
+          "description": "Indicates algorithmic trade."
+        },
+        {
+          "name": "execType",
+          "type": "ExecType",
+          "description": "Type of execution being reported. Uses subset of ExecType for trade capture reports."
+        },
+        {
+          "name": "tradeReportRefId",
+          "type": "TradeReportRefID",
+          "description": "Reference identifier used with Cancel and Replace transaction types. The TradeReportID that is being referenced for trade correction or cancelation."
+        },
+        {
+          "name": "lastQty",
+          "type": "Quantity",
+          "description": "Quantity (e.g. shares) bought/sold on this (last) fill."
+        },
+        {
+          "name": "lastPx",
+          "type": "Price",
+          "description": "Price of this (last) fill."
+        },
+        {
+          "name": "settlementDate",
+          "type": "Date",
+          "description": "Settlement date of the trade is equal to current date plus actual settlement offset calendar days."
+        },
+        {
+          "name": "matchStatus",
+          "type": "MatchStatus",
+          "description": "The status of this trade with respect to matching or comparison."
+        },
+        {
+          "name": "tcrPartyBuy",
+          "type": "TcrParty",
+          "description": "TCR party - buy side."
+        },
+        {
+          "name": "tcrPartySell",
+          "type": "TcrParty",
+          "description": "TCR party - sell side."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "TradeCaptureReportResponse",
+      "description": "The message is a response to an Trade Capture Report message, containing the state of TCR execution.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        },
+        {
+          "name": "instrumentId",
+          "type": "ElementId",
+          "description": "ID of the instrument included in the order."
+        },
+        {
+          "name": "tradeId",
+          "type": "TradeId",
+          "description": "The unique ID assigned to the trade entity once it is received or matched by the exchange or central counterparty."
+        },
+        {
+          "name": "tradeReportId",
+          "type": "TradeReportId",
+          "description": "Unique identifier of trade capture report."
+        },
+        {
+          "name": "secondaryTradeReportId",
+          "type": "OrderId",
+          "description": "ID of the trade capture report."
+        },
+        {
+          "name": "status",
+          "type": "TcrStatus",
+          "description": "Status of the given order."
+        },
+        {
+          "name": "reason",
+          "type": "TcrRejectionReason",
+          "description": "Reason for rejecting the given TCR."
+        }
+      ]
+    },
+    {
+      "kind": "Alias",
+      "name": "RiskLimitAmount",
+      "alias": "u64",
+      "description": "Risk Limit Amount."
+    },
+    {
+      "kind": "Alias",
+      "name": "RiskDefinitionId",
+      "alias": "u64",
+      "description": "Risk limit definition id."
+    },
+    {
+      "kind": "Enum",
+      "name": "RiskLimitType",
+      "description": "Indicates the risk controls.",
+      "underlying": "u16",
+      "variants": [
+        [
+          "PerBuyOrderVolume",
+          301,
+          "Per buy order volume."
+        ],
+        [
+          "PerBuyOrderNotionalValue",
+          302,
+          "Per buy order notional value."
+        ],
+        [
+          "PerSellOrderVolume",
+          311,
+          "Per sell order volume."
+        ],
+        [
+          "PerSellOrderNotionalValue",
+          312,
+          "Per sell order notional value."
+        ],
+        [
+          "PerBuyPriceLimit",
+          313,
+          "Per buy price limit."
+        ],
+        [
+          "PerSellPriceLimit",
+          314,
+          "Per Sell Price Limit."
+        ],
+        [
+          "PerTotalBuyTradedValue",
+          315,
+          "Per total buy traded value."
+        ],
+        [
+          "PerTotalSellTradedValue",
+          316,
+          "Per total sell traded value."
+        ],
+        [
+          "PerTotalTradedValue",
+          317,
+          "Per total traded value."
+        ],
+        [
+          "PerTotalBuyOpenOrdersValue",
+          318,
+          "Per total buy open orders value."
+        ],
+        [
+          "PerTotalSellOpenOrdersValue",
+          319,
+          "Per total sell open orders value."
+        ],
+        [
+          "PerTotalOpenOrdersValue",
+          320,
+          "Per total open orders value."
+        ],
+        [
+          "PerTotalBuyRiskValue",
+          321,
+          "Per total buy risk value."
+        ],
+        [
+          "PerTotalSellRiskValue",
+          322,
+          "Per total sell risk value."
+        ],
+        [
+          "PerTotalRiskValue",
+          323,
+          "Per total risk value."
+        ],
+        [
+          "PerTotalNetRiskValue",
+          324,
+          "Per total net risk value."
+        ],
+        [
+          "PerTotalDailyNumberOfOrders",
+          325,
+          "Per total daily number Of orders."
+        ],
+        [
+          "RiskLimitNotDefined",
+          326,
+          "Requiered risk limits are missing."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "RiskOperation",
+      "description": "Risk limit definition message operation type.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "Add",
+          1,
+          "Add operation."
+        ],
+        [
+          "Modify",
+          2,
+          "Modify operation."
+        ],
+        [
+          "Delete",
+          3,
+          "Delete operation."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "RiskLimitAction",
+      "description": "Risk limit definition, request action type.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "ToReject",
+          1,
+          "Reject when limits are exceeded."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "RiskDefinitionStatus",
+      "description": "Risk limit definition request status.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "Ack",
+          1,
+          "Ack"
+        ],
+        [
+          "Rejected",
+          3,
+          "Rejected"
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "RiskLimitDefinitionRejectionReason",
+      "description": "Indicates the reason why the RiskLimitDefinition message was rejected.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "NA",
+          0,
+          "Not applicable."
+        ],
+        [
+          "InvalidParty",
+          1,
+          "Invalid party."
+        ],
+        [
+          "InvalidRelatedParty",
+          2,
+          "Invalid related party."
+        ],
+        [
+          "InvalidRiskLimitType",
+          3,
+          "Invalid risk limit type."
+        ],
+        [
+          "InvalidRiskLimitID",
+          4,
+          "Invalid risk limit ID."
+        ],
+        [
+          "InvalidRiskLimitAmount",
+          5,
+          "Invalid risk limit amount."
+        ],
+        [
+          "InvalidRiskWarningLevelAction",
+          6,
+          "Invalid risk warning level action."
+        ],
+        [
+          "InvalidRiskInstrumentScope",
+          7,
+          "Invalid risk instrument scope."
+        ],
+        [
+          "RiskLimitActionsNotSupported",
+          8,
+          "Risk limit actions not supported."
+        ],
+        [
+          "WarningLevelsNotSupported",
+          9,
+          "Warning levels not supported."
+        ],
+        [
+          "WarningLevelActionsNotSupported",
+          10,
+          "Warning level actions not supported."
+        ],
+        [
+          "RiskInstrumentScopeNotSupported",
+          11,
+          "Risk instrument scope not supported."
+        ],
+        [
+          "RiskLimitNotApprovedForParty",
+          12,
+          "Risk limit not approved for party."
+        ],
+        [
+          "RiskLimitAlreadyDefinedForParty",
+          13,
+          "Risk limit already defined for party."
+        ],
+        [
+          "InstrumentNotApprovedForParty",
+          14,
+          "Instrument not approved for party."
+        ],
+        [
+          "NotAuthorized",
+          98,
+          "Not authorized."
+        ],
+        [
+          "Other",
+          99,
+          "Other."
+        ],
+        [
+          "MissingMicCode",
+          101,
+          "Missing Mic code."
+        ],
+        [
+          "InvalidPartyRoleQualifier",
+          102,
+          "Invalid party role qualifier."
+        ]
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "RiskLimitDefinition",
+      "description": "Risk limit definition message.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        },
+        {
+          "name": "id",
+          "type": "RiskDefinitionId",
+          "description": "RiskLimitDefinition message identifier."
+        },
+        {
+          "name": "RiskLimitId",
+          "type": "RiskDefinitionId",
+          "description": "Risk limit row identifier."
+        },
+        {
+          "name": "instrumentId",
+          "type": "ElementId",
+          "description": "Id of an instrument."
+        },
+        {
+          "name": "Mic",
+          "type": "MicCode",
+          "description": "Mic code is replacing instrument and market segment."
+        },
+        {
+          "name": "action",
+          "type": "RiskLimitAction",
+          "description": "Risk limit definition action after breach."
+        },
+        {
+          "name": "amount",
+          "type": "RiskLimitAmount",
+          "description": "Risk limit definition amount"
+        },
+        {
+          "name": "limitType",
+          "type": "RiskLimitType",
+          "description": "Risk limit definition limit type."
+        },
+        {
+          "name": "riskMemberCode",
+          "type": "LeiCode",
+          "description": "LEI code of the participant imposing the Limits and managing the risk."
+        },
+        {
+          "name": "memberPartyId",
+          "type": "LeiCode",
+          "description": "Exchange member risk entity identifier, should be LEI."
+        },
+        {
+          "name": "clientPartyId",
+          "type": "ShortCode",
+          "description": "Exchange member client risk identifier, is optional."
+        },
+        {
+          "name": "clientRoleQualifier",
+          "type": "PartyRoleQualifier",
+          "description": "Risk entity role qualifier."
+        },
+        {
+          "name": "operation",
+          "type": "RiskOperation",
+          "description": "Risk limit definition operation type."
+        },
+        {
+          "name": "marketSegmentId",
+          "type": "ElementId",
+          "description": "A market segment id."
+        },
+        {
+          "name": "capacity",
+          "type": "Capacity",
+          "description": "Capacity of the party making the order (either principal or agency)."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "RiskLimitDefinitionResponse",
+      "description": "Risk limit definition response message.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        },
+        {
+          "name": "id",
+          "type": "RiskDefinitionId",
+          "description": "Risk limit definition message Id."
+        },
+        {
+          "name": "status",
+          "type": "RiskDefinitionStatus",
+          "description": "Risk limit definition status."
+        },
+        {
+          "name": "reason",
+          "type": "RiskLimitDefinitionRejectionReason",
+          "description": "Risk limit definition rejection reason."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "RiskLimitBreach",
+      "description": "Message to inform about violation of risk limit.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        },
+        {
+          "name": "id",
+          "type": "RiskDefinitionId",
+          "description": "Risk limit definition id."
+        },
+        {
+          "name": "amount",
+          "type": "RiskLimitAmount",
+          "description": "Amount of the overrun."
+        },
+        {
+          "name": "riskLimitRequestType",
+          "type": "RiskLimitRequestType",
+          "description": "Type of risk limit information."
+        },
+        {
+          "name": "unsolicitedIndicator",
+          "type": "bool",
+          "description": "Indicates whether or not message is being sent as a result of a subscription request or not."
+        },
+        {
+          "name": "limitType",
+          "type": "RiskLimitType",
+          "description": "Risk limit definition limit type."
+        },
+        {
+          "name": "riskWarningLevelAction",
+          "type": "RiskWarningLevelAction",
+          "description": "Action that was take because warning level was exceeded."
+        },
+        {
+          "name": "riskLimitUtilizationAmount",
+          "type": "RiskLimitAmount",
+          "description": "Absolute amount of utilization of a party's set risk limit."
+        },
+        {
+          "name": "riskLimitUtilizationPercent",
+          "type": "Percentage",
+          "description": "Percentage of utilization of a party's set risk limit."
+        }
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "RiskLimitRequestType",
+      "underlying": "u8",
+      "variants": [
+        [
+          "Definitions",
+          1,
+          "Definitions."
+        ],
+        [
+          "Utilization",
+          2,
+          "Utilization."
+        ],
+        [
+          "DefinitionsAndUtilizations",
+          3,
+          "Definitions and utilization."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "MsgType",
+      "underlying": "u16",
+      "variants": [
+        [
+          "Test",
+          1,
+          "The internal message for a test purpose."
+        ],
+        [
+          "Login",
+          2,
+          "The login message authenticates a user establishing a connection to the trading port service. The login message must be the first message sent by the client application to request the initiation of a trading port session."
+        ],
+        [
+          "LoginResponse",
+          3,
+          "The login response message. The result field describes the login status, indicating whether the login was successful or not (i.e. successful login)."
+        ],
+        [
+          "OrderAdd",
+          4,
+          "Message used to add new orders to the system."
+        ],
+        [
+          "OrderAddResponse",
+          5,
+          "The message is a response to an OrderAdd message and includes the order execution status."
+        ],
+        [
+          "OrderCancel",
+          6,
+          "Message used to cancel the previously submitted orders."
+        ],
+        [
+          "OrderCancelResponse",
+          7,
+          "The message is a response to an order cancel request and contains information about its execution, in particular whether the order to cancel was found or not."
+        ],
+        [
+          "OrderModify",
+          8,
+          "Message used to modify the submitted order."
+        ],
+        [
+          "OrderModifyResponse",
+          9,
+          "The response message for an OrderModify."
+        ],
+        [
+          "Trade",
+          10,
+          "The message used to report trades between counterparties (i.e. generated when two or more orders are matched)."
+        ],
+        [
+          "Logout",
+          11,
+          "The logout message is sent from the client application to terminate the communication session with the trading port."
+        ],
+        [
+          "ConnectionClose",
+          12,
+          "The ConnectionClose message confirms the termination of a session through the trading port service."
+        ],
+        [
+          "Heartbeat",
+          13,
+          "Heartbeat message."
+        ],
+        [
+          "LogoutResponse",
+          14,
+          "The logout response message confirms the client logout message."
+        ],
+        [
+          "Reject",
+          15,
+          "The reject message is sent by the trading port service when receiving an erroneous message that cannot be further processed."
+        ],
+        [
+          "RiskLimitDefinition",
+          16,
+          "The risk limit definition message."
+        ],
+        [
+          "RiskLimitDefinitionResponse",
+          17,
+          "The risk limit definition response message."
+        ],
+        [
+          "TradeCaptureReportSingle",
+          18,
+          "Trade Capture Report - single side."
+        ],
+        [
+          "TradeCaptureReportDual",
+          19,
+          "Trade Capture Report - dual sided."
+        ],
+        [
+          "TradeCaptureReportResponse",
+          20,
+          "The message is a response to an Trade Capture Report message, containing the state of TCR execution."
+        ],
+        [
+          "RiskLimitBreach",
+          21,
+          "Risk limit breach notification message."
+        ],
+        [
+          "TradeBust",
+          23,
+          "TradeBust."
+        ],
+        [
+          "MassQuote",
+          24,
+          "MassQuote."
+        ],
+        [
+          "MassQuoteResponse",
+          25,
+          "MassQuoteResponse."
+        ],
+        [
+          "InitiateState",
+          26,
+          "Market maker initiates state transition."
+        ],
+        [
+          "RequestForExecution",
+          28,
+          "Informs MM that execution has been requested."
+        ],
+        [
+          "TestEvent",
+          255,
+          "A message to relay test scenario information"
+        ]
+      ]
+    },
+    {
+      "kind": "Array",
+      "name": "LeiCode",
+      "type": "AnsiChar",
+      "length": 20,
+      "description": "Legal Entity Identifier as specified in ISO 17422."
+    },
+    {
+      "kind": "Enum",
+      "name": "ElementType",
+      "description": "Market structure element type.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "MarketStructure",
+          1
+        ],
+        [
+          "Instrument",
+          2
+        ]
+      ]
+    },
+    {
+      "kind": "Array",
+      "name": "ScenarioName",
+      "type": "AnsiChar",
+      "length": 200,
+      "description": "Test scenario name"
+    },
+    {
+      "kind": "Enum",
+      "name": "EventType",
+      "description": "Test event type",
+      "underlying": "u8",
+      "variants": [
+        [
+          "Flush",
+          1,
+          "Flush the Test scenario"
+        ],
+        [
+          "ScenarioStart",
+          2,
+          "Start of test scenario"
+        ],
+        [
+          "ScenarioEnd",
+          3,
+          "End of test scenario"
+        ]
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "TestEvent",
+      "description": "Test event",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Message header."
+        },
+        {
+          "name": "scenarioName",
+          "type": "ScenarioName",
+          "description": "Test scenario name"
+        },
+        {
+          "name": "eventType",
+          "type": "EventType",
+          "description": "Test event type"
+        }
+      ]
+    },
+    {
+      "kind": "Union",
+      "name": "Message",
+      "members": [
+        "Test",
+        "Login",
+        "LoginResponse",
+        "OrderAdd",
+        "OrderAddResponse",
+        "OrderCancel",
+        "OrderCancelResponse",
+        "OrderModify",
+        "OrderModifyResponse",
+        "Trade",
+        "Logout",
+        "ConnectionClose",
+        "Heartbeat",
+        "LogoutResponse",
+        "Reject",
+        "TradeCaptureReportSingle",
+        "TradeCaptureReportDual",
+        "TradeBust",
+        "TradeCaptureReportResponse",
+        "RiskLimitDefinition",
+        "RiskLimitDefinitionResponse",
+        "RiskLimitBreach",
+        "MassQuote",
+        "MassQuoteResponse",
+        "InitiateState",
+        "RequestForExecution",
+        "TestEvent"
+      ],
+      "discriminator": [
+        "header",
+        "msgType"
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "OrderSource",
+      "underlying": "u8",
+      "description": "The message source of the order response.",
+      "variants": [
+        [
+          "Submitted",
+          1,
+          "Order message coming from the trading port."
+        ],
+        [
+          "Cod",
+          2,
+          "Order cancelled by the canceller on client disconnect."
+        ],
+        [
+          "Expired",
+          3,
+          "Order cancelled by the canceller due to expiration."
+        ],
+        [
+          "StopOrder",
+          4,
+          "Order message coming from the stop order subsystem, after the stop order got triggered."
+        ],
+        [
+          "Suspended",
+          5,
+          "Order cancelled by canceller due to instrument suspension."
+        ],
+        [
+          "Reinstated",
+          6,
+          "Order reinstated"
+        ],
+        [
+          "IcebergRefill",
+          7,
+          "Iceberg order refill"
+        ],
+        [
+          "OrderBookRebuild",
+          8,
+          "Order book rebuild after auction"
+        ],
+        [
+          "Activated",
+          9,
+          "VFA/C order got activated, from now on it will take part in matching"
+        ],
+        [
+          "Stp",
+          10,
+          "Order cancelled due to self-trade prevention"
+        ],
+        [
+          "CorporateAction",
+          11,
+          "Order cancelled due to submitted Corporate Action."
+        ]
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "QuoteOrder",
+      "description": "Quote order with price and quantity.",
+      "fields": [
+        {
+          "name": "price",
+          "type": "Price",
+          "description": "Indicates the price of the given order."
+        },
+        {
+          "name": "quantity",
+          "type": "Quantity",
+          "description": "Indicates the quantity of the instrument included in the order."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "Quote",
+      "description": "Quote with bid / ask",
+      "fields": [
+        {
+          "name": "instrumentId",
+          "type": "ElementId",
+          "description": "ID of the instrument being traded."
+        },
+        {
+          "name": "bid",
+          "type": "QuoteOrder",
+          "description": "Bid side of the quote"
+        },
+        {
+          "name": "ask",
+          "type": "QuoteOrder",
+          "description": "Ask side of the quote"
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "MassQuote",
+      "description": "Mass Quote",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Message header."
+        },
+        {
+          "name": "onBehalfOf",
+          "type": "OnBehalfOf"
+        },
+        {
+          "name": "stpId",
+          "type": "STPId",
+          "description": "An ID assigned by the client used in Self Match Prevention mechanism."
+        },
+        {
+          "name": "capacity",
+          "type": "Capacity",
+          "description": "Capacity of the party making the order (either principal or agency)."
+        },
+        {
+          "name": "account",
+          "type": "Account",
+          "description": "Account mnemonic as agreed between buy and sell sides."
+        },
+        {
+          "name": "accountType",
+          "type": "AccountType",
+          "description": "Type of account associated with the order."
+        },
+        {
+          "name": "mifidFields",
+          "type": "MifidFields"
+        },
+        {
+          "name": "memo",
+          "type": "Memo"
+        },
+        {
+          "name": "clearingMemberCode",
+          "type": "ClearingCode",
+          "description": "Clearing member code."
+        },
+        {
+          "name": "clearingMemberClearingIdentifier",
+          "type": "ClearingIdentifier",
+          "description": "Clearing member's clearing identifier."
+        },
+        {
+          "name": "count",
+          "type": "u8",
+          "description": "How many quotes this message contains."
+        },
+        {
+          "name": "quotes",
+          "type": "Quotes",
+          "description": "The array of quotes."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "QuoteOrderResponse",
+      "description": "The message is a response to a single Quote and includes the order execution status.",
+      "fields": [
+        {
+          "name": "instrumentId",
+          "type": "ElementId",
+          "description": "ID of the instrument being traded."
+        },
+        {
+          "name": "bidOrderId",
+          "type": "OrderId",
+          "description": "Unique for each trading day order identifier based on the sequence number of order message, bulk sequence number, session ID and connection ID."
+        },
+        {
+          "name": "askOrderId",
+          "type": "OrderId",
+          "description": "Unique for each trading day order identifier based on the sequence number of order message, bulk sequence number, session ID and connection ID."
+        },
+        {
+          "name": "status",
+          "type": "OrderStatus",
+          "description": "Status of the given order."
+        },
+        {
+          "name": "reason",
+          "type": "OrderRejectionReason",
+          "description": "Reason for rejecting the given order."
+        }
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "MassQuoteStatus",
+      "description": "Indicates the status of the mass quote.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "Accepted",
+          1,
+          "Mass quote acknowledged by system."
+        ],
+        [
+          "Rejected",
+          2,
+          "Mass quote rejected."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "MassQuoteRejectionReason",
+      "description": "Indicates the status of the mass quote.",
+      "underlying": "u16",
+      "variants": [
+        [
+          "NA",
+          1,
+          "Not applicable."
+        ],
+        [
+          "ExchangeClosed",
+          2,
+          "Exchange closed."
+        ],
+        [
+          "Other",
+          99,
+          "Other."
+        ],
+        [
+          "InvalidExecutionTrader",
+          1005,
+          "Invalid execution trader."
+        ],
+        [
+          "InvalidDecisionMaker",
+          1006,
+          "Invalid decision maker."
+        ],
+        [
+          "InvalidClientId",
+          1007,
+          "Invalid client."
+        ],
+        [
+          "InvalidPartyRoleQualifierForClientId",
+          1008,
+          "Invalid Party Role Qualifier for Client Id Party group"
+        ],
+        [
+          "InvalidPartyRoleQualifierForExecutingTrader",
+          1009,
+          "Invalid Party Role Qualifier for Executing Trader Party group"
+        ],
+        [
+          "InvalidPartyRoleQualifierForInvestmentDecisionMaker",
+          1010,
+          "Invalid Party Role Qualifier for Investment Decision Maker Party group"
+        ],
+        [
+          "InvalidPartyIdForClientId",
+          1070,
+          "Invalid PartyID (448) for Client ID"
+        ],
+        [
+          "InvalidPartyIdForExecutingTrader",
+          1071,
+          "Invalid PartyID (448) for Executing Trader"
+        ],
+        [
+          "InvalidPartyIdForInvestmentDecisionMaker",
+          1072,
+          "Invalid PartyID (448) for Investment Decision Maker"
+        ],
+        [
+          "InvalidPartyRoleQualifierForPartyId",
+          1075,
+          "Invalid PartyRoleQualifier (2376) for PartyID (448)"
+        ],
+        [
+          "DuplicateInstrument",
+          1202,
+          "Multiple quotes for the same instrument within Mass Quote message."
+        ],
+        [
+          "InvalidQuotesCount",
+          1204,
+          "Invalid quotes count value."
+        ],
+        [
+          "ForbiddenOrderCapacityValue",
+          1210,
+          "Forbidden OrderCapacity (528) value for Mass Quote."
+        ]
+      ]
+    },
+    {
+      "kind": "Array",
+      "name": "QuoteOrderResponses",
+      "type": "QuoteOrderResponse",
+      "length": 30,
+      "description": "An array of QuoteOrderResponse."
+    },
+    {
+      "kind": "Struct",
+      "name": "MassQuoteResponse",
+      "description": "The response to a MassQuote message.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Message header."
+        },
+        {
+          "name": "massQuoteId",
+          "type": "OrderId",
+          "description": "Quote id"
+        },
+        {
+          "name": "count",
+          "type": "u8",
+          "description": "How many responses this message contains."
+        },
+        {
+          "name": "responses",
+          "type": "QuoteOrderResponses",
+          "description": "The array of responses."
+        },
+        {
+          "name": "status",
+          "type": "MassQuoteStatus",
+          "description": "Status of the given mass quote order."
+        },
+        {
+          "name": "reason",
+          "type": "MassQuoteRejectionReason",
+          "description": "Reason for rejecting the given mass quote order."
+        }
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "HybridMarketState",
+      "description": "Enumeration of possible hybrid market states that mm can initiate the transition to.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "Regular",
+          1,
+          "Regular trading."
+        ],
+        [
+          "BuyOnly",
+          2,
+          "Buy only trading."
+        ]
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "InitiateState",
+      "description": "The information that the market switches to given state. Sent by MM.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Message header."
+        },
+        {
+          "name": "instrumentId",
+          "type": "ElementId",
+          "description": "Instrument ID"
+        },
+        {
+          "name": "state",
+          "type": "HybridMarketState",
+          "description": "The state the mm wants the hybrid market to switch to."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "RequestForExecution",
+      "description": "The information for the MM that one of the quotes has been crossed.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Message header."
+        },
+        {
+          "name": "instrumentId",
+          "type": "ElementId",
+          "description": "Instrument ID"
+        },
+        {
+          "name": "side",
+          "type": "OrderSide",
+          "description": "Indicates the side of the order"
+        },
+        {
+          "name": "price",
+          "type": "Price",
+          "description": "Indicates the price of the order."
+        },
+        {
+          "name": "quantity",
+          "type": "Quantity",
+          "description": "Indicates the quantity of the instrument included in the order."
+        }
+      ]
+    }
+  ]
+}

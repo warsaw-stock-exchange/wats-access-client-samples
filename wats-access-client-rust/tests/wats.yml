@@ -1,0 +1,73 @@
+# Test binary trading port client configuration
+
+# Trading Port [BIN] peer socket address
+trading_port:
+  host: 127.0.0.1
+  port: 10010
+
+# Online Market Data Snapshot
+omd_snapshot:
+  host: 127.0.0.1
+  port: 10033
+
+# Online Market Data multicast group address
+omd_stream:
+  host: 224.3.1.1
+  port: 10009
+
+# Online Market Data replay
+omd_replay:
+  host: 127.0.0.1
+  port: 10011
+
+# Best Bid Offer Snapshot
+bbo_snapshot:
+  host: 127.0.0.1
+  port: 10035
+
+# Best Bid Offer multicast group address
+bbo_stream:
+  host: 224.3.1.1
+  port: 10031
+
+# Best Bid Offer replay endpoint
+bbo_replay:
+  host: 127.0.0.1
+  port: 10032
+
+# Delayed Market Data multicast group address
+dmd_stream:
+  host: 224.4.1.1
+  port: 10031
+
+# Delayed Market Data replay
+dmd_replay:
+  host: 127.0.0.1
+  port: 10034
+
+multicast_interface: 172.20.100.65
+
+connection_01:
+  id: 581
+  token: ABCDEFGH
+
+connection_02:
+  id: 589
+  token: ABCDEFGH
+
+connection_03:
+  id: 597
+  token: ABCDEFGH
+
+product_bucket:
+  limit_order_instrument_id: 4688
+  modify_in_fly_instrument_id: 4672
+  bad_instrument_id: 654321
+  bad_price_instrument_id: 4675
+  order_cancel_ok_instrument_id: 4669
+  order_cancel_bad_instrument_id: 4669
+  violates_tick_table_instrument_id: 4669
+  bbo_instrument_id: 4679
+  gap_in_omd_instrument_id: 4700
+  ptc_instrument_id: 4697
+  order_book_based_on_market_data_instrument_id: 4685

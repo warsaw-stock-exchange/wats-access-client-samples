@@ -1,0 +1,201 @@
+# Connectivity data
+services: &services_default
+  market_data: &market_data_default
+    snapshot:
+      host: 127.0.0.1
+      port: 10033
+    stream:
+      host: 224.3.1.1
+      port: 10009
+      interface: 172.20.100.65
+    replay:
+      host: 127.0.0.1
+      port: 10011
+  delayed_market_data: &delayed_market_data_default
+    stream:
+      host: 224.4.1.1
+      port: 10031
+      interface: 172.20.100.65
+    replay:
+      host: 127.0.0.1
+      port: 10034
+  best_bid_offer: &best_bid_offer_default
+    snapshot:
+      host: 127.0.0.1
+      port: 10035
+    stream:
+      host: 224.3.1.1
+      port: 10031
+      interface: 172.20.100.65
+    replay:
+      host: 127.0.0.1
+      port: 10032
+  trading_port: &trading_port_default
+    host: 127.0.0.1
+    port: 10010
+
+# Connections pool
+connections:
+  market_data_connection_0: &market_data_connection_0_default
+    connection_id: 587
+    token: ABCDEFGH
+  market_data_connection_1: &market_data_connection_1_default
+    connection_id: 595
+    token: ABCDEFGH
+  best_bid_offer_connection_0: &best_bid_offer_connection_0_default
+    connection_id: 587
+    token: ABCDEFGH
+  trading_port_connection_0: &trading_port_connection_0_default
+    connection_id: 581
+    token: ABCDEFGH
+  trading_port_connection_1: &trading_port_connection_1_default
+    connection_id: 589
+    token: ABCDEFGH
+  trading_port_connection_2: &trading_port_connection_2_default
+    connection_id: 597
+    token: ABCDEFGH
+
+# Trading constans
+products:
+  limit_order: &limit_order_default 4688
+  modify_inflight: &modify_inflight_default 4672
+  bad_price: &bad_price_default 4675
+  order_cancel: &order_cancel_default 4669
+  order_cancel_bad_order_ref_id: &order_cancel_bad_order_ref_id_default 4669
+  price_violates_tick_table: &price_violates_tick_table_default 4669
+  bbo_price_level: &bbo_price_level_default 4679
+  ptc_verification: &ptc_verification_default 4697
+  order_book_based_on_omd: &order_book_based_on_omd_default 4685
+
+# C++ spdlog levels: trace, debug, info, warning, error, critical, off
+log_level: &log_level_default debug
+
+# Tests' configuration
+login_logout:
+  log_level: *log_level_default
+  services: *services_default
+  connections:
+    trading_port: *trading_port_connection_0_default
+
+limit_order:
+  log_level: *log_level_default
+  connection_0:
+    services: *services_default
+    connections:
+      trading_port: *trading_port_connection_0_default
+  connection_1:
+    services: *services_default
+    connections:
+      trading_port: *trading_port_connection_1_default
+  product: *limit_order_default
+
+modify_inflight:
+  log_level: *log_level_default
+  services: *services_default
+  connections:
+    trading_port: *trading_port_connection_0_default
+  product: *modify_inflight_default
+
+bad_instrument_id:
+  log_level: *log_level_default
+  services: *services_default
+  connections:
+    trading_port: *trading_port_connection_0_default
+
+bad_price:
+  log_level: *log_level_default
+  services: *services_default
+  connections:
+    trading_port: *trading_port_connection_0_default
+  product: *bad_price_default
+
+order_cancel:
+  log_level: *log_level_default
+  services: *services_default
+  connections:
+    trading_port: *trading_port_connection_0_default
+  product: *order_cancel_default
+
+order_cancel_bad_order_ref_id:
+  log_level: *log_level_default
+  services: *services_default
+  connections:
+    trading_port: *trading_port_connection_0_default
+  product: *order_cancel_bad_order_ref_id_default
+
+price_violates_tick_table:
+  log_level: *log_level_default
+  services: *services_default
+  connections:
+    trading_port: *trading_port_connection_0_default
+    market_data: *market_data_connection_0_default
+  product: *price_violates_tick_table_default
+
+request_omd_replay:
+  log_level: *log_level_default
+  services: *services_default
+  connections:
+    trading_port: *trading_port_connection_0_default
+    market_data: *market_data_connection_0_default
+
+bbo_price_level:
+  log_level: *log_level_default
+  services: *services_default
+  connections:
+    trading_port: *trading_port_connection_0_default
+    best_bid_offer: *best_bid_offer_connection_0_default
+  product: *bbo_price_level_default
+
+orders_in_phase:
+  log_level: *log_level_default
+  services: *services_default
+  connections:
+    trading_port: *trading_port_connection_0_default
+  orders:
+    - product: 4687
+      side: Buy
+      quantity: 200000
+      price: 103
+    - product: 4687
+      side: Sell
+      quantity: 200000
+      price: 104
+    - product: 4687
+      side: Buy
+      quantity: 300000
+      price: 101
+    - product: 4687
+      side: Sell
+      quantity: 100000
+      price: 99
+    - product: 4687
+      side: Buy
+      quantity: 200000
+      price: 98
+    - product: 4687
+      side: Sell
+      quantity: 400000
+      price: 99
+
+ptc_verification:
+  log_level: *log_level_default
+  services: *services_default
+  connections:
+    trading_port: *trading_port_connection_0_default
+    market_data: *market_data_connection_0_default
+  product: *ptc_verification_default
+
+order_book_based_on_omd:
+  log_level: *log_level_default
+  services: *services_default
+  connections:
+    market_data: *market_data_connection_0_default
+  connection_0:
+    services: *services_default
+    connections:
+      trading_port: *trading_port_connection_0_default
+  connection_1:
+    services: *services_default
+    connections:
+      trading_port: *trading_port_connection_1_default
+  product: *order_book_based_on_omd_default

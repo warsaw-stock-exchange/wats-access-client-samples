@@ -1,0 +1,13 @@
+[requires]
+boost/1.80.0
+cryptopp/8.6.0
+spdlog/1.10.0
+yaml-cpp/0.7.0
+
+[options]
+spdlog/*:header_only=False
+fmt/*:header_only=False
+yaml-cpp/*:shared=False
+
+[layout]
+cmake_layout

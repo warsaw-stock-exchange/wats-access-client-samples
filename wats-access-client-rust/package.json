@@ -1,0 +1,11 @@
+{
+  "name": "wats-access-client-rust",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "gen-rust": "node ./generator/generateRust"
+  },
+  "dependencies": {
+    "bendec": "0.43.0"
+  }
+}

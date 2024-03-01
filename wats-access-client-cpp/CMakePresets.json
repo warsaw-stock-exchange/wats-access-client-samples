@@ -1,0 +1,126 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 20,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "windows-debug",
+            "displayName": "windows-debug",
+            "description": "Windows debug configuration",
+            "generator": "Visual Studio 16 2019",
+            "toolset": "host=x64",
+            "architecture": "x64",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            },
+             "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_PROJECT_TOP_LEVEL_INCLUDES": "${sourceDir}/conan_provider.cmake"
+            }
+        },
+        {
+            "name": "windows-release",
+            "displayName": "windows-release",
+            "description": "Windows release configuration",
+            "generator": "Visual Studio 16 2019",
+            "toolset": "host=x64",
+            "architecture": "x64",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            },
+             "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_PROJECT_TOP_LEVEL_INCLUDES": "${sourceDir}/conan_provider.cmake"
+            }
+        },
+        {
+            "name": "linux-debug",
+            "displayName": "linux-debug",
+            "description": "Linux debug configuration",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_PROJECT_TOP_LEVEL_INCLUDES": "${sourceDir}/conan_provider.cmake"
+            }
+        },
+        {
+            "name": "linux-release",
+            "displayName": "linux-release",
+            "description": "Linux release configuration",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_PROJECT_TOP_LEVEL_INCLUDES": "${sourceDir}/conan_provider.cmake"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "configurePreset": "windows-debug",
+            "name": "windows-debug",
+            "displayName": "default",
+            "description": "",
+            "configuration": "Debug",
+            "targets": [ "all_build" ]
+        },
+        {
+            "configurePreset": "windows-release",
+            "name": "windows-release",
+            "displayName": "default",
+            "description": "",
+            "configuration": "Release",
+            "targets": [ "all_build" ]
+        },
+        {
+            "configurePreset": "linux-debug",
+            "name": "linux-debug",
+            "displayName": "default",
+            "description": "",
+            "configuration": "Debug",
+            "targets": [ "all" ]
+        },
+        {
+            "configurePreset": "linux-release",
+            "name": "linux-release",
+            "displayName": "default",
+            "description": "",
+            "configuration": "Release",
+            "targets": [ "all" ]
+        }
+    ],
+    "testPresets": [
+        {
+            "configurePreset": "windows-debug",
+            "name": "windows-debug",
+            "description": "",
+            "displayName": "default"
+        },
+        {
+            "configurePreset": "linux-debug",
+            "name": "linux-debug",
+            "description": "",
+            "displayName": "default"
+        }
+    ]
+}
