@@ -16,9 +16,6 @@ use crate::messages::bytes_validator::BytesValidator;
 
 // primitive built-in: i64
 
-/// Number of significant digits.
-pub type Precision = u8;
-
 /// String.
 pub type AnsiChar = u8;
 
@@ -1211,6 +1208,10 @@ pub enum TradingPhaseType {
   HybridPreTrade = 0x0012,
   /// Auction after suspension
   UnsuspensionAuction = 0x0013,
+  /// Initial public offering phase
+  Ipo = 0x0014,
+  /// Tender offer phase
+  TenderOffer = 0x0015,
 }
 impl Default for TradingPhaseType {
   fn default() -> Self {
@@ -1240,6 +1241,8 @@ impl std::convert::TryFrom<u8> for TradingPhaseType {
       0x0011 => Ok(Self::HybridBuyOnly),
       0x0012 => Ok(Self::HybridPreTrade),
       0x0013 => Ok(Self::UnsuspensionAuction),
+      0x0014 => Ok(Self::Ipo),
+      0x0015 => Ok(Self::TenderOffer),
       other => Err(InvalidVariant::new(other as u32, "TradingPhaseType")),
     }
   }
@@ -1838,8 +1841,6 @@ pub struct CalendarException {
   pub calendar_id: ElementId,
   /// Calendar exception date.
   pub calendar_exception_date: Date,
-  /// True if the calendar exception is recurring.
-  pub calendar_exception_recurrent: bool,
   /// Calendar exception type.
   pub calendar_exception_type: CalendarExceptionType,
 }
@@ -2500,18 +2501,18 @@ pub struct TradingPhaseScheduleEntry {
   pub dynamic_collar_volatility_auction_id: ElementId,
   /// Trading phase start time.
   pub trading_phase_start_time: Timestamp,
-  /// Trading phase stop time.
-  pub trading_phase_stop_time: Timestamp,
   /// Type of matching algorithm.
   pub trading_phase_type: TradingPhaseType,
   /// Type of auction.
   pub auction_type: AuctionType,
-  /// True if the auction includes an uncrossing.
-  pub auction_uncrossing: bool,
+  /// True if the phase includes an uncrossing.
+  pub uncrossing: bool,
   /// ID of Static Collar Volatility Auction.
   pub ext_static_collar_volatility_auction_id: ElementId,
   /// ID of Dynamic Collar Volatility Auction.
   pub ext_dynamic_collar_volatility_auction_id: ElementId,
+  /// ID of last auction phase.
+  pub last_auction_phase_id: ElementId,
 }
 
 /// Trading week plan.
@@ -3628,31 +3629,34 @@ impl BytesValidator for MsgType {
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum MarketModelType {
-  /// A Central Limit Order Book (CLOB)
-  CLOB = 0x0001,
-  /// BLOCK
-  BLOCK = 0x0002,
-  /// HYBRID market model
-  HYBRID = 0x0003,
-  /// CROSS
-  CROSS = 0x0004,
   /// Not applicable
-  NotApplicable = 0x0005,
+  NotApplicable = 0x0001,
+  /// A Central Limit Order Book (CLOB)
+  CLOB = 0x0002,
+  /// BLOCK
+  BLOCK = 0x0003,
+  /// HYBRID market model
+  HYBRID = 0x0004,
+  /// CROSS
+  CROSS = 0x0005,
+  /// Initial public offering
+  IPO = 0x0006,
 }
 impl Default for MarketModelType {
   fn default() -> Self {
-    Self::CLOB
+    Self::NotApplicable
   }
 }
 impl std::convert::TryFrom<u8> for MarketModelType {
   type Error = InvalidVariant;
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
-      0x0001 => Ok(Self::CLOB),
-      0x0002 => Ok(Self::BLOCK),
-      0x0003 => Ok(Self::HYBRID),
-      0x0004 => Ok(Self::CROSS),
-      0x0005 => Ok(Self::NotApplicable),
+      0x0001 => Ok(Self::NotApplicable),
+      0x0002 => Ok(Self::CLOB),
+      0x0003 => Ok(Self::BLOCK),
+      0x0004 => Ok(Self::HYBRID),
+      0x0005 => Ok(Self::CROSS),
+      0x0006 => Ok(Self::IPO),
       other => Err(InvalidVariant::new(other as u32, "MarketModelType")),
     }
   }
@@ -3755,7 +3759,8 @@ pub union Message {
 
 impl Serialize for Message {
   fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-  where S: Serializer,
+  where
+    S: Serializer,
   {
     unsafe {
       match self.heartbeat.header.msg_type {
@@ -3863,7 +3868,7 @@ impl Message {
 }
 
 impl Message {
-  pub fn size_of(disc: MsgType) -> usize {
+  pub const fn size_of(disc: MsgType) -> usize {
     match disc {
       MsgType::Heartbeat => std::mem::size_of::<Heartbeat>(),
       MsgType::Text => std::mem::size_of::<Text>(),

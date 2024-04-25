@@ -56,6 +56,10 @@ public enum OrderSource {
      * Order cancelled due to submitted Corporate Action.
      */
     CORPORATEACTION(11),
+    /**
+     * Order cancelled due to mass cancel
+     */
+    MASSCANCEL(12),
     UNKNOWN(99999);
 
     private final int value;

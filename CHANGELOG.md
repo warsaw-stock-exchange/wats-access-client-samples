@@ -1,5 +1,11 @@
 # Changes history for WATS Access Clients samples
 
+## 0.62
+
+* **New:** Changelog documents added
+* **Change:** Access Clients (connectivity example code) repositiories updated and adapted to version 0.62
+* **Change:** Documentation updated to version 0.62
+* **Change:** QuickFIX XML templates updated to 0.62
 
 ## 0.59
 

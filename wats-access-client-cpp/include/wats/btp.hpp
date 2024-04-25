@@ -136,13 +136,13 @@ private:
 
     void dispatch();
 
-    template <typename T>
-    void send(const T& t) {
-        write(socket_, buffer((char*) &t, sizeof(T)));
+    template <typename M>
+    void send(const M& m) {
+        write(socket_, buffer((char*) &m, sizeof(M)));
 
         spdlog::debug("{} sent {{ SeqNum: {}, MsgType: {}, length: {} }}",
-            btp::messages::MsgType2Name.find(t.header.msgType)->second,
-            (uint32_t)t.header.seqNum, (uint16_t)t.header.msgType, t.header.length);
+            btp::messages::MsgType2Name.find(m.header.msgType)->second,
+            (uint32_t)m.header.seqNum, (uint16_t)m.header.msgType, m.header.length);
     }
 
     inline btp::messages::OrderId createOrderId(uint16_t seqNum,
@@ -200,17 +200,40 @@ public:
     /// @brief Log out of the system
     void logout();
 
-    /// @brief Add order to the system.
-    /// @param message OrderAdd message structure. Has to be prepared by the user, header fields wil get updated by the library.
+    /// @brief Basic method to submit unsequenced message to the system.
+    /// @param message Message structure. Has to be prepared by the user. Certain header fields will get updated by the library.
+    template <typename M>
+    void send_unsequenced(const M& message) {
+
+        send(message);
+    }
+
+    /// @brief Basic method to submit sequenced message to the system.
+    /// @param message Message structure. Has to be prepared by the user. Certain header fields will get updated by the library.
+    template <typename M>
+    void send_sequenced(M& message) {
+
+        const auto header_ =
+            boost::asio::buffer(&message, sizeof(btp::messages::Message));
+        btp::messages::Header* header =
+            boost::asio::buffer_cast<btp::messages::Header*>(header_);
+
+        header->seqNum = outSeqNum_++;
+
+        send(message);
+    }
+
+    /// @brief Convenience method to add order to the system.
+    /// @param message OrderAdd message structure. Has to be prepared by the user. Certain header fields will get updated by the library.
     /// @param OrderId Reference ID for the order submitted.
     void orderAdd(btp::messages::OrderAdd message, btp::messages::OrderId& OrderId);
 
-    /// @brief Modify order earlier submitted to the system.
-    /// @param message OrderModify structure. Has to be prepared by the user, header fields wil get updated by the library.
+    /// @brief Convenience method to modify order earlier submitted to the system.
+    /// @param message OrderModify structure. Has to be prepared by the user. Certain header fields will get updated by the library.
     void orderModify(btp::messages::OrderModify message);
 
-    /// @brief Cancel order earlier submitted to the system.
-    /// @param message OrderCancel message structure. Has to be prepared by the user, header fields wil get updated by the library.
+    /// @brief Convenience method to cancel order earlier submitted to the system.
+    /// @param message OrderCancel message structure. Has to be prepared by the user. Certain header fields will get updated by the library.
     void orderCancel(btp::messages::OrderCancel message);
 };
 

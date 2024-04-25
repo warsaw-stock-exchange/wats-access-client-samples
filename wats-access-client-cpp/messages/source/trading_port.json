@@ -1,5 +1,5 @@
 {
-  "version": 1027,
+  "version": 1043,
   "typeDefinitions": [
     {
       "kind": "Alias",
@@ -12,12 +12,6 @@
       "name": "bool",
       "size": 1,
       "description": "Boolean"
-    },
-    {
-      "kind": "Alias",
-      "name": "ParticipantId",
-      "alias": "u32",
-      "description": "Participant ID."
     },
     {
       "kind": "Primitive",
@@ -142,7 +136,7 @@
     {
       "kind": "Alias",
       "name": "STPId",
-      "alias": "u16",
+      "alias": "u8",
       "description": "An ID assigned by the client used in Self Trade Prevention mechanism."
     },
     {
@@ -226,13 +220,6 @@
       "type": "AnsiChar",
       "length": 18,
       "description": "Free format text string."
-    },
-    {
-      "kind": "Array",
-      "name": "Quotes",
-      "type": "Quote",
-      "length": 30,
-      "description": "An array of quotes."
     },
     {
       "kind": "Enum",
@@ -595,9 +582,9 @@
           "The order value must be lower than maximum value."
         ],
         [
-          "MarketOrderNotAllowedInAuction",
+          "InvalidOrdTypeForSelectedMarketModel",
           1032,
-          "Market orders are not permitted during the auction."
+          "Invalid OrdType for selected market model"
         ],
         [
           "LeavesQuantityMustBeGreaterThanZeroAfterModification",
@@ -610,24 +597,39 @@
           "The price is not allowed for a market order. In the binary protocol, the price field should have a value of 0."
         ],
         [
-          "InvalidMarketOrderTimeInForce",
+          "InvalidTimeInForceForOrderType",
           1039,
-          "A market order can only have a TimeInForce value of 3 (IOC - Immediate or Cancel) or 4 (FOK - Fill or Kill)."
+          "Invalid TimeInForce for specified OrderType"
         ],
         [
-          "InvalidAuctionTimeInForce",
+          "InvalidTimeInForceForCurrentMarketPhase",
           1040,
-          "The TimeInForce value of 3 (IOC - Immediate or Cancel) or 4 (FOK - Fill or Kill) is not allowed during the auction."
+          "Invalid TimeInForce for current market phase"
         ],
         [
-          "InvalidIcebergAndStopOrderTimeInForce",
+          "InvalidTimeInForceForSelectedMarketModel",
           1041,
-          "Iceberg and Stop orders can only have a TimeInForce value of DAY, GTC (Good Till Cancel), GTD (Good Till Date), or GTT (Good Till Time)."
+          "Invalid TimeInForce for selected market model"
+        ],
+        [
+          "ExpireTimeCannotBeModified",
+          1043,
+          "ExpireTime (126) cannot be modified."
+        ],
+        [
+          "ObsoleteExpireDate",
+          1044,
+          "ExpireDate (432) not allowed for selected TimeInForce (59)."
         ],
         [
           "ExpireDateInPast",
           1045,
           "The expiration date is earlier than the current date."
+        ],
+        [
+          "ObsoleteExpireTime",
+          1046,
+          "ExpireTime (126) not allowed for selected TimeInForce (59)."
         ],
         [
           "ExpireTimeInPast",
@@ -685,6 +687,11 @@
           "The trigger price has been modified for the activated order."
         ],
         [
+          "TriggerPriceMustBeGreaterThanZero",
+          1069,
+          "TriggerPrice (1102) must be greater than 0."
+        ],
+        [
           "InvalidPartyIdForClientId",
           1070,
           "Invalid PartyID (448) for Client ID"
@@ -705,9 +712,29 @@
           "Invalid PartyRoleQualifier (2376) for PartyID (448)"
         ],
         [
+          "UnknownInstrument",
+          1201,
+          "SecurityID (48) not recognized by the system."
+        ],
+        [
+          "InstrumentClosed",
+          1203,
+          "Instrument closed for trading."
+        ],
+        [
           "InvalidBidAskSpread",
           1208,
           "OfferPx (133) must be greater than BidPx (132)."
+        ],
+        [
+          "BuyOrderNotAllowed",
+          1301,
+          "Buy orders from participants are not allowed in BuyOnly phase."
+        ],
+        [
+          "OnlyOneSellOrderIsAllowedForIpo",
+          1401,
+          "Only one sell order is allowed for IPO instrument"
         ],
         [
           "RequestNotAllowedForBlockInstrument",
@@ -1306,6 +1333,11 @@
           "name": "displayQty",
           "type": "Quantity",
           "description": "Used only for iceberg order. The quantity to be displayed."
+        },
+        {
+          "name": "expire",
+          "type": "Timestamp",
+          "description": "Expiration time indicating the validity of the order - relevant only when TimeInForce is set to GTD (Good Till Date)."
         }
       ]
     },
@@ -1338,6 +1370,113 @@
           "name": "reason",
           "type": "OrderRejectionReason",
           "description": "Reason for rejecting the given order."
+        }
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "MassCancelRejectionReason",
+      "description": "Indicates a mass cancel rejection reason.",
+      "underlying": "u16",
+      "variants": [
+        [
+          "NA",
+          101,
+          "Not applicable."
+        ],
+        [
+          "UnknownInstrumentId",
+          100,
+          "Unknown instrument ID."
+        ],
+        [
+          "UnknownMarketSegmentId",
+          1016,
+          "Unknown market segment ID."
+        ]
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "OrderMassCancel",
+      "description": "Message used to cancel multiple existing orders.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        },
+        {
+          "name": "massCancelRequestType",
+          "type": "MassCancelRequestType",
+          "description": "Mass cancel request type."
+        },
+        {
+          "name": "targetPartyRole",
+          "type": "TargetPartyRole",
+          "description": "Target party role filter selection field."
+        },
+        {
+          "name": "targetPartyId",
+          "type": "u32",
+          "description": "Used to identify the party targeted for the action specified in the message."
+        },
+        {
+          "name": "marketSegmentId",
+          "type": "ElementId",
+          "description": "Identifies the market segment for request type CancelOrdersForMarketSegment."
+        },
+        {
+          "name": "instrumentId",
+          "type": "ElementId",
+          "description:": "ID of the instrument to cancel, valid only for CancelForSecurity."
+        }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "OrderMassCancelResponse",
+      "description": "Response to message used to cancel multiple existing orders.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Header."
+        },
+        {
+          "name": "totalAffectedOrders",
+          "type": "u64",
+          "description": "Total number of orders affected by the mass cancel request."
+        },
+        {
+          "name": "massCancelRequestType",
+          "type": "MassCancelRequestType",
+          "description": "Mass cancel request type."
+        },
+        {
+          "name": "massCancelId",
+          "type": "OrderId",
+          "description": "Mass cancel request ID."
+        },
+        {
+          "name": "targetPartyRole",
+          "type": "TargetPartyRole",
+          "description": "Target party role filter selection field."
+        },
+        {
+          "name": "targetPartyId",
+          "type": "u32",
+          "description": "Used to identify the party targeted for the action specified in the message."
+        },
+        {
+          "name": "marketSegmentId",
+          "type": "ElementId",
+          "description": "Identifies the market segment for request type CancelOrdersForMarketSegment."
+        },
+        {
+          "name": "reason",
+          "type": "MassCancelRejectionReason",
+          "description": "Reason for rejecting the given mass order cancel request."
         }
       ]
     },
@@ -1799,914 +1938,6 @@
     },
     {
       "kind": "Enum",
-      "name": "Currency",
-      "description": "Currency - ISO 4217 (2022/04/01) code (e.g. PLN).",
-      "underlying": "u16",
-      "variants": [
-        [
-          "ALL",
-          8,
-          "Lek"
-        ],
-        [
-          "DZD",
-          12,
-          "Algerian Dinar"
-        ],
-        [
-          "ARS",
-          32,
-          "Argentine Peso"
-        ],
-        [
-          "AUD",
-          36,
-          "Australian Dollar"
-        ],
-        [
-          "BSD",
-          44,
-          "Bahamian Dollar"
-        ],
-        [
-          "BHD",
-          48,
-          "Bahraini Dinar"
-        ],
-        [
-          "BDT",
-          50,
-          "Taka"
-        ],
-        [
-          "AMD",
-          51,
-          "Armenian Dram"
-        ],
-        [
-          "BBD",
-          52,
-          "Barbados Dollar"
-        ],
-        [
-          "BMD",
-          60,
-          "Bermudian Dollar"
-        ],
-        [
-          "BTN",
-          64,
-          "Ngultrum"
-        ],
-        [
-          "BOB",
-          68,
-          "Boliviano"
-        ],
-        [
-          "BWP",
-          72,
-          "Pula"
-        ],
-        [
-          "BZD",
-          84,
-          "Belize Dollar"
-        ],
-        [
-          "SBD",
-          90,
-          "Solomon Islands Dollar"
-        ],
-        [
-          "BND",
-          96,
-          "Brunei Dollar"
-        ],
-        [
-          "MMK",
-          104,
-          "Kyat"
-        ],
-        [
-          "BIF",
-          108,
-          "Burundi Franc"
-        ],
-        [
-          "KHR",
-          116,
-          "Riel"
-        ],
-        [
-          "CAD",
-          124,
-          "Canadian Dollar"
-        ],
-        [
-          "CVE",
-          132,
-          "Cabo Verde Escudo"
-        ],
-        [
-          "KYD",
-          136,
-          "Cayman Islands Dollar"
-        ],
-        [
-          "LKR",
-          144,
-          "Sri Lanka Rupee"
-        ],
-        [
-          "CLP",
-          152,
-          "Chilean Peso"
-        ],
-        [
-          "CNY",
-          156,
-          "Yuan Renminbi"
-        ],
-        [
-          "COP",
-          170,
-          "Colombian Peso"
-        ],
-        [
-          "KMF",
-          174,
-          "Comorian Franc "
-        ],
-        [
-          "CRC",
-          188,
-          "Costa Rican Colon"
-        ],
-        [
-          "HRK",
-          191,
-          "Kuna"
-        ],
-        [
-          "CUP",
-          192,
-          "Cuban Peso"
-        ],
-        [
-          "CZK",
-          203,
-          "Czech Koruna"
-        ],
-        [
-          "DKK",
-          208,
-          "Danish Krone"
-        ],
-        [
-          "DOP",
-          214,
-          "Dominican Peso"
-        ],
-        [
-          "SVC",
-          222,
-          "El Salvador Colon"
-        ],
-        [
-          "ETB",
-          230,
-          "Ethiopian Birr"
-        ],
-        [
-          "ERN",
-          232,
-          "Nakfa"
-        ],
-        [
-          "FKP",
-          238,
-          "Falkland Islands Pound"
-        ],
-        [
-          "FJD",
-          242,
-          "Fiji Dollar"
-        ],
-        [
-          "DJF",
-          262,
-          "Djibouti Franc"
-        ],
-        [
-          "GMD",
-          270,
-          "Dalasi"
-        ],
-        [
-          "GIP",
-          292,
-          "Gibraltar Pound"
-        ],
-        [
-          "GTQ",
-          320,
-          "Quetzal"
-        ],
-        [
-          "GNF",
-          324,
-          "Guinean Franc"
-        ],
-        [
-          "GYD",
-          328,
-          "Guyana Dollar"
-        ],
-        [
-          "HTG",
-          332,
-          "Gourde"
-        ],
-        [
-          "HNL",
-          340,
-          "Lempira"
-        ],
-        [
-          "HKD",
-          344,
-          "Hong Kong Dollar"
-        ],
-        [
-          "HUF",
-          348,
-          "Forint"
-        ],
-        [
-          "ISK",
-          352,
-          "Iceland Krona"
-        ],
-        [
-          "INR",
-          356,
-          "Indian Rupee"
-        ],
-        [
-          "IDR",
-          360,
-          "Rupiah"
-        ],
-        [
-          "IRR",
-          364,
-          "Iranian Rial"
-        ],
-        [
-          "IQD",
-          368,
-          "Iraqi Dinar"
-        ],
-        [
-          "ILS",
-          376,
-          "New Israeli Sheqel"
-        ],
-        [
-          "JMD",
-          388,
-          "Jamaican Dollar"
-        ],
-        [
-          "JPY",
-          392,
-          "Yen"
-        ],
-        [
-          "KZT",
-          398,
-          "Tenge"
-        ],
-        [
-          "JOD",
-          400,
-          "Jordanian Dinar"
-        ],
-        [
-          "KES",
-          404,
-          "Kenyan Shilling"
-        ],
-        [
-          "KPW",
-          408,
-          "North Korean Won"
-        ],
-        [
-          "KRW",
-          410,
-          "Won"
-        ],
-        [
-          "KWD",
-          414,
-          "Kuwaiti Dinar"
-        ],
-        [
-          "KGS",
-          417,
-          "Som"
-        ],
-        [
-          "LAK",
-          418,
-          "Lao Kip"
-        ],
-        [
-          "LBP",
-          422,
-          "Lebanese Pound"
-        ],
-        [
-          "LSL",
-          426,
-          "Loti"
-        ],
-        [
-          "LRD",
-          430,
-          "Liberian Dollar"
-        ],
-        [
-          "LYD",
-          434,
-          "Libyan Dinar"
-        ],
-        [
-          "MOP",
-          446,
-          "Pataca"
-        ],
-        [
-          "MWK",
-          454,
-          "Malawi Kwacha"
-        ],
-        [
-          "MYR",
-          458,
-          "Malaysian Ringgit"
-        ],
-        [
-          "MVR",
-          462,
-          "Rufiyaa"
-        ],
-        [
-          "MUR",
-          480,
-          "Mauritius Rupee"
-        ],
-        [
-          "MXN",
-          484,
-          "Mexican Peso"
-        ],
-        [
-          "MNT",
-          496,
-          "Tugrik"
-        ],
-        [
-          "MDL",
-          498,
-          "Moldovan Leu"
-        ],
-        [
-          "MAD",
-          504,
-          "Moroccan Dirham"
-        ],
-        [
-          "OMR",
-          512,
-          "Rial Omani"
-        ],
-        [
-          "NAD",
-          516,
-          "Namibia Dollar"
-        ],
-        [
-          "NPR",
-          524,
-          "Nepalese Rupee"
-        ],
-        [
-          "ANG",
-          532,
-          "Netherlands Antillean Guilder"
-        ],
-        [
-          "AWG",
-          533,
-          "Aruban Florin"
-        ],
-        [
-          "VUV",
-          548,
-          "Vatu"
-        ],
-        [
-          "NZD",
-          554,
-          "New Zealand Dollar"
-        ],
-        [
-          "NIO",
-          558,
-          "Cordoba Oro"
-        ],
-        [
-          "NGN",
-          566,
-          "Naira"
-        ],
-        [
-          "NOK",
-          578,
-          "Norwegian Krone"
-        ],
-        [
-          "PKR",
-          586,
-          "Pakistan Rupee"
-        ],
-        [
-          "PAB",
-          590,
-          "Balboa"
-        ],
-        [
-          "PGK",
-          598,
-          "Kina"
-        ],
-        [
-          "PYG",
-          600,
-          "Guarani"
-        ],
-        [
-          "PEN",
-          604,
-          "Sol"
-        ],
-        [
-          "PHP",
-          608,
-          "Philippine Peso"
-        ],
-        [
-          "QAR",
-          634,
-          "Qatari Rial"
-        ],
-        [
-          "RUB",
-          643,
-          "Russian Ruble"
-        ],
-        [
-          "RWF",
-          646,
-          "Rwanda Franc"
-        ],
-        [
-          "SHP",
-          654,
-          "Saint Helena Pound"
-        ],
-        [
-          "SAR",
-          682,
-          "Saudi Riyal"
-        ],
-        [
-          "SCR",
-          690,
-          "Seychelles Rupee"
-        ],
-        [
-          "SGD",
-          702,
-          "Singapore Dollar"
-        ],
-        [
-          "VND",
-          704,
-          "Dong"
-        ],
-        [
-          "SOS",
-          706,
-          "Somali Shilling"
-        ],
-        [
-          "ZAR",
-          710,
-          "Rand"
-        ],
-        [
-          "SSP",
-          728,
-          "South Sudanese Pound"
-        ],
-        [
-          "SZL",
-          748,
-          "Lilangeni"
-        ],
-        [
-          "SEK",
-          752,
-          "Swedish Krona"
-        ],
-        [
-          "CHF",
-          756,
-          "Swiss Franc"
-        ],
-        [
-          "SYP",
-          760,
-          "Syrian Pound"
-        ],
-        [
-          "THB",
-          764,
-          "Baht"
-        ],
-        [
-          "TOP",
-          776,
-          "Pa’anga"
-        ],
-        [
-          "TTD",
-          780,
-          "Trinidad and Tobago Dollar"
-        ],
-        [
-          "AED",
-          784,
-          "UAE Dirham"
-        ],
-        [
-          "TND",
-          788,
-          "Tunisian Dinar"
-        ],
-        [
-          "UGX",
-          800,
-          "Uganda Shilling"
-        ],
-        [
-          "MKD",
-          807,
-          "Denar"
-        ],
-        [
-          "EGP",
-          818,
-          "Egyptian Pound"
-        ],
-        [
-          "GBP",
-          826,
-          "Pound Sterling"
-        ],
-        [
-          "TZS",
-          834,
-          "Tanzanian Shilling"
-        ],
-        [
-          "USD",
-          840,
-          "US Dollar"
-        ],
-        [
-          "UYU",
-          858,
-          "Peso Uruguayo"
-        ],
-        [
-          "UZS",
-          860,
-          "Uzbekistan Sum"
-        ],
-        [
-          "WST",
-          882,
-          "Tala"
-        ],
-        [
-          "YER",
-          886,
-          "Yemeni Rial"
-        ],
-        [
-          "TWD",
-          901,
-          "New Taiwan Dollar"
-        ],
-        [
-          "SLE",
-          925,
-          "Leone"
-        ],
-        [
-          "VED",
-          926,
-          "Bolívar Soberano"
-        ],
-        [
-          "UYW",
-          927,
-          "Unidad Previsional"
-        ],
-        [
-          "VES",
-          928,
-          "Bolívar Soberano"
-        ],
-        [
-          "MRU",
-          929,
-          "Ouguiya"
-        ],
-        [
-          "STN",
-          930,
-          "Dobra"
-        ],
-        [
-          "CUC",
-          931,
-          "Peso Convertible"
-        ],
-        [
-          "ZWL",
-          932,
-          "Zimbabwe Dollar"
-        ],
-        [
-          "BYN",
-          933,
-          "Belarusian Ruble"
-        ],
-        [
-          "TMT",
-          934,
-          "Turkmenistan New Manat"
-        ],
-        [
-          "GHS",
-          936,
-          "Ghana Cedi"
-        ],
-        [
-          "SDG",
-          938,
-          "Sudanese Pound"
-        ],
-        [
-          "UYI",
-          940,
-          "[object Object]"
-        ],
-        [
-          "RSD",
-          941,
-          "Serbian Dinar"
-        ],
-        [
-          "MZN",
-          943,
-          "Mozambique Metical"
-        ],
-        [
-          "AZN",
-          944,
-          "Azerbaijan Manat"
-        ],
-        [
-          "RON",
-          946,
-          "Romanian Leu"
-        ],
-        [
-          "CHE",
-          947,
-          "[object Object]"
-        ],
-        [
-          "CHW",
-          948,
-          "[object Object]"
-        ],
-        [
-          "TRY",
-          949,
-          "Turkish Lira"
-        ],
-        [
-          "XAF",
-          950,
-          "CFA Franc BEAC"
-        ],
-        [
-          "XCD",
-          951,
-          "East Caribbean Dollar"
-        ],
-        [
-          "XOF",
-          952,
-          "CFA Franc BCEAO"
-        ],
-        [
-          "XPF",
-          953,
-          "CFP Franc"
-        ],
-        [
-          "XBA",
-          955,
-          "Bond Markets Unit European Composite Unit (EURCO)"
-        ],
-        [
-          "XBB",
-          956,
-          "Bond Markets Unit European Monetary Unit (E.M.U.-6)"
-        ],
-        [
-          "XBC",
-          957,
-          "Bond Markets Unit European Unit of Account 9 (E.U.A.-9)"
-        ],
-        [
-          "XBD",
-          958,
-          "Bond Markets Unit European Unit of Account 17 (E.U.A.-17)"
-        ],
-        [
-          "XAU",
-          959,
-          "Gold"
-        ],
-        [
-          "XDR",
-          960,
-          "SDR (Special Drawing Right)"
-        ],
-        [
-          "XAG",
-          961,
-          "Silver"
-        ],
-        [
-          "XPT",
-          962,
-          "Platinum"
-        ],
-        [
-          "XTS",
-          963,
-          "Codes specifically reserved for testing purposes"
-        ],
-        [
-          "XPD",
-          964,
-          "Palladium"
-        ],
-        [
-          "XUA",
-          965,
-          "ADB Unit of Account"
-        ],
-        [
-          "ZMW",
-          967,
-          "Zambian Kwacha"
-        ],
-        [
-          "SRD",
-          968,
-          "Surinam Dollar"
-        ],
-        [
-          "MGA",
-          969,
-          "Malagasy Ariary"
-        ],
-        [
-          "COU",
-          970,
-          "[object Object]"
-        ],
-        [
-          "AFN",
-          971,
-          "Afghani"
-        ],
-        [
-          "TJS",
-          972,
-          "Somoni"
-        ],
-        [
-          "AOA",
-          973,
-          "Kwanza"
-        ],
-        [
-          "BGN",
-          975,
-          "Bulgarian Lev"
-        ],
-        [
-          "CDF",
-          976,
-          "Congolese Franc"
-        ],
-        [
-          "BAM",
-          977,
-          "Convertible Mark"
-        ],
-        [
-          "EUR",
-          978,
-          "Euro"
-        ],
-        [
-          "MXV",
-          979,
-          "[object Object]"
-        ],
-        [
-          "UAH",
-          980,
-          "Hryvnia"
-        ],
-        [
-          "GEL",
-          981,
-          "Lari"
-        ],
-        [
-          "BOV",
-          984,
-          "[object Object]"
-        ],
-        [
-          "PLN",
-          985,
-          "Zloty"
-        ],
-        [
-          "BRL",
-          986,
-          "Brazilian Real"
-        ],
-        [
-          "CLF",
-          990,
-          "[object Object]"
-        ],
-        [
-          "XSU",
-          994,
-          "Sucre"
-        ],
-        [
-          "USN",
-          997,
-          "[object Object]"
-        ],
-        [
-          "XXX",
-          999,
-          "The codes assigned for transactions where no currency is involved"
-        ]
-      ]
-    },
-    {
-      "kind": "Enum",
       "name": "AlgorithmicTradeIndicator",
       "description": "Indicates algorithmic trade.",
       "underlying": "u8",
@@ -2743,112 +1974,6 @@
       "description": "Reference identifier used with Cancel and Replace transaction types. The TradeReportID that is being referenced for trade correction or cancelation."
     },
     {
-      "kind": "Array",
-      "name": "MarketSegmentID",
-      "type": "AnsiChar",
-      "length": 2,
-      "description": "Identifies the market segment."
-    },
-    {
-      "kind": "Array",
-      "name": "SecurityAltID",
-      "type": "AnsiChar",
-      "length": 12,
-      "description": "Alternate Security identifier value for this security of SecurityAltIDSource type (e.g. CUSIP, SEDOL, ISIN, etc)."
-    },
-    {
-      "kind": "Enum",
-      "name": "SecurityIdSource",
-      "description": "Identifies class or source of the SecurityID value.",
-      "underlying": "u8",
-      "variants": [
-        [
-          "CUSIP",
-          1,
-          "CUSIP."
-        ],
-        [
-          "SEDOL",
-          2,
-          "SEDOL."
-        ],
-        [
-          "ISIN",
-          4,
-          "ISIN."
-        ],
-        [
-          "ExchangeSymbol",
-          8,
-          "Exchange Symbol."
-        ]
-      ]
-    },
-    {
-      "kind": "Enum",
-      "name": "NoSides",
-      "description": "Number of sides.",
-      "underlying": "u8",
-      "variants": [
-        [
-          "OneSide",
-          1,
-          "One Side."
-        ],
-        [
-          "BothSides",
-          2,
-          "Both Sides."
-        ]
-      ]
-    },
-    {
-      "kind": "Enum",
-      "name": "PartyId",
-      "description": "Identification of the party.",
-      "underlying": "u8",
-      "variants": [
-        [
-          "NONE",
-          1,
-          "No client for this order."
-        ],
-        [
-          "AGGR",
-          2,
-          "An aggregation of multiple client orders."
-        ],
-        [
-          "PNAL",
-          3,
-          "Clients are pending allocation."
-        ],
-        [
-          "NORE",
-          4,
-          "Timing and location of the execution determined by the client of the participant."
-        ]
-      ]
-    },
-    {
-      "kind": "Enum",
-      "name": "PartyIdSource",
-      "description": "Used to identify classification source of the party id.",
-      "underlying": "u8",
-      "variants": [
-        [
-          "Proprietary",
-          68,
-          "Proprietary / Custom code."
-        ],
-        [
-          "ShortCode",
-          80,
-          "Short code identifier."
-        ]
-      ]
-    },
-    {
       "kind": "Enum",
       "name": "ExecType",
       "description": "Type of execution being reported. Uses subset of ExecType for trade capture reports.",
@@ -2863,6 +1988,11 @@
           "Rejected",
           8,
           "Rejected."
+        ],
+        [
+          "Expired",
+          12,
+          "Expired"
         ],
         [
           "Trade",
@@ -3599,6 +2729,72 @@
     },
     {
       "kind": "Enum",
+      "name": "MassCancelRequestType",
+      "underlying": "u8",
+      "description": "Mass cancel request type.",
+      "variants": [
+        [
+          "CancelForSecurity",
+          1,
+          "Cancel orders for a security."
+        ],
+        [
+          "CancelAllOrders",
+          7,
+          "Cancel all orders."
+        ],
+        [
+          "CancelOrdersForMarketSegment",
+          9,
+          "Cancel orders for a market segment."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "TargetPartyRole",
+      "underlying": "u8",
+      "description": "Target party role filter selection field.",
+      "variants": [
+        [
+          "None",
+          0,
+          "No filtering."
+        ],
+        [
+          "LiquidityProvider",
+          35,
+          "Liquidity provider."
+        ],
+        [
+          "SenderLocation",
+          54,
+          "Sender location."
+        ],
+        [
+          "MarketMaker",
+          66,
+          "Market maker."
+        ],
+        [
+          "ClientID",
+          3,
+          "Client ID."
+        ],
+        [
+          "ExecutingTrader",
+          12,
+          "Executing trader."
+        ],
+        [
+          "InvestmentDecisionMaker",
+          122,
+          "Investment decision maker."
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
       "name": "MsgType",
       "underlying": "u16",
       "variants": [
@@ -3728,9 +2924,24 @@
           "Market maker initiates state transition."
         ],
         [
+          "InitiateStateResponse",
+          27,
+          "A response to the Market maker initiating state transition."
+        ],
+        [
           "RequestForExecution",
           28,
           "Informs MM that execution has been requested."
+        ],
+        [
+          "OrderMassCancel",
+          29,
+          "Message used to cancel multiple existing orders."
+        ],
+        [
+          "OrderMassCancelResponse",
+          30,
+          "Response to message used to cancel multiple existing orders."
         ],
         [
           "TestEvent",
@@ -3745,22 +2956,6 @@
       "type": "AnsiChar",
       "length": 20,
       "description": "Legal Entity Identifier as specified in ISO 17422."
-    },
-    {
-      "kind": "Enum",
-      "name": "ElementType",
-      "description": "Market structure element type.",
-      "underlying": "u8",
-      "variants": [
-        [
-          "MarketStructure",
-          1
-        ],
-        [
-          "Instrument",
-          2
-        ]
-      ]
     },
     {
       "kind": "Array",
@@ -3843,7 +3038,10 @@
         "MassQuote",
         "MassQuoteResponse",
         "InitiateState",
+        "InitiateStateResponse",
         "RequestForExecution",
+        "OrderMassCancel",
+        "OrderMassCancelResponse",
         "TestEvent"
       ],
       "discriminator": [
@@ -3911,6 +3109,11 @@
           "CorporateAction",
           11,
           "Order cancelled due to submitted Corporate Action."
+        ],
+        [
+          "MassCancel",
+          12,
+          "Order cancelled due to mass cancel"
         ]
       ]
     },
@@ -3950,6 +3153,30 @@
           "name": "ask",
           "type": "QuoteOrder",
           "description": "Ask side of the quote"
+        }
+      ]
+    },
+    {
+      "kind": "Array",
+      "name": "QuotesArray",
+      "type": "Quote",
+      "description": "The Array of quotes.",
+      "length": 30
+    },
+    {
+      "kind": "Struct",
+      "name": "Quotes",
+      "description": "Array of quotes grouped with their amount.",
+      "fields": [
+        {
+          "name": "count",
+          "type": "u8",
+          "description": "How many quotes this message contains."
+        },
+        {
+          "name": "items",
+          "type": "QuotesArray",
+          "description": "The array of quotes."
         }
       ]
     },
@@ -4004,11 +3231,6 @@
           "name": "clearingMemberClearingIdentifier",
           "type": "ClearingIdentifier",
           "description": "Clearing member's clearing identifier."
-        },
-        {
-          "name": "count",
-          "type": "u8",
-          "description": "How many quotes this message contains."
         },
         {
           "name": "quotes",
@@ -4157,10 +3379,27 @@
     },
     {
       "kind": "Array",
-      "name": "QuoteOrderResponses",
+      "name": "QuoteOrderResponseArray",
       "type": "QuoteOrderResponse",
       "length": 30,
       "description": "An array of QuoteOrderResponse."
+    },
+    {
+      "kind": "Struct",
+      "name": "QuoteOrderResponses",
+      "description": "Array of quote order responses grouped with their amount.",
+      "fields": [
+        {
+          "name": "count",
+          "type": "u8",
+          "description": "How many quote order responses this message contains."
+        },
+        {
+          "name": "items",
+          "type": "QuoteOrderResponseArray",
+          "description": "The array of quote order responses."
+        }
+      ]
     },
     {
       "kind": "Struct",
@@ -4178,14 +3417,9 @@
           "description": "Quote id"
         },
         {
-          "name": "count",
-          "type": "u8",
-          "description": "How many responses this message contains."
-        },
-        {
           "name": "responses",
           "type": "QuoteOrderResponses",
-          "description": "The array of responses."
+          "description": "The slice of responses."
         },
         {
           "name": "status",
@@ -4220,7 +3454,7 @@
     {
       "kind": "Struct",
       "name": "InitiateState",
-      "description": "The information that the market switches to given state. Sent by MM.",
+      "description": "Initiate state change to Regular or BuyOnly.",
       "fields": [
         {
           "name": "header",
@@ -4240,6 +3474,39 @@
       ]
     },
     {
+      "kind": "Enum",
+      "name": "InitiateStateResult",
+      "description": "The result of the state change.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "Success",
+          1
+        ],
+        [
+          "Failure",
+          2
+        ]
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "InitiateStateResponse",
+      "description": "The response to the attempt at state change.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Message header."
+        },
+        {
+          "name": "result",
+          "type": "InitiateStateResult",
+          "description": "The result of an attempt at changing phase."
+        }
+      ]
+    },
+    {
       "kind": "Struct",
       "name": "RequestForExecution",
       "description": "The information for the MM that one of the quotes has been crossed.",
@@ -4253,21 +3520,6 @@
           "name": "instrumentId",
           "type": "ElementId",
           "description": "Instrument ID"
-        },
-        {
-          "name": "side",
-          "type": "OrderSide",
-          "description": "Indicates the side of the order"
-        },
-        {
-          "name": "price",
-          "type": "Price",
-          "description": "Indicates the price of the order."
-        },
-        {
-          "name": "quantity",
-          "type": "Quantity",
-          "description": "Indicates the quantity of the instrument included in the order."
         }
       ]
     }

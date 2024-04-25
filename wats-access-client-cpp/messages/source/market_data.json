@@ -1,6 +1,6 @@
 {
   "$schema": "./schema.json",
-  "version": 2017,
+  "version": 2024,
   "typeDefinitions": {
     "marketData": [
       {
@@ -38,12 +38,6 @@
         "name": "i64",
         "size": 8,
         "description": "Unsigned integer, 64-bit."
-      },
-      {
-        "kind": "Alias",
-        "name": "Precision",
-        "alias": "u8",
-        "description": "Number of significant digits."
       },
       {
         "kind": "Alias",
@@ -1594,6 +1588,16 @@
             "UnsuspensionAuction",
             19,
             "Auction after suspension"
+          ],
+          [
+            "Ipo",
+            20,
+            "Initial public offering phase"
+          ],
+          [
+            "TenderOffer",
+            21,
+            "Tender offer phase"
           ]
         ]
       },
@@ -2282,11 +2286,6 @@
             "name": "calendarExceptionDate",
             "type": "Date",
             "description": "Calendar exception date."
-          },
-          {
-            "name": "calendarExceptionRecurrent",
-            "type": "bool",
-            "description": "True if the calendar exception is recurring."
           },
           {
             "name": "calendarExceptionType",
@@ -3502,11 +3501,6 @@
             "description": "Trading phase start time."
           },
           {
-            "name": "tradingPhaseStopTime",
-            "type": "Timestamp",
-            "description": "Trading phase stop time."
-          },
-          {
             "name": "tradingPhaseType",
             "type": "TradingPhaseType",
             "description": "Type of matching algorithm."
@@ -3517,9 +3511,9 @@
             "description": "Type of auction."
           },
           {
-            "name": "auctionUncrossing",
+            "name": "uncrossing",
             "type": "bool",
-            "description": "True if the auction includes an uncrossing."
+            "description": "True if the phase includes an uncrossing."
           },
           {
             "name": "extStaticCollarVolatilityAuctionId",
@@ -3530,6 +3524,11 @@
             "name": "extDynamicCollarVolatilityAuctionId",
             "type": "ElementId",
             "description": "ID of Dynamic Collar Volatility Auction."
+          },
+          {
+            "name": "lastAuctionPhaseId",
+            "type": "ElementId",
+            "description": "ID of last auction phase."
           }
         ]
       },
@@ -5047,29 +5046,34 @@
         "underlying": "u8",
         "variants": [
           [
-            "CLOB",
+            "NotApplicable",
             1,
+            "Not applicable"
+          ],
+          [
+            "CLOB",
+            2,
             "A Central Limit Order Book (CLOB)"
           ],
           [
             "BLOCK",
-            2,
+            3,
             "BLOCK"
           ],
           [
             "HYBRID",
-            3,
+            4,
             "HYBRID market model"
           ],
           [
             "CROSS",
-            4,
+            5,
             "CROSS"
           ],
           [
-            "NotApplicable",
-            5,
-            "Not applicable"
+            "IPO",
+            6,
+            "Initial public offering"
           ]
         ]
       },

@@ -9,7 +9,8 @@
 //! let client = utils::create_client(id, token);
 //! ```
 
-use crate::utils::{init_tracing, simple_order_add};
+use crate::utils::{init_tracing, simple_order_add, simple_trade_capture_report_dual};
+use chrono::{DateTime, Datelike, Local};
 use std::collections::HashMap;
 use std::time::Duration;
 use tokio::time::sleep;
@@ -30,6 +31,8 @@ async fn basic_client_login_logout() {
     let mut client = utils::create_client(
         wats_config.connection_01_id(),
         wats_config.connection_01_token(),
+        wats_config.connection_04_id(),
+        wats_config.connection_04_token()
     )
     .await
     .unwrap();
@@ -48,17 +51,21 @@ async fn limit_order() {
     let wats_config = config::get_config().unwrap();
 
     let mut client_a = utils::create_client(
-        wats_config.connection_01_id(),
-        wats_config.connection_01_token(),
-    )
+      wats_config.connection_01_id(),
+      wats_config.connection_01_token(),
+      wats_config.connection_04_id(),
+      wats_config.connection_04_token()
+  )
     .await
     .unwrap();
     utils::fetch_messages(&mut client_a).await;
 
     let mut client_b = utils::create_client(
-        wats_config.connection_02_id(),
-        wats_config.connection_02_token(),
-    )
+      wats_config.connection_02_id(),
+      wats_config.connection_02_token(),
+      wats_config.connection_04_id(),
+      wats_config.connection_04_token()
+  )
     .await
     .unwrap();
     utils::fetch_messages(&mut client_b).await;
@@ -136,9 +143,11 @@ async fn modify_in_fly() {
     let wats_config = config::get_config().unwrap();
 
     let mut client = utils::create_client(
-        wats_config.connection_01_id(),
-        wats_config.connection_01_token(),
-    )
+      wats_config.connection_01_id(),
+      wats_config.connection_01_token(),
+      wats_config.connection_04_id(),
+      wats_config.connection_04_token()
+  )
     .await
     .unwrap();
 
@@ -186,9 +195,11 @@ async fn bad_instrument_id() {
     let wats_config = config::get_config().unwrap();
 
     let mut client = utils::create_client(
-        wats_config.connection_01_id(),
-        wats_config.connection_01_token(),
-    )
+      wats_config.connection_01_id(),
+      wats_config.connection_01_token(),
+      wats_config.connection_04_id(),
+      wats_config.connection_04_token()
+  )
     .await
     .unwrap();
 
@@ -225,9 +236,11 @@ async fn bad_price() {
     let wats_config = config::get_config().unwrap();
 
     let mut client = utils::create_client(
-        wats_config.connection_01_id(),
-        wats_config.connection_01_token(),
-    )
+      wats_config.connection_01_id(),
+      wats_config.connection_01_token(),
+      wats_config.connection_04_id(),
+      wats_config.connection_04_token()
+  )
     .await
     .unwrap();
 
@@ -265,9 +278,11 @@ async fn order_cancel_ok() {
     let wats_config = config::get_config().unwrap();
 
     let mut client = utils::create_client(
-        wats_config.connection_03_id(),
-        wats_config.connection_03_token(),
-    )
+      wats_config.connection_01_id(),
+      wats_config.connection_01_token(),
+      wats_config.connection_04_id(),
+      wats_config.connection_04_token()
+  )
     .await
     .unwrap();
 
@@ -312,9 +327,11 @@ async fn order_cancel_bad_order_id() {
     let wats_config = config::get_config().unwrap();
 
     let mut client = utils::create_client(
-        wats_config.connection_01_id(),
-        wats_config.connection_01_token(),
-    )
+      wats_config.connection_01_id(),
+      wats_config.connection_01_token(),
+      wats_config.connection_04_id(),
+      wats_config.connection_04_token()
+  )
     .await
     .unwrap();
 
@@ -343,10 +360,7 @@ async fn order_cancel_bad_order_id() {
 
     // Then, get OrderCancelResponse and skip any heartbeat
     let mod_resp = client.get_order_cancel_resp().await.unwrap();
-    assert_eq!(
-        { mod_resp.reason },
-        tp::OrderRejectionReason::UnknownOrder
-    );
+    assert_eq!({ mod_resp.reason }, tp::OrderRejectionReason::UnknownOrder);
 
     client.logout().await.unwrap();
 }
@@ -362,9 +376,11 @@ async fn price_violates_tick_table() {
     let wats_config = config::get_config().unwrap();
 
     let mut client = utils::create_client(
-        wats_config.connection_01_id(),
-        wats_config.connection_01_token(),
-    )
+      wats_config.connection_01_id(),
+      wats_config.connection_01_token(),
+      wats_config.connection_04_id(),
+      wats_config.connection_04_token()
+  )
     .await
     .unwrap();
 
@@ -411,9 +427,11 @@ async fn no_gap_in_omd_msg() {
     let wats_config = config::get_config().unwrap();
 
     let mut client = utils::create_client(
-        wats_config.connection_01_id(),
-        wats_config.connection_01_token(),
-    )
+      wats_config.connection_01_id(),
+      wats_config.connection_01_token(),
+      wats_config.connection_04_id(),
+      wats_config.connection_04_token()
+  )
     .await
     .unwrap();
 
@@ -449,9 +467,11 @@ async fn request_omd_replay() {
     let wats_config = config::get_config().unwrap();
 
     let mut client = utils::create_client(
-        wats_config.connection_01_id(),
-        wats_config.connection_01_token(),
-    )
+      wats_config.connection_01_id(),
+      wats_config.connection_01_token(),
+      wats_config.connection_04_id(),
+      wats_config.connection_04_token()
+  )
     .await
     .unwrap();
 
@@ -502,9 +522,13 @@ async fn bbo_price_level() {
     let wats_config = config::get_config().unwrap();
 
     // Connect to BBO replay service
-    let mut bbo = Bbo::new(wats_config.bbo_addr(),
+    let mut bbo = Bbo::new(
+        wats_config.bbo_addr(),
         wats_config.bbo_snap_addr(),
-        wats_config.bbo_replay_addr()).await.unwrap();
+        wats_config.bbo_replay_addr(),
+    )
+    .await
+    .unwrap();
 
     // Assert initial state of BBO and then fetch all messages
     assert_eq!(0, bbo.last_seq_num());
@@ -519,9 +543,11 @@ async fn bbo_price_level() {
 
     // Create trading port client
     let mut client = utils::create_client(
-        wats_config.connection_01_id(),
-        wats_config.connection_01_token(),
-    )
+      wats_config.connection_01_id(),
+      wats_config.connection_01_token(),
+      wats_config.connection_04_id(),
+      wats_config.connection_04_token()
+  )
     .await
     .unwrap();
 
@@ -665,9 +691,11 @@ async fn orders_in_phase() {
     let wats_config = config::get_config().unwrap();
 
     let mut client = utils::create_client(
-        wats_config.connection_01_id(),
-        wats_config.connection_01_token(),
-    )
+      wats_config.connection_01_id(),
+      wats_config.connection_01_token(),
+      wats_config.connection_04_id(),
+      wats_config.connection_04_token()
+  )
     .await
     .unwrap();
 
@@ -702,9 +730,11 @@ async fn ptc() {
     let wats_config = config::get_config().unwrap();
 
     let mut client = utils::create_client(
-        wats_config.connection_01_id(),
-        wats_config.connection_01_token(),
-    )
+      wats_config.connection_01_id(),
+      wats_config.connection_01_token(),
+      wats_config.connection_04_id(),
+      wats_config.connection_04_token()
+  )
     .await
     .unwrap();
 
@@ -729,7 +759,10 @@ async fn ptc() {
         .find(|msg| msg.instrument_id == wats_config.ptc_instrument_id())
         .unwrap();
 
-    assert_eq!(product_type, market_data::ProductType::FinancialProductShare);
+    assert_eq!(
+        product_type,
+        market_data::ProductType::FinancialProductShare
+    );
 
     let price = 100 * 100_000_000;
     let max_price = (pre_trade_check_max_value
@@ -829,17 +862,21 @@ async fn order_book_based_on_market_data() {
     let wats_config = config::get_config().unwrap();
 
     let mut client_a = utils::create_client(
-        wats_config.connection_01_id(),
-        wats_config.connection_01_token(),
-    )
+      wats_config.connection_01_id(),
+      wats_config.connection_01_token(),
+      wats_config.connection_04_id(),
+      wats_config.connection_04_token()
+  )
     .await
     .unwrap();
     utils::fetch_messages_until_heartbeat(&mut client_a).await;
 
     let mut client_b = utils::create_client(
-        wats_config.connection_02_id(),
-        wats_config.connection_02_token(),
-    )
+      wats_config.connection_02_id(),
+      wats_config.connection_02_token(),
+      wats_config.connection_04_id(),
+      wats_config.connection_04_token()
+  )
     .await
     .unwrap();
     utils::fetch_messages_until_heartbeat(&mut client_b).await;
@@ -880,9 +917,10 @@ async fn order_book_based_on_market_data() {
     assert_eq!({ buy_resp.public_order_id }, {
         last_md_order_add.public_order_id
     });
-    assert_eq!(wats_config.order_book_based_on_market_data_instrument_id(), {
-        last_md_order_add.instrument_id
-    });
+    assert_eq!(
+        wats_config.order_book_based_on_market_data_instrument_id(),
+        { last_md_order_add.instrument_id }
+    );
     assert_eq!(tp::OrderSide::Buy as u8, last_md_order_add.side as u8);
     assert_eq!(100 * 100_000_000, { last_md_order_add.price });
     assert_eq!(5000, { last_md_order_add.quantity });
@@ -1041,4 +1079,134 @@ async fn order_book_based_on_market_data() {
 
     client_a.logout().await.unwrap();
     client_b.logout().await.unwrap();
+}
+
+fn trade_report_id_from_str(id: &str) -> tp::TradeReportId {
+    let mut trade_report_id: tp::TradeReportId = tp::TradeReportId::default();
+    let len = id.len();
+    trade_report_id
+        .split_at_mut(len)
+        .0
+        .copy_from_slice(id.as_bytes().split_at(len).0);
+    trade_report_id
+}
+
+fn settlement_date(d: DateTime<Local>) -> u32 {
+    (d.year() as u32) * 10000 + d.month() * 100 + d.day()
+}
+
+/// Trade Capture Report Dual
+#[tokio::test]
+#[ignore]
+async fn block_dual() {
+    let wats_config = config::get_config().unwrap();
+
+    let mut client = utils::create_client(
+      wats_config.connection_01_id(),
+      wats_config.connection_01_token(),
+      wats_config.connection_04_id(),
+      wats_config.connection_04_token()
+  )
+    .await
+    .unwrap();
+
+    utils::fetch_messages(&mut client).await;
+
+    client
+        .submit_trade_capture_report_dual(simple_trade_capture_report_dual(
+            wats_config.block_dual(),
+            trade_report_id_from_str("ID0000"),
+            tp::ExecType::New,
+            100 * 100_000_000,
+            10,
+            settlement_date(Local::now() + chrono::Duration::try_days(1).unwrap()),
+        ))
+        .await
+        .unwrap();
+
+    // Get OrderAddResponse and skip any heartbeat
+    let tcrd_resp = client.get_trade_capture_report_dual_resp().await.unwrap();
+    assert_eq!(tcrd_resp.status, tp::TcrStatus::Accepted);
+
+    client
+        .submit_trade_capture_report_dual(simple_trade_capture_report_dual(
+            wats_config.block_dual(),
+            trade_report_id_from_str("ID0001"),
+            tp::ExecType::Trade,
+            100 * 100_000_000,
+            10,
+            settlement_date(Local::now() + chrono::Duration::try_days(1).unwrap()),
+        ))
+        .await
+        .unwrap();
+
+    // Get OrderAddResponse and skip any heartbeat
+    let tcrd_resp = client.get_trade_capture_report_dual_resp().await.unwrap();
+    assert_eq!(tcrd_resp.status, tp::TcrStatus::Rejected);
+
+    client
+        .submit_trade_capture_report_dual(simple_trade_capture_report_dual(
+            wats_config.block_dual(),
+            trade_report_id_from_str("ID0002"),
+            tp::ExecType::New,
+            100 * 100_000_000,
+            10,
+            settlement_date(Local::now() + chrono::Duration::try_days(1).unwrap()),
+        ))
+        .await
+        .unwrap();
+
+    // Get OrderAddResponse and skip any heartbeat
+    let tcrd_resp = client.get_trade_capture_report_dual_resp().await.unwrap();
+    assert_eq!(tcrd_resp.status, tp::TcrStatus::Accepted);
+
+    client
+        .submit_trade_capture_report_dual(simple_trade_capture_report_dual(
+            wats_config.block_dual(),
+            trade_report_id_from_str("ID0002"),
+            tp::ExecType::New,
+            100 * 100_000_000,
+            10,
+            settlement_date(Local::now() + chrono::Duration::try_days(1).unwrap()),
+        ))
+        .await
+        .unwrap();
+
+    // Get OrderAddResponse and skip any heartbeat
+    let tcrd_resp = client.get_trade_capture_report_dual_resp().await.unwrap();
+    assert_eq!(tcrd_resp.status, tp::TcrStatus::Rejected);
+
+    // client
+    //     .submit_trade_capture_report_dual(simple_trade_capture_report_dual(
+    //         wats_config.block_dual(),
+    //         trade_report_id_from_str("ID0003"),
+    //         tp::ExecType::New,
+    //         100 * 100_000_000,
+    //         1,
+    //         settlement_date(Local::now() + chrono::Duration::try_days(1).unwrap()),
+    //     ))
+    //     .await
+    //     .unwrap();
+
+    // Get OrderAddResponse and skip any heartbeat
+    // let tcrd_resp = client.get_trade_capture_report_dual_resp().await.unwrap();
+    // assert_eq!(tcrd_resp.status, tp::TcrStatus::Accepted);
+
+    client
+        .submit_trade_capture_report_dual(simple_trade_capture_report_dual(
+            wats_config.block_dual(),
+            trade_report_id_from_str("ID0004"),
+            tp::ExecType::New,
+            100 * 100_000_000,
+            1,
+            settlement_date(Local::now() - chrono::Duration::try_days(1).unwrap()),
+        ))
+        .await
+        .unwrap();
+
+    // Get OrderAddResponse and skip any heartbeat
+    let tcrd_resp = client.get_trade_capture_report_dual_resp().await.unwrap();
+    assert_eq!(tcrd_resp.status, tp::TcrStatus::Rejected);
+
+    client.logout().await.unwrap();
 }

@@ -36,7 +36,7 @@ async fn handle_connector(socket: TcpStream, addr: SocketAddr, config: &Config) 
         config.multicast_interface(),
     )
     .await?
-    .login(config.conn_id(), config.token())
+    .login(config.conn_id(), config.token(), config.conn_id(), config.token())
     .await?;
 
     let mut orders = Framed::new(socket, BytesCodec::new());

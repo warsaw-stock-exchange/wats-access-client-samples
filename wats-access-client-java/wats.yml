@@ -67,6 +67,7 @@ products:
   bbo_price_level: &bbo_price_level_default 4679
   ptc_verification: &ptc_verification_default 4697
   order_book_based_on_omd: &order_book_based_on_omd_default 4685
+  block_dual: &block_dual_default 4701
 
 # Tests' configuration
 login_logout:

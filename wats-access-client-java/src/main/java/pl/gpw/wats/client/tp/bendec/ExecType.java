@@ -21,6 +21,10 @@ public enum ExecType {
      */
     REJECTED(8),
     /**
+     * Expired
+     */
+    EXPIRED(12),
+    /**
      * Trade.
      */
     TRADE(15),

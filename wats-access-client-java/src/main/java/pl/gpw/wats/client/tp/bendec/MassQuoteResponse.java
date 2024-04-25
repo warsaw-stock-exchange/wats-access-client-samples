@@ -14,8 +14,7 @@ import java.nio.ByteBuffer;
  * <p>Byte length: 718</p>
  * <p>Header header - Message header. | size 16</p>
  * <p>OrderId > BigInteger (u64) massQuoteId - Quote id | size 8</p>
- * <p>u8 > int count - How many responses this message contains. | size 1</p>
- * <p>QuoteOrderResponses > QuoteOrderResponse[] (QuoteOrderResponse[]) responses - The array of responses. | size 690</p>
+ * <p>QuoteOrderResponses responses - The slice of responses. | size 691</p>
  * <p>MassQuoteStatus status - Status of the given mass quote order. | size 1</p>
  * <p>MassQuoteRejectionReason reason - Reason for rejecting the given mass quote order. | size 2</p>
  * */
@@ -24,16 +23,14 @@ public class MassQuoteResponse implements ByteSerializable, Message {
 
     private Header header;
     private BigInteger massQuoteId;
-    private int count;
-    private QuoteOrderResponse[] responses;
+    private QuoteOrderResponses responses;
     private MassQuoteStatus status;
     private MassQuoteRejectionReason reason;
     public static final int byteLength = 718;
 
-    public MassQuoteResponse(Header header, BigInteger massQuoteId, int count, QuoteOrderResponse[] responses, MassQuoteStatus status, MassQuoteRejectionReason reason) {
+    public MassQuoteResponse(Header header, BigInteger massQuoteId, QuoteOrderResponses responses, MassQuoteStatus status, MassQuoteRejectionReason reason) {
         this.header = header;
         this.massQuoteId = massQuoteId;
-        this.count = count;
         this.responses = responses;
         this.status = status;
         this.reason = reason;
@@ -44,11 +41,7 @@ public class MassQuoteResponse implements ByteSerializable, Message {
     public MassQuoteResponse(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
         this.massQuoteId = BendecUtils.uInt64FromByteArray(bytes, offset + 16);
-        this.count = BendecUtils.uInt8FromByteArray(bytes, offset + 24);
-        this.responses = new QuoteOrderResponse[30];
-        for(int i = 0; i < responses.length; i++) {
-            this.responses[i] = new QuoteOrderResponse(bytes, offset + 25 + i * 23);
-        }
+        this.responses = new QuoteOrderResponses(bytes, offset + 24);
         this.status = MassQuoteStatus.getMassQuoteStatus(bytes, offset + 715);
         this.reason = MassQuoteRejectionReason.getMassQuoteRejectionReason(bytes, offset + 716);
         this.header.setLength(this.byteLength);
@@ -77,15 +70,9 @@ public class MassQuoteResponse implements ByteSerializable, Message {
         return this.massQuoteId;
     };
     /**
-     * @return How many responses this message contains.
+     * @return The slice of responses.
      */
-    public int getCount() {
-        return this.count;
-    };
-    /**
-     * @return The array of responses.
-     */
-    public QuoteOrderResponse[] getResponses() {
+    public QuoteOrderResponses getResponses() {
         return this.responses;
     };
     /**
@@ -114,15 +101,9 @@ public class MassQuoteResponse implements ByteSerializable, Message {
         this.massQuoteId = massQuoteId;
     };
     /**
-     * @param count How many responses this message contains.
+     * @param responses The slice of responses.
      */
-    public void setCount(int count) {
-        this.count = count;
-    };
-    /**
-     * @param responses The array of responses.
-     */
-    public void setResponses(QuoteOrderResponse[] responses) {
+    public void setResponses(QuoteOrderResponses responses) {
         this.responses = responses;
     };
     /**
@@ -144,10 +125,7 @@ public class MassQuoteResponse implements ByteSerializable, Message {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt64ToByteArray(this.massQuoteId));
-        buffer.put(BendecUtils.uInt8ToByteArray(this.count));
-        for(int i = 0; i < responses.length; i++) {
-            responses[i].toBytes(buffer);
-        }
+        responses.toBytes(buffer);
         status.toBytes(buffer);
         reason.toBytes(buffer);
         return buffer.array();
@@ -157,17 +135,14 @@ public class MassQuoteResponse implements ByteSerializable, Message {
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt64ToByteArray(this.massQuoteId));
-        buffer.put(BendecUtils.uInt8ToByteArray(this.count));
-        for(int i = 0; i < responses.length; i++) {
-            responses[i].toBytes(buffer);
-        }
+        responses.toBytes(buffer);
         status.toBytes(buffer);
         reason.toBytes(buffer);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(header, massQuoteId, count, responses, status, reason);
+        return Objects.hash(header, massQuoteId, responses, status, reason);
     }
 
     @Override
@@ -175,7 +150,6 @@ public class MassQuoteResponse implements ByteSerializable, Message {
         return "MassQuoteResponse{" +
             "header=" + header +
             ", massQuoteId=" + massQuoteId +
-            ", count=" + count +
             ", responses=" + responses +
             ", status=" + status +
             ", reason=" + reason +

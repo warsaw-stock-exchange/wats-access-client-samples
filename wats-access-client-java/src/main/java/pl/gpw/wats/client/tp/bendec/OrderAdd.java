@@ -11,10 +11,10 @@ import java.nio.ByteBuffer;
 /**
  * <h2>OrderAdd</h2>
  * <p>Message used to add new orders to the system.</p>
- * <p>Byte length: 140</p>
+ * <p>Byte length: 139</p>
  * <p>Header header - Header. | size 16</p>
  * <p>OnBehalfOf > int (u16) onBehalfOf - ID of the client party on behalf which order is submitted. The default value is 0. | size 2</p>
- * <p>STPId > int (u16) stpId - ID assigned by the client used in the Self Trade Prevention mechanism. | size 2</p>
+ * <p>STPId > int (u8) stpId - ID assigned by the client used in the Self Trade Prevention mechanism. | size 1</p>
  * <p>ElementId > long (u32) instrumentId - ID of the instrument being traded. | size 4</p>
  * <p>OrderType orderType - Indicates the order type. | size 1</p>
  * <p>TimeInForce timeInForce - Indicates the order's time in force (e.g. GTC). | size 1</p>
@@ -54,7 +54,7 @@ public class OrderAdd implements ByteSerializable, Message {
     private String memo;
     private String clearingMemberCode;
     private ClearingIdentifier clearingMemberClearingIdentifier;
-    public static final int byteLength = 140;
+    public static final int byteLength = 139;
 
     public OrderAdd(Header header, int onBehalfOf, int stpId, long instrumentId, OrderType orderType, TimeInForce timeInForce, OrderSide side, long price, long triggerPrice, BigInteger quantity, BigInteger displayQty, Capacity capacity, String account, AccountType accountType, MifidFields mifidFields, BigInteger expire, String memo, String clearingMemberCode, ClearingIdentifier clearingMemberClearingIdentifier) {
         this.header = header;
@@ -83,23 +83,23 @@ public class OrderAdd implements ByteSerializable, Message {
     public OrderAdd(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
         this.onBehalfOf = BendecUtils.uInt16FromByteArray(bytes, offset + 16);
-        this.stpId = BendecUtils.uInt16FromByteArray(bytes, offset + 18);
-        this.instrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 20);
-        this.orderType = OrderType.getOrderType(bytes, offset + 24);
-        this.timeInForce = TimeInForce.getTimeInForce(bytes, offset + 25);
-        this.side = OrderSide.getOrderSide(bytes, offset + 26);
-        this.price = BendecUtils.int64FromByteArray(bytes, offset + 27);
-        this.triggerPrice = BendecUtils.int64FromByteArray(bytes, offset + 35);
-        this.quantity = BendecUtils.uInt64FromByteArray(bytes, offset + 43);
-        this.displayQty = BendecUtils.uInt64FromByteArray(bytes, offset + 51);
-        this.capacity = Capacity.getCapacity(bytes, offset + 59);
-        this.account = BendecUtils.stringFromByteArray(bytes, offset + 60, 16);
-        this.accountType = AccountType.getAccountType(bytes, offset + 76);
-        this.mifidFields = new MifidFields(bytes, offset + 77);
-        this.expire = BendecUtils.uInt64FromByteArray(bytes, offset + 93);
-        this.memo = BendecUtils.stringFromByteArray(bytes, offset + 101, 18);
-        this.clearingMemberCode = BendecUtils.stringFromByteArray(bytes, offset + 119, 20);
-        this.clearingMemberClearingIdentifier = ClearingIdentifier.getClearingIdentifier(bytes, offset + 139);
+        this.stpId = BendecUtils.uInt8FromByteArray(bytes, offset + 18);
+        this.instrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 19);
+        this.orderType = OrderType.getOrderType(bytes, offset + 23);
+        this.timeInForce = TimeInForce.getTimeInForce(bytes, offset + 24);
+        this.side = OrderSide.getOrderSide(bytes, offset + 25);
+        this.price = BendecUtils.int64FromByteArray(bytes, offset + 26);
+        this.triggerPrice = BendecUtils.int64FromByteArray(bytes, offset + 34);
+        this.quantity = BendecUtils.uInt64FromByteArray(bytes, offset + 42);
+        this.displayQty = BendecUtils.uInt64FromByteArray(bytes, offset + 50);
+        this.capacity = Capacity.getCapacity(bytes, offset + 58);
+        this.account = BendecUtils.stringFromByteArray(bytes, offset + 59, 16);
+        this.accountType = AccountType.getAccountType(bytes, offset + 75);
+        this.mifidFields = new MifidFields(bytes, offset + 76);
+        this.expire = BendecUtils.uInt64FromByteArray(bytes, offset + 92);
+        this.memo = BendecUtils.stringFromByteArray(bytes, offset + 100, 18);
+        this.clearingMemberCode = BendecUtils.stringFromByteArray(bytes, offset + 118, 20);
+        this.clearingMemberClearingIdentifier = ClearingIdentifier.getClearingIdentifier(bytes, offset + 138);
         this.header.setLength(this.byteLength);
         this.header.setMsgType(MsgType.ORDERADD);
     }
@@ -349,7 +349,7 @@ public class OrderAdd implements ByteSerializable, Message {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt16ToByteArray(this.onBehalfOf));
-        buffer.put(BendecUtils.uInt16ToByteArray(this.stpId));
+        buffer.put(BendecUtils.uInt8ToByteArray(this.stpId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
         orderType.toBytes(buffer);
         timeInForce.toBytes(buffer);
@@ -373,7 +373,7 @@ public class OrderAdd implements ByteSerializable, Message {
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt16ToByteArray(this.onBehalfOf));
-        buffer.put(BendecUtils.uInt16ToByteArray(this.stpId));
+        buffer.put(BendecUtils.uInt8ToByteArray(this.stpId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
         orderType.toBytes(buffer);
         timeInForce.toBytes(buffer);

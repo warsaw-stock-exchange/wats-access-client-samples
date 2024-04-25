@@ -6,6 +6,6 @@
     "gen-rust": "node ./generator/generateRust"
   },
   "dependencies": {
-    "bendec": "0.43.0"
+    "bendec": "0.48.0"
   }
 }

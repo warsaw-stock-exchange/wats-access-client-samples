@@ -15,8 +15,7 @@ pub(super) fn init_tracing() {
 }
 
 /// Create a WATS client
-#[instrument(skip(token))]
-pub(super) async fn create_client(connection_id: u16, token: [u8; 8]) -> Result<Client> {
+pub(super) async fn create_client(tp_connection_id: u16, tp_token: [u8; 8], md_connection_id: u16, md_token: [u8; 8]) -> Result<Client> {
     debug!("Creating new client");
 
     let wats_config = crate::config::get_config()?;
@@ -29,12 +28,12 @@ pub(super) async fn create_client(connection_id: u16, token: [u8; 8]) -> Result<
         wats_config.multicast_interface(),
     )
     .await?
-    .login(connection_id, token)
+    .login(tp_connection_id, tp_token, md_connection_id, md_token)
     .await
 }
 
 // Fetch messages buffer up to `last_replay_seq_num` from `LoginResponse`.
-#[instrument(skip_all, fields(connection_id = client.connection_id()))]
+#[instrument(skip_all, fields(connection_id = client.tp_connection_id()))]
 pub(super) async fn fetch_messages(client: &mut Client) {
     let last_seq_num = client.last_seq_num();
 
@@ -55,7 +54,7 @@ pub(super) async fn fetch_messages(client: &mut Client) {
 }
 
 // Fetch messages buffer up to first Heartbeat
-#[instrument(skip_all, fields(connection_id = client.connection_id()))]
+#[instrument(skip_all, fields(connection_id = client.tp_connection_id()))]
 pub(super) async fn fetch_messages_until_heartbeat(client: &mut Client) {
     loop {
         let bytes = client.get_tp_msg_from_wats().await.unwrap();
@@ -94,6 +93,64 @@ pub(super) fn simple_order_add(
                 short_code: 1234567,
                 qualifier: PartyRoleQualifier::NaturalPerson,
             },
+        },
+        ..Default::default()
+    }
+}
+
+pub(super) fn simple_trade_capture_report_dual(
+    instrument_id: tp::ElementId,
+    trade_report_id: tp::TradeReportId,
+    exec_type: tp::ExecType ,
+    last_px: tp::Price,
+    last_qty: tp::Quantity ,
+    settlement_date: tp::Date
+) -> tp::TradeCaptureReportDual {
+    tp::TradeCaptureReportDual {
+        header: tp::Header::new(tp::MsgType::TradeCaptureReportDual),
+        instrument_id,
+        trade_type: tp::TradeType::BlockTrade,
+        algorithmic_trade_indicator: tp::AlgorithmicTradeIndicator::NonAlgorithmicTrade,
+        trade_report_id,
+        exec_type,
+        last_qty,
+        last_px,
+        settlement_date,
+        tcr_party_buy: tp::TcrParty {
+            mifid_fields: MifidFields {
+                flags: MifidFlags::NONE,
+                client: MifidField {
+                    short_code: 1,
+                    qualifier: PartyRoleQualifier::NA,
+                },
+                executing_trader: MifidField {
+                    short_code: 4,
+                    qualifier: PartyRoleQualifier::Algorithm,
+                },
+                investment_decision_maker: MifidField {
+                    short_code: 17,
+                    qualifier: PartyRoleQualifier::NaturalPerson,
+                },
+            },
+            ..Default::default()
+        },
+        tcr_party_sell: tp::TcrParty {
+            mifid_fields: MifidFields {
+                flags: MifidFlags::NONE,
+                client: MifidField {
+                    short_code: 1,
+                    qualifier: PartyRoleQualifier::NA,
+                },
+                executing_trader: MifidField {
+                    short_code: 4,
+                    qualifier: PartyRoleQualifier::Algorithm,
+                },
+                investment_decision_maker: MifidField {
+                    short_code: 17,
+                    qualifier: PartyRoleQualifier::NaturalPerson,
+                },
+            },
+            ..Default::default()
         },
         ..Default::default()
     }

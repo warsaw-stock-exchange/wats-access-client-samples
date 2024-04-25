@@ -6,7 +6,7 @@
 
 use crate::{
     messages::{market_data, trading_port as tp, replay},
-    utils::{create_md_codec, create_tp_codec, TradinPortMsg},
+    utils::{create_md_codec, create_tp_codec, TradingPortMsg},
 };
 use anyhow::{Context, Result};
 use bytes::Bytes;
@@ -62,7 +62,8 @@ pub struct Client {
     tx: OwnedWriteHalf,
     next_expected_seq_num: u32,
     last_replay_seq_num: u32,
-    connection_id: u16,
+    tp_connection_id: u16,
+    md_connection_id: u16,
     session_id: u16,
     snap: Snapshot,
     omd_framed: UdpFramed<LengthDelimitedCodec>,
@@ -75,12 +76,16 @@ impl Client {
         self.last_replay_seq_num
     }
 
-    pub fn connection_id(&self) -> u16 {
-        self.connection_id
+    pub fn tp_connection_id(&self) -> u16 {
+        self.tp_connection_id
     }
 
-    /// Logout from WATS [BIN] Trading Port. Skip `Heartbeat` message in response.
-    #[instrument(skip_all, fields(connection_id = self.connection_id()))]
+    pub fn md_connection_id(&self) -> u16 {
+      self.md_connection_id
+  }
+
+  /// Logout from WATS [BIN] Trading Port. Skip `Heartbeat` message in response.
+    #[instrument(skip_all, fields(connection_id = self.tp_connection_id()))]
     pub async fn logout(mut self) -> Result<()> {
         // Leak `PanicOnDrop` since we are performing graceful logout.
         std::mem::forget(self._remember_to_logout);
@@ -158,7 +163,7 @@ impl Client {
     }
 
     /// Submit order to WATS and increase internal seq_num counter.
-    #[instrument(skip_all, fields(connection_id = self.connection_id()))]
+    #[instrument(skip_all, fields(connection_id = self.tp_connection_id()))]
     pub async fn submit_order(&mut self, mut order: tp::OrderAdd) -> Result<()> {
         // Assert that order's header is correct
         debug_assert_eq!(
@@ -183,6 +188,58 @@ impl Client {
         Ok(())
     }
 
+    #[instrument(skip_all, fields(connection_id = self.tp_connection_id()))]
+    pub async fn submit_trade_capture_report_dual(&mut self, 
+      mut tcrd: tp::TradeCaptureReportDual) -> Result<()> {
+
+        // Assert that order's header is correct
+        debug_assert_eq!(
+            usize::from(tcrd.header.length),
+            std::mem::size_of::<tp::TradeCaptureReportDual>()
+        );
+        debug_assert_eq!({ tcrd.header.msg_type }, tp::MsgType::TradeCaptureReportDual);
+
+        tcrd.header.seq_num = self.next_expected_seq_num;
+        self.tx
+            .write_all_buf(&mut tcrd.as_slice())
+            .await
+            .context("Failed sending TradeCaptureReportDual message")?;
+
+        debug!(
+            "Submitted TradeCaptureReportDual: {}",
+            serde_json::to_string(&tcrd).unwrap()
+        );
+
+        self.next_expected_seq_num = self.next_expected_seq_num.saturating_add(1);
+
+        Ok(())
+    }
+
+    /// Get expected `tp::TradeCaptureReportResponse` from WATS.
+    #[instrument(skip_all, fields(connection_id = self.tp_connection_id()))]
+    pub async fn get_trade_capture_report_dual_resp(&mut self)
+      -> Result<tp::TradeCaptureReportResponse> {
+        loop {
+            let bytes = self.get_tp_msg_from_wats().await?;
+            let msg = unsafe { from_bytes::<tp::Message>(&bytes) };
+            match msg.msg_type() {
+                tp::MsgType::TradeCaptureReportResponse => {
+                    let msg = unsafe { msg.trade_capture_report_response };
+                    debug!(
+                        "TradeCaptureReportResponse: {}",
+                        serde_json::to_string(&msg).unwrap()
+                    );
+                    return Ok(msg);
+                },
+                tp::MsgType::TradeCaptureReportDual => continue,
+                tp::MsgType::Heartbeat => continue,
+                tp::MsgType::Trade => continue,
+                _ => continue,
+                // anyhow::bail!("If not TradeCaptureReportResponse then it should be a heartbeat"),
+            }
+        }
+    }
+
     /// Calculate orderRefId for last order.
     ///
     /// WATS use bitwise combination of connection_id, session_id, bulk_seq_num
@@ -191,12 +248,12 @@ impl Client {
         let bulk_seq_num = 0;
         let last_seq_num = self.next_expected_seq_num.saturating_sub(1);
 
-        tp::OrderId::new(self.connection_id, self.session_id,
+        tp::OrderId::new(self.tp_connection_id, self.session_id,
             bulk_seq_num, last_seq_num).unwrap()
     }
 
     /// Submit order modify for last order submitted to WATS.
-    #[instrument(skip_all, fields(connection_id = self.connection_id()))]
+    #[instrument(skip_all, fields(connection_id = self.tp_connection_id()))]
     pub async fn mod_last_order(&mut self, mut order: tp::OrderModify) -> Result<()> {
         // Assert that order's header is correct
         debug_assert_eq!(
@@ -223,7 +280,7 @@ impl Client {
     }
 
     /// Cancel order earlier submitted to WATS.
-    #[instrument(skip_all, fields(connection_id = self.connection_id()))]
+    #[instrument(skip_all, fields(connection_id = self.tp_connection_id()))]
     pub async fn cancel_order(&mut self, mut order: tp::OrderCancel) -> Result<()> {
         // Assert that order's header is correct
         debug_assert_eq!(
@@ -261,7 +318,7 @@ impl Client {
     /// Get expected `tp::OrderAddResponse` from WATS. Skip any heartbeat
     /// message and return error if there is anything else than
     /// `tp::OrderAddResponse`.
-    #[instrument(skip_all, fields(connection_id = self.connection_id()))]
+    #[instrument(skip_all, fields(connection_id = self.tp_connection_id()))]
     pub async fn get_order_add_resp(&mut self) -> Result<tp::OrderAddResponse> {
         loop {
             let bytes = self.get_tp_msg_from_wats().await?;
@@ -335,7 +392,7 @@ impl Client {
     }
 
     /// Request a replay of Online Market Data messages within given range.
-    #[instrument(skip_all, fields(connection_id = self.connection_id()))]
+    #[instrument(skip_all, fields(connection_id = self.tp_connection_id()))]
     pub async fn request_omd_replay(&mut self, range: Range<u32>) -> Result<()> {
         self.snap.request_md_replay(self.replay_addr, range).await
     }
@@ -343,7 +400,7 @@ impl Client {
     /// Get expected `tp::OrderModifyResponse` from WATS. Skip any heartbeat
     /// message and return error if there is anything else than
     /// `tp::OrderModifyResponse`.
-    #[instrument(skip_all, fields(connection_id = self.connection_id()))]
+    #[instrument(skip_all, fields(connection_id = self.tp_connection_id()))]
     pub async fn get_order_mod_resp(&mut self) -> Result<tp::OrderModifyResponse> {
         loop {
             let bytes = self.get_tp_msg_from_wats().await?;
@@ -366,7 +423,7 @@ impl Client {
     /// Get expected `tp::OrderCancelResponse` from WATS. Skip any heartbeat
     /// message and return error if there is anything else than
     /// `tp::OrderCancelResponse`.
-    #[instrument(skip_all, fields(connection_id = self.connection_id()))]
+    #[instrument(skip_all, fields(connection_id = self.tp_connection_id()))]
     pub async fn get_order_cancel_resp(&mut self) -> Result<tp::OrderCancelResponse> {
         loop {
             let bytes = self.get_tp_msg_from_wats().await?;
@@ -388,7 +445,7 @@ impl Client {
 
     /// Get expected `tp::Trade` from WATS. Skip any heartbeat message
     /// and return error if there is anything else than `tp::Trade`.
-    #[instrument(skip_all, fields(connection_id = self.connection_id()))]
+    #[instrument(skip_all, fields(connection_id = self.tp_connection_id()))]
     pub async fn get_trade(&mut self) -> Result<tp::Trade> {
         loop {
             let bytes = self.get_tp_msg_from_wats().await?;
@@ -551,16 +608,18 @@ impl ClientBuilder {
 
     /// Login to the Online Market Data Snapshot and pull it then login to
     /// WATS Trading Port.
-    pub async fn login(mut self, connection_id: u16, token: [u8; 8]) -> Result<Client> {
-        let snap = self.get_market_data_snapshot(connection_id, token).await?;
+    pub async fn login(mut self, 
+        tp_connection_id: u16, tp_token: [u8; 8],
+        md_connection_id: u16, md_token: [u8; 8]) -> Result<Client> {
+        let snap = self.get_market_data_snapshot(md_connection_id, md_token).await?;
 
         let login = tp::Login {
             header: tp::Header::new(tp::MsgType::Login),
             version: 0,
-            connection_id,
+            connection_id: tp_connection_id,
             next_expected_seq_num: 0,
             last_sent_seq_num: 0,
-            token,
+            token: tp_token,
         };
 
         self.tp_tx
@@ -596,7 +655,8 @@ impl ClientBuilder {
             tx: self.tp_tx,
             next_expected_seq_num: response.next_expected_seq_num,
             last_replay_seq_num: response.last_replay_seq_num,
-            connection_id,
+            tp_connection_id,
+            md_connection_id: md_connection_id,
             session_id: response.session_id,
             snap,
             omd_framed: self.omd_framed,

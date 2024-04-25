@@ -80,7 +80,7 @@
       <field name="Currency" required="N"/>
       <field name="TradeDate" required="N"/>
       <field name="TransactTime" required="Y"/>
-      <field name="SettlDate" required="Y"/>
+      <field name="SettlDate" required="N"/>
       <field name="TradeHandlingInstr" required="Y"/>
       <field name="AlgorithmicTradeIndicator" required="N"/>
       <component name="TrdCapRptSideGrp" required="Y"/>
@@ -101,7 +101,7 @@
       <field name="TradeReportType" required="Y"/>
       <field name="TrdType" required="Y"/>
       <field name="TrdRptStatus" required="Y"/>
-      <field name="TradeReportRejectReason" required="Y"/>
+      <field name="TradeReportRejectReason" required="N"/>
       <field name="RejectText" required="N"/>
       <field name="LastQty" required="Y"/>
       <field name="LastPx" required="Y"/>
@@ -168,6 +168,7 @@
       <field name="OrdType" required="Y"/>
       <field name="Price" required="N"/>
       <component name="TriggeringInstruction" required="N"/>
+      <field name="ExpireDate" required="N"/>
     </message>
     <message name="MassQuote" msgtype="i" msgcat="app">
       <field name="QuoteID" required="Y"/>
@@ -178,6 +179,7 @@
       <field name="OrderRestrictions" required="N"/>
       <field name="OrderOrigination" required="N"/>
       <field name="Text" required="N"/>
+      <field name="SelfMatchPreventionID" required="N"/>
       <component name="QuotSetGrp" required="Y"/>
     </message>
     <message name="MassQuoteAck" msgtype="b" msgcat="app">
@@ -191,6 +193,7 @@
       <field name="OrderRestrictions" required="N"/>
       <field name="OrderOrigination" required="N"/>
       <field name="Text" required="N"/>
+      <field name="SelfMatchPreventionID" required="N"/>
       <component name="QuotSetAckGrp" required="Y"/>
     </message>
     <message name="BusinessMessageReject" msgtype="j" msgcat="app">
@@ -532,7 +535,7 @@
         <field name="PartyID" required="Y"/>
         <field name="PartyIDSource" required="Y"/>
         <field name="PartyRole" required="Y"/>
-        <field name="PartyRoleQualifier" required="Y"/>
+        <field name="PartyRoleQualifier" required="N"/>
       </group>
     </component>
     <component name="PartyDetailGrp">
@@ -675,6 +678,9 @@
       <value enum="1035" description="PRICE_NOT_ALLOWED"/>
       <value enum="1037" description="PRICE_BELOW_LOW_COLLAR"/>
       <value enum="1038" description="PRICE_ABOVE_HIGH_COLLAR"/>
+      <value enum="1044" description="OBSOLETE_EXPIRE_DATE"/>
+      <value enum="1045" description="EXPIRE_DATE_IN_PAST"/>
+      <value enum="1049" description="EXPIRE_DATE_EXCEEDS_LIMIT"/>
       <value enum="1063" description="TRIGGER_PRICE_NOT_ALLOWED"/>
       <value enum="1064" description="TRIGGER_PRICE_NOT_HIGHER_THAN_LTP"/>
       <value enum="1065" description="TRIGGER_PRICE_NOT_LOWER_THAN_LTP"/>
@@ -712,13 +718,13 @@
       <value enum="1029" description="ORDER_PRICE_MUST_BE_NONZERO"/>
       <value enum="1030" description="ORDER_VALUE_MUST_BE_GREATER_THAN_MINIMUM_VALUE"/>
       <value enum="1031" description="ORDER_VALUE_MUST_BE_LOWER_THAN_MAXIMUM_VALUE"/>
-      <value enum="1032" description="MARKET_ORDER_NOT_ALLOWED_IN_AUCTION"/>
+      <value enum="1032" description="INVALID_ORD_TYPE_FOR_SELECTED_MARKET_MODEL"/>
       <value enum="1035" description="PRICE_NOT_ALLOWED"/>
       <value enum="1037" description="PRICE_BELOW_LOW_COLLAR"/>
       <value enum="1038" description="PRICE_ABOVE_HIGH_COLLAR"/>
-      <value enum="1039" description="INVALID_MARKET_ORDER_TIME_IN_FORCE"/>
-      <value enum="1040" description="INVALID_AUCTION_TIME_IN_FORCE"/>
-      <value enum="1041" description="INVALID_ICEBERG_AND_STOP_ORDER_TIME_IN_FORCE"/>
+      <value enum="1039" description="INVALID_TIME_IN_FORCE_FOR_ORDER_TYPE"/>
+      <value enum="1040" description="INVALID_TIME_IN_FORCE_FOR_CURRENT_MARKET_PHASE"/>
+      <value enum="1041" description="INVALID_TIME_IN_FORCE_FOR_SELECTED_MARKET_MODEL"/>
       <value enum="1044" description="OBSOLETE_EXPIRE_DATE"/>
       <value enum="1045" description="EXPIRE_DATE_IN_PAST"/>
       <value enum="1046" description="OBSOLETE_EXPIRE_TIME"/>
@@ -731,6 +737,7 @@
       <value enum="1065" description="TRIGGER_PRICE_NOT_LOWER_THAN_LTP"/>
       <value enum="1066" description="TRIGGER_PRICE_LOWER_THAN_PRICE"/>
       <value enum="1067" description="TRIGGER_PRICE_HIGHER_THAN_PRICE"/>
+      <value enum="1069" description="TRIGGER_PRICE_MUST_BE_GREATER_THAN_ZERO"/>
       <value enum="1070" description="INVALID_PARTY_ID_FOR_CLIENT_ID"/>
       <value enum="1071" description="INVALID_PARTY_ID_FOR_EXECUTING_TRADER"/>
       <value enum="1072" description="INVALID_PARTY_ID_FOR_INVESTMENT_DECISION_MAKER"/>
@@ -738,6 +745,8 @@
       <value enum="1074" description="INVALID_PARTY_ROLE_FOR_PARTY_ID_SOURCE"/>
       <value enum="1075" description="INVALID_PARTY_ROLE_QUALIFIER_FOR_PARTY_ID"/>
       <value enum="1208" description="INVALID_BID" doc="Invalid bid/ask spread"/>
+      <value enum="1301" description="BUY_ORDER_NOT_ALLOWED" doc="During BuyOnly state in Hybrid market model, buy orders are not accepted."/>
+      <value enum="1401" description="ONLY_ONE_SELL_ORDER_IS_ALLOWED_FOR_IPO"/>
       <value enum="2026" description="REQUEST_NOT_ALLOWED_FOR_BLOCK_INSTRUMENT"/>
       <value enum="2028" description="REQUEST_NOT_ALLOWED_FOR_CROSS_INSTRUMENT"/>
       <value enum="7000" description="RISK_LIMIT_NOT_DEFINED"/>
@@ -746,7 +755,6 @@
       <value enum="7003" description="RISK_ORDER_PRICE_COLLAR_EXCEEDED"/>
     </field>
     <field number="751" name="TradeReportRejectReason" type="INT" doc="Reason Trade Capture Request was rejected. 100+ reserved and available for bi-laterally agreed upon user-defined values.">
-      <value enum="0" description="SUCCESSFUL"/>
       <value enum="1" description="INVALID_PARTY_INFORMATION"/>
       <value enum="2" description="UNKNOWN_INSTRUMENT"/>
       <value enum="3" description="UNAUTHORIZED_TO_REPORT_TRADES"/>
@@ -866,8 +874,11 @@ MDEntryID is unique across all order books and all trading members, but only wit
       <value enum="1074" description="INVALID_PARTY_ROLE_FOR_PARTY_ID_SOURCE"/>
       <value enum="1075" description="INVALID_PARTY_ROLE_QUALIFIER_FOR_PARTY_ID"/>
       <value enum="1202" description="DUPLICATE_INSTRUMENT"/>
+      <value enum="1204" description="INVALID_NUMBER_OF_QUOTES"/>
       <value enum="1206" description="DUPLICATE_MASS_QUOTE"/>
       <value enum="1207" description="DUPLICATE_QUOTE"/>
+      <value enum="1210" description="FORBIDDEN_ORDER_CAPACITY_VALUE"/>
+      <value enum="1211" description="TOT_NO_QUOTE_ENTRIES_DIFFERENT_FROM_NO_QUOTE_ENTRIES"/>
       <value enum="99" description="OTHER"/>
     </field>
     <field number="302" name="QuoteSetID" type="STRING" doc="Required if NoQuoteSets &gt; 0. Sequential number for the Quote Set. For a given QuoteID - assumed to start at 1. Must be the first field in the repeating group."/>
@@ -883,6 +894,8 @@ MDEntryID is unique across all order books and all trading members, but only wit
       <value enum="1027" description="ORDER_PRICE_MUST_BE_GREATER_THAN_MINIMUM_PRICE"/>
       <value enum="1028" description="ORDER_PRICE_MUST_BE_LOWER_THAN_MAXIMUM_PRICE"/>
       <value enum="1029" description="ORDER_PRICE_MUST_BE_NONZERO"/>
+      <value enum="1030" description="ORDER_VALUE_MUST_BE_GREATER_THAN_MINIMUM_VALUE"/>
+      <value enum="1031" description="ORDER_VALUE_MUST_BE_LOWER_THAN_MAXIMUM_VALUE"/>
       <value enum="1037" description="PRICE_BELOW_LOW_COLLAR"/>
       <value enum="1038" description="PRICE_ABOVE_HIGH_COLLAR"/>
       <value enum="1201" description="UNKNOWN_SYMBOL" doc="Unknown symbol (security)"/>
@@ -1263,7 +1276,6 @@ MDEntryID is unique across all order books and all trading members, but only wit
       <value enum="3" description="DEFINITIONS_AND_UTILIZATION"/>
     </field>
     <field number="1761" name="RiskLimitRequestResult" type="INT">
-      <value enum="0" description="SUCCESSFUL"/>
       <value enum="1" description="INVALID_PARTY"/>
       <value enum="2" description="INVALID_RELATED_PARTY"/>
       <value enum="3" description="INVALID_RISK_LIMIT_TYPE"/>
@@ -1305,7 +1317,6 @@ MDEntryID is unique across all order books and all trading members, but only wit
       <value enum="5" description="OUO_ORDER_TRIGGERED"/>
     </field>
     <field number="2376" name="PartyRoleQualifier" type="INT" doc="Provides further qualification of the PartyRole (452) value.">
-      <value enum="0" description="NA" doc="None (only valid for reserved short codes or in case of Clearing Firm)"/>
       <value enum="22" description="ALGORITHM" doc="Algorithm (applicable to PartyRole values 12 or 122)"/>
       <value enum="23" description="FIRM_OR_LEGAL_ENTITY" doc="Firm or legal entity (LEI) (applicable to PartyRole value 3)"/>
       <value enum="24" description="NATURAL_PERSON" doc="Natural person (applicable to PartyRole values 3, 12, 122)"/>

@@ -17,7 +17,7 @@ System's Trading Services enable following types of order:
 * Market (IOC/FOK)
 * Market to limit (IOC/FOK)
 
-Placing, modifying and cancelling of orders through Trading Services:
+Placing, modifying and canceling of orders through Trading Services:
 
 ### FIX Order Gateway
 
@@ -79,22 +79,20 @@ To check the status of the services running you can invoke:
 Each time the services are restarted the Reference Data database is populated with new data and state files are reset so no trace of previously submitted orders is kept.
 
 ## Connectivity Data
-There is a live version of core system, limited for development purposes, running on the machine. All of the above shown samples are pre-configured to connect with the services on this machine. Please see respectable configuration files for details.
-
-Below table summarizes the connectivity data for core services on the machine:
+Below table summarizes the connectivity data for core services on the ISV development machine. Other environments may require other connectivity data.
 
 | Port                                         | Connectivity data                                                                                                                                                                           |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Market Data Snapshot (DDS::OMD::Snapshot)    | ConnectionID = 587<br />Token = ABCDEFGH <br />IP:Port (TCP) = 127.0.0.1:10033                                                                                                              |
 | Market Data Stream (DDS::OMD::Stream)        | IP:Port (UDP) = 224.3.1.1:10009                                                                                                                                                             |
 | Market Data Replay (DDS::OMD::Replay)        | IP:Port (TCP) = 127.0.0.1:10011                                                                                                                                                             |
-| Best Bid Offer Snapshot (DDS::BBO::Snapshot) | ConnectionID = 587<br />Token = ABCDEFGH <br />IP:Port (TCP) = 127.0.0.1:10035                                                                                                              |
+| Best Bid Offer Snapshot (DDS::BBO::Snapshot) | ConnectionID = 609<br />Token = ABCDEFGH <br />IP:Port (TCP) = 127.0.0.1:10035                                                                                                              |
 | Best Bid Offer Stream (DDS::BBO::Stream)     | IP:Port (UDP) = 224.3.1.1:10031                                                                                                                                                             |
 | Best Bid Offer Replay (DDS::BBO::Replay)     | IP:Port (TCP) = 127.0.0.1:10032                                                                                                                                                             |
-| FIX Order Gateway (OEG::FIX)                 | Connection #1<br /><br />TargetCompId = WATS_FIX_TP<br />SenderCompId = WATSAC01_FIX01<br />Token = ABCDEFGH<br />IP:Port (TCP) = 127.0.0.1:10050                                           |
-|                                              | Connection #2<br /><br />TargetCompId = WATS_FIX_TP<br />SenderCompId = WATSAC02_FIX01<br />Token = ABCDEFGH<br />IP:Port (TCP) = 127.0.0.1:10050                                           |
-| Native Order Gateway (OEG::BIN)              | Connection #1<br /><br />ConnectionID = 581<br />Token = ABCDEFGH<br />IP:Port (TCP) = 127.0.0.1:10010                                                                                      |
-|                                              | Connection #2<br /><br />ConnectionID = 589<br />Token = ABCDEFGH<br />IP:Port (TCP) = 127.0.0.1:10010                                                                                      |
+| FIX Order Gateway (OEG::FIX)                 | ConnectionID = 581<br />TargetCompId = WATS_FIX_TP<br />SenderCompId = WATSAC01_FIX01<br />Token = ABCDEFGH<br />IP:Port (TCP) = 127.0.0.1:10050                                           |
+|                                              | ConnectionID = 589<br />TargetCompId = WATS_FIX_TP<br />SenderCompId = WATSAC02_FIX01<br />Token = ABCDEFGH<br />IP:Port (TCP) = 127.0.0.1:10050                                           |
+| Native Order Gateway (OEG::BIN)              | ConnectionID = 581<br />Token = ABCDEFGH<br />IP:Port (TCP) = 127.0.0.1:10010                                                                                      |
+|                                              | ConnectionID = 589<br />Token = ABCDEFGH<br />IP:Port (TCP) = 127.0.0.1:10010                                                                                      |
 | Drop Copy Service (OEG::DCP)                 | TargetCompId = WATS_FIX_DC<br />SenderCompId = WATSAC01_FIXDC<br />Token = ABCDEFGH<br />IP:Port (TCP) = 127.0.0.1:10052<br /><br />Works with OEG::FIX and OEG::BIN connection #1 |
 |                                              | TargetCompId = WATS_FIX_DC<br />SenderCompId = WATSAC02_FIXDC<br />Token = ABCDEFGH<br />IP:Port (TCP) = 127.0.0.1:10052<br /><br />Works with OEG::FIX and OEG::BIN connection #2 |
 
@@ -108,34 +106,55 @@ Repository contains messages definitions for FIX protocol in XML format, complai
 * [FIXT11.xml](quickfix/FIXT11.xml)
 
 ## Reference Documents
-Documentation of the trading protocols supported by the EUAT WATS:
+Documentation of the trading protocols supported by the WATS system:
 
 ### Introduction
 
-* [GPW WATS 1.01 Trading System](docs/GPW%20WATS%201.01%20Trading%20System%20v0.59.pdf)
-* [GPW WATS 1.02 Glossary](docs/GPW%20WATS%201.02%20Glossary%20v0.59.pdf)
+* [GPW WATS 1.01 Trading System](docs/GPW%20WATS%201.01%20Trading%20System%20v0.62.pdf)
+* [Changelog for GPW WATS 1.01 Trading System](docs/Changelog%20for%20GPW%20WATS%201.01%20Trading%20System.pdf)
+* [GPW WATS 1.02 Glossary](docs/GPW%20WATS%201.02%20Glossary%20v0.62.pdf)
+* [Changelog for GPW WATS 1.02 Glossary](docs/Changelog%20for%20GPW%20WATS%201.02%20Glossary.pdf)
 
 ### Trading Protocols
 
-* [GPW WATS 2.01 Native Order Gateway Specification](docs/GPW%20WATS%202.01%20Native%20Order%20Gateway%20Specification%20v0.59.pdf)
-* [GPW WATS 2.02 FIX Order Gateway Specification (FIX 5.0)](docs/GPW%20WATS%202.02%20FIX%20Order%20Gateway%20Specification%20v0.59.pdf)
+* [GPW WATS 2.01 Native Order Gateway Specification](docs/GPW%20WATS%202.01%20Native%20Order%20Gateway%20Specification%20v0.62.pdf)
+* [Changelog for GPW WATS 2.01 Native Order Gateway Specification](docs/Changelog%20for%20GPW%20WATS%202.01%20Native%20Order%20Gateway%20Specification.pdf)
+* [GPW WATS 2.02 FIX Order Gateway Specification](docs/GPW%20WATS%202.02%20FIX%20Order%20Gateway%20Specification%20v0.62.pdf)
+* [Changelog for GPW WATS 2.02 FIX Order Gateway Specification](docs/Changelog%20for%20GPW%20WATS%202.02%20FIX%20Order%20Gateway%20Specification.pdf)
 
 ### Data Distribution Service
 
-* [GPW WATS 3.01 Market Data Protocol](docs/GPW%20WATS%203.01%20Market%20Data%20Protocol%20v0.59.pdf)
+* [GPW WATS 3.01 Market Data Protocol](docs/GPW%20WATS%203.01%20Market%20Data%20Protocol%20v0.62.pdf)
+* [Changelog for GPW WATS 3.01 Market Data Protocol](docs/Changelog%20for%20GPW%20WATS%203.01%20Market%20Data%20Protocol.pdf)
+* [GPW WATS 3.02 Internet Data Distribution System](docs/GPW%20WATS%203.02%20Internet%20Data%20Distribution%20System%20v0.62.pdf)
+* [GPW WATS 3.03 Streaming Messages](docs/GPW%20WATS%203.03%20Streaming%20Messages.pdf)
+* [Changelog for GPW WATS 3.03 Streaming Messages](docs/Changelog%20for%20GPW%20WATS%203.03%20Streaming%20Messages%20for%20IDDS.pdf)
+* [GPW WATS 3.04 Rest API Messages for IDDS](docs/GPW%20WATS%203.04%20Rest%20API%20Messages%20for%20IDDS%20v0.62.pdf)
+* [Changelog GPW WATS 3.04 Rest API Messages for IDDS](docs/Changelog%20for%20GPW%20WATS%203.04%20Rest%20API%20Messages%20for%20IDDS.pdf)
 
 ### Other Services
 
-* [GPW WATS 4.01 Drop Copy Gateway](docs/GPW%20WATS%204.01%20Drop%20Copy%20Gateway%20v0.59.pdf)
-* [GPW WATS 4.02 Post Trade Gateway](docs/GPW%20WATS%204.02%20Post%20Trade%20Gateway%20v0.59.pdf)
-* [GPW WATS 5.01 Risk Management Gateway](docs/GPW%20WATS%205.01%20Risk%20Management%20Gateway%20v0.59.pdf)
+* [GPW WATS 4.01 Drop Copy Gateway](docs/GPW%20WATS%204.01%20Drop%20Copy%20Gateway%20v0.62.pdf)
+* [Changelog for GPW WATS 4.01 Drop Copy Gateway](docs/Changelog%20for%20GPW%20WATS%204.01%20Drop%20Copy%20Gateway.pdf)
+* [GPW WATS 4.02 Post Trade Gateway](docs/GPW%20WATS%204.02%20Post%20Trade%20Gateway%20v0.62.pdf)
+* [Changelog for GPW WATS 4.02 Post Trade Gateway](docs/Changelog%20for%20GPW%20WATS%204.02%20Post%20Trade%20Gateway.pdf)
+* [GPW WATS 4.03 Contract Notes](docs/GPW%20WATS%204.03%20Contract%20Notes%20v0.62.pdf)
+* [GPW WATS 5.01 Risk Management Gateway](docs/GPW%20WATS%205.01%20Risk%20Management%20Gateway%20v0.62.pdf)
+* [Changelog for GPW WATS 5.01 Risk Management Gateway](docs/Changelog%20for%20GPW%20WATS%205.01%20Risk%20Management%20Gateway.pdf)
 
 ### Additional Documentation
 
-* [GPW WATS 2.03 Rejection Codes](docs/GPW%20WATS%202.03%20Rejection%20Codes%20v0.59.pdf)
-* [GPW WATS 2.04 BenDec Message Definition Format](docs/GPW%20WATS%202.04%20BenDec%20Mesage%20Definition%20Format%20v0.59.pdf)
-* [GPW WATS 6.01 Connectivity](docs/GPW%20WATS%206.01%20Connectivity%20v0.59.1.pdf)
-* [GPW WATS Advancement](docs/GPW%20WATS%20Advancement.pdf)
+* [GPW WATS 2.03 Rejection Codes](docs/GPW%20WATS%202.03%20Rejection%20Codes%20v0.62.pdf)
+* [Changelog for GPW WATS 2.03 Rejection Codes](docs/Changelog%20for%20GPW%20WATS%202.03%20Rejection%20Codes.pdf)
+* [GPW WATS 2.04 BenDec Message Definition Format](docs/GPW%20WATS%202.04%20BenDec%20Message%20Definition%20Format%20v0.62.pdf)
+* [GPW WATS 6.01 Connectivity](docs/GPW%20WATS%206.01%20Connectivity%20v0.62.pdf)
+* [Changelog for GPW WATS 6.01 Connectivity](docs/Changelog%20for%20GPW%20WATS%206.01%20Connectivity.pdf)
+* [GPW WATS 6.02(ENG) Short Code Record Keeping](docs/GPW%20WATS%206.02(ENG)%20Short%20Code%20Record%20Keeping.pdf)
+* [Changelog for GPW WATS 6.02(ENG) Short Code Record Keeping](docs/Changelog%20for%20GPW%20WATS%206.02(ENG)%20Short%20Code%20Record%20Keeping.pdf)
+* [GPW WATS 6.02(PL) Mapowanie Short Code](docs/GPW%20WATS%206.02(PL)%20Mapowanie%20Short%20Code.pdf)
+* [Protokół zmian dla GPW WATS 6.02(PL) Mapowanie Short Code](docs/Protokół%20zmian%20dla%20GPW%20WATS%206.02(PL)%20Mapowanie%20Short%20Code.pdf)
+* [GPW WATS 6.03 Short-Long Mapper User Guide](docs/GPW%20WATS%206.03%20Short-Long%20Mapper%20User%20Guide.pdf)
+* [Changelog for GPW WATS 6.03 Short-Long Mapper User Guide](docs/Changelog%20for%20GPW%20WATS%206.03%20Short-Long%20Mapper%20User%20Guide.pdf)
 
 ## Support
 If you have any doubts please feel free to contact support for WATS Access Client development environment for ISVs:

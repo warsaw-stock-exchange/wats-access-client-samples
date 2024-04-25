@@ -11,11 +11,10 @@ import java.nio.ByteBuffer;
 /**
  * <h2>CalendarException</h2>
  * <p>Upcoming calendar day exception.</p>
- * <p>Byte length: 49</p>
+ * <p>Byte length: 48</p>
  * <p>Header header - Message header. | size 39</p>
  * <p>ElementId > long (u32) calendarId - Calendar ID. | size 4</p>
  * <p>Date > long (u32) calendarExceptionDate - Calendar exception date. | size 4</p>
- * <p>bool > boolean calendarExceptionRecurrent - True if the calendar exception is recurring. | size 1</p>
  * <p>CalendarExceptionType calendarExceptionType - Calendar exception type. | size 1</p>
  * */
 
@@ -24,15 +23,13 @@ public class CalendarException implements ByteSerializable, Message {
     private Header header;
     private long calendarId;
     private long calendarExceptionDate;
-    private boolean calendarExceptionRecurrent;
     private CalendarExceptionType calendarExceptionType;
-    public static final int byteLength = 49;
+    public static final int byteLength = 48;
 
-    public CalendarException(Header header, long calendarId, long calendarExceptionDate, boolean calendarExceptionRecurrent, CalendarExceptionType calendarExceptionType) {
+    public CalendarException(Header header, long calendarId, long calendarExceptionDate, CalendarExceptionType calendarExceptionType) {
         this.header = header;
         this.calendarId = calendarId;
         this.calendarExceptionDate = calendarExceptionDate;
-        this.calendarExceptionRecurrent = calendarExceptionRecurrent;
         this.calendarExceptionType = calendarExceptionType;
         this.header.setLength(this.byteLength);
         this.header.setMsgType(MsgType.CALENDAREXCEPTION);
@@ -42,8 +39,7 @@ public class CalendarException implements ByteSerializable, Message {
         this.header = new Header(bytes, offset);
         this.calendarId = BendecUtils.uInt32FromByteArray(bytes, offset + 39);
         this.calendarExceptionDate = BendecUtils.uInt32FromByteArray(bytes, offset + 43);
-        this.calendarExceptionRecurrent = BendecUtils.booleanFromByteArray(bytes, offset + 47);
-        this.calendarExceptionType = CalendarExceptionType.getCalendarExceptionType(bytes, offset + 48);
+        this.calendarExceptionType = CalendarExceptionType.getCalendarExceptionType(bytes, offset + 47);
         this.header.setLength(this.byteLength);
         this.header.setMsgType(MsgType.CALENDAREXCEPTION);
     }
@@ -76,12 +72,6 @@ public class CalendarException implements ByteSerializable, Message {
         return this.calendarExceptionDate;
     };
     /**
-     * @return True if the calendar exception is recurring.
-     */
-    public boolean getCalendarExceptionRecurrent() {
-        return this.calendarExceptionRecurrent;
-    };
-    /**
      * @return Calendar exception type.
      */
     public CalendarExceptionType getCalendarExceptionType() {
@@ -107,12 +97,6 @@ public class CalendarException implements ByteSerializable, Message {
         this.calendarExceptionDate = calendarExceptionDate;
     };
     /**
-     * @param calendarExceptionRecurrent True if the calendar exception is recurring.
-     */
-    public void setCalendarExceptionRecurrent(boolean calendarExceptionRecurrent) {
-        this.calendarExceptionRecurrent = calendarExceptionRecurrent;
-    };
-    /**
      * @param calendarExceptionType Calendar exception type.
      */
     public void setCalendarExceptionType(CalendarExceptionType calendarExceptionType) {
@@ -126,7 +110,6 @@ public class CalendarException implements ByteSerializable, Message {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.calendarId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.calendarExceptionDate));
-        buffer.put(BendecUtils.booleanToByteArray(this.calendarExceptionRecurrent));
         calendarExceptionType.toBytes(buffer);
         return buffer.array();
     }
@@ -136,13 +119,12 @@ public class CalendarException implements ByteSerializable, Message {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.calendarId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.calendarExceptionDate));
-        buffer.put(BendecUtils.booleanToByteArray(this.calendarExceptionRecurrent));
         calendarExceptionType.toBytes(buffer);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(header, calendarId, calendarExceptionDate, calendarExceptionRecurrent, calendarExceptionType);
+        return Objects.hash(header, calendarId, calendarExceptionDate, calendarExceptionType);
     }
 
     @Override
@@ -151,7 +133,6 @@ public class CalendarException implements ByteSerializable, Message {
             "header=" + header +
             ", calendarId=" + calendarId +
             ", calendarExceptionDate=" + calendarExceptionDate +
-            ", calendarExceptionRecurrent=" + calendarExceptionRecurrent +
             ", calendarExceptionType=" + calendarExceptionType +
             '}';
         }

@@ -20,12 +20,49 @@ function aliasBytesValidator(meta, alias) {
 }
 
 function structBytesValidator(struct) {
-  const validateFields = struct.fields.map((field) => `${field.type}::is_valid(bytes.get_unchecked(memoffset::span_of!(${struct.name}, ${_.snakeCase(field.name)})))`)
-    .join(' && ')
+  let validateFields
+  if (struct.name === 'Empty') {
+    validateFields = 'false'
+  }
+  else if (struct.fields.length === 0) {
+    validateFields = 'true'
+  }
+  else {
+    validateFields = struct.fields.map((field) => {
+      if (field.length) {
+        return `<[${field.type};${field.length}]>::is_valid(bytes.get_unchecked(memoffset::span_of!(${struct.name}, ${_.snakeCase(field.name)})))`
+      }
+
+      return `${field.type}::is_valid(bytes.get_unchecked(memoffset::span_of!(${struct.name}, ${_.snakeCase(field.name)})))`
+    }).join(' && ')
+  }
+
   return implIsValid(struct.name, validateFields)
 }
 
+function enumBytesValidatorWithData(enumType) {
+  const msgType = enumType.name === 'Message'
+    ? 'MsgType'
+    : 'ReplayMsgType'
+  const discriminator = _.snakeCase(msgType)
+  const validateVariant = enumType.variants.map(([key, disc, comm, data]) => `${msgType}Int::${key} => std::mem::size_of::<${data}>() == length && unsafe { ${data}::is_valid(bytes) },`).join('\n')
+  return `impl ${enumType.name} {
+    pub(crate) fn is_valid_variant(${discriminator}: ${msgType}IntType, bytes: &[u8]) -> bool {
+      let length = bytes.len();
+      match ${discriminator} {
+        ${validateVariant}
+        _ => false,
+      }
+    }
+  }`
+}
+
 function enumBytesValidator(enumType) {
+  const hasData = enumType.variants.some(([key, disc, comm, data]) => data !== undefined)
+  if (hasData) {
+    return enumBytesValidatorWithData(enumType)
+  }
+
   const enumIntType = `#[allow(dead_code)]\ntype ${enumType.name}IntType = ${enumType.underlying};\n`;
   const matchVariants = enumType.variants.map(([key, ,]) => `${enumType.name}Int::${key}`).join(' | ')
   const body = `let disc = std::convert::TryInto::try_into(bytes).map(${enumType.underlying}::from_le_bytes).unwrap_unchecked();
@@ -57,16 +94,6 @@ function unionBytesValidator(union) {
 }
 
 function arrayBytesValidator(meta, array) {
-
-  // We know that the Quote doesn't contain any enums
-  if (array.name == "Quotes") {
-    return implIsValid(array.name, `true`)
-  }
-
-  if (array.name == "QuoteOrderResponses") {
-    return implIsValid(array.name, `true`)
-  }
-
   if (meta?.newtype) {
     return implIsValid(array.name, `<[${array.type}; ${array.length}]>::is_valid(bytes)`)
   }
@@ -75,6 +102,10 @@ function arrayBytesValidator(meta, array) {
 }
 
 function attachBytesValidator([generated, context, meta]) {
+  if (meta?.skipBytesValidator) {
+    return generated
+  }
+
   switch (context.kind) {
     case Kind.Primitive:
       return generated

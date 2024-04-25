@@ -15,13 +15,20 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+
+import javax.swing.event.AncestorEvent;
+
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static pl.gpw.wats.client.TestUtils.orderAdd;
 import static pl.gpw.wats.client.TestUtils.orderModify;
 import static pl.gpw.wats.client.TestUtils.orderCancel;
+import static pl.gpw.wats.client.TestUtils.tradeCaptureReportDual;
+import static pl.gpw.wats.client.TestUtils.toDate;
 
 @TestMethodOrder(MethodOrderer.Alphanumeric.class)
 public class TradingPortClientTest {
@@ -43,7 +50,7 @@ public class TradingPortClientTest {
         // Catch login response and send logout request
         tpc.addHandler(MsgType.LOGINRESPONSE, x -> {
             try {
-                LoginResponse response = new LoginResponse((byte[])x);
+                LoginResponse response = new LoginResponse((byte[]) x);
                 assertEquals(LoginResult.OK, response.getResult());
                 System.out.println("Received: " + response);
                 tpc.logout();
@@ -54,7 +61,7 @@ public class TradingPortClientTest {
 
         // Catch logout reponse
         tpc.addHandler(MsgType.LOGOUTRESPONSE, x -> {
-            System.out.println("Received: " + new LogoutResponse((byte[])x));
+            System.out.println("Received: " + new LogoutResponse((byte[]) x));
             // We've got logoutResponse message, tell test result is a success!
             waitForLogoutResponse.set(false);
             testSuccess.set(true);
@@ -73,7 +80,8 @@ public class TradingPortClientTest {
     }
 
     /**
-     * Put a limit buy order and wait for an ACK response from WATS and then put a matching sell order.
+     * Put a limit buy order and wait for an ACK response from WATS and then put a
+     * matching sell order.
      * Assert that a Trade response has expected value.
      */
     @Test
@@ -90,7 +98,8 @@ public class TradingPortClientTest {
                 "limit_order.connection_0.connections.trading_port");
         TradingPortClient tpcA = new TradingPortClient(configA, 10000, true);
         tpcA.addGeneralHandler(x -> {
-            System.out.println("Connector A received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
+            System.out.println(
+                    "Connector A received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
         });
 
         ConnectionConfig configB = Config.createConnectionConfig(
@@ -98,7 +107,8 @@ public class TradingPortClientTest {
                 "limit_order.connection_1.connections.trading_port");
         TradingPortClient tpcB = new TradingPortClient(configB, 10000, true);
         tpcB.addGeneralHandler(x -> {
-            System.out.println("Connector B received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
+            System.out.println(
+                    "Connector B received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
         });
 
         // Catch Trade message
@@ -149,19 +159,24 @@ public class TradingPortClientTest {
     }
 
     /**
-     *  Put a limit buy order for TradableProduct. Then immediately send OrderModify,
-     *  without waiting for an ACK response from WATS. Assert that OrderModify was sent for the right OrderAdd.
+     * Put a limit buy order for TradableProduct. Then immediately send OrderModify,
+     * without waiting for an ACK response from WATS. Assert that OrderModify was
+     * sent for the right OrderAdd.
      *
-     *  The important bit here is prior knowledge of order_ref_id that must be calculated on the client's side
-     *  without waiting for a WATS response. The order_ref_id is formed from connection_id, session_id and seq_num
-     *  concatenated together bitwise:
+     * The important bit here is prior knowledge of order_ref_id that must be
+     * calculated on the client's side
+     * without waiting for a WATS response. The order_ref_id is formed from
+     * connection_id, session_id and seq_num
+     * concatenated together bitwise:
      *
-     *  <connection_id> <session_id> <seq_num>
-     *          <63-48>      <47-32>    <31-0>
+     * <connection_id> <session_id> <seq_num>
+     * <63-48> <47-32> <31-0>
      *
-     *  `Client` keeps track of `connection_id`, `session_id` and `seq_num`, thus it's possible to calculate
-     *  order_ref_id on the client's side. With the knowledge of `seq_num` of OrderAdd, it's possible to send OrderModify
-     *  for any matching message.
+     * `Client` keeps track of `connection_id`, `session_id` and `seq_num`, thus
+     * it's possible to calculate
+     * order_ref_id on the client's side. With the knowledge of `seq_num` of
+     * OrderAdd, it's possible to send OrderModify
+     * for any matching message.
      */
     @Test
     public void modifyInflight() throws IOException, NoSuchFieldException {
@@ -183,7 +198,8 @@ public class TradingPortClientTest {
         ignoreMessagesFromPreviousTests(tpc);
 
         tpc.addGeneralHandler(x -> {
-            System.out.println("Connector received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
+            System.out.println(
+                    "Connector received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
         });
         tpc.addHandler(MsgType.ORDERADDRESPONSE, x -> {
             orderAddResponse.set(new OrderAddResponse((byte[]) x));
@@ -204,8 +220,8 @@ public class TradingPortClientTest {
 
         // Calculate oderRefId
         BigInteger orderRefId = calcuateRefId(config.connectionId(),
-            tpc.getConnectionStatus().getSessionId(),
-            tpc.getConnectionStatus().getNextExpectedSeqNum() - 1);
+                tpc.getConnectionStatus().getSessionId(),
+                tpc.getConnectionStatus().getNextExpectedSeqNum() - 1);
 
         // Send Modify previous order to WATS
         OrderModify modify = orderModify(orderRefId, 100L * 100_000_000L, BigInteger.valueOf(2000L));
@@ -229,7 +245,8 @@ public class TradingPortClientTest {
     }
 
     /**
-     * Put a limit buy order with a bad instrumentId (it does not exist). Assert that WATS response
+     * Put a limit buy order with a bad instrumentId (it does not exist). Assert
+     * that WATS response
      * status is rejected and rejection reason is UnknowninstrumentId.
      */
     @Test
@@ -243,7 +260,8 @@ public class TradingPortClientTest {
                 "bad_tradable_product_id.connections.trading_port");
         TradingPortClient tpc = new TradingPortClient(config, 10000, true);
         tpc.addGeneralHandler(x -> {
-            System.out.println("Connector received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
+            System.out.println(
+                    "Connector received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
         });
 
         tpc.login();
@@ -282,7 +300,8 @@ public class TradingPortClientTest {
 
     /**
      * Put a limit buy order with a bad price=100.00000001 and quantity=1000.
-     * Assert that WATS response status is rejected and rejection reason is InvalidPriceIncrement.
+     * Assert that WATS response status is rejected and rejection reason is
+     * InvalidPriceIncrement.
      */
     @Test
     public void badPrice() throws IOException, NoSuchFieldException {
@@ -295,7 +314,8 @@ public class TradingPortClientTest {
                 "bad_price.connections.trading_port");
         TradingPortClient tpc = new TradingPortClient(config, 500000, true);
         tpc.addGeneralHandler(x -> {
-            System.out.println("Connector received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
+            System.out.println(
+                    "Connector received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
         });
 
         // Catch LogoutResponse
@@ -335,7 +355,8 @@ public class TradingPortClientTest {
 
     /**
      * Put a limit buy order with a price=100.00000000 and quantity=1000.
-     * Wait for an ACK for OrderAdd and then send a CancelOrder for it. Assert that rejection reason in
+     * Wait for an ACK for OrderAdd and then send a CancelOrder for it. Assert that
+     * rejection reason in
      * OrderCancelResponse is NA and order_ref_id matches OrderAddResponse.
      */
     @Test
@@ -358,7 +379,8 @@ public class TradingPortClientTest {
         ignoreMessagesFromPreviousTests(tpc);
 
         tpc.addGeneralHandler(x -> {
-            System.out.println("Connector received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
+            System.out.println(
+                    "Connector received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
         });
         tpc.addHandler(MsgType.ORDERADDRESPONSE, x -> {
             orderAddResponse.set(new OrderAddResponse((byte[]) x));
@@ -403,7 +425,8 @@ public class TradingPortClientTest {
 
     /**
      * Put a limit buy order with a price=100.00000000 and quantity=1000.
-     * Wait for an ACK for OrderAdd and then send a CancelOrder with bad order_ref_id. Assert that
+     * Wait for an ACK for OrderAdd and then send a CancelOrder with bad
+     * order_ref_id. Assert that
      * rejection reason in OrderCancelResponse is UnknownOrderRefId.
      */
     @Test
@@ -425,7 +448,8 @@ public class TradingPortClientTest {
         ignoreMessagesFromPreviousTests(tpc);
 
         tpc.addGeneralHandler(x -> {
-            System.out.println("Connector received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
+            System.out.println(
+                    "Connector received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
         });
         tpc.addHandler(MsgType.ORDERADDRESPONSE, x -> {
             orderAddResponse.set(new OrderAddResponse((byte[]) x));
@@ -471,10 +495,10 @@ public class TradingPortClientTest {
     }
 
     /**
-     *  Submit OrderAdds that:
-     *  1. Fits PTC
-     *  2. Violates PTC (volume above max volume)
-     *  3. Violates PTC (value above max value)
+     * Submit OrderAdds that:
+     * 1. Fits PTC
+     * 2. Violates PTC (volume above max volume)
+     * 3. Violates PTC (value above max value)
      */
     @Test
     public void preTradeCheckVerification() throws IOException, NoSuchFieldException {
@@ -490,16 +514,16 @@ public class TradingPortClientTest {
                 "ptc_verification.connections.market_data");
         OnlineMarketDataSnapshotClient omdsc = new OnlineMarketDataSnapshotClient(configMds, 1000, true);
         omdsc.addHandler(pl.gpw.wats.client.md.bendec.MsgType.INSTRUMENT, x -> {
-            Instrument product = new Instrument((byte[])x);
+            Instrument product = new Instrument((byte[]) x);
             instruments.put(product.getInstrumentId(), product);
         });
         omdsc.addHandler(pl.gpw.wats.client.md.bendec.MsgType.TICKTABLEENTRY, x -> {
-            TickTableEntry entry = new TickTableEntry((byte[])x);
+            TickTableEntry entry = new TickTableEntry((byte[]) x);
             tickTables.putIfAbsent(entry.getTickTableId(), new ArrayList<>());
-            tickTables.get(entry.getTickTableId()).add(new Long[]{entry.getTickSize(), entry.getLowerBound()});
+            tickTables.get(entry.getTickTableId()).add(new Long[] { entry.getTickSize(), entry.getLowerBound() });
         });
         omdsc.login();
-        while(readData.get()) {
+        while (readData.get()) {
             try {
                 omdsc.read();
             } catch (Exception e) {
@@ -514,16 +538,17 @@ public class TradingPortClientTest {
                 "ptc_verification.connections.trading_port");
         TradingPortClient tpc = new TradingPortClient(config, 10000, true);
         tpc.addGeneralHandler(x -> {
-            System.out.println("Connector received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
+            System.out.println(
+                    "Connector received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
         });
-        LinkedList<OrderAddResponse> orderAddResponses = new LinkedList<>();
+        LinkedList<OrderAddResponse> tradeCaptureReportResponses = new LinkedList<>();
         tpc.login();
-        while(!tpc.getConnectionStatus().isLogged()) {
+        while (!tpc.getConnectionStatus().isLogged()) {
             tpc.read();
         }
         ignoreMessagesFromPreviousTests(tpc);
         tpc.addHandler(MsgType.ORDERADDRESPONSE, x -> {
-            orderAddResponses.add(new OrderAddResponse((byte[])x));
+            tradeCaptureReportResponses.add(new OrderAddResponse((byte[]) x));
         });
 
         // Catch LogoutResponse
@@ -545,16 +570,16 @@ public class TradingPortClientTest {
                 orderAdd(instrumentId, OrderSide.BUY, price, quantity));
         BigInteger orderRefId_tooHighQuantity = sendOrderAndCalcuateRefId(config, tpc,
                 orderAdd(instrumentId, OrderSide.BUY, price,
-                    product.getPreTradeCheckMaxQuantity().add(BigInteger.ONE)));
+                        product.getPreTradeCheckMaxQuantity().add(BigInteger.ONE)));
         BigInteger orderRefId_tooHighPrice = sendOrderAndCalcuateRefId(config, tpc,
                 orderAdd(instrumentId, OrderSide.BUY, maxPrice.longValue(),
-                    product.getPreTradeCheckMaxQuantity()));
+                        product.getPreTradeCheckMaxQuantity()));
 
         // check responses
-        while (orderAddResponses.size() != 4) {
+        while (tradeCaptureReportResponses.size() != 4) {
             tpc.read();
         }
-        orderAddResponses.forEach(response -> {
+        tradeCaptureReportResponses.forEach(response -> {
             if (response.getOrderId().equals(orderRefId_ok)) {
                 assertEquals(OrderStatus.ACK, response.getStatus());
             } else if (response.getOrderId().equals(orderRefId_tooHighValue)) {
@@ -597,10 +622,11 @@ public class TradingPortClientTest {
         }
         ignoreMessagesFromPreviousTests(tpc);
         tpc.addHandler(MsgType.ORDERADDRESPONSE, byteResponse -> {
-            OrderAddResponse orderAddResponse = new OrderAddResponse((byte[])byteResponse);
+            OrderAddResponse orderAddResponse = new OrderAddResponse((byte[]) byteResponse);
             assertTrue(orderAddResponse.getStatus().equals(OrderStatus.ACK) ||
-                            orderAddResponse.getStatus().equals(OrderStatus.FILLED),
-                    "Expected Ack or Filled but received " + orderAddResponse.getStatus() + " - " + orderAddResponse.getReason());
+                    orderAddResponse.getStatus().equals(OrderStatus.FILLED),
+                    "Expected Ack or Filled but received " + orderAddResponse.getStatus() + " - "
+                            + orderAddResponse.getReason());
             counter.countDown();
         });
 
@@ -634,13 +660,130 @@ public class TradingPortClientTest {
         tpc.close();
     }
 
-    private BigInteger sendOrderAndCalcuateRefId(ConnectionConfig config, TradingPortClient tpc, OrderAdd order) throws IOException {
+    @Test
+    public void blockDual() throws IOException, NoSuchFieldException {
+        Long instrumentId = Long.valueOf((Integer) Config.get("block_dual.product"));
+        AtomicBoolean waitForLogoutResponse = new AtomicBoolean(true);
+        AtomicLong responsesCount = new AtomicLong(0l);
+
+        // connect to trading port
+        ConnectionConfig config = Config.createConnectionConfig(
+                "block_dual.services.trading_port",
+                "block_dual.connections.trading_port");
+        TradingPortClient tpc = new TradingPortClient(config, 10000, true);
+        tpc.addGeneralHandler(x -> {
+            System.out.println(
+                    "Connector received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
+        });
+        tpc.login();
+        while (!tpc.getConnectionStatus().isLogged()) {
+            tpc.read();
+        }
+
+        ignoreMessagesFromPreviousTests(tpc);
+
+        tpc.addHandler(MsgType.TRADECAPTUREREPORTRESPONSE, x -> {
+            TradeCaptureReportResponse response = new TradeCaptureReportResponse((byte[]) x);
+            responsesCount.set(responsesCount.get() + 1);
+
+            // Examine responses
+            if (response.getTradeReportId().equals("ID0000")) {
+                assertEquals(TcrStatus.ACCEPTED, response.getStatus());
+            } else if (response.getTradeReportId().equals("ID0001")) {
+                assertEquals(TcrStatus.REJECTED, response.getStatus());
+            } else if (response.getTradeReportId().equals("ID0002")) {
+                if (responsesCount.get() == 3) {
+                    assertEquals(TcrStatus.ACCEPTED, response.getStatus());
+                } else if (responsesCount.get() == 4) {
+                    assertEquals(TcrStatus.REJECTED, response.getStatus());
+                }
+            } else if (response.getTradeReportId().equals("ID0003")) {
+                assertEquals(TcrStatus.ACCEPTED, response.getStatus());
+            } else if (response.getTradeReportId().equals("ID0004")) {
+                assertEquals(TcrStatus.REJECTED, response.getStatus());
+            }
+        });
+
+        // Catch LogoutResponse
+        tpc.addHandler(MsgType.LOGOUTRESPONSE, x -> waitForLogoutResponse.set(false));
+
+        // send TradeCaptureReportDual
+        tpc.send(tradeCaptureReportDual(
+                instrumentId,
+                "ID0000",
+                ExecType.NEW,
+                100 * 100_000_000l,
+                BigInteger.valueOf(10),
+                toDate(LocalDate.now().plusDays(1))));
+
+        tpc.read();
+
+        tpc.send(tradeCaptureReportDual(
+                instrumentId,
+                "ID0001",
+                ExecType.TRADE,
+                100 * 100_000_000l,
+                BigInteger.valueOf(10),
+                toDate(LocalDate.now().plusDays(1))));
+
+        tpc.read();
+
+        tpc.send(tradeCaptureReportDual(
+                instrumentId,
+                "ID0002",
+                ExecType.NEW,
+                100 * 100_000_000l,
+                BigInteger.valueOf(10),
+                toDate(LocalDate.now().plusDays(1))));
+
+        tpc.read();
+
+        tpc.send(tradeCaptureReportDual(
+                instrumentId,
+                "ID0002",
+                ExecType.NEW,
+                100 * 100_000_000l,
+                BigInteger.valueOf(10),
+                toDate(LocalDate.now().plusDays(1))));
+
+        tpc.read();
+
+        tpc.send(tradeCaptureReportDual(
+                instrumentId,
+                "ID0003",
+                ExecType.NEW,
+                100 * 100_000_000l,
+                BigInteger.valueOf(1),
+                toDate(LocalDate.now().plusDays(1))));
+
+        tpc.read();
+
+        tpc.send(tradeCaptureReportDual(
+                instrumentId,
+                "ID0004",
+                ExecType.NEW,
+                100 * 100_000_000l,
+                BigInteger.valueOf(10),
+                toDate(LocalDate.now().plusDays(-1))));
+
+        tpc.logout();
+
+        // Wait for LogoutResponse
+        while (waitForLogoutResponse.get()) {
+            tpc.read();
+        }
+
+        tpc.close();
+    }
+
+    private BigInteger sendOrderAndCalcuateRefId(ConnectionConfig config, TradingPortClient tpc, OrderAdd order)
+            throws IOException {
         System.out.println("Sending order: " + order);
         tpc.send(order);
 
         return calcuateRefId(config.connectionId(),
-            tpc.getConnectionStatus().getSessionId(),
-            tpc.getConnectionStatus().getNextExpectedSeqNum() - 1);
+                tpc.getConnectionStatus().getSessionId(),
+                tpc.getConnectionStatus().getNextExpectedSeqNum() - 1);
     }
 
     private BigInteger calcuateRefId(Integer connectionId, Integer sessionId, Long seqNum) throws IOException {
@@ -656,7 +799,7 @@ public class TradingPortClientTest {
         AtomicBoolean wait = new AtomicBoolean(true);
         Consumer<byte[]> countHandler = (bytes) -> {
             Header h = new Header(bytes);
-            if(tpc.getConnectionStatus().getLastReplaySeqNum() <= h.getSeqNum() || h.getSeqNum() == 0)
+            if (tpc.getConnectionStatus().getLastReplaySeqNum() <= h.getSeqNum() || h.getSeqNum() == 0)
                 wait.set(false);
         };
         tpc.addGeneralHandler(countHandler);

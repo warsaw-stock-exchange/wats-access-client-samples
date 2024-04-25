@@ -43,6 +43,9 @@ const tradingPortTypes = {
       'QuoteOrder': ['Default'],
       'Timestamp': ['Clone', 'Copy', 'Debug', 'Default', 'Ord', 'PartialOrd', 'Eq', 'PartialEq', 'Serialize', 'Deserialize'],
       'ScenarioName': ['Debug', 'Serialize', 'Deserialize'],
+      'TradeCaptureReportSingle': ['Default'],
+      'TradeCaptureReportDual': ['Default'],
+      'TcrParty': ['Default'],
     },
     meta: {
       'OrderId': {
@@ -65,6 +68,12 @@ const tradingPortTypes = {
             annotations: ['#[serde(with = "BigArray")]']
           }
         }
+      },
+      'Quotes': {
+        skipBytesValidator: true,
+      },
+      'QuoteOrderResponses': {
+        skipBytesValidator: true,
       },
       ...enumsWithConstTpMap
     },

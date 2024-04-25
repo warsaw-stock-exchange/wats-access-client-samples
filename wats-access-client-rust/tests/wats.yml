@@ -55,8 +55,8 @@ connection_02:
   id: 589
   token: ABCDEFGH
 
-connection_03:
-  id: 597
+connection_04:
+  id: 587
   token: ABCDEFGH
 
 product_bucket:
@@ -71,3 +71,4 @@ product_bucket:
   gap_in_omd_instrument_id: 4700
   ptc_instrument_id: 4697
   order_book_based_on_market_data_instrument_id: 4685
+  block_dual: 4701

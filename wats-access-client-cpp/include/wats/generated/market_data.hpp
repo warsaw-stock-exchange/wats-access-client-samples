@@ -8,8 +8,6 @@
   #pragma pack(1)
   
   
-// primitive built-in: uint8_t
-using Precision = uint8_t;
 // primitive built-in: uint16_t
 using MsgLength = uint16_t;
 
@@ -181,6 +179,7 @@ struct Heartbeat {
 
     friend std::ostream &operator << (std::ostream &, const Heartbeat &);
 };
+// primitive built-in: uint8_t
 using AnsiChar = uint8_t;
 using TextMessage = AnsiChar[50];
 
@@ -383,7 +382,9 @@ enum class TradingPhaseType: uint8_t {
     Hybrid = 16,
     HybridBuyOnly = 17,
     HybridPreTrade = 18,
-    UnsuspensionAuction = 19
+    UnsuspensionAuction = 19,
+    Ipo = 20,
+    TenderOffer = 21
 };
 
 static const std::map<std::string, TradingPhaseType> Name2TradingPhaseType {
@@ -405,7 +406,9 @@ static const std::map<std::string, TradingPhaseType> Name2TradingPhaseType {
     { "Hybrid", TradingPhaseType::Hybrid },
     { "HybridBuyOnly", TradingPhaseType::HybridBuyOnly },
     { "HybridPreTrade", TradingPhaseType::HybridPreTrade },
-    { "UnsuspensionAuction", TradingPhaseType::UnsuspensionAuction }
+    { "UnsuspensionAuction", TradingPhaseType::UnsuspensionAuction },
+    { "Ipo", TradingPhaseType::Ipo },
+    { "TenderOffer", TradingPhaseType::TenderOffer }
 };
 
 static const std::map<TradingPhaseType, std::string> TradingPhaseType2Name {
@@ -427,7 +430,9 @@ static const std::map<TradingPhaseType, std::string> TradingPhaseType2Name {
     { TradingPhaseType::Hybrid, "Hybrid" },
     { TradingPhaseType::HybridBuyOnly, "HybridBuyOnly" },
     { TradingPhaseType::HybridPreTrade, "HybridPreTrade" },
-    { TradingPhaseType::UnsuspensionAuction, "UnsuspensionAuction" }
+    { TradingPhaseType::UnsuspensionAuction, "UnsuspensionAuction" },
+    { TradingPhaseType::Ipo, "Ipo" },
+    { TradingPhaseType::TenderOffer, "TenderOffer" }
 };
 
 
@@ -477,12 +482,12 @@ struct TradingPhaseScheduleEntry {
     ElementId staticCollarVolatilityAuctionId;
     ElementId dynamicCollarVolatilityAuctionId;
     Timestamp tradingPhaseStartTime;
-    Timestamp tradingPhaseStopTime;
     TradingPhaseType tradingPhaseType;
     AuctionType auctionType;
-    bool auctionUncrossing;
+    bool uncrossing;
     ElementId extStaticCollarVolatilityAuctionId;
     ElementId extDynamicCollarVolatilityAuctionId;
+    ElementId lastAuctionPhaseId;
 
     friend std::ostream &operator << (std::ostream &, const TradingPhaseScheduleEntry &);
 };
@@ -528,7 +533,6 @@ struct CalendarException {
     Header header;
     ElementId calendarId;
     Date calendarExceptionDate;
-    bool calendarExceptionRecurrent;
     CalendarExceptionType calendarExceptionType;
 
     friend std::ostream &operator << (std::ostream &, const CalendarException &);
@@ -1671,27 +1675,30 @@ struct AuctionSummary {
 using Name = AnsiChar[50];
 
 enum class MarketModelType: uint8_t {
-    CLOB = 1,
-    BLOCK = 2,
-    HYBRID = 3,
-    CROSS = 4,
-    NotApplicable = 5
+    NotApplicable = 1,
+    CLOB = 2,
+    BLOCK = 3,
+    HYBRID = 4,
+    CROSS = 5,
+    IPO = 6
 };
 
 static const std::map<std::string, MarketModelType> Name2MarketModelType {
+    { "NotApplicable", MarketModelType::NotApplicable },
     { "CLOB", MarketModelType::CLOB },
     { "BLOCK", MarketModelType::BLOCK },
     { "HYBRID", MarketModelType::HYBRID },
     { "CROSS", MarketModelType::CROSS },
-    { "NotApplicable", MarketModelType::NotApplicable }
+    { "IPO", MarketModelType::IPO }
 };
 
 static const std::map<MarketModelType, std::string> MarketModelType2Name {
+    { MarketModelType::NotApplicable, "NotApplicable" },
     { MarketModelType::CLOB, "CLOB" },
     { MarketModelType::BLOCK, "BLOCK" },
     { MarketModelType::HYBRID, "HYBRID" },
     { MarketModelType::CROSS, "CROSS" },
-    { MarketModelType::NotApplicable, "NotApplicable" }
+    { MarketModelType::IPO, "IPO" }
 };
 
 

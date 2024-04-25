@@ -1,5 +1,6 @@
 #include <iostream>
 #include <queue>
+#include <chrono>
 
 #include <boost/asio/io_context.hpp>
 #include <boost/dll.hpp>
@@ -133,6 +134,8 @@ int main() {
     io_context.run();
 
     trading_port.stop();
+
+    std::this_thread::sleep_for(1000ms);
 
     io_context.reset();
 

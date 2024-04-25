@@ -11,10 +11,10 @@ import java.nio.ByteBuffer;
 /**
  * <h2>MassQuote</h2>
  * <p>Mass Quote</p>
- * <p>Byte length: 1174</p>
+ * <p>Byte length: 1173</p>
  * <p>Header header - Message header. | size 16</p>
  * <p>OnBehalfOf > int (u16) onBehalfOf | size 2</p>
- * <p>STPId > int (u16) stpId - An ID assigned by the client used in Self Match Prevention mechanism. | size 2</p>
+ * <p>STPId > int (u8) stpId - An ID assigned by the client used in Self Match Prevention mechanism. | size 1</p>
  * <p>Capacity capacity - Capacity of the party making the order (either principal or agency). | size 1</p>
  * <p>Account > String (u8[]) account - Account mnemonic as agreed between buy and sell sides. | size 16</p>
  * <p>AccountType accountType - Type of account associated with the order. | size 1</p>
@@ -22,8 +22,7 @@ import java.nio.ByteBuffer;
  * <p>Memo > String (u8[]) memo | size 18</p>
  * <p>ClearingCode > String (u8[]) clearingMemberCode - Clearing member code. | size 20</p>
  * <p>ClearingIdentifier clearingMemberClearingIdentifier - Clearing member's clearing identifier. | size 1</p>
- * <p>u8 > int count - How many quotes this message contains. | size 1</p>
- * <p>Quotes > Quote[] (Quote[]) quotes - The array of quotes. | size 1080</p>
+ * <p>Quotes quotes - The array of quotes. | size 1081</p>
  * */
 
 public class MassQuote implements ByteSerializable, Message {
@@ -38,11 +37,10 @@ public class MassQuote implements ByteSerializable, Message {
     private String memo;
     private String clearingMemberCode;
     private ClearingIdentifier clearingMemberClearingIdentifier;
-    private int count;
-    private Quote[] quotes;
-    public static final int byteLength = 1174;
+    private Quotes quotes;
+    public static final int byteLength = 1173;
 
-    public MassQuote(Header header, int onBehalfOf, int stpId, Capacity capacity, String account, AccountType accountType, MifidFields mifidFields, String memo, String clearingMemberCode, ClearingIdentifier clearingMemberClearingIdentifier, int count, Quote[] quotes) {
+    public MassQuote(Header header, int onBehalfOf, int stpId, Capacity capacity, String account, AccountType accountType, MifidFields mifidFields, String memo, String clearingMemberCode, ClearingIdentifier clearingMemberClearingIdentifier, Quotes quotes) {
         this.header = header;
         this.onBehalfOf = onBehalfOf;
         this.stpId = stpId;
@@ -53,7 +51,6 @@ public class MassQuote implements ByteSerializable, Message {
         this.memo = memo;
         this.clearingMemberCode = clearingMemberCode;
         this.clearingMemberClearingIdentifier = clearingMemberClearingIdentifier;
-        this.count = count;
         this.quotes = quotes;
         this.header.setLength(this.byteLength);
         this.header.setMsgType(MsgType.MASSQUOTE);
@@ -62,19 +59,15 @@ public class MassQuote implements ByteSerializable, Message {
     public MassQuote(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
         this.onBehalfOf = BendecUtils.uInt16FromByteArray(bytes, offset + 16);
-        this.stpId = BendecUtils.uInt16FromByteArray(bytes, offset + 18);
-        this.capacity = Capacity.getCapacity(bytes, offset + 20);
-        this.account = BendecUtils.stringFromByteArray(bytes, offset + 21, 16);
-        this.accountType = AccountType.getAccountType(bytes, offset + 37);
-        this.mifidFields = new MifidFields(bytes, offset + 38);
-        this.memo = BendecUtils.stringFromByteArray(bytes, offset + 54, 18);
-        this.clearingMemberCode = BendecUtils.stringFromByteArray(bytes, offset + 72, 20);
-        this.clearingMemberClearingIdentifier = ClearingIdentifier.getClearingIdentifier(bytes, offset + 92);
-        this.count = BendecUtils.uInt8FromByteArray(bytes, offset + 93);
-        this.quotes = new Quote[30];
-        for(int i = 0; i < quotes.length; i++) {
-            this.quotes[i] = new Quote(bytes, offset + 94 + i * 36);
-        }
+        this.stpId = BendecUtils.uInt8FromByteArray(bytes, offset + 18);
+        this.capacity = Capacity.getCapacity(bytes, offset + 19);
+        this.account = BendecUtils.stringFromByteArray(bytes, offset + 20, 16);
+        this.accountType = AccountType.getAccountType(bytes, offset + 36);
+        this.mifidFields = new MifidFields(bytes, offset + 37);
+        this.memo = BendecUtils.stringFromByteArray(bytes, offset + 53, 18);
+        this.clearingMemberCode = BendecUtils.stringFromByteArray(bytes, offset + 71, 20);
+        this.clearingMemberClearingIdentifier = ClearingIdentifier.getClearingIdentifier(bytes, offset + 91);
+        this.quotes = new Quotes(bytes, offset + 92);
         this.header.setLength(this.byteLength);
         this.header.setMsgType(MsgType.MASSQUOTE);
     }
@@ -140,15 +133,9 @@ public class MassQuote implements ByteSerializable, Message {
         return this.clearingMemberClearingIdentifier;
     };
     /**
-     * @return How many quotes this message contains.
-     */
-    public int getCount() {
-        return this.count;
-    };
-    /**
      * @return The array of quotes.
      */
-    public Quote[] getQuotes() {
+    public Quotes getQuotes() {
         return this.quotes;
     };
 
@@ -204,15 +191,9 @@ public class MassQuote implements ByteSerializable, Message {
         this.clearingMemberClearingIdentifier = clearingMemberClearingIdentifier;
     };
     /**
-     * @param count How many quotes this message contains.
-     */
-    public void setCount(int count) {
-        this.count = count;
-    };
-    /**
      * @param quotes The array of quotes.
      */
-    public void setQuotes(Quote[] quotes) {
+    public void setQuotes(Quotes quotes) {
         this.quotes = quotes;
     };
 
@@ -222,7 +203,7 @@ public class MassQuote implements ByteSerializable, Message {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt16ToByteArray(this.onBehalfOf));
-        buffer.put(BendecUtils.uInt16ToByteArray(this.stpId));
+        buffer.put(BendecUtils.uInt8ToByteArray(this.stpId));
         capacity.toBytes(buffer);
         buffer.put(BendecUtils.stringToByteArray(this.account, 16));
         accountType.toBytes(buffer);
@@ -230,10 +211,7 @@ public class MassQuote implements ByteSerializable, Message {
         buffer.put(BendecUtils.stringToByteArray(this.memo, 18));
         buffer.put(BendecUtils.stringToByteArray(this.clearingMemberCode, 20));
         clearingMemberClearingIdentifier.toBytes(buffer);
-        buffer.put(BendecUtils.uInt8ToByteArray(this.count));
-        for(int i = 0; i < quotes.length; i++) {
-            quotes[i].toBytes(buffer);
-        }
+        quotes.toBytes(buffer);
         return buffer.array();
     }
 
@@ -241,7 +219,7 @@ public class MassQuote implements ByteSerializable, Message {
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt16ToByteArray(this.onBehalfOf));
-        buffer.put(BendecUtils.uInt16ToByteArray(this.stpId));
+        buffer.put(BendecUtils.uInt8ToByteArray(this.stpId));
         capacity.toBytes(buffer);
         buffer.put(BendecUtils.stringToByteArray(this.account, 16));
         accountType.toBytes(buffer);
@@ -249,15 +227,12 @@ public class MassQuote implements ByteSerializable, Message {
         buffer.put(BendecUtils.stringToByteArray(this.memo, 18));
         buffer.put(BendecUtils.stringToByteArray(this.clearingMemberCode, 20));
         clearingMemberClearingIdentifier.toBytes(buffer);
-        buffer.put(BendecUtils.uInt8ToByteArray(this.count));
-        for(int i = 0; i < quotes.length; i++) {
-            quotes[i].toBytes(buffer);
-        }
+        quotes.toBytes(buffer);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(header, onBehalfOf, stpId, capacity, account, accountType, mifidFields, memo, clearingMemberCode, clearingMemberClearingIdentifier, count, quotes);
+        return Objects.hash(header, onBehalfOf, stpId, capacity, account, accountType, mifidFields, memo, clearingMemberCode, clearingMemberClearingIdentifier, quotes);
     }
 
     @Override
@@ -273,7 +248,6 @@ public class MassQuote implements ByteSerializable, Message {
             ", memo=" + memo +
             ", clearingMemberCode=" + clearingMemberCode +
             ", clearingMemberClearingIdentifier=" + clearingMemberClearingIdentifier +
-            ", count=" + count +
             ", quotes=" + quotes +
             '}';
         }

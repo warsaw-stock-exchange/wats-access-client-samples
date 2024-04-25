@@ -13,25 +13,29 @@ import java.nio.ByteBuffer;
  */
 public enum MarketModelType {
     /**
+     * Not applicable
+     */
+    NOTAPPLICABLE(1),
+    /**
      * A Central Limit Order Book (CLOB)
      */
-    CLOB(1),
+    CLOB(2),
     /**
      * BLOCK
      */
-    BLOCK(2),
+    BLOCK(3),
     /**
      * HYBRID market model
      */
-    HYBRID(3),
+    HYBRID(4),
     /**
      * CROSS
      */
-    CROSS(4),
+    CROSS(5),
     /**
-     * Not applicable
+     * Initial public offering
      */
-    NOTAPPLICABLE(5),
+    IPO(6),
     UNKNOWN(99999);
 
     private final int value;

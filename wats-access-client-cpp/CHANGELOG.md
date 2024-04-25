@@ -1,8 +1,12 @@
 # Changes history for WATS Access Client C++ sample code
 
-## 0.59
+## 0.62
 
-* **Change:** Message definitions (contract) updated to version 0.59
+* **Change:** Message definitions (contract) updated to version 0.62
+
+## 0.61
+
+* **Change:** Message definitions (contract) updated to version 0.61
 
 ## 0.36
 

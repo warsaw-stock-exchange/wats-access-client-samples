@@ -10,7 +10,7 @@ import java.nio.ByteBuffer;
 
 /**
  * <h2>InitiateState</h2>
- * <p>The information that the market switches to given state. Sent by MM.</p>
+ * <p>Initiate state change to Regular or BuyOnly.</p>
  * <p>Byte length: 21</p>
  * <p>Header header - Message header. | size 16</p>
  * <p>ElementId > long (u32) instrumentId - Instrument ID | size 4</p>

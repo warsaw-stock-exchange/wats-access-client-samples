@@ -113,9 +113,21 @@ public enum MsgType {
      */
     INITIATESTATE(26),
     /**
+     * A response to the Market maker initiating state transition.
+     */
+    INITIATESTATERESPONSE(27),
+    /**
      * Informs MM that execution has been requested.
      */
     REQUESTFOREXECUTION(28),
+    /**
+     * Message used to cancel multiple existing orders.
+     */
+    ORDERMASSCANCEL(29),
+    /**
+     * Response to message used to cancel multiple existing orders.
+     */
+    ORDERMASSCANCELRESPONSE(30),
     /**
      * A message to relay test scenario information
      */

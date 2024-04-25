@@ -47,7 +47,7 @@ MarketData::MarketData(boost::asio::io_context& io_context) :
         spdlog::info("finished reading from market-data/snapshot");
         spdlog::debug("EndOfSnapshot received with {{ lastSeqNum: {} }}",
             (uint32_t)message.lastSeqNum);
-        expectedSeqNum_ = message.lastSeqNum;
+        expectedSeqNum_ = message.lastSeqNum + 1;
     });
 }
 
@@ -161,7 +161,7 @@ void MarketData::dispatch(Message &message, EventSource source) {
 
     // If it is a message from the future then we have missed some messages
     // and we need to replay them.
-    if(gap > 0 && source == EventSource::stream) {
+    if(gap > 0 && source == EventSource::stream && !heartbeat) {
         spdlog::debug("requesting replay for missing {} messages", +gap);
         replay_request(expectedSeqNum_, (heartbeat ? pheader->seqNum : pheader->seqNum - 1));
     }

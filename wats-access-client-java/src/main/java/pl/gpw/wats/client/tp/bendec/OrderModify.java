@@ -11,13 +11,14 @@ import java.nio.ByteBuffer;
 /**
  * <h2>OrderModify</h2>
  * <p>Message used to modify the submitted order.</p>
- * <p>Byte length: 56</p>
+ * <p>Byte length: 64</p>
  * <p>Header header - Header. | size 16</p>
  * <p>OrderId > BigInteger (u64) orderId - Unique for each trading day order identifier based on the sequence number of order message, bulk sequence number, session ID and connection ID. | size 8</p>
  * <p>Price > long (i64) price - Indicates the price of the given order. | size 8</p>
  * <p>Price > long (i64) triggerPrice - Indicates the trigger price (Last Trade Price - LTP) after which the order should be added to the order book. | size 8</p>
  * <p>Quantity > BigInteger (u64) quantity - Indicates the quantity of the instrument included in the order. | size 8</p>
  * <p>Quantity > BigInteger (u64) displayQty - Used only for iceberg order. The quantity to be displayed. | size 8</p>
+ * <p>Timestamp > BigInteger (u64) expire - Expiration time indicating the validity of the order - relevant only when TimeInForce is set to GTD (Good Till Date). | size 8</p>
  * */
 
 public class OrderModify implements ByteSerializable, Message {
@@ -28,15 +29,17 @@ public class OrderModify implements ByteSerializable, Message {
     private long triggerPrice;
     private BigInteger quantity;
     private BigInteger displayQty;
-    public static final int byteLength = 56;
+    private BigInteger expire;
+    public static final int byteLength = 64;
 
-    public OrderModify(Header header, BigInteger orderId, long price, long triggerPrice, BigInteger quantity, BigInteger displayQty) {
+    public OrderModify(Header header, BigInteger orderId, long price, long triggerPrice, BigInteger quantity, BigInteger displayQty, BigInteger expire) {
         this.header = header;
         this.orderId = orderId;
         this.price = price;
         this.triggerPrice = triggerPrice;
         this.quantity = quantity;
         this.displayQty = displayQty;
+        this.expire = expire;
         this.header.setLength(this.byteLength);
         this.header.setMsgType(MsgType.ORDERMODIFY);
     }
@@ -48,6 +51,7 @@ public class OrderModify implements ByteSerializable, Message {
         this.triggerPrice = BendecUtils.int64FromByteArray(bytes, offset + 32);
         this.quantity = BendecUtils.uInt64FromByteArray(bytes, offset + 40);
         this.displayQty = BendecUtils.uInt64FromByteArray(bytes, offset + 48);
+        this.expire = BendecUtils.uInt64FromByteArray(bytes, offset + 56);
         this.header.setLength(this.byteLength);
         this.header.setMsgType(MsgType.ORDERMODIFY);
     }
@@ -97,6 +101,12 @@ public class OrderModify implements ByteSerializable, Message {
     public BigInteger getDisplayQty() {
         return this.displayQty;
     };
+    /**
+     * @return Expiration time indicating the validity of the order - relevant only when TimeInForce is set to GTD (Good Till Date).
+     */
+    public BigInteger getExpire() {
+        return this.expire;
+    };
 
     /**
      * @param header Header.
@@ -134,6 +144,12 @@ public class OrderModify implements ByteSerializable, Message {
     public void setDisplayQty(BigInteger displayQty) {
         this.displayQty = displayQty;
     };
+    /**
+     * @param expire Expiration time indicating the validity of the order - relevant only when TimeInForce is set to GTD (Good Till Date).
+     */
+    public void setExpire(BigInteger expire) {
+        this.expire = expire;
+    };
 
 
     @Override  
@@ -145,6 +161,7 @@ public class OrderModify implements ByteSerializable, Message {
         buffer.put(BendecUtils.int64ToByteArray(this.triggerPrice));
         buffer.put(BendecUtils.uInt64ToByteArray(this.quantity));
         buffer.put(BendecUtils.uInt64ToByteArray(this.displayQty));
+        buffer.put(BendecUtils.uInt64ToByteArray(this.expire));
         return buffer.array();
     }
 
@@ -156,11 +173,12 @@ public class OrderModify implements ByteSerializable, Message {
         buffer.put(BendecUtils.int64ToByteArray(this.triggerPrice));
         buffer.put(BendecUtils.uInt64ToByteArray(this.quantity));
         buffer.put(BendecUtils.uInt64ToByteArray(this.displayQty));
+        buffer.put(BendecUtils.uInt64ToByteArray(this.expire));
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(header, orderId, price, triggerPrice, quantity, displayQty);
+        return Objects.hash(header, orderId, price, triggerPrice, quantity, displayQty, expire);
     }
 
     @Override
@@ -172,6 +190,7 @@ public class OrderModify implements ByteSerializable, Message {
             ", triggerPrice=" + triggerPrice +
             ", quantity=" + quantity +
             ", displayQty=" + displayQty +
+            ", expire=" + expire +
             '}';
         }
 }

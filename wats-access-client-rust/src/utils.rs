@@ -42,7 +42,7 @@ pub unsafe fn from_bytes<T>(bytes: &[u8]) -> &T {
     &*(bytes.as_ptr() as *const T)
 }
 
-pub trait TradinPortMsg: sealed::TradinPortMsgPriv {
+pub trait TradingPortMsg: sealed::TradingPortMsgPriv {
     fn as_slice(&self) -> &[u8]
     where
         Self: Sized,
@@ -59,26 +59,29 @@ pub trait TradinPortMsg: sealed::TradinPortMsgPriv {
 mod sealed {
     /// Allow only specific trading port messages. Make sure that this not get
     /// implemented for `tp::Message`
-    pub trait TradinPortMsgPriv {}
+    pub trait TradingPortMsgPriv {}
 }
 
-impl sealed::TradinPortMsgPriv for tp::Logout {}
-impl TradinPortMsg for tp::Logout {}
+impl sealed::TradingPortMsgPriv for tp::Logout {}
+impl TradingPortMsg for tp::Logout {}
 
-impl sealed::TradinPortMsgPriv for tp::Login {}
-impl TradinPortMsg for tp::Login {}
+impl sealed::TradingPortMsgPriv for tp::Login {}
+impl TradingPortMsg for tp::Login {}
 
-impl sealed::TradinPortMsgPriv for tp::OrderAdd {}
-impl TradinPortMsg for tp::OrderAdd {}
+impl sealed::TradingPortMsgPriv for tp::OrderAdd {}
+impl TradingPortMsg for tp::OrderAdd {}
 
-impl sealed::TradinPortMsgPriv for tp::OrderModify {}
-impl TradinPortMsg for tp::OrderModify {}
+impl sealed::TradingPortMsgPriv for tp::OrderModify {}
+impl TradingPortMsg for tp::OrderModify {}
 
-impl sealed::TradinPortMsgPriv for tp::OrderCancel {}
-impl TradinPortMsg for tp::OrderCancel {}
+impl sealed::TradingPortMsgPriv for tp::OrderCancel {}
+impl TradingPortMsg for tp::OrderCancel {}
 
-impl sealed::TradinPortMsgPriv for market_data::Login {}
-impl TradinPortMsg for market_data::Login {}
+impl sealed::TradingPortMsgPriv for tp::TradeCaptureReportDual {}
+impl TradingPortMsg for tp::TradeCaptureReportDual {}
 
-impl sealed::TradinPortMsgPriv for replay::ReplayRequest {}
-impl TradinPortMsg for replay::ReplayRequest {}
+impl sealed::TradingPortMsgPriv for market_data::Login {}
+impl TradingPortMsg for market_data::Login {}
+
+impl sealed::TradingPortMsgPriv for replay::ReplayRequest {}
+impl TradingPortMsg for replay::ReplayRequest {}

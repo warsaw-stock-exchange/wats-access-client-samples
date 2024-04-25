@@ -88,6 +88,14 @@ public enum TradingPhaseType {
      * Auction after suspension
      */
     UNSUSPENSIONAUCTION(19),
+    /**
+     * Initial public offering phase
+     */
+    IPO(20),
+    /**
+     * Tender offer phase
+     */
+    TENDEROFFER(21),
     UNKNOWN(99999);
 
     private final int value;

@@ -101,7 +101,8 @@ pub union ReplayMessage {
 
 impl Serialize for ReplayMessage {
   fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-  where S: Serializer,
+  where
+    S: Serializer,
   {
     unsafe {
       match self.replay_request.header.replay_msg_type {
@@ -123,7 +124,7 @@ impl ReplayMessage {
 }
 
 impl ReplayMessage {
-  pub fn size_of(disc: ReplayMsgType) -> usize {
+  pub const fn size_of(disc: ReplayMsgType) -> usize {
     match disc {
       ReplayMsgType::ReplayRequest => std::mem::size_of::<ReplayRequest>(),
     }

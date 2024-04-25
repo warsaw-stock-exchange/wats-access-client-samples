@@ -10,10 +10,6 @@ pub type Percentage = i64;
 
 // primitive built-in: bool
 
-/// Participant ID.
-pub type ParticipantId = u32;
-
-
 // primitive built-in: u8
 
 // primitive built-in: u16
@@ -118,7 +114,7 @@ pub type OnBehalfOf = u16;
 
 
 /// An ID assigned by the client used in Self Trade Prevention mechanism.
-pub type STPId = u16;
+pub type STPId = u8;
 
 
 /// Unique for single trading day order identifier assigned by the trading system and shared publicly in market data (public information).
@@ -195,17 +191,6 @@ pub type Token = [AnsiChar; 8];
 pub type Memo = [AnsiChar; 18];
 
 
-
-/// An array of quotes.
-pub type Quotes = [Quote; 30];
-
-impl BytesValidator for Quotes {
-    #[inline]
-    unsafe fn is_valid(bytes: &[u8]) -> bool {
-      debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      true
-    }
-  }
 
 /// Account type.
 #[repr(u8)]
@@ -677,20 +662,26 @@ pub enum OrderRejectionReason {
   OrderValueMustBeGreaterThanMinimumValue = 0x0406,
   /// The order value must be lower than maximum value.
   OrderValueMustBeLowerThanMaximumValue = 0x0407,
-  /// Market orders are not permitted during the auction.
-  MarketOrderNotAllowedInAuction = 0x0408,
+  /// Invalid OrdType for selected market model
+  InvalidOrdTypeForSelectedMarketModel = 0x0408,
   /// The remaining quantity (LeavesQty) must be greater than 0 after the modification.
   LeavesQuantityMustBeGreaterThanZeroAfterModification = 0x040a,
   /// The price is not allowed for a market order. In the binary protocol, the price field should have a value of 0.
   PriceNotAllowed = 0x040b,
-  /// A market order can only have a TimeInForce value of 3 (IOC - Immediate or Cancel) or 4 (FOK - Fill or Kill).
-  InvalidMarketOrderTimeInForce = 0x040f,
-  /// The TimeInForce value of 3 (IOC - Immediate or Cancel) or 4 (FOK - Fill or Kill) is not allowed during the auction.
-  InvalidAuctionTimeInForce = 0x0410,
-  /// Iceberg and Stop orders can only have a TimeInForce value of DAY, GTC (Good Till Cancel), GTD (Good Till Date), or GTT (Good Till Time).
-  InvalidIcebergAndStopOrderTimeInForce = 0x0411,
+  /// Invalid TimeInForce for specified OrderType
+  InvalidTimeInForceForOrderType = 0x040f,
+  /// Invalid TimeInForce for current market phase
+  InvalidTimeInForceForCurrentMarketPhase = 0x0410,
+  /// Invalid TimeInForce for selected market model
+  InvalidTimeInForceForSelectedMarketModel = 0x0411,
+  /// ExpireTime (126) cannot be modified.
+  ExpireTimeCannotBeModified = 0x0413,
+  /// ExpireDate (432) not allowed for selected TimeInForce (59).
+  ObsoleteExpireDate = 0x0414,
   /// The expiration date is earlier than the current date.
   ExpireDateInPast = 0x0415,
+  /// ExpireTime (126) not allowed for selected TimeInForce (59).
+  ObsoleteExpireTime = 0x0416,
   /// The expiration time is earlier than the current time.
   ExpireTimeInPast = 0x0417,
   /// Please provide either a time or a date, but not both.
@@ -713,6 +704,8 @@ pub enum OrderRejectionReason {
   TriggerPriceHigherThanPrice = 0x042b,
   /// The trigger price has been modified for the activated order.
   TriggerPriceModifiedForActivatedOrder = 0x042c,
+  /// TriggerPrice (1102) must be greater than 0.
+  TriggerPriceMustBeGreaterThanZero = 0x042d,
   /// Invalid PartyID (448) for Client ID
   InvalidPartyIdForClientId = 0x042e,
   /// Invalid PartyID (448) for Executing Trader
@@ -721,8 +714,16 @@ pub enum OrderRejectionReason {
   InvalidPartyIdForInvestmentDecisionMaker = 0x0430,
   /// Invalid PartyRoleQualifier (2376) for PartyID (448)
   InvalidPartyRoleQualifierForPartyId = 0x0433,
+  /// SecurityID (48) not recognized by the system.
+  UnknownInstrument = 0x04b1,
+  /// Instrument closed for trading.
+  InstrumentClosed = 0x04b3,
   /// OfferPx (133) must be greater than BidPx (132).
   InvalidBidAskSpread = 0x04b8,
+  /// Buy orders from participants are not allowed in BuyOnly phase.
+  BuyOrderNotAllowed = 0x0515,
+  /// Only one sell order is allowed for IPO instrument
+  OnlyOneSellOrderIsAllowedForIpo = 0x0579,
   /// Request not allowed for BLOCK instrument
   RequestNotAllowedForBlockInstrument = 0x07ea,
   /// Request not allowed for CROSS instrument
@@ -768,13 +769,16 @@ impl std::convert::TryFrom<u16> for OrderRejectionReason {
       0x0405 => Ok(Self::OrderPriceMustBeNonzero),
       0x0406 => Ok(Self::OrderValueMustBeGreaterThanMinimumValue),
       0x0407 => Ok(Self::OrderValueMustBeLowerThanMaximumValue),
-      0x0408 => Ok(Self::MarketOrderNotAllowedInAuction),
+      0x0408 => Ok(Self::InvalidOrdTypeForSelectedMarketModel),
       0x040a => Ok(Self::LeavesQuantityMustBeGreaterThanZeroAfterModification),
       0x040b => Ok(Self::PriceNotAllowed),
-      0x040f => Ok(Self::InvalidMarketOrderTimeInForce),
-      0x0410 => Ok(Self::InvalidAuctionTimeInForce),
-      0x0411 => Ok(Self::InvalidIcebergAndStopOrderTimeInForce),
+      0x040f => Ok(Self::InvalidTimeInForceForOrderType),
+      0x0410 => Ok(Self::InvalidTimeInForceForCurrentMarketPhase),
+      0x0411 => Ok(Self::InvalidTimeInForceForSelectedMarketModel),
+      0x0413 => Ok(Self::ExpireTimeCannotBeModified),
+      0x0414 => Ok(Self::ObsoleteExpireDate),
       0x0415 => Ok(Self::ExpireDateInPast),
+      0x0416 => Ok(Self::ObsoleteExpireTime),
       0x0417 => Ok(Self::ExpireTimeInPast),
       0x0418 => Ok(Self::AmbigousExpire),
       0x0419 => Ok(Self::ExpireDateExceedsLimit),
@@ -786,11 +790,16 @@ impl std::convert::TryFrom<u16> for OrderRejectionReason {
       0x042a => Ok(Self::TriggerPriceLowerThanPrice),
       0x042b => Ok(Self::TriggerPriceHigherThanPrice),
       0x042c => Ok(Self::TriggerPriceModifiedForActivatedOrder),
+      0x042d => Ok(Self::TriggerPriceMustBeGreaterThanZero),
       0x042e => Ok(Self::InvalidPartyIdForClientId),
       0x042f => Ok(Self::InvalidPartyIdForExecutingTrader),
       0x0430 => Ok(Self::InvalidPartyIdForInvestmentDecisionMaker),
       0x0433 => Ok(Self::InvalidPartyRoleQualifierForPartyId),
+      0x04b1 => Ok(Self::UnknownInstrument),
+      0x04b3 => Ok(Self::InstrumentClosed),
       0x04b8 => Ok(Self::InvalidBidAskSpread),
+      0x0515 => Ok(Self::BuyOrderNotAllowed),
+      0x0579 => Ok(Self::OnlyOneSellOrderIsAllowedForIpo),
       0x07ea => Ok(Self::RequestNotAllowedForBlockInstrument),
       0x07ec => Ok(Self::RequestNotAllowedForCrossInstrument),
       0x1b58 => Ok(Self::RiskLimitNotDefined),
@@ -827,13 +836,16 @@ impl OrderRejectionReasonInt {
   pub const OrderPriceMustBeNonzero: u16 = 0x0405;
   pub const OrderValueMustBeGreaterThanMinimumValue: u16 = 0x0406;
   pub const OrderValueMustBeLowerThanMaximumValue: u16 = 0x0407;
-  pub const MarketOrderNotAllowedInAuction: u16 = 0x0408;
+  pub const InvalidOrdTypeForSelectedMarketModel: u16 = 0x0408;
   pub const LeavesQuantityMustBeGreaterThanZeroAfterModification: u16 = 0x040a;
   pub const PriceNotAllowed: u16 = 0x040b;
-  pub const InvalidMarketOrderTimeInForce: u16 = 0x040f;
-  pub const InvalidAuctionTimeInForce: u16 = 0x0410;
-  pub const InvalidIcebergAndStopOrderTimeInForce: u16 = 0x0411;
+  pub const InvalidTimeInForceForOrderType: u16 = 0x040f;
+  pub const InvalidTimeInForceForCurrentMarketPhase: u16 = 0x0410;
+  pub const InvalidTimeInForceForSelectedMarketModel: u16 = 0x0411;
+  pub const ExpireTimeCannotBeModified: u16 = 0x0413;
+  pub const ObsoleteExpireDate: u16 = 0x0414;
   pub const ExpireDateInPast: u16 = 0x0415;
+  pub const ObsoleteExpireTime: u16 = 0x0416;
   pub const ExpireTimeInPast: u16 = 0x0417;
   pub const AmbigousExpire: u16 = 0x0418;
   pub const ExpireDateExceedsLimit: u16 = 0x0419;
@@ -845,11 +857,16 @@ impl OrderRejectionReasonInt {
   pub const TriggerPriceLowerThanPrice: u16 = 0x042a;
   pub const TriggerPriceHigherThanPrice: u16 = 0x042b;
   pub const TriggerPriceModifiedForActivatedOrder: u16 = 0x042c;
+  pub const TriggerPriceMustBeGreaterThanZero: u16 = 0x042d;
   pub const InvalidPartyIdForClientId: u16 = 0x042e;
   pub const InvalidPartyIdForExecutingTrader: u16 = 0x042f;
   pub const InvalidPartyIdForInvestmentDecisionMaker: u16 = 0x0430;
   pub const InvalidPartyRoleQualifierForPartyId: u16 = 0x0433;
+  pub const UnknownInstrument: u16 = 0x04b1;
+  pub const InstrumentClosed: u16 = 0x04b3;
   pub const InvalidBidAskSpread: u16 = 0x04b8;
+  pub const BuyOrderNotAllowed: u16 = 0x0515;
+  pub const OnlyOneSellOrderIsAllowedForIpo: u16 = 0x0579;
   pub const RequestNotAllowedForBlockInstrument: u16 = 0x07ea;
   pub const RequestNotAllowedForCrossInstrument: u16 = 0x07ec;
   pub const RiskLimitNotDefined: u16 = 0x1b58;
@@ -866,7 +883,7 @@ impl BytesValidator for OrderRejectionReason {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u16::from_le_bytes).unwrap_unchecked();
-  matches!(disc, OrderRejectionReasonInt::NA | OrderRejectionReasonInt::ExchangeClosed | OrderRejectionReasonInt::InvalidPriceIncrement | OrderRejectionReasonInt::Other | OrderRejectionReasonInt::UnknownInstrumentId | OrderRejectionReasonInt::InstrumentPhaseNoTrading | OrderRejectionReasonInt::UnknownOrder | OrderRejectionReasonInt::InvalidExecutionTrader | OrderRejectionReasonInt::InvalidDecisionMaker | OrderRejectionReasonInt::InvalidClientId | OrderRejectionReasonInt::InvalidPartyRoleQualifierForClientId | OrderRejectionReasonInt::InvalidPartyRoleQualifierForExecutingTrader | OrderRejectionReasonInt::InvalidPartyRoleQualifierForInvestmentDecisionMaker | OrderRejectionReasonInt::WrongDisplayQtyValue | OrderRejectionReasonInt::InvalidDisplayQty | OrderRejectionReasonInt::WrongIcebergOrderValue | OrderRejectionReasonInt::OrderQuantityMustBeGreaterThanMinimumQuantity | OrderRejectionReasonInt::OrderQuantityMustBeLowerThanMaximumQuantity | OrderRejectionReasonInt::OrderPriceMustBeGreaterThanMinimumPrice | OrderRejectionReasonInt::OrderPriceMustBeLowerThanMaximumPrice | OrderRejectionReasonInt::OrderPriceMustBeNonzero | OrderRejectionReasonInt::OrderValueMustBeGreaterThanMinimumValue | OrderRejectionReasonInt::OrderValueMustBeLowerThanMaximumValue | OrderRejectionReasonInt::MarketOrderNotAllowedInAuction | OrderRejectionReasonInt::LeavesQuantityMustBeGreaterThanZeroAfterModification | OrderRejectionReasonInt::PriceNotAllowed | OrderRejectionReasonInt::InvalidMarketOrderTimeInForce | OrderRejectionReasonInt::InvalidAuctionTimeInForce | OrderRejectionReasonInt::InvalidIcebergAndStopOrderTimeInForce | OrderRejectionReasonInt::ExpireDateInPast | OrderRejectionReasonInt::ExpireTimeInPast | OrderRejectionReasonInt::AmbigousExpire | OrderRejectionReasonInt::ExpireDateExceedsLimit | OrderRejectionReasonInt::PriceBelowLowCollar | OrderRejectionReasonInt::PriceAboveHighCollar | OrderRejectionReasonInt::TriggerPriceNotAllowed | OrderRejectionReasonInt::TriggerPriceNotHigherThanLTP | OrderRejectionReasonInt::TriggerPriceNotLowerThanLTP | OrderRejectionReasonInt::TriggerPriceLowerThanPrice | OrderRejectionReasonInt::TriggerPriceHigherThanPrice | OrderRejectionReasonInt::TriggerPriceModifiedForActivatedOrder | OrderRejectionReasonInt::InvalidPartyIdForClientId | OrderRejectionReasonInt::InvalidPartyIdForExecutingTrader | OrderRejectionReasonInt::InvalidPartyIdForInvestmentDecisionMaker | OrderRejectionReasonInt::InvalidPartyRoleQualifierForPartyId | OrderRejectionReasonInt::InvalidBidAskSpread | OrderRejectionReasonInt::RequestNotAllowedForBlockInstrument | OrderRejectionReasonInt::RequestNotAllowedForCrossInstrument | OrderRejectionReasonInt::RiskLimitNotDefined | OrderRejectionReasonInt::RiskMaximumOrderVolumeExceeded | OrderRejectionReasonInt::RiskMaximumOrderValueExceeded | OrderRejectionReasonInt::RiskOrderPriceCollarExceeded)
+  matches!(disc, OrderRejectionReasonInt::NA | OrderRejectionReasonInt::ExchangeClosed | OrderRejectionReasonInt::InvalidPriceIncrement | OrderRejectionReasonInt::Other | OrderRejectionReasonInt::UnknownInstrumentId | OrderRejectionReasonInt::InstrumentPhaseNoTrading | OrderRejectionReasonInt::UnknownOrder | OrderRejectionReasonInt::InvalidExecutionTrader | OrderRejectionReasonInt::InvalidDecisionMaker | OrderRejectionReasonInt::InvalidClientId | OrderRejectionReasonInt::InvalidPartyRoleQualifierForClientId | OrderRejectionReasonInt::InvalidPartyRoleQualifierForExecutingTrader | OrderRejectionReasonInt::InvalidPartyRoleQualifierForInvestmentDecisionMaker | OrderRejectionReasonInt::WrongDisplayQtyValue | OrderRejectionReasonInt::InvalidDisplayQty | OrderRejectionReasonInt::WrongIcebergOrderValue | OrderRejectionReasonInt::OrderQuantityMustBeGreaterThanMinimumQuantity | OrderRejectionReasonInt::OrderQuantityMustBeLowerThanMaximumQuantity | OrderRejectionReasonInt::OrderPriceMustBeGreaterThanMinimumPrice | OrderRejectionReasonInt::OrderPriceMustBeLowerThanMaximumPrice | OrderRejectionReasonInt::OrderPriceMustBeNonzero | OrderRejectionReasonInt::OrderValueMustBeGreaterThanMinimumValue | OrderRejectionReasonInt::OrderValueMustBeLowerThanMaximumValue | OrderRejectionReasonInt::InvalidOrdTypeForSelectedMarketModel | OrderRejectionReasonInt::LeavesQuantityMustBeGreaterThanZeroAfterModification | OrderRejectionReasonInt::PriceNotAllowed | OrderRejectionReasonInt::InvalidTimeInForceForOrderType | OrderRejectionReasonInt::InvalidTimeInForceForCurrentMarketPhase | OrderRejectionReasonInt::InvalidTimeInForceForSelectedMarketModel | OrderRejectionReasonInt::ExpireTimeCannotBeModified | OrderRejectionReasonInt::ObsoleteExpireDate | OrderRejectionReasonInt::ExpireDateInPast | OrderRejectionReasonInt::ObsoleteExpireTime | OrderRejectionReasonInt::ExpireTimeInPast | OrderRejectionReasonInt::AmbigousExpire | OrderRejectionReasonInt::ExpireDateExceedsLimit | OrderRejectionReasonInt::PriceBelowLowCollar | OrderRejectionReasonInt::PriceAboveHighCollar | OrderRejectionReasonInt::TriggerPriceNotAllowed | OrderRejectionReasonInt::TriggerPriceNotHigherThanLTP | OrderRejectionReasonInt::TriggerPriceNotLowerThanLTP | OrderRejectionReasonInt::TriggerPriceLowerThanPrice | OrderRejectionReasonInt::TriggerPriceHigherThanPrice | OrderRejectionReasonInt::TriggerPriceModifiedForActivatedOrder | OrderRejectionReasonInt::TriggerPriceMustBeGreaterThanZero | OrderRejectionReasonInt::InvalidPartyIdForClientId | OrderRejectionReasonInt::InvalidPartyIdForExecutingTrader | OrderRejectionReasonInt::InvalidPartyIdForInvestmentDecisionMaker | OrderRejectionReasonInt::InvalidPartyRoleQualifierForPartyId | OrderRejectionReasonInt::UnknownInstrument | OrderRejectionReasonInt::InstrumentClosed | OrderRejectionReasonInt::InvalidBidAskSpread | OrderRejectionReasonInt::BuyOrderNotAllowed | OrderRejectionReasonInt::OnlyOneSellOrderIsAllowedForIpo | OrderRejectionReasonInt::RequestNotAllowedForBlockInstrument | OrderRejectionReasonInt::RequestNotAllowedForCrossInstrument | OrderRejectionReasonInt::RiskLimitNotDefined | OrderRejectionReasonInt::RiskMaximumOrderVolumeExceeded | OrderRejectionReasonInt::RiskMaximumOrderValueExceeded | OrderRejectionReasonInt::RiskOrderPriceCollarExceeded)
     }
   }
 
@@ -1434,12 +1451,14 @@ pub struct OrderModify {
   pub quantity: Quantity,
   /// Used only for iceberg order. The quantity to be displayed.
   pub display_qty: Quantity,
+  /// Expiration time indicating the validity of the order - relevant only when TimeInForce is set to GTD (Good Till Date).
+  pub expire: Timestamp,
 }
 impl BytesValidator for OrderModify {
     #[inline]
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, header))) && OrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, order_id))) && Price::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, price))) && Price::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, trigger_price))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, quantity))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, display_qty)))
+      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, header))) && OrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, order_id))) && Price::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, price))) && Price::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, trigger_price))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, quantity))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, display_qty))) && Timestamp::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, expire)))
     }
   }
 
@@ -1465,6 +1484,110 @@ impl BytesValidator for OrderModifyResponse {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       Header::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModifyResponse, header))) && OrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModifyResponse, order_id))) && OrderStatus::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModifyResponse, status))) && PriorityFlag::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModifyResponse, priority_flag))) && OrderRejectionReason::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModifyResponse, reason)))
+    }
+  }
+
+/// Indicates a mass cancel rejection reason.
+#[repr(u16)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum MassCancelRejectionReason {
+  /// Not applicable.
+  NA = 0x0065,
+  /// Unknown instrument ID.
+  UnknownInstrumentId = 0x0064,
+  /// Unknown market segment ID.
+  UnknownMarketSegmentId = 0x03f8,
+}
+impl Default for MassCancelRejectionReason {
+  fn default() -> Self {
+    Self::NA
+  }
+}
+impl std::convert::TryFrom<u16> for MassCancelRejectionReason {
+  type Error = InvalidVariant;
+  fn try_from(value: u16) -> Result<Self, Self::Error> {
+    match value {
+      0x0065 => Ok(Self::NA),
+      0x0064 => Ok(Self::UnknownInstrumentId),
+      0x03f8 => Ok(Self::UnknownMarketSegmentId),
+      other => Err(InvalidVariant::new(other as u32, "MassCancelRejectionReason")),
+    }
+  }
+}
+pub struct MassCancelRejectionReasonInt;
+#[allow(non_upper_case_globals, dead_code)]
+impl MassCancelRejectionReasonInt {
+  pub const NA: u16 = 0x0065;
+  pub const UnknownInstrumentId: u16 = 0x0064;
+  pub const UnknownMarketSegmentId: u16 = 0x03f8;
+}
+
+#[allow(dead_code)]
+type MassCancelRejectionReasonIntType = u16;
+
+impl BytesValidator for MassCancelRejectionReason {
+    #[inline]
+    unsafe fn is_valid(bytes: &[u8]) -> bool {
+      debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
+      let disc = std::convert::TryInto::try_into(bytes).map(u16::from_le_bytes).unwrap_unchecked();
+  matches!(disc, MassCancelRejectionReasonInt::NA | MassCancelRejectionReasonInt::UnknownInstrumentId | MassCancelRejectionReasonInt::UnknownMarketSegmentId)
+    }
+  }
+
+/// Message used to cancel multiple existing orders.
+#[repr(C, packed)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
+#[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
+pub struct OrderMassCancel {
+  /// Header.
+  pub header: Header,
+  /// Mass cancel request type.
+  pub mass_cancel_request_type: MassCancelRequestType,
+  /// Target party role filter selection field.
+  pub target_party_role: TargetPartyRole,
+  /// Used to identify the party targeted for the action specified in the message.
+  pub target_party_id: u32,
+  /// Identifies the market segment for request type CancelOrdersForMarketSegment.
+  pub market_segment_id: ElementId,
+  pub instrument_id: ElementId,
+}
+impl BytesValidator for OrderMassCancel {
+    #[inline]
+    unsafe fn is_valid(bytes: &[u8]) -> bool {
+      debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
+      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancel, header))) && MassCancelRequestType::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancel, mass_cancel_request_type))) && TargetPartyRole::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancel, target_party_role))) && u32::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancel, target_party_id))) && ElementId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancel, market_segment_id))) && ElementId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancel, instrument_id)))
+    }
+  }
+
+/// Response to message used to cancel multiple existing orders.
+#[repr(C, packed)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
+#[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
+pub struct OrderMassCancelResponse {
+  /// Header.
+  pub header: Header,
+  /// Total number of orders affected by the mass cancel request.
+  pub total_affected_orders: u64,
+  /// Mass cancel request type.
+  pub mass_cancel_request_type: MassCancelRequestType,
+  /// Mass cancel request ID.
+  pub mass_cancel_id: OrderId,
+  /// Target party role filter selection field.
+  pub target_party_role: TargetPartyRole,
+  /// Used to identify the party targeted for the action specified in the message.
+  pub target_party_id: u32,
+  /// Identifies the market segment for request type CancelOrdersForMarketSegment.
+  pub market_segment_id: ElementId,
+  /// Reason for rejecting the given mass order cancel request.
+  pub reason: MassCancelRejectionReason,
+}
+impl BytesValidator for OrderMassCancelResponse {
+    #[inline]
+    unsafe fn is_valid(bytes: &[u8]) -> bool {
+      debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
+      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, header))) && u64::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, total_affected_orders))) && MassCancelRequestType::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, mass_cancel_request_type))) && OrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, mass_cancel_id))) && TargetPartyRole::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, target_party_role))) && u32::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, target_party_id))) && ElementId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, market_segment_id))) && MassCancelRejectionReason::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, reason)))
     }
   }
 
@@ -1949,8 +2072,8 @@ impl BytesValidator for TcrRejectionReason {
 
 /// Information about Trade Capture Report party.
 #[repr(C, packed)]
-#[derive(Serialize, Deserialize, Clone, Copy)]
-#[serde(deny_unknown_fields)]
+#[derive(Serialize, Deserialize, Clone, Copy, Default)]
+#[serde(deny_unknown_fields, default)]
 #[serde(rename_all = "camelCase")]
 pub struct TcrParty {
   /// Fields related to the MiFID directive.
@@ -1973,761 +2096,6 @@ impl BytesValidator for TcrParty {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       MifidFields::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, mifid_fields))) && Account::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, account))) && AccountType::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, account_type))) && Capacity::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, order_capacity))) && ElementId::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, order_restrictions))) && ElementId::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, order_origination))) && Memo::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, memo)))
-    }
-  }
-
-/// Currency - ISO 4217 (2022/04/01) code (e.g. PLN).
-#[repr(u16)]
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
-pub enum Currency {
-  /// Lek
-  ALL = 0x0008,
-  /// Algerian Dinar
-  DZD = 0x000c,
-  /// Argentine Peso
-  ARS = 0x0020,
-  /// Australian Dollar
-  AUD = 0x0024,
-  /// Bahamian Dollar
-  BSD = 0x002c,
-  /// Bahraini Dinar
-  BHD = 0x0030,
-  /// Taka
-  BDT = 0x0032,
-  /// Armenian Dram
-  AMD = 0x0033,
-  /// Barbados Dollar
-  BBD = 0x0034,
-  /// Bermudian Dollar
-  BMD = 0x003c,
-  /// Ngultrum
-  BTN = 0x0040,
-  /// Boliviano
-  BOB = 0x0044,
-  /// Pula
-  BWP = 0x0048,
-  /// Belize Dollar
-  BZD = 0x0054,
-  /// Solomon Islands Dollar
-  SBD = 0x005a,
-  /// Brunei Dollar
-  BND = 0x0060,
-  /// Kyat
-  MMK = 0x0068,
-  /// Burundi Franc
-  BIF = 0x006c,
-  /// Riel
-  KHR = 0x0074,
-  /// Canadian Dollar
-  CAD = 0x007c,
-  /// Cabo Verde Escudo
-  CVE = 0x0084,
-  /// Cayman Islands Dollar
-  KYD = 0x0088,
-  /// Sri Lanka Rupee
-  LKR = 0x0090,
-  /// Chilean Peso
-  CLP = 0x0098,
-  /// Yuan Renminbi
-  CNY = 0x009c,
-  /// Colombian Peso
-  COP = 0x00aa,
-  /// Comorian Franc 
-  KMF = 0x00ae,
-  /// Costa Rican Colon
-  CRC = 0x00bc,
-  /// Kuna
-  HRK = 0x00bf,
-  /// Cuban Peso
-  CUP = 0x00c0,
-  /// Czech Koruna
-  CZK = 0x00cb,
-  /// Danish Krone
-  DKK = 0x00d0,
-  /// Dominican Peso
-  DOP = 0x00d6,
-  /// El Salvador Colon
-  SVC = 0x00de,
-  /// Ethiopian Birr
-  ETB = 0x00e6,
-  /// Nakfa
-  ERN = 0x00e8,
-  /// Falkland Islands Pound
-  FKP = 0x00ee,
-  /// Fiji Dollar
-  FJD = 0x00f2,
-  /// Djibouti Franc
-  DJF = 0x0106,
-  /// Dalasi
-  GMD = 0x010e,
-  /// Gibraltar Pound
-  GIP = 0x0124,
-  /// Quetzal
-  GTQ = 0x0140,
-  /// Guinean Franc
-  GNF = 0x0144,
-  /// Guyana Dollar
-  GYD = 0x0148,
-  /// Gourde
-  HTG = 0x014c,
-  /// Lempira
-  HNL = 0x0154,
-  /// Hong Kong Dollar
-  HKD = 0x0158,
-  /// Forint
-  HUF = 0x015c,
-  /// Iceland Krona
-  ISK = 0x0160,
-  /// Indian Rupee
-  INR = 0x0164,
-  /// Rupiah
-  IDR = 0x0168,
-  /// Iranian Rial
-  IRR = 0x016c,
-  /// Iraqi Dinar
-  IQD = 0x0170,
-  /// New Israeli Sheqel
-  ILS = 0x0178,
-  /// Jamaican Dollar
-  JMD = 0x0184,
-  /// Yen
-  JPY = 0x0188,
-  /// Tenge
-  KZT = 0x018e,
-  /// Jordanian Dinar
-  JOD = 0x0190,
-  /// Kenyan Shilling
-  KES = 0x0194,
-  /// North Korean Won
-  KPW = 0x0198,
-  /// Won
-  KRW = 0x019a,
-  /// Kuwaiti Dinar
-  KWD = 0x019e,
-  /// Som
-  KGS = 0x01a1,
-  /// Lao Kip
-  LAK = 0x01a2,
-  /// Lebanese Pound
-  LBP = 0x01a6,
-  /// Loti
-  LSL = 0x01aa,
-  /// Liberian Dollar
-  LRD = 0x01ae,
-  /// Libyan Dinar
-  LYD = 0x01b2,
-  /// Pataca
-  MOP = 0x01be,
-  /// Malawi Kwacha
-  MWK = 0x01c6,
-  /// Malaysian Ringgit
-  MYR = 0x01ca,
-  /// Rufiyaa
-  MVR = 0x01ce,
-  /// Mauritius Rupee
-  MUR = 0x01e0,
-  /// Mexican Peso
-  MXN = 0x01e4,
-  /// Tugrik
-  MNT = 0x01f0,
-  /// Moldovan Leu
-  MDL = 0x01f2,
-  /// Moroccan Dirham
-  MAD = 0x01f8,
-  /// Rial Omani
-  OMR = 0x0200,
-  /// Namibia Dollar
-  NAD = 0x0204,
-  /// Nepalese Rupee
-  NPR = 0x020c,
-  /// Netherlands Antillean Guilder
-  ANG = 0x0214,
-  /// Aruban Florin
-  AWG = 0x0215,
-  /// Vatu
-  VUV = 0x0224,
-  /// New Zealand Dollar
-  NZD = 0x022a,
-  /// Cordoba Oro
-  NIO = 0x022e,
-  /// Naira
-  NGN = 0x0236,
-  /// Norwegian Krone
-  NOK = 0x0242,
-  /// Pakistan Rupee
-  PKR = 0x024a,
-  /// Balboa
-  PAB = 0x024e,
-  /// Kina
-  PGK = 0x0256,
-  /// Guarani
-  PYG = 0x0258,
-  /// Sol
-  PEN = 0x025c,
-  /// Philippine Peso
-  PHP = 0x0260,
-  /// Qatari Rial
-  QAR = 0x027a,
-  /// Russian Ruble
-  RUB = 0x0283,
-  /// Rwanda Franc
-  RWF = 0x0286,
-  /// Saint Helena Pound
-  SHP = 0x028e,
-  /// Saudi Riyal
-  SAR = 0x02aa,
-  /// Seychelles Rupee
-  SCR = 0x02b2,
-  /// Singapore Dollar
-  SGD = 0x02be,
-  /// Dong
-  VND = 0x02c0,
-  /// Somali Shilling
-  SOS = 0x02c2,
-  /// Rand
-  ZAR = 0x02c6,
-  /// South Sudanese Pound
-  SSP = 0x02d8,
-  /// Lilangeni
-  SZL = 0x02ec,
-  /// Swedish Krona
-  SEK = 0x02f0,
-  /// Swiss Franc
-  CHF = 0x02f4,
-  /// Syrian Pound
-  SYP = 0x02f8,
-  /// Baht
-  THB = 0x02fc,
-  /// Pa’anga
-  TOP = 0x0308,
-  /// Trinidad and Tobago Dollar
-  TTD = 0x030c,
-  /// UAE Dirham
-  AED = 0x0310,
-  /// Tunisian Dinar
-  TND = 0x0314,
-  /// Uganda Shilling
-  UGX = 0x0320,
-  /// Denar
-  MKD = 0x0327,
-  /// Egyptian Pound
-  EGP = 0x0332,
-  /// Pound Sterling
-  GBP = 0x033a,
-  /// Tanzanian Shilling
-  TZS = 0x0342,
-  /// US Dollar
-  USD = 0x0348,
-  /// Peso Uruguayo
-  UYU = 0x035a,
-  /// Uzbekistan Sum
-  UZS = 0x035c,
-  /// Tala
-  WST = 0x0372,
-  /// Yemeni Rial
-  YER = 0x0376,
-  /// New Taiwan Dollar
-  TWD = 0x0385,
-  /// Leone
-  SLE = 0x039d,
-  /// Bolívar Soberano
-  VED = 0x039e,
-  /// Unidad Previsional
-  UYW = 0x039f,
-  /// Bolívar Soberano
-  VES = 0x03a0,
-  /// Ouguiya
-  MRU = 0x03a1,
-  /// Dobra
-  STN = 0x03a2,
-  /// Peso Convertible
-  CUC = 0x03a3,
-  /// Zimbabwe Dollar
-  ZWL = 0x03a4,
-  /// Belarusian Ruble
-  BYN = 0x03a5,
-  /// Turkmenistan New Manat
-  TMT = 0x03a6,
-  /// Ghana Cedi
-  GHS = 0x03a8,
-  /// Sudanese Pound
-  SDG = 0x03aa,
-  /// [object Object]
-  UYI = 0x03ac,
-  /// Serbian Dinar
-  RSD = 0x03ad,
-  /// Mozambique Metical
-  MZN = 0x03af,
-  /// Azerbaijan Manat
-  AZN = 0x03b0,
-  /// Romanian Leu
-  RON = 0x03b2,
-  /// [object Object]
-  CHE = 0x03b3,
-  /// [object Object]
-  CHW = 0x03b4,
-  /// Turkish Lira
-  TRY = 0x03b5,
-  /// CFA Franc BEAC
-  XAF = 0x03b6,
-  /// East Caribbean Dollar
-  XCD = 0x03b7,
-  /// CFA Franc BCEAO
-  XOF = 0x03b8,
-  /// CFP Franc
-  XPF = 0x03b9,
-  /// Bond Markets Unit European Composite Unit (EURCO)
-  XBA = 0x03bb,
-  /// Bond Markets Unit European Monetary Unit (E.M.U.-6)
-  XBB = 0x03bc,
-  /// Bond Markets Unit European Unit of Account 9 (E.U.A.-9)
-  XBC = 0x03bd,
-  /// Bond Markets Unit European Unit of Account 17 (E.U.A.-17)
-  XBD = 0x03be,
-  /// Gold
-  XAU = 0x03bf,
-  /// SDR (Special Drawing Right)
-  XDR = 0x03c0,
-  /// Silver
-  XAG = 0x03c1,
-  /// Platinum
-  XPT = 0x03c2,
-  /// Codes specifically reserved for testing purposes
-  XTS = 0x03c3,
-  /// Palladium
-  XPD = 0x03c4,
-  /// ADB Unit of Account
-  XUA = 0x03c5,
-  /// Zambian Kwacha
-  ZMW = 0x03c7,
-  /// Surinam Dollar
-  SRD = 0x03c8,
-  /// Malagasy Ariary
-  MGA = 0x03c9,
-  /// [object Object]
-  COU = 0x03ca,
-  /// Afghani
-  AFN = 0x03cb,
-  /// Somoni
-  TJS = 0x03cc,
-  /// Kwanza
-  AOA = 0x03cd,
-  /// Bulgarian Lev
-  BGN = 0x03cf,
-  /// Congolese Franc
-  CDF = 0x03d0,
-  /// Convertible Mark
-  BAM = 0x03d1,
-  /// Euro
-  EUR = 0x03d2,
-  /// [object Object]
-  MXV = 0x03d3,
-  /// Hryvnia
-  UAH = 0x03d4,
-  /// Lari
-  GEL = 0x03d5,
-  /// [object Object]
-  BOV = 0x03d8,
-  /// Zloty
-  PLN = 0x03d9,
-  /// Brazilian Real
-  BRL = 0x03da,
-  /// [object Object]
-  CLF = 0x03de,
-  /// Sucre
-  XSU = 0x03e2,
-  /// [object Object]
-  USN = 0x03e5,
-  /// The codes assigned for transactions where no currency is involved
-  XXX = 0x03e7,
-}
-impl Default for Currency {
-  fn default() -> Self {
-    Self::ALL
-  }
-}
-impl std::convert::TryFrom<u16> for Currency {
-  type Error = InvalidVariant;
-  fn try_from(value: u16) -> Result<Self, Self::Error> {
-    match value {
-      0x0008 => Ok(Self::ALL),
-      0x000c => Ok(Self::DZD),
-      0x0020 => Ok(Self::ARS),
-      0x0024 => Ok(Self::AUD),
-      0x002c => Ok(Self::BSD),
-      0x0030 => Ok(Self::BHD),
-      0x0032 => Ok(Self::BDT),
-      0x0033 => Ok(Self::AMD),
-      0x0034 => Ok(Self::BBD),
-      0x003c => Ok(Self::BMD),
-      0x0040 => Ok(Self::BTN),
-      0x0044 => Ok(Self::BOB),
-      0x0048 => Ok(Self::BWP),
-      0x0054 => Ok(Self::BZD),
-      0x005a => Ok(Self::SBD),
-      0x0060 => Ok(Self::BND),
-      0x0068 => Ok(Self::MMK),
-      0x006c => Ok(Self::BIF),
-      0x0074 => Ok(Self::KHR),
-      0x007c => Ok(Self::CAD),
-      0x0084 => Ok(Self::CVE),
-      0x0088 => Ok(Self::KYD),
-      0x0090 => Ok(Self::LKR),
-      0x0098 => Ok(Self::CLP),
-      0x009c => Ok(Self::CNY),
-      0x00aa => Ok(Self::COP),
-      0x00ae => Ok(Self::KMF),
-      0x00bc => Ok(Self::CRC),
-      0x00bf => Ok(Self::HRK),
-      0x00c0 => Ok(Self::CUP),
-      0x00cb => Ok(Self::CZK),
-      0x00d0 => Ok(Self::DKK),
-      0x00d6 => Ok(Self::DOP),
-      0x00de => Ok(Self::SVC),
-      0x00e6 => Ok(Self::ETB),
-      0x00e8 => Ok(Self::ERN),
-      0x00ee => Ok(Self::FKP),
-      0x00f2 => Ok(Self::FJD),
-      0x0106 => Ok(Self::DJF),
-      0x010e => Ok(Self::GMD),
-      0x0124 => Ok(Self::GIP),
-      0x0140 => Ok(Self::GTQ),
-      0x0144 => Ok(Self::GNF),
-      0x0148 => Ok(Self::GYD),
-      0x014c => Ok(Self::HTG),
-      0x0154 => Ok(Self::HNL),
-      0x0158 => Ok(Self::HKD),
-      0x015c => Ok(Self::HUF),
-      0x0160 => Ok(Self::ISK),
-      0x0164 => Ok(Self::INR),
-      0x0168 => Ok(Self::IDR),
-      0x016c => Ok(Self::IRR),
-      0x0170 => Ok(Self::IQD),
-      0x0178 => Ok(Self::ILS),
-      0x0184 => Ok(Self::JMD),
-      0x0188 => Ok(Self::JPY),
-      0x018e => Ok(Self::KZT),
-      0x0190 => Ok(Self::JOD),
-      0x0194 => Ok(Self::KES),
-      0x0198 => Ok(Self::KPW),
-      0x019a => Ok(Self::KRW),
-      0x019e => Ok(Self::KWD),
-      0x01a1 => Ok(Self::KGS),
-      0x01a2 => Ok(Self::LAK),
-      0x01a6 => Ok(Self::LBP),
-      0x01aa => Ok(Self::LSL),
-      0x01ae => Ok(Self::LRD),
-      0x01b2 => Ok(Self::LYD),
-      0x01be => Ok(Self::MOP),
-      0x01c6 => Ok(Self::MWK),
-      0x01ca => Ok(Self::MYR),
-      0x01ce => Ok(Self::MVR),
-      0x01e0 => Ok(Self::MUR),
-      0x01e4 => Ok(Self::MXN),
-      0x01f0 => Ok(Self::MNT),
-      0x01f2 => Ok(Self::MDL),
-      0x01f8 => Ok(Self::MAD),
-      0x0200 => Ok(Self::OMR),
-      0x0204 => Ok(Self::NAD),
-      0x020c => Ok(Self::NPR),
-      0x0214 => Ok(Self::ANG),
-      0x0215 => Ok(Self::AWG),
-      0x0224 => Ok(Self::VUV),
-      0x022a => Ok(Self::NZD),
-      0x022e => Ok(Self::NIO),
-      0x0236 => Ok(Self::NGN),
-      0x0242 => Ok(Self::NOK),
-      0x024a => Ok(Self::PKR),
-      0x024e => Ok(Self::PAB),
-      0x0256 => Ok(Self::PGK),
-      0x0258 => Ok(Self::PYG),
-      0x025c => Ok(Self::PEN),
-      0x0260 => Ok(Self::PHP),
-      0x027a => Ok(Self::QAR),
-      0x0283 => Ok(Self::RUB),
-      0x0286 => Ok(Self::RWF),
-      0x028e => Ok(Self::SHP),
-      0x02aa => Ok(Self::SAR),
-      0x02b2 => Ok(Self::SCR),
-      0x02be => Ok(Self::SGD),
-      0x02c0 => Ok(Self::VND),
-      0x02c2 => Ok(Self::SOS),
-      0x02c6 => Ok(Self::ZAR),
-      0x02d8 => Ok(Self::SSP),
-      0x02ec => Ok(Self::SZL),
-      0x02f0 => Ok(Self::SEK),
-      0x02f4 => Ok(Self::CHF),
-      0x02f8 => Ok(Self::SYP),
-      0x02fc => Ok(Self::THB),
-      0x0308 => Ok(Self::TOP),
-      0x030c => Ok(Self::TTD),
-      0x0310 => Ok(Self::AED),
-      0x0314 => Ok(Self::TND),
-      0x0320 => Ok(Self::UGX),
-      0x0327 => Ok(Self::MKD),
-      0x0332 => Ok(Self::EGP),
-      0x033a => Ok(Self::GBP),
-      0x0342 => Ok(Self::TZS),
-      0x0348 => Ok(Self::USD),
-      0x035a => Ok(Self::UYU),
-      0x035c => Ok(Self::UZS),
-      0x0372 => Ok(Self::WST),
-      0x0376 => Ok(Self::YER),
-      0x0385 => Ok(Self::TWD),
-      0x039d => Ok(Self::SLE),
-      0x039e => Ok(Self::VED),
-      0x039f => Ok(Self::UYW),
-      0x03a0 => Ok(Self::VES),
-      0x03a1 => Ok(Self::MRU),
-      0x03a2 => Ok(Self::STN),
-      0x03a3 => Ok(Self::CUC),
-      0x03a4 => Ok(Self::ZWL),
-      0x03a5 => Ok(Self::BYN),
-      0x03a6 => Ok(Self::TMT),
-      0x03a8 => Ok(Self::GHS),
-      0x03aa => Ok(Self::SDG),
-      0x03ac => Ok(Self::UYI),
-      0x03ad => Ok(Self::RSD),
-      0x03af => Ok(Self::MZN),
-      0x03b0 => Ok(Self::AZN),
-      0x03b2 => Ok(Self::RON),
-      0x03b3 => Ok(Self::CHE),
-      0x03b4 => Ok(Self::CHW),
-      0x03b5 => Ok(Self::TRY),
-      0x03b6 => Ok(Self::XAF),
-      0x03b7 => Ok(Self::XCD),
-      0x03b8 => Ok(Self::XOF),
-      0x03b9 => Ok(Self::XPF),
-      0x03bb => Ok(Self::XBA),
-      0x03bc => Ok(Self::XBB),
-      0x03bd => Ok(Self::XBC),
-      0x03be => Ok(Self::XBD),
-      0x03bf => Ok(Self::XAU),
-      0x03c0 => Ok(Self::XDR),
-      0x03c1 => Ok(Self::XAG),
-      0x03c2 => Ok(Self::XPT),
-      0x03c3 => Ok(Self::XTS),
-      0x03c4 => Ok(Self::XPD),
-      0x03c5 => Ok(Self::XUA),
-      0x03c7 => Ok(Self::ZMW),
-      0x03c8 => Ok(Self::SRD),
-      0x03c9 => Ok(Self::MGA),
-      0x03ca => Ok(Self::COU),
-      0x03cb => Ok(Self::AFN),
-      0x03cc => Ok(Self::TJS),
-      0x03cd => Ok(Self::AOA),
-      0x03cf => Ok(Self::BGN),
-      0x03d0 => Ok(Self::CDF),
-      0x03d1 => Ok(Self::BAM),
-      0x03d2 => Ok(Self::EUR),
-      0x03d3 => Ok(Self::MXV),
-      0x03d4 => Ok(Self::UAH),
-      0x03d5 => Ok(Self::GEL),
-      0x03d8 => Ok(Self::BOV),
-      0x03d9 => Ok(Self::PLN),
-      0x03da => Ok(Self::BRL),
-      0x03de => Ok(Self::CLF),
-      0x03e2 => Ok(Self::XSU),
-      0x03e5 => Ok(Self::USN),
-      0x03e7 => Ok(Self::XXX),
-      other => Err(InvalidVariant::new(other as u32, "Currency")),
-    }
-  }
-}
-pub struct CurrencyInt;
-#[allow(non_upper_case_globals, dead_code)]
-impl CurrencyInt {
-  pub const ALL: u16 = 0x0008;
-  pub const DZD: u16 = 0x000c;
-  pub const ARS: u16 = 0x0020;
-  pub const AUD: u16 = 0x0024;
-  pub const BSD: u16 = 0x002c;
-  pub const BHD: u16 = 0x0030;
-  pub const BDT: u16 = 0x0032;
-  pub const AMD: u16 = 0x0033;
-  pub const BBD: u16 = 0x0034;
-  pub const BMD: u16 = 0x003c;
-  pub const BTN: u16 = 0x0040;
-  pub const BOB: u16 = 0x0044;
-  pub const BWP: u16 = 0x0048;
-  pub const BZD: u16 = 0x0054;
-  pub const SBD: u16 = 0x005a;
-  pub const BND: u16 = 0x0060;
-  pub const MMK: u16 = 0x0068;
-  pub const BIF: u16 = 0x006c;
-  pub const KHR: u16 = 0x0074;
-  pub const CAD: u16 = 0x007c;
-  pub const CVE: u16 = 0x0084;
-  pub const KYD: u16 = 0x0088;
-  pub const LKR: u16 = 0x0090;
-  pub const CLP: u16 = 0x0098;
-  pub const CNY: u16 = 0x009c;
-  pub const COP: u16 = 0x00aa;
-  pub const KMF: u16 = 0x00ae;
-  pub const CRC: u16 = 0x00bc;
-  pub const HRK: u16 = 0x00bf;
-  pub const CUP: u16 = 0x00c0;
-  pub const CZK: u16 = 0x00cb;
-  pub const DKK: u16 = 0x00d0;
-  pub const DOP: u16 = 0x00d6;
-  pub const SVC: u16 = 0x00de;
-  pub const ETB: u16 = 0x00e6;
-  pub const ERN: u16 = 0x00e8;
-  pub const FKP: u16 = 0x00ee;
-  pub const FJD: u16 = 0x00f2;
-  pub const DJF: u16 = 0x0106;
-  pub const GMD: u16 = 0x010e;
-  pub const GIP: u16 = 0x0124;
-  pub const GTQ: u16 = 0x0140;
-  pub const GNF: u16 = 0x0144;
-  pub const GYD: u16 = 0x0148;
-  pub const HTG: u16 = 0x014c;
-  pub const HNL: u16 = 0x0154;
-  pub const HKD: u16 = 0x0158;
-  pub const HUF: u16 = 0x015c;
-  pub const ISK: u16 = 0x0160;
-  pub const INR: u16 = 0x0164;
-  pub const IDR: u16 = 0x0168;
-  pub const IRR: u16 = 0x016c;
-  pub const IQD: u16 = 0x0170;
-  pub const ILS: u16 = 0x0178;
-  pub const JMD: u16 = 0x0184;
-  pub const JPY: u16 = 0x0188;
-  pub const KZT: u16 = 0x018e;
-  pub const JOD: u16 = 0x0190;
-  pub const KES: u16 = 0x0194;
-  pub const KPW: u16 = 0x0198;
-  pub const KRW: u16 = 0x019a;
-  pub const KWD: u16 = 0x019e;
-  pub const KGS: u16 = 0x01a1;
-  pub const LAK: u16 = 0x01a2;
-  pub const LBP: u16 = 0x01a6;
-  pub const LSL: u16 = 0x01aa;
-  pub const LRD: u16 = 0x01ae;
-  pub const LYD: u16 = 0x01b2;
-  pub const MOP: u16 = 0x01be;
-  pub const MWK: u16 = 0x01c6;
-  pub const MYR: u16 = 0x01ca;
-  pub const MVR: u16 = 0x01ce;
-  pub const MUR: u16 = 0x01e0;
-  pub const MXN: u16 = 0x01e4;
-  pub const MNT: u16 = 0x01f0;
-  pub const MDL: u16 = 0x01f2;
-  pub const MAD: u16 = 0x01f8;
-  pub const OMR: u16 = 0x0200;
-  pub const NAD: u16 = 0x0204;
-  pub const NPR: u16 = 0x020c;
-  pub const ANG: u16 = 0x0214;
-  pub const AWG: u16 = 0x0215;
-  pub const VUV: u16 = 0x0224;
-  pub const NZD: u16 = 0x022a;
-  pub const NIO: u16 = 0x022e;
-  pub const NGN: u16 = 0x0236;
-  pub const NOK: u16 = 0x0242;
-  pub const PKR: u16 = 0x024a;
-  pub const PAB: u16 = 0x024e;
-  pub const PGK: u16 = 0x0256;
-  pub const PYG: u16 = 0x0258;
-  pub const PEN: u16 = 0x025c;
-  pub const PHP: u16 = 0x0260;
-  pub const QAR: u16 = 0x027a;
-  pub const RUB: u16 = 0x0283;
-  pub const RWF: u16 = 0x0286;
-  pub const SHP: u16 = 0x028e;
-  pub const SAR: u16 = 0x02aa;
-  pub const SCR: u16 = 0x02b2;
-  pub const SGD: u16 = 0x02be;
-  pub const VND: u16 = 0x02c0;
-  pub const SOS: u16 = 0x02c2;
-  pub const ZAR: u16 = 0x02c6;
-  pub const SSP: u16 = 0x02d8;
-  pub const SZL: u16 = 0x02ec;
-  pub const SEK: u16 = 0x02f0;
-  pub const CHF: u16 = 0x02f4;
-  pub const SYP: u16 = 0x02f8;
-  pub const THB: u16 = 0x02fc;
-  pub const TOP: u16 = 0x0308;
-  pub const TTD: u16 = 0x030c;
-  pub const AED: u16 = 0x0310;
-  pub const TND: u16 = 0x0314;
-  pub const UGX: u16 = 0x0320;
-  pub const MKD: u16 = 0x0327;
-  pub const EGP: u16 = 0x0332;
-  pub const GBP: u16 = 0x033a;
-  pub const TZS: u16 = 0x0342;
-  pub const USD: u16 = 0x0348;
-  pub const UYU: u16 = 0x035a;
-  pub const UZS: u16 = 0x035c;
-  pub const WST: u16 = 0x0372;
-  pub const YER: u16 = 0x0376;
-  pub const TWD: u16 = 0x0385;
-  pub const SLE: u16 = 0x039d;
-  pub const VED: u16 = 0x039e;
-  pub const UYW: u16 = 0x039f;
-  pub const VES: u16 = 0x03a0;
-  pub const MRU: u16 = 0x03a1;
-  pub const STN: u16 = 0x03a2;
-  pub const CUC: u16 = 0x03a3;
-  pub const ZWL: u16 = 0x03a4;
-  pub const BYN: u16 = 0x03a5;
-  pub const TMT: u16 = 0x03a6;
-  pub const GHS: u16 = 0x03a8;
-  pub const SDG: u16 = 0x03aa;
-  pub const UYI: u16 = 0x03ac;
-  pub const RSD: u16 = 0x03ad;
-  pub const MZN: u16 = 0x03af;
-  pub const AZN: u16 = 0x03b0;
-  pub const RON: u16 = 0x03b2;
-  pub const CHE: u16 = 0x03b3;
-  pub const CHW: u16 = 0x03b4;
-  pub const TRY: u16 = 0x03b5;
-  pub const XAF: u16 = 0x03b6;
-  pub const XCD: u16 = 0x03b7;
-  pub const XOF: u16 = 0x03b8;
-  pub const XPF: u16 = 0x03b9;
-  pub const XBA: u16 = 0x03bb;
-  pub const XBB: u16 = 0x03bc;
-  pub const XBC: u16 = 0x03bd;
-  pub const XBD: u16 = 0x03be;
-  pub const XAU: u16 = 0x03bf;
-  pub const XDR: u16 = 0x03c0;
-  pub const XAG: u16 = 0x03c1;
-  pub const XPT: u16 = 0x03c2;
-  pub const XTS: u16 = 0x03c3;
-  pub const XPD: u16 = 0x03c4;
-  pub const XUA: u16 = 0x03c5;
-  pub const ZMW: u16 = 0x03c7;
-  pub const SRD: u16 = 0x03c8;
-  pub const MGA: u16 = 0x03c9;
-  pub const COU: u16 = 0x03ca;
-  pub const AFN: u16 = 0x03cb;
-  pub const TJS: u16 = 0x03cc;
-  pub const AOA: u16 = 0x03cd;
-  pub const BGN: u16 = 0x03cf;
-  pub const CDF: u16 = 0x03d0;
-  pub const BAM: u16 = 0x03d1;
-  pub const EUR: u16 = 0x03d2;
-  pub const MXV: u16 = 0x03d3;
-  pub const UAH: u16 = 0x03d4;
-  pub const GEL: u16 = 0x03d5;
-  pub const BOV: u16 = 0x03d8;
-  pub const PLN: u16 = 0x03d9;
-  pub const BRL: u16 = 0x03da;
-  pub const CLF: u16 = 0x03de;
-  pub const XSU: u16 = 0x03e2;
-  pub const USN: u16 = 0x03e5;
-  pub const XXX: u16 = 0x03e7;
-}
-
-#[allow(dead_code)]
-type CurrencyIntType = u16;
-
-impl BytesValidator for Currency {
-    #[inline]
-    unsafe fn is_valid(bytes: &[u8]) -> bool {
-      debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      let disc = std::convert::TryInto::try_into(bytes).map(u16::from_le_bytes).unwrap_unchecked();
-  matches!(disc, CurrencyInt::ALL | CurrencyInt::DZD | CurrencyInt::ARS | CurrencyInt::AUD | CurrencyInt::BSD | CurrencyInt::BHD | CurrencyInt::BDT | CurrencyInt::AMD | CurrencyInt::BBD | CurrencyInt::BMD | CurrencyInt::BTN | CurrencyInt::BOB | CurrencyInt::BWP | CurrencyInt::BZD | CurrencyInt::SBD | CurrencyInt::BND | CurrencyInt::MMK | CurrencyInt::BIF | CurrencyInt::KHR | CurrencyInt::CAD | CurrencyInt::CVE | CurrencyInt::KYD | CurrencyInt::LKR | CurrencyInt::CLP | CurrencyInt::CNY | CurrencyInt::COP | CurrencyInt::KMF | CurrencyInt::CRC | CurrencyInt::HRK | CurrencyInt::CUP | CurrencyInt::CZK | CurrencyInt::DKK | CurrencyInt::DOP | CurrencyInt::SVC | CurrencyInt::ETB | CurrencyInt::ERN | CurrencyInt::FKP | CurrencyInt::FJD | CurrencyInt::DJF | CurrencyInt::GMD | CurrencyInt::GIP | CurrencyInt::GTQ | CurrencyInt::GNF | CurrencyInt::GYD | CurrencyInt::HTG | CurrencyInt::HNL | CurrencyInt::HKD | CurrencyInt::HUF | CurrencyInt::ISK | CurrencyInt::INR | CurrencyInt::IDR | CurrencyInt::IRR | CurrencyInt::IQD | CurrencyInt::ILS | CurrencyInt::JMD | CurrencyInt::JPY | CurrencyInt::KZT | CurrencyInt::JOD | CurrencyInt::KES | CurrencyInt::KPW | CurrencyInt::KRW | CurrencyInt::KWD | CurrencyInt::KGS | CurrencyInt::LAK | CurrencyInt::LBP | CurrencyInt::LSL | CurrencyInt::LRD | CurrencyInt::LYD | CurrencyInt::MOP | CurrencyInt::MWK | CurrencyInt::MYR | CurrencyInt::MVR | CurrencyInt::MUR | CurrencyInt::MXN | CurrencyInt::MNT | CurrencyInt::MDL | CurrencyInt::MAD | CurrencyInt::OMR | CurrencyInt::NAD | CurrencyInt::NPR | CurrencyInt::ANG | CurrencyInt::AWG | CurrencyInt::VUV | CurrencyInt::NZD | CurrencyInt::NIO | CurrencyInt::NGN | CurrencyInt::NOK | CurrencyInt::PKR | CurrencyInt::PAB | CurrencyInt::PGK | CurrencyInt::PYG | CurrencyInt::PEN | CurrencyInt::PHP | CurrencyInt::QAR | CurrencyInt::RUB | CurrencyInt::RWF | CurrencyInt::SHP | CurrencyInt::SAR | CurrencyInt::SCR | CurrencyInt::SGD | CurrencyInt::VND | CurrencyInt::SOS | CurrencyInt::ZAR | CurrencyInt::SSP | CurrencyInt::SZL | CurrencyInt::SEK | CurrencyInt::CHF | CurrencyInt::SYP | CurrencyInt::THB | CurrencyInt::TOP | CurrencyInt::TTD | CurrencyInt::AED | CurrencyInt::TND | CurrencyInt::UGX | CurrencyInt::MKD | CurrencyInt::EGP | CurrencyInt::GBP | CurrencyInt::TZS | CurrencyInt::USD | CurrencyInt::UYU | CurrencyInt::UZS | CurrencyInt::WST | CurrencyInt::YER | CurrencyInt::TWD | CurrencyInt::SLE | CurrencyInt::VED | CurrencyInt::UYW | CurrencyInt::VES | CurrencyInt::MRU | CurrencyInt::STN | CurrencyInt::CUC | CurrencyInt::ZWL | CurrencyInt::BYN | CurrencyInt::TMT | CurrencyInt::GHS | CurrencyInt::SDG | CurrencyInt::UYI | CurrencyInt::RSD | CurrencyInt::MZN | CurrencyInt::AZN | CurrencyInt::RON | CurrencyInt::CHE | CurrencyInt::CHW | CurrencyInt::TRY | CurrencyInt::XAF | CurrencyInt::XCD | CurrencyInt::XOF | CurrencyInt::XPF | CurrencyInt::XBA | CurrencyInt::XBB | CurrencyInt::XBC | CurrencyInt::XBD | CurrencyInt::XAU | CurrencyInt::XDR | CurrencyInt::XAG | CurrencyInt::XPT | CurrencyInt::XTS | CurrencyInt::XPD | CurrencyInt::XUA | CurrencyInt::ZMW | CurrencyInt::SRD | CurrencyInt::MGA | CurrencyInt::COU | CurrencyInt::AFN | CurrencyInt::TJS | CurrencyInt::AOA | CurrencyInt::BGN | CurrencyInt::CDF | CurrencyInt::BAM | CurrencyInt::EUR | CurrencyInt::MXV | CurrencyInt::UAH | CurrencyInt::GEL | CurrencyInt::BOV | CurrencyInt::PLN | CurrencyInt::BRL | CurrencyInt::CLF | CurrencyInt::XSU | CurrencyInt::USN | CurrencyInt::XXX)
     }
   }
 
@@ -2788,204 +2156,6 @@ pub type TradeReportRefID = [AnsiChar; 20];
 
 
 
-/// Identifies the market segment.
-pub type MarketSegmentID = [AnsiChar; 2];
-
-
-
-/// Alternate Security identifier value for this security of SecurityAltIDSource type (e.g. CUSIP, SEDOL, ISIN, etc).
-pub type SecurityAltID = [AnsiChar; 12];
-
-
-
-/// Identifies class or source of the SecurityID value.
-#[repr(u8)]
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
-pub enum SecurityIdSource {
-  /// CUSIP.
-  CUSIP = 0x0001,
-  /// SEDOL.
-  SEDOL = 0x0002,
-  /// ISIN.
-  ISIN = 0x0004,
-  /// Exchange Symbol.
-  ExchangeSymbol = 0x0008,
-}
-impl Default for SecurityIdSource {
-  fn default() -> Self {
-    Self::CUSIP
-  }
-}
-impl std::convert::TryFrom<u8> for SecurityIdSource {
-  type Error = InvalidVariant;
-  fn try_from(value: u8) -> Result<Self, Self::Error> {
-    match value {
-      0x0001 => Ok(Self::CUSIP),
-      0x0002 => Ok(Self::SEDOL),
-      0x0004 => Ok(Self::ISIN),
-      0x0008 => Ok(Self::ExchangeSymbol),
-      other => Err(InvalidVariant::new(other as u32, "SecurityIdSource")),
-    }
-  }
-}
-pub struct SecurityIdSourceInt;
-#[allow(non_upper_case_globals, dead_code)]
-impl SecurityIdSourceInt {
-  pub const CUSIP: u8 = 0x0001;
-  pub const SEDOL: u8 = 0x0002;
-  pub const ISIN: u8 = 0x0004;
-  pub const ExchangeSymbol: u8 = 0x0008;
-}
-
-#[allow(dead_code)]
-type SecurityIdSourceIntType = u8;
-
-impl BytesValidator for SecurityIdSource {
-    #[inline]
-    unsafe fn is_valid(bytes: &[u8]) -> bool {
-      debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      let disc = std::convert::TryInto::try_into(bytes).map(u8::from_le_bytes).unwrap_unchecked();
-  matches!(disc, SecurityIdSourceInt::CUSIP | SecurityIdSourceInt::SEDOL | SecurityIdSourceInt::ISIN | SecurityIdSourceInt::ExchangeSymbol)
-    }
-  }
-
-/// Number of sides.
-#[repr(u8)]
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
-pub enum NoSides {
-  /// One Side.
-  OneSide = 0x0001,
-  /// Both Sides.
-  BothSides = 0x0002,
-}
-impl Default for NoSides {
-  fn default() -> Self {
-    Self::OneSide
-  }
-}
-impl std::convert::TryFrom<u8> for NoSides {
-  type Error = InvalidVariant;
-  fn try_from(value: u8) -> Result<Self, Self::Error> {
-    match value {
-      0x0001 => Ok(Self::OneSide),
-      0x0002 => Ok(Self::BothSides),
-      other => Err(InvalidVariant::new(other as u32, "NoSides")),
-    }
-  }
-}
-pub struct NoSidesInt;
-#[allow(non_upper_case_globals, dead_code)]
-impl NoSidesInt {
-  pub const OneSide: u8 = 0x0001;
-  pub const BothSides: u8 = 0x0002;
-}
-
-#[allow(dead_code)]
-type NoSidesIntType = u8;
-
-impl BytesValidator for NoSides {
-    #[inline]
-    unsafe fn is_valid(bytes: &[u8]) -> bool {
-      debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      let disc = std::convert::TryInto::try_into(bytes).map(u8::from_le_bytes).unwrap_unchecked();
-  matches!(disc, NoSidesInt::OneSide | NoSidesInt::BothSides)
-    }
-  }
-
-/// Identification of the party.
-#[repr(u8)]
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
-pub enum PartyId {
-  /// No client for this order.
-  NONE = 0x0001,
-  /// An aggregation of multiple client orders.
-  AGGR = 0x0002,
-  /// Clients are pending allocation.
-  PNAL = 0x0003,
-  /// Timing and location of the execution determined by the client of the participant.
-  NORE = 0x0004,
-}
-impl Default for PartyId {
-  fn default() -> Self {
-    Self::NONE
-  }
-}
-impl std::convert::TryFrom<u8> for PartyId {
-  type Error = InvalidVariant;
-  fn try_from(value: u8) -> Result<Self, Self::Error> {
-    match value {
-      0x0001 => Ok(Self::NONE),
-      0x0002 => Ok(Self::AGGR),
-      0x0003 => Ok(Self::PNAL),
-      0x0004 => Ok(Self::NORE),
-      other => Err(InvalidVariant::new(other as u32, "PartyId")),
-    }
-  }
-}
-pub struct PartyIdInt;
-#[allow(non_upper_case_globals, dead_code)]
-impl PartyIdInt {
-  pub const NONE: u8 = 0x0001;
-  pub const AGGR: u8 = 0x0002;
-  pub const PNAL: u8 = 0x0003;
-  pub const NORE: u8 = 0x0004;
-}
-
-#[allow(dead_code)]
-type PartyIdIntType = u8;
-
-impl BytesValidator for PartyId {
-    #[inline]
-    unsafe fn is_valid(bytes: &[u8]) -> bool {
-      debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      let disc = std::convert::TryInto::try_into(bytes).map(u8::from_le_bytes).unwrap_unchecked();
-  matches!(disc, PartyIdInt::NONE | PartyIdInt::AGGR | PartyIdInt::PNAL | PartyIdInt::NORE)
-    }
-  }
-
-/// Used to identify classification source of the party id.
-#[repr(u8)]
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
-pub enum PartyIdSource {
-  /// Proprietary / Custom code.
-  Proprietary = 0x0044,
-  /// Short code identifier.
-  ShortCode = 0x0050,
-}
-impl Default for PartyIdSource {
-  fn default() -> Self {
-    Self::Proprietary
-  }
-}
-impl std::convert::TryFrom<u8> for PartyIdSource {
-  type Error = InvalidVariant;
-  fn try_from(value: u8) -> Result<Self, Self::Error> {
-    match value {
-      0x0044 => Ok(Self::Proprietary),
-      0x0050 => Ok(Self::ShortCode),
-      other => Err(InvalidVariant::new(other as u32, "PartyIdSource")),
-    }
-  }
-}
-pub struct PartyIdSourceInt;
-#[allow(non_upper_case_globals, dead_code)]
-impl PartyIdSourceInt {
-  pub const Proprietary: u8 = 0x0044;
-  pub const ShortCode: u8 = 0x0050;
-}
-
-#[allow(dead_code)]
-type PartyIdSourceIntType = u8;
-
-impl BytesValidator for PartyIdSource {
-    #[inline]
-    unsafe fn is_valid(bytes: &[u8]) -> bool {
-      debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      let disc = std::convert::TryInto::try_into(bytes).map(u8::from_le_bytes).unwrap_unchecked();
-  matches!(disc, PartyIdSourceInt::Proprietary | PartyIdSourceInt::ShortCode)
-    }
-  }
-
 /// Type of execution being reported. Uses subset of ExecType for trade capture reports.
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
@@ -2994,6 +2164,8 @@ pub enum ExecType {
   New = 0x0001,
   /// Rejected.
   Rejected = 0x0008,
+  /// Expired
+  Expired = 0x000c,
   /// Trade.
   Trade = 0x000f,
   /// Trade Correct.
@@ -3012,6 +2184,7 @@ impl std::convert::TryFrom<u8> for ExecType {
     match value {
       0x0001 => Ok(Self::New),
       0x0008 => Ok(Self::Rejected),
+      0x000c => Ok(Self::Expired),
       0x000f => Ok(Self::Trade),
       0x0010 => Ok(Self::TradeCorrect),
       0x0011 => Ok(Self::TradeCancel),
@@ -3024,6 +2197,7 @@ pub struct ExecTypeInt;
 impl ExecTypeInt {
   pub const New: u8 = 0x0001;
   pub const Rejected: u8 = 0x0008;
+  pub const Expired: u8 = 0x000c;
   pub const Trade: u8 = 0x000f;
   pub const TradeCorrect: u8 = 0x0010;
   pub const TradeCancel: u8 = 0x0011;
@@ -3037,7 +2211,7 @@ impl BytesValidator for ExecType {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u8::from_le_bytes).unwrap_unchecked();
-  matches!(disc, ExecTypeInt::New | ExecTypeInt::Rejected | ExecTypeInt::Trade | ExecTypeInt::TradeCorrect | ExecTypeInt::TradeCancel)
+  matches!(disc, ExecTypeInt::New | ExecTypeInt::Rejected | ExecTypeInt::Expired | ExecTypeInt::Trade | ExecTypeInt::TradeCorrect | ExecTypeInt::TradeCancel)
     }
   }
 
@@ -3109,8 +2283,8 @@ impl BytesValidator for TradeBust {
 
 /// Trade Capture Report - single side.
 #[repr(C, packed)]
-#[derive(Serialize, Deserialize, Clone, Copy)]
-#[serde(deny_unknown_fields)]
+#[derive(Serialize, Deserialize, Clone, Copy, Default)]
+#[serde(deny_unknown_fields, default)]
 #[serde(rename_all = "camelCase")]
 pub struct TradeCaptureReportSingle {
   /// Header.
@@ -3160,8 +2334,8 @@ impl BytesValidator for TradeCaptureReportSingle {
 
 /// Trade Capture Report - dual sided.
 #[repr(C, packed)]
-#[derive(Serialize, Deserialize, Clone, Copy)]
-#[serde(deny_unknown_fields)]
+#[derive(Serialize, Deserialize, Clone, Copy, Default)]
+#[serde(deny_unknown_fields, default)]
 #[serde(rename_all = "camelCase")]
 pub struct TradeCaptureReportDual {
   /// Header.
@@ -3736,6 +2910,116 @@ impl BytesValidator for RiskLimitRequestType {
     }
   }
 
+/// Mass cancel request type.
+#[repr(u8)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum MassCancelRequestType {
+  /// Cancel orders for a security.
+  CancelForSecurity = 0x0001,
+  /// Cancel all orders.
+  CancelAllOrders = 0x0007,
+  /// Cancel orders for a market segment.
+  CancelOrdersForMarketSegment = 0x0009,
+}
+impl Default for MassCancelRequestType {
+  fn default() -> Self {
+    Self::CancelForSecurity
+  }
+}
+impl std::convert::TryFrom<u8> for MassCancelRequestType {
+  type Error = InvalidVariant;
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      0x0001 => Ok(Self::CancelForSecurity),
+      0x0007 => Ok(Self::CancelAllOrders),
+      0x0009 => Ok(Self::CancelOrdersForMarketSegment),
+      other => Err(InvalidVariant::new(other as u32, "MassCancelRequestType")),
+    }
+  }
+}
+pub struct MassCancelRequestTypeInt;
+#[allow(non_upper_case_globals, dead_code)]
+impl MassCancelRequestTypeInt {
+  pub const CancelForSecurity: u8 = 0x0001;
+  pub const CancelAllOrders: u8 = 0x0007;
+  pub const CancelOrdersForMarketSegment: u8 = 0x0009;
+}
+
+#[allow(dead_code)]
+type MassCancelRequestTypeIntType = u8;
+
+impl BytesValidator for MassCancelRequestType {
+    #[inline]
+    unsafe fn is_valid(bytes: &[u8]) -> bool {
+      debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
+      let disc = std::convert::TryInto::try_into(bytes).map(u8::from_le_bytes).unwrap_unchecked();
+  matches!(disc, MassCancelRequestTypeInt::CancelForSecurity | MassCancelRequestTypeInt::CancelAllOrders | MassCancelRequestTypeInt::CancelOrdersForMarketSegment)
+    }
+  }
+
+/// Target party role filter selection field.
+#[repr(u8)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum TargetPartyRole {
+  /// No filtering.
+  None = 0x0000,
+  /// Liquidity provider.
+  LiquidityProvider = 0x0023,
+  /// Sender location.
+  SenderLocation = 0x0036,
+  /// Market maker.
+  MarketMaker = 0x0042,
+  /// Client ID.
+  ClientID = 0x0003,
+  /// Executing trader.
+  ExecutingTrader = 0x000c,
+  /// Investment decision maker.
+  InvestmentDecisionMaker = 0x007a,
+}
+impl Default for TargetPartyRole {
+  fn default() -> Self {
+    Self::None
+  }
+}
+impl std::convert::TryFrom<u8> for TargetPartyRole {
+  type Error = InvalidVariant;
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      0x0000 => Ok(Self::None),
+      0x0023 => Ok(Self::LiquidityProvider),
+      0x0036 => Ok(Self::SenderLocation),
+      0x0042 => Ok(Self::MarketMaker),
+      0x0003 => Ok(Self::ClientID),
+      0x000c => Ok(Self::ExecutingTrader),
+      0x007a => Ok(Self::InvestmentDecisionMaker),
+      other => Err(InvalidVariant::new(other as u32, "TargetPartyRole")),
+    }
+  }
+}
+pub struct TargetPartyRoleInt;
+#[allow(non_upper_case_globals, dead_code)]
+impl TargetPartyRoleInt {
+  pub const None: u8 = 0x0000;
+  pub const LiquidityProvider: u8 = 0x0023;
+  pub const SenderLocation: u8 = 0x0036;
+  pub const MarketMaker: u8 = 0x0042;
+  pub const ClientID: u8 = 0x0003;
+  pub const ExecutingTrader: u8 = 0x000c;
+  pub const InvestmentDecisionMaker: u8 = 0x007a;
+}
+
+#[allow(dead_code)]
+type TargetPartyRoleIntType = u8;
+
+impl BytesValidator for TargetPartyRole {
+    #[inline]
+    unsafe fn is_valid(bytes: &[u8]) -> bool {
+      debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
+      let disc = std::convert::TryInto::try_into(bytes).map(u8::from_le_bytes).unwrap_unchecked();
+  matches!(disc, TargetPartyRoleInt::None | TargetPartyRoleInt::LiquidityProvider | TargetPartyRoleInt::SenderLocation | TargetPartyRoleInt::MarketMaker | TargetPartyRoleInt::ClientID | TargetPartyRoleInt::ExecutingTrader | TargetPartyRoleInt::InvestmentDecisionMaker)
+    }
+  }
+
 #[repr(u16)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum MsgType {
@@ -3789,8 +3073,14 @@ pub enum MsgType {
   MassQuoteResponse = 0x0019,
   /// Market maker initiates state transition.
   InitiateState = 0x001a,
+  /// A response to the Market maker initiating state transition.
+  InitiateStateResponse = 0x001b,
   /// Informs MM that execution has been requested.
   RequestForExecution = 0x001c,
+  /// Message used to cancel multiple existing orders.
+  OrderMassCancel = 0x001d,
+  /// Response to message used to cancel multiple existing orders.
+  OrderMassCancelResponse = 0x001e,
   /// A message to relay test scenario information
   TestEvent = 0x00ff,
 }
@@ -3828,7 +3118,10 @@ impl std::convert::TryFrom<u16> for MsgType {
       0x0018 => Ok(Self::MassQuote),
       0x0019 => Ok(Self::MassQuoteResponse),
       0x001a => Ok(Self::InitiateState),
+      0x001b => Ok(Self::InitiateStateResponse),
       0x001c => Ok(Self::RequestForExecution),
+      0x001d => Ok(Self::OrderMassCancel),
+      0x001e => Ok(Self::OrderMassCancelResponse),
       0x00ff => Ok(Self::TestEvent),
       other => Err(InvalidVariant::new(other as u32, "MsgType")),
     }
@@ -3862,7 +3155,10 @@ impl MsgTypeInt {
   pub const MassQuote: u16 = 0x0018;
   pub const MassQuoteResponse: u16 = 0x0019;
   pub const InitiateState: u16 = 0x001a;
+  pub const InitiateStateResponse: u16 = 0x001b;
   pub const RequestForExecution: u16 = 0x001c;
+  pub const OrderMassCancel: u16 = 0x001d;
+  pub const OrderMassCancelResponse: u16 = 0x001e;
   pub const TestEvent: u16 = 0x00ff;
 }
 
@@ -3874,7 +3170,7 @@ impl BytesValidator for MsgType {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u16::from_le_bytes).unwrap_unchecked();
-  matches!(disc, MsgTypeInt::Test | MsgTypeInt::Login | MsgTypeInt::LoginResponse | MsgTypeInt::OrderAdd | MsgTypeInt::OrderAddResponse | MsgTypeInt::OrderCancel | MsgTypeInt::OrderCancelResponse | MsgTypeInt::OrderModify | MsgTypeInt::OrderModifyResponse | MsgTypeInt::Trade | MsgTypeInt::Logout | MsgTypeInt::ConnectionClose | MsgTypeInt::Heartbeat | MsgTypeInt::LogoutResponse | MsgTypeInt::Reject | MsgTypeInt::RiskLimitDefinition | MsgTypeInt::RiskLimitDefinitionResponse | MsgTypeInt::TradeCaptureReportSingle | MsgTypeInt::TradeCaptureReportDual | MsgTypeInt::TradeCaptureReportResponse | MsgTypeInt::RiskLimitBreach | MsgTypeInt::TradeBust | MsgTypeInt::MassQuote | MsgTypeInt::MassQuoteResponse | MsgTypeInt::InitiateState | MsgTypeInt::RequestForExecution | MsgTypeInt::TestEvent)
+  matches!(disc, MsgTypeInt::Test | MsgTypeInt::Login | MsgTypeInt::LoginResponse | MsgTypeInt::OrderAdd | MsgTypeInt::OrderAddResponse | MsgTypeInt::OrderCancel | MsgTypeInt::OrderCancelResponse | MsgTypeInt::OrderModify | MsgTypeInt::OrderModifyResponse | MsgTypeInt::Trade | MsgTypeInt::Logout | MsgTypeInt::ConnectionClose | MsgTypeInt::Heartbeat | MsgTypeInt::LogoutResponse | MsgTypeInt::Reject | MsgTypeInt::RiskLimitDefinition | MsgTypeInt::RiskLimitDefinitionResponse | MsgTypeInt::TradeCaptureReportSingle | MsgTypeInt::TradeCaptureReportDual | MsgTypeInt::TradeCaptureReportResponse | MsgTypeInt::RiskLimitBreach | MsgTypeInt::TradeBust | MsgTypeInt::MassQuote | MsgTypeInt::MassQuoteResponse | MsgTypeInt::InitiateState | MsgTypeInt::InitiateStateResponse | MsgTypeInt::RequestForExecution | MsgTypeInt::OrderMassCancel | MsgTypeInt::OrderMassCancelResponse | MsgTypeInt::TestEvent)
     }
   }
 
@@ -3882,47 +3178,6 @@ impl BytesValidator for MsgType {
 pub type LeiCode = [AnsiChar; 20];
 
 
-
-/// Market structure element type.
-#[repr(u8)]
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
-pub enum ElementType {
-  MarketStructure = 0x0001,
-  Instrument = 0x0002,
-}
-impl Default for ElementType {
-  fn default() -> Self {
-    Self::MarketStructure
-  }
-}
-impl std::convert::TryFrom<u8> for ElementType {
-  type Error = InvalidVariant;
-  fn try_from(value: u8) -> Result<Self, Self::Error> {
-    match value {
-      0x0001 => Ok(Self::MarketStructure),
-      0x0002 => Ok(Self::Instrument),
-      other => Err(InvalidVariant::new(other as u32, "ElementType")),
-    }
-  }
-}
-pub struct ElementTypeInt;
-#[allow(non_upper_case_globals, dead_code)]
-impl ElementTypeInt {
-  pub const MarketStructure: u8 = 0x0001;
-  pub const Instrument: u8 = 0x0002;
-}
-
-#[allow(dead_code)]
-type ElementTypeIntType = u8;
-
-impl BytesValidator for ElementType {
-    #[inline]
-    unsafe fn is_valid(bytes: &[u8]) -> bool {
-      debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      let disc = std::convert::TryInto::try_into(bytes).map(u8::from_le_bytes).unwrap_unchecked();
-  matches!(disc, ElementTypeInt::MarketStructure | ElementTypeInt::Instrument)
-    }
-  }
 
 /// Test scenario name
 pub type ScenarioName = [AnsiChar; 200];
@@ -4025,13 +3280,17 @@ pub union Message {
   pub mass_quote: MassQuote,
   pub mass_quote_response: MassQuoteResponse,
   pub initiate_state: InitiateState,
+  pub initiate_state_response: InitiateStateResponse,
   pub request_for_execution: RequestForExecution,
+  pub order_mass_cancel: OrderMassCancel,
+  pub order_mass_cancel_response: OrderMassCancelResponse,
   pub test_event: TestEvent,
 }
 
 impl Serialize for Message {
   fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-  where S: Serializer,
+  where
+    S: Serializer,
   {
     unsafe {
       match self.test.header.msg_type {
@@ -4060,7 +3319,10 @@ impl Serialize for Message {
         MsgType::MassQuote => self.mass_quote.serialize(serializer),
         MsgType::MassQuoteResponse => self.mass_quote_response.serialize(serializer),
         MsgType::InitiateState => self.initiate_state.serialize(serializer),
+        MsgType::InitiateStateResponse => self.initiate_state_response.serialize(serializer),
         MsgType::RequestForExecution => self.request_for_execution.serialize(serializer),
+        MsgType::OrderMassCancel => self.order_mass_cancel.serialize(serializer),
+        MsgType::OrderMassCancelResponse => self.order_mass_cancel_response.serialize(serializer),
         MsgType::TestEvent => self.test_event.serialize(serializer), 
       }
     }
@@ -4098,14 +3360,17 @@ impl Message {
       MsgType::MassQuote => MassQuote::deserialize(de).map(|v| Message { mass_quote: v }),
       MsgType::MassQuoteResponse => MassQuoteResponse::deserialize(de).map(|v| Message { mass_quote_response: v }),
       MsgType::InitiateState => InitiateState::deserialize(de).map(|v| Message { initiate_state: v }),
+      MsgType::InitiateStateResponse => InitiateStateResponse::deserialize(de).map(|v| Message { initiate_state_response: v }),
       MsgType::RequestForExecution => RequestForExecution::deserialize(de).map(|v| Message { request_for_execution: v }),
+      MsgType::OrderMassCancel => OrderMassCancel::deserialize(de).map(|v| Message { order_mass_cancel: v }),
+      MsgType::OrderMassCancelResponse => OrderMassCancelResponse::deserialize(de).map(|v| Message { order_mass_cancel_response: v }),
       MsgType::TestEvent => TestEvent::deserialize(de).map(|v| Message { test_event: v }),
     }
   }
 }
 
 impl Message {
-  pub fn size_of(disc: MsgType) -> usize {
+  pub const fn size_of(disc: MsgType) -> usize {
     match disc {
       MsgType::Test => std::mem::size_of::<Test>(),
       MsgType::Login => std::mem::size_of::<Login>(),
@@ -4132,7 +3397,10 @@ impl Message {
       MsgType::MassQuote => std::mem::size_of::<MassQuote>(),
       MsgType::MassQuoteResponse => std::mem::size_of::<MassQuoteResponse>(),
       MsgType::InitiateState => std::mem::size_of::<InitiateState>(),
+      MsgType::InitiateStateResponse => std::mem::size_of::<InitiateStateResponse>(),
       MsgType::RequestForExecution => std::mem::size_of::<RequestForExecution>(),
+      MsgType::OrderMassCancel => std::mem::size_of::<OrderMassCancel>(),
+      MsgType::OrderMassCancelResponse => std::mem::size_of::<OrderMassCancelResponse>(),
       MsgType::TestEvent => std::mem::size_of::<TestEvent>(),
     }
   }
@@ -4166,7 +3434,10 @@ MsgTypeInt::RiskLimitBreach => std::mem::size_of::<RiskLimitBreach>() == length 
 MsgTypeInt::MassQuote => std::mem::size_of::<MassQuote>() == length && unsafe { MassQuote::is_valid(bytes) },
 MsgTypeInt::MassQuoteResponse => std::mem::size_of::<MassQuoteResponse>() == length && unsafe { MassQuoteResponse::is_valid(bytes) },
 MsgTypeInt::InitiateState => std::mem::size_of::<InitiateState>() == length && unsafe { InitiateState::is_valid(bytes) },
+MsgTypeInt::InitiateStateResponse => std::mem::size_of::<InitiateStateResponse>() == length && unsafe { InitiateStateResponse::is_valid(bytes) },
 MsgTypeInt::RequestForExecution => std::mem::size_of::<RequestForExecution>() == length && unsafe { RequestForExecution::is_valid(bytes) },
+MsgTypeInt::OrderMassCancel => std::mem::size_of::<OrderMassCancel>() == length && unsafe { OrderMassCancel::is_valid(bytes) },
+MsgTypeInt::OrderMassCancelResponse => std::mem::size_of::<OrderMassCancelResponse>() == length && unsafe { OrderMassCancelResponse::is_valid(bytes) },
 MsgTypeInt::TestEvent => std::mem::size_of::<TestEvent>() == length && unsafe { TestEvent::is_valid(bytes) },
         _ => false,
       }
@@ -4199,6 +3470,8 @@ pub enum OrderSource {
   Stp = 0x000a,
   /// Order cancelled due to submitted Corporate Action.
   CorporateAction = 0x000b,
+  /// Order cancelled due to mass cancel
+  MassCancel = 0x000c,
 }
 impl Default for OrderSource {
   fn default() -> Self {
@@ -4220,6 +3493,7 @@ impl std::convert::TryFrom<u8> for OrderSource {
       0x0009 => Ok(Self::Activated),
       0x000a => Ok(Self::Stp),
       0x000b => Ok(Self::CorporateAction),
+      0x000c => Ok(Self::MassCancel),
       other => Err(InvalidVariant::new(other as u32, "OrderSource")),
     }
   }
@@ -4238,6 +3512,7 @@ impl OrderSourceInt {
   pub const Activated: u8 = 0x0009;
   pub const Stp: u8 = 0x000a;
   pub const CorporateAction: u8 = 0x000b;
+  pub const MassCancel: u8 = 0x000c;
 }
 
 #[allow(dead_code)]
@@ -4248,7 +3523,7 @@ impl BytesValidator for OrderSource {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u8::from_le_bytes).unwrap_unchecked();
-  matches!(disc, OrderSourceInt::Submitted | OrderSourceInt::Cod | OrderSourceInt::Expired | OrderSourceInt::StopOrder | OrderSourceInt::Suspended | OrderSourceInt::Reinstated | OrderSourceInt::IcebergRefill | OrderSourceInt::OrderBookRebuild | OrderSourceInt::Activated | OrderSourceInt::Stp | OrderSourceInt::CorporateAction)
+  matches!(disc, OrderSourceInt::Submitted | OrderSourceInt::Cod | OrderSourceInt::Expired | OrderSourceInt::StopOrder | OrderSourceInt::Suspended | OrderSourceInt::Reinstated | OrderSourceInt::IcebergRefill | OrderSourceInt::OrderBookRebuild | OrderSourceInt::Activated | OrderSourceInt::Stp | OrderSourceInt::CorporateAction | OrderSourceInt::MassCancel)
     }
   }
 
@@ -4292,6 +3567,23 @@ impl BytesValidator for Quote {
     }
   }
 
+/// The Array of quotes.
+pub type QuotesArray = [Quote; 30];
+
+
+
+/// Array of quotes grouped with their amount.
+#[repr(C, packed)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
+#[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
+pub struct Quotes {
+  /// How many quotes this message contains.
+  pub count: u8,
+  /// The array of quotes.
+  pub items: QuotesArray,
+}
+
 /// Mass Quote
 #[repr(C, packed)]
 #[derive(Serialize, Deserialize, Clone, Copy)]
@@ -4315,8 +3607,6 @@ pub struct MassQuote {
   pub clearing_member_code: ClearingCode,
   /// Clearing member's clearing identifier.
   pub clearing_member_clearing_identifier: ClearingIdentifier,
-  /// How many quotes this message contains.
-  pub count: u8,
   /// The array of quotes.
   pub quotes: Quotes,
 }
@@ -4324,7 +3614,7 @@ impl BytesValidator for MassQuote {
     #[inline]
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, header))) && OnBehalfOf::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, on_behalf_of))) && STPId::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, stp_id))) && Capacity::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, capacity))) && Account::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, account))) && AccountType::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, account_type))) && MifidFields::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, mifid_fields))) && Memo::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, memo))) && ClearingCode::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, clearing_member_code))) && ClearingIdentifier::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, clearing_member_clearing_identifier))) && u8::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, count))) && Quotes::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, quotes)))
+      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, header))) && OnBehalfOf::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, on_behalf_of))) && STPId::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, stp_id))) && Capacity::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, capacity))) && Account::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, account))) && AccountType::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, account_type))) && MifidFields::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, mifid_fields))) && Memo::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, memo))) && ClearingCode::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, clearing_member_code))) && ClearingIdentifier::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, clearing_member_clearing_identifier))) && Quotes::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, quotes)))
     }
   }
 
@@ -4496,15 +3786,21 @@ impl BytesValidator for MassQuoteRejectionReason {
   }
 
 /// An array of QuoteOrderResponse.
-pub type QuoteOrderResponses = [QuoteOrderResponse; 30];
+pub type QuoteOrderResponseArray = [QuoteOrderResponse; 30];
 
-impl BytesValidator for QuoteOrderResponses {
-    #[inline]
-    unsafe fn is_valid(bytes: &[u8]) -> bool {
-      debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      true
-    }
-  }
+
+
+/// Array of quote order responses grouped with their amount.
+#[repr(C, packed)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
+#[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
+pub struct QuoteOrderResponses {
+  /// How many quote order responses this message contains.
+  pub count: u8,
+  /// The array of quote order responses.
+  pub items: QuoteOrderResponseArray,
+}
 
 /// The response to a MassQuote message.
 #[repr(C, packed)]
@@ -4516,9 +3812,7 @@ pub struct MassQuoteResponse {
   pub header: Header,
   /// Quote id
   pub mass_quote_id: OrderId,
-  /// How many responses this message contains.
-  pub count: u8,
-  /// The array of responses.
+  /// The slice of responses.
   pub responses: QuoteOrderResponses,
   /// Status of the given mass quote order.
   pub status: MassQuoteStatus,
@@ -4529,7 +3823,7 @@ impl BytesValidator for MassQuoteResponse {
     #[inline]
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuoteResponse, header))) && OrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuoteResponse, mass_quote_id))) && u8::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuoteResponse, count))) && QuoteOrderResponses::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuoteResponse, responses))) && MassQuoteStatus::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuoteResponse, status))) && MassQuoteRejectionReason::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuoteResponse, reason)))
+      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuoteResponse, header))) && OrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuoteResponse, mass_quote_id))) && QuoteOrderResponses::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuoteResponse, responses))) && MassQuoteStatus::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuoteResponse, status))) && MassQuoteRejectionReason::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuoteResponse, reason)))
     }
   }
 
@@ -4576,7 +3870,7 @@ impl BytesValidator for HybridMarketState {
     }
   }
 
-/// The information that the market switches to given state. Sent by MM.
+/// Initiate state change to Regular or BuyOnly.
 #[repr(C, packed)]
 #[derive(Serialize, Deserialize, Clone, Copy)]
 #[serde(deny_unknown_fields)]
@@ -4597,6 +3891,66 @@ impl BytesValidator for InitiateState {
     }
   }
 
+/// The result of the state change.
+#[repr(u8)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum InitiateStateResult {
+  Success = 0x0001,
+  Failure = 0x0002,
+}
+impl Default for InitiateStateResult {
+  fn default() -> Self {
+    Self::Success
+  }
+}
+impl std::convert::TryFrom<u8> for InitiateStateResult {
+  type Error = InvalidVariant;
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      0x0001 => Ok(Self::Success),
+      0x0002 => Ok(Self::Failure),
+      other => Err(InvalidVariant::new(other as u32, "InitiateStateResult")),
+    }
+  }
+}
+pub struct InitiateStateResultInt;
+#[allow(non_upper_case_globals, dead_code)]
+impl InitiateStateResultInt {
+  pub const Success: u8 = 0x0001;
+  pub const Failure: u8 = 0x0002;
+}
+
+#[allow(dead_code)]
+type InitiateStateResultIntType = u8;
+
+impl BytesValidator for InitiateStateResult {
+    #[inline]
+    unsafe fn is_valid(bytes: &[u8]) -> bool {
+      debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
+      let disc = std::convert::TryInto::try_into(bytes).map(u8::from_le_bytes).unwrap_unchecked();
+  matches!(disc, InitiateStateResultInt::Success | InitiateStateResultInt::Failure)
+    }
+  }
+
+/// The response to the attempt at state change.
+#[repr(C, packed)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
+#[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
+pub struct InitiateStateResponse {
+  /// Message header.
+  pub header: Header,
+  /// The result of an attempt at changing phase.
+  pub result: InitiateStateResult,
+}
+impl BytesValidator for InitiateStateResponse {
+    #[inline]
+    unsafe fn is_valid(bytes: &[u8]) -> bool {
+      debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
+      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(InitiateStateResponse, header))) && InitiateStateResult::is_valid(bytes.get_unchecked(memoffset::span_of!(InitiateStateResponse, result)))
+    }
+  }
+
 /// The information for the MM that one of the quotes has been crossed.
 #[repr(C, packed)]
 #[derive(Serialize, Deserialize, Clone, Copy)]
@@ -4607,17 +3961,11 @@ pub struct RequestForExecution {
   pub header: Header,
   /// Instrument ID
   pub instrument_id: ElementId,
-  /// Indicates the side of the order
-  pub side: OrderSide,
-  /// Indicates the price of the order.
-  pub price: Price,
-  /// Indicates the quantity of the instrument included in the order.
-  pub quantity: Quantity,
 }
 impl BytesValidator for RequestForExecution {
     #[inline]
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(RequestForExecution, header))) && ElementId::is_valid(bytes.get_unchecked(memoffset::span_of!(RequestForExecution, instrument_id))) && OrderSide::is_valid(bytes.get_unchecked(memoffset::span_of!(RequestForExecution, side))) && Price::is_valid(bytes.get_unchecked(memoffset::span_of!(RequestForExecution, price))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(RequestForExecution, quantity)))
+      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(RequestForExecution, header))) && ElementId::is_valid(bytes.get_unchecked(memoffset::span_of!(RequestForExecution, instrument_id)))
     }
   }

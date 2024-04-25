@@ -3,7 +3,7 @@
 use anyhow::{anyhow, Context, Result};
 use serde::Deserialize;
 use std::collections::HashMap;
-use std::net::{Ipv4Addr};
+use std::net::Ipv4Addr;
 use std::str::FromStr;
 use std::fs::File;
 use wats_access_client_rust::messages::trading_port::{self as tp};
@@ -101,7 +101,7 @@ pub(super) struct Config {
 
     connection_02: Connection,
 
-    connection_03: Connection,
+    connection_04: Connection,
 
     product_bucket: ProductBucket,
 }
@@ -161,7 +161,10 @@ struct ProductBucket {
 
     /// A product for the Order Book test
     order_book_based_on_market_data_instrument_id: u32,
-}
+
+    /// A product TradeCaptureReportDual
+    block_dual: u32,
+  }
 
 impl Config {
     /// Trading Port peer socket address
@@ -241,19 +244,19 @@ impl Config {
     }
 
     /// Connection 3 id
-    pub(super) fn connection_03_id(&self) -> u16 {
-        self.connection_03.id
-    }
+    pub(super) fn connection_04_id(&self) -> u16 {
+      self.connection_04.id
+  }
 
-    /// Connection 3 token
-    pub(super) fn connection_03_token(&self) -> [u8; 8] {
-        let mut token_arr = [0u8; 8];
-        token_arr[..self.connection_03.token.len()]
-            .copy_from_slice(self.connection_03.token.as_bytes());
-        token_arr
-    }
+  /// Connection 3 token
+  pub(super) fn connection_04_token(&self) -> [u8; 8] {
+      let mut token_arr = [0u8; 8];
+      token_arr[..self.connection_04.token.len()]
+          .copy_from_slice(self.connection_04.token.as_bytes());
+      token_arr
+  }
 
-    /// A product for the limit_order test
+  /// A product for the limit_order test
     pub(super) fn limit_order_instrument_id(&self) -> u32 {
         self.product_bucket.limit_order_instrument_id as u32
     }
@@ -307,4 +310,9 @@ impl Config {
     pub(super) fn order_book_based_on_market_data_instrument_id(&self) -> u32 {
         self.product_bucket.order_book_based_on_market_data_instrument_id as u32
     }
+
+    /// A product for Block Dual test
+    pub(super) fn block_dual(&self) -> u32 {
+      self.product_bucket.block_dual as u32
+  }
 }

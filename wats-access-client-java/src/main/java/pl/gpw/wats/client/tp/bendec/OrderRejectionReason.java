@@ -105,9 +105,9 @@ public enum OrderRejectionReason {
      */
     ORDERVALUEMUSTBELOWERTHANMAXIMUMVALUE(1031),
     /**
-     * Market orders are not permitted during the auction.
+     * Invalid OrdType for selected market model
      */
-    MARKETORDERNOTALLOWEDINAUCTION(1032),
+    INVALIDORDTYPEFORSELECTEDMARKETMODEL(1032),
     /**
      * The remaining quantity (LeavesQty) must be greater than 0 after the modification.
      */
@@ -117,21 +117,33 @@ public enum OrderRejectionReason {
      */
     PRICENOTALLOWED(1035),
     /**
-     * A market order can only have a TimeInForce value of 3 (IOC - Immediate or Cancel) or 4 (FOK - Fill or Kill).
+     * Invalid TimeInForce for specified OrderType
      */
-    INVALIDMARKETORDERTIMEINFORCE(1039),
+    INVALIDTIMEINFORCEFORORDERTYPE(1039),
     /**
-     * The TimeInForce value of 3 (IOC - Immediate or Cancel) or 4 (FOK - Fill or Kill) is not allowed during the auction.
+     * Invalid TimeInForce for current market phase
      */
-    INVALIDAUCTIONTIMEINFORCE(1040),
+    INVALIDTIMEINFORCEFORCURRENTMARKETPHASE(1040),
     /**
-     * Iceberg and Stop orders can only have a TimeInForce value of DAY, GTC (Good Till Cancel), GTD (Good Till Date), or GTT (Good Till Time).
+     * Invalid TimeInForce for selected market model
      */
-    INVALIDICEBERGANDSTOPORDERTIMEINFORCE(1041),
+    INVALIDTIMEINFORCEFORSELECTEDMARKETMODEL(1041),
+    /**
+     * ExpireTime (126) cannot be modified.
+     */
+    EXPIRETIMECANNOTBEMODIFIED(1043),
+    /**
+     * ExpireDate (432) not allowed for selected TimeInForce (59).
+     */
+    OBSOLETEEXPIREDATE(1044),
     /**
      * The expiration date is earlier than the current date.
      */
     EXPIREDATEINPAST(1045),
+    /**
+     * ExpireTime (126) not allowed for selected TimeInForce (59).
+     */
+    OBSOLETEEXPIRETIME(1046),
     /**
      * The expiration time is earlier than the current time.
      */
@@ -177,6 +189,10 @@ public enum OrderRejectionReason {
      */
     TRIGGERPRICEMODIFIEDFORACTIVATEDORDER(1068),
     /**
+     * TriggerPrice (1102) must be greater than 0.
+     */
+    TRIGGERPRICEMUSTBEGREATERTHANZERO(1069),
+    /**
      * Invalid PartyID (448) for Client ID
      */
     INVALIDPARTYIDFORCLIENTID(1070),
@@ -193,9 +209,25 @@ public enum OrderRejectionReason {
      */
     INVALIDPARTYROLEQUALIFIERFORPARTYID(1075),
     /**
+     * SecurityID (48) not recognized by the system.
+     */
+    UNKNOWNINSTRUMENT(1201),
+    /**
+     * Instrument closed for trading.
+     */
+    INSTRUMENTCLOSED(1203),
+    /**
      * OfferPx (133) must be greater than BidPx (132).
      */
     INVALIDBIDASKSPREAD(1208),
+    /**
+     * Buy orders from participants are not allowed in BuyOnly phase.
+     */
+    BUYORDERNOTALLOWED(1301),
+    /**
+     * Only one sell order is allowed for IPO instrument
+     */
+    ONLYONESELLORDERISALLOWEDFORIPO(1401),
     /**
      * Request not allowed for BLOCK instrument
      */

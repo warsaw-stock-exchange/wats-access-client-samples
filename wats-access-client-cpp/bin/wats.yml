@@ -66,6 +66,7 @@ products:
   bbo_price_level: &bbo_price_level_default 4679
   ptc_verification: &ptc_verification_default 4697
   order_book_based_on_omd: &order_book_based_on_omd_default 4685
+  block_dual: &block_dual_default 4701
 
 # C++ spdlog levels: trace, debug, info, warning, error, critical, off
 log_level: &log_level_default debug
@@ -199,3 +200,11 @@ order_book_based_on_omd:
     connections:
       trading_port: *trading_port_connection_1_default
   product: *order_book_based_on_omd_default
+
+block_dual:
+  log_level: *log_level_default
+  services: *services_default
+  connections:
+    trading_port: *trading_port_connection_0_default
+    market_data: *market_data_connection_0_default
+  product: *block_dual_default

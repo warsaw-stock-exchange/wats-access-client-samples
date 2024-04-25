@@ -8,655 +8,8 @@
   #pragma pack(1)
   
   
-// primitive built-in: uint32_t
-using ParticipantId = uint32_t;
 // primitive built-in: uint8_t
 using BulkSeqNum = uint8_t;
-
-enum class Currency: uint16_t {
-    ALL = 8,
-    DZD = 12,
-    ARS = 32,
-    AUD = 36,
-    BSD = 44,
-    BHD = 48,
-    BDT = 50,
-    AMD = 51,
-    BBD = 52,
-    BMD = 60,
-    BTN = 64,
-    BOB = 68,
-    BWP = 72,
-    BZD = 84,
-    SBD = 90,
-    BND = 96,
-    MMK = 104,
-    BIF = 108,
-    KHR = 116,
-    CAD = 124,
-    CVE = 132,
-    KYD = 136,
-    LKR = 144,
-    CLP = 152,
-    CNY = 156,
-    COP = 170,
-    KMF = 174,
-    CRC = 188,
-    HRK = 191,
-    CUP = 192,
-    CZK = 203,
-    DKK = 208,
-    DOP = 214,
-    SVC = 222,
-    ETB = 230,
-    ERN = 232,
-    FKP = 238,
-    FJD = 242,
-    DJF = 262,
-    GMD = 270,
-    GIP = 292,
-    GTQ = 320,
-    GNF = 324,
-    GYD = 328,
-    HTG = 332,
-    HNL = 340,
-    HKD = 344,
-    HUF = 348,
-    ISK = 352,
-    INR = 356,
-    IDR = 360,
-    IRR = 364,
-    IQD = 368,
-    ILS = 376,
-    JMD = 388,
-    JPY = 392,
-    KZT = 398,
-    JOD = 400,
-    KES = 404,
-    KPW = 408,
-    KRW = 410,
-    KWD = 414,
-    KGS = 417,
-    LAK = 418,
-    LBP = 422,
-    LSL = 426,
-    LRD = 430,
-    LYD = 434,
-    MOP = 446,
-    MWK = 454,
-    MYR = 458,
-    MVR = 462,
-    MUR = 480,
-    MXN = 484,
-    MNT = 496,
-    MDL = 498,
-    MAD = 504,
-    OMR = 512,
-    NAD = 516,
-    NPR = 524,
-    ANG = 532,
-    AWG = 533,
-    VUV = 548,
-    NZD = 554,
-    NIO = 558,
-    NGN = 566,
-    NOK = 578,
-    PKR = 586,
-    PAB = 590,
-    PGK = 598,
-    PYG = 600,
-    PEN = 604,
-    PHP = 608,
-    QAR = 634,
-    RUB = 643,
-    RWF = 646,
-    SHP = 654,
-    SAR = 682,
-    SCR = 690,
-    SGD = 702,
-    VND = 704,
-    SOS = 706,
-    ZAR = 710,
-    SSP = 728,
-    SZL = 748,
-    SEK = 752,
-    CHF = 756,
-    SYP = 760,
-    THB = 764,
-    TOP = 776,
-    TTD = 780,
-    AED = 784,
-    TND = 788,
-    UGX = 800,
-    MKD = 807,
-    EGP = 818,
-    GBP = 826,
-    TZS = 834,
-    USD = 840,
-    UYU = 858,
-    UZS = 860,
-    WST = 882,
-    YER = 886,
-    TWD = 901,
-    SLE = 925,
-    VED = 926,
-    UYW = 927,
-    VES = 928,
-    MRU = 929,
-    STN = 930,
-    CUC = 931,
-    ZWL = 932,
-    BYN = 933,
-    TMT = 934,
-    GHS = 936,
-    SDG = 938,
-    UYI = 940,
-    RSD = 941,
-    MZN = 943,
-    AZN = 944,
-    RON = 946,
-    CHE = 947,
-    CHW = 948,
-    TRY = 949,
-    XAF = 950,
-    XCD = 951,
-    XOF = 952,
-    XPF = 953,
-    XBA = 955,
-    XBB = 956,
-    XBC = 957,
-    XBD = 958,
-    XAU = 959,
-    XDR = 960,
-    XAG = 961,
-    XPT = 962,
-    XTS = 963,
-    XPD = 964,
-    XUA = 965,
-    ZMW = 967,
-    SRD = 968,
-    MGA = 969,
-    COU = 970,
-    AFN = 971,
-    TJS = 972,
-    AOA = 973,
-    BGN = 975,
-    CDF = 976,
-    BAM = 977,
-    EUR = 978,
-    MXV = 979,
-    UAH = 980,
-    GEL = 981,
-    BOV = 984,
-    PLN = 985,
-    BRL = 986,
-    CLF = 990,
-    XSU = 994,
-    USN = 997,
-    XXX = 999
-};
-
-static const std::map<std::string, Currency> Name2Currency {
-    { "ALL", Currency::ALL },
-    { "DZD", Currency::DZD },
-    { "ARS", Currency::ARS },
-    { "AUD", Currency::AUD },
-    { "BSD", Currency::BSD },
-    { "BHD", Currency::BHD },
-    { "BDT", Currency::BDT },
-    { "AMD", Currency::AMD },
-    { "BBD", Currency::BBD },
-    { "BMD", Currency::BMD },
-    { "BTN", Currency::BTN },
-    { "BOB", Currency::BOB },
-    { "BWP", Currency::BWP },
-    { "BZD", Currency::BZD },
-    { "SBD", Currency::SBD },
-    { "BND", Currency::BND },
-    { "MMK", Currency::MMK },
-    { "BIF", Currency::BIF },
-    { "KHR", Currency::KHR },
-    { "CAD", Currency::CAD },
-    { "CVE", Currency::CVE },
-    { "KYD", Currency::KYD },
-    { "LKR", Currency::LKR },
-    { "CLP", Currency::CLP },
-    { "CNY", Currency::CNY },
-    { "COP", Currency::COP },
-    { "KMF", Currency::KMF },
-    { "CRC", Currency::CRC },
-    { "HRK", Currency::HRK },
-    { "CUP", Currency::CUP },
-    { "CZK", Currency::CZK },
-    { "DKK", Currency::DKK },
-    { "DOP", Currency::DOP },
-    { "SVC", Currency::SVC },
-    { "ETB", Currency::ETB },
-    { "ERN", Currency::ERN },
-    { "FKP", Currency::FKP },
-    { "FJD", Currency::FJD },
-    { "DJF", Currency::DJF },
-    { "GMD", Currency::GMD },
-    { "GIP", Currency::GIP },
-    { "GTQ", Currency::GTQ },
-    { "GNF", Currency::GNF },
-    { "GYD", Currency::GYD },
-    { "HTG", Currency::HTG },
-    { "HNL", Currency::HNL },
-    { "HKD", Currency::HKD },
-    { "HUF", Currency::HUF },
-    { "ISK", Currency::ISK },
-    { "INR", Currency::INR },
-    { "IDR", Currency::IDR },
-    { "IRR", Currency::IRR },
-    { "IQD", Currency::IQD },
-    { "ILS", Currency::ILS },
-    { "JMD", Currency::JMD },
-    { "JPY", Currency::JPY },
-    { "KZT", Currency::KZT },
-    { "JOD", Currency::JOD },
-    { "KES", Currency::KES },
-    { "KPW", Currency::KPW },
-    { "KRW", Currency::KRW },
-    { "KWD", Currency::KWD },
-    { "KGS", Currency::KGS },
-    { "LAK", Currency::LAK },
-    { "LBP", Currency::LBP },
-    { "LSL", Currency::LSL },
-    { "LRD", Currency::LRD },
-    { "LYD", Currency::LYD },
-    { "MOP", Currency::MOP },
-    { "MWK", Currency::MWK },
-    { "MYR", Currency::MYR },
-    { "MVR", Currency::MVR },
-    { "MUR", Currency::MUR },
-    { "MXN", Currency::MXN },
-    { "MNT", Currency::MNT },
-    { "MDL", Currency::MDL },
-    { "MAD", Currency::MAD },
-    { "OMR", Currency::OMR },
-    { "NAD", Currency::NAD },
-    { "NPR", Currency::NPR },
-    { "ANG", Currency::ANG },
-    { "AWG", Currency::AWG },
-    { "VUV", Currency::VUV },
-    { "NZD", Currency::NZD },
-    { "NIO", Currency::NIO },
-    { "NGN", Currency::NGN },
-    { "NOK", Currency::NOK },
-    { "PKR", Currency::PKR },
-    { "PAB", Currency::PAB },
-    { "PGK", Currency::PGK },
-    { "PYG", Currency::PYG },
-    { "PEN", Currency::PEN },
-    { "PHP", Currency::PHP },
-    { "QAR", Currency::QAR },
-    { "RUB", Currency::RUB },
-    { "RWF", Currency::RWF },
-    { "SHP", Currency::SHP },
-    { "SAR", Currency::SAR },
-    { "SCR", Currency::SCR },
-    { "SGD", Currency::SGD },
-    { "VND", Currency::VND },
-    { "SOS", Currency::SOS },
-    { "ZAR", Currency::ZAR },
-    { "SSP", Currency::SSP },
-    { "SZL", Currency::SZL },
-    { "SEK", Currency::SEK },
-    { "CHF", Currency::CHF },
-    { "SYP", Currency::SYP },
-    { "THB", Currency::THB },
-    { "TOP", Currency::TOP },
-    { "TTD", Currency::TTD },
-    { "AED", Currency::AED },
-    { "TND", Currency::TND },
-    { "UGX", Currency::UGX },
-    { "MKD", Currency::MKD },
-    { "EGP", Currency::EGP },
-    { "GBP", Currency::GBP },
-    { "TZS", Currency::TZS },
-    { "USD", Currency::USD },
-    { "UYU", Currency::UYU },
-    { "UZS", Currency::UZS },
-    { "WST", Currency::WST },
-    { "YER", Currency::YER },
-    { "TWD", Currency::TWD },
-    { "SLE", Currency::SLE },
-    { "VED", Currency::VED },
-    { "UYW", Currency::UYW },
-    { "VES", Currency::VES },
-    { "MRU", Currency::MRU },
-    { "STN", Currency::STN },
-    { "CUC", Currency::CUC },
-    { "ZWL", Currency::ZWL },
-    { "BYN", Currency::BYN },
-    { "TMT", Currency::TMT },
-    { "GHS", Currency::GHS },
-    { "SDG", Currency::SDG },
-    { "UYI", Currency::UYI },
-    { "RSD", Currency::RSD },
-    { "MZN", Currency::MZN },
-    { "AZN", Currency::AZN },
-    { "RON", Currency::RON },
-    { "CHE", Currency::CHE },
-    { "CHW", Currency::CHW },
-    { "TRY", Currency::TRY },
-    { "XAF", Currency::XAF },
-    { "XCD", Currency::XCD },
-    { "XOF", Currency::XOF },
-    { "XPF", Currency::XPF },
-    { "XBA", Currency::XBA },
-    { "XBB", Currency::XBB },
-    { "XBC", Currency::XBC },
-    { "XBD", Currency::XBD },
-    { "XAU", Currency::XAU },
-    { "XDR", Currency::XDR },
-    { "XAG", Currency::XAG },
-    { "XPT", Currency::XPT },
-    { "XTS", Currency::XTS },
-    { "XPD", Currency::XPD },
-    { "XUA", Currency::XUA },
-    { "ZMW", Currency::ZMW },
-    { "SRD", Currency::SRD },
-    { "MGA", Currency::MGA },
-    { "COU", Currency::COU },
-    { "AFN", Currency::AFN },
-    { "TJS", Currency::TJS },
-    { "AOA", Currency::AOA },
-    { "BGN", Currency::BGN },
-    { "CDF", Currency::CDF },
-    { "BAM", Currency::BAM },
-    { "EUR", Currency::EUR },
-    { "MXV", Currency::MXV },
-    { "UAH", Currency::UAH },
-    { "GEL", Currency::GEL },
-    { "BOV", Currency::BOV },
-    { "PLN", Currency::PLN },
-    { "BRL", Currency::BRL },
-    { "CLF", Currency::CLF },
-    { "XSU", Currency::XSU },
-    { "USN", Currency::USN },
-    { "XXX", Currency::XXX }
-};
-
-static const std::map<Currency, std::string> Currency2Name {
-    { Currency::ALL, "ALL" },
-    { Currency::DZD, "DZD" },
-    { Currency::ARS, "ARS" },
-    { Currency::AUD, "AUD" },
-    { Currency::BSD, "BSD" },
-    { Currency::BHD, "BHD" },
-    { Currency::BDT, "BDT" },
-    { Currency::AMD, "AMD" },
-    { Currency::BBD, "BBD" },
-    { Currency::BMD, "BMD" },
-    { Currency::BTN, "BTN" },
-    { Currency::BOB, "BOB" },
-    { Currency::BWP, "BWP" },
-    { Currency::BZD, "BZD" },
-    { Currency::SBD, "SBD" },
-    { Currency::BND, "BND" },
-    { Currency::MMK, "MMK" },
-    { Currency::BIF, "BIF" },
-    { Currency::KHR, "KHR" },
-    { Currency::CAD, "CAD" },
-    { Currency::CVE, "CVE" },
-    { Currency::KYD, "KYD" },
-    { Currency::LKR, "LKR" },
-    { Currency::CLP, "CLP" },
-    { Currency::CNY, "CNY" },
-    { Currency::COP, "COP" },
-    { Currency::KMF, "KMF" },
-    { Currency::CRC, "CRC" },
-    { Currency::HRK, "HRK" },
-    { Currency::CUP, "CUP" },
-    { Currency::CZK, "CZK" },
-    { Currency::DKK, "DKK" },
-    { Currency::DOP, "DOP" },
-    { Currency::SVC, "SVC" },
-    { Currency::ETB, "ETB" },
-    { Currency::ERN, "ERN" },
-    { Currency::FKP, "FKP" },
-    { Currency::FJD, "FJD" },
-    { Currency::DJF, "DJF" },
-    { Currency::GMD, "GMD" },
-    { Currency::GIP, "GIP" },
-    { Currency::GTQ, "GTQ" },
-    { Currency::GNF, "GNF" },
-    { Currency::GYD, "GYD" },
-    { Currency::HTG, "HTG" },
-    { Currency::HNL, "HNL" },
-    { Currency::HKD, "HKD" },
-    { Currency::HUF, "HUF" },
-    { Currency::ISK, "ISK" },
-    { Currency::INR, "INR" },
-    { Currency::IDR, "IDR" },
-    { Currency::IRR, "IRR" },
-    { Currency::IQD, "IQD" },
-    { Currency::ILS, "ILS" },
-    { Currency::JMD, "JMD" },
-    { Currency::JPY, "JPY" },
-    { Currency::KZT, "KZT" },
-    { Currency::JOD, "JOD" },
-    { Currency::KES, "KES" },
-    { Currency::KPW, "KPW" },
-    { Currency::KRW, "KRW" },
-    { Currency::KWD, "KWD" },
-    { Currency::KGS, "KGS" },
-    { Currency::LAK, "LAK" },
-    { Currency::LBP, "LBP" },
-    { Currency::LSL, "LSL" },
-    { Currency::LRD, "LRD" },
-    { Currency::LYD, "LYD" },
-    { Currency::MOP, "MOP" },
-    { Currency::MWK, "MWK" },
-    { Currency::MYR, "MYR" },
-    { Currency::MVR, "MVR" },
-    { Currency::MUR, "MUR" },
-    { Currency::MXN, "MXN" },
-    { Currency::MNT, "MNT" },
-    { Currency::MDL, "MDL" },
-    { Currency::MAD, "MAD" },
-    { Currency::OMR, "OMR" },
-    { Currency::NAD, "NAD" },
-    { Currency::NPR, "NPR" },
-    { Currency::ANG, "ANG" },
-    { Currency::AWG, "AWG" },
-    { Currency::VUV, "VUV" },
-    { Currency::NZD, "NZD" },
-    { Currency::NIO, "NIO" },
-    { Currency::NGN, "NGN" },
-    { Currency::NOK, "NOK" },
-    { Currency::PKR, "PKR" },
-    { Currency::PAB, "PAB" },
-    { Currency::PGK, "PGK" },
-    { Currency::PYG, "PYG" },
-    { Currency::PEN, "PEN" },
-    { Currency::PHP, "PHP" },
-    { Currency::QAR, "QAR" },
-    { Currency::RUB, "RUB" },
-    { Currency::RWF, "RWF" },
-    { Currency::SHP, "SHP" },
-    { Currency::SAR, "SAR" },
-    { Currency::SCR, "SCR" },
-    { Currency::SGD, "SGD" },
-    { Currency::VND, "VND" },
-    { Currency::SOS, "SOS" },
-    { Currency::ZAR, "ZAR" },
-    { Currency::SSP, "SSP" },
-    { Currency::SZL, "SZL" },
-    { Currency::SEK, "SEK" },
-    { Currency::CHF, "CHF" },
-    { Currency::SYP, "SYP" },
-    { Currency::THB, "THB" },
-    { Currency::TOP, "TOP" },
-    { Currency::TTD, "TTD" },
-    { Currency::AED, "AED" },
-    { Currency::TND, "TND" },
-    { Currency::UGX, "UGX" },
-    { Currency::MKD, "MKD" },
-    { Currency::EGP, "EGP" },
-    { Currency::GBP, "GBP" },
-    { Currency::TZS, "TZS" },
-    { Currency::USD, "USD" },
-    { Currency::UYU, "UYU" },
-    { Currency::UZS, "UZS" },
-    { Currency::WST, "WST" },
-    { Currency::YER, "YER" },
-    { Currency::TWD, "TWD" },
-    { Currency::SLE, "SLE" },
-    { Currency::VED, "VED" },
-    { Currency::UYW, "UYW" },
-    { Currency::VES, "VES" },
-    { Currency::MRU, "MRU" },
-    { Currency::STN, "STN" },
-    { Currency::CUC, "CUC" },
-    { Currency::ZWL, "ZWL" },
-    { Currency::BYN, "BYN" },
-    { Currency::TMT, "TMT" },
-    { Currency::GHS, "GHS" },
-    { Currency::SDG, "SDG" },
-    { Currency::UYI, "UYI" },
-    { Currency::RSD, "RSD" },
-    { Currency::MZN, "MZN" },
-    { Currency::AZN, "AZN" },
-    { Currency::RON, "RON" },
-    { Currency::CHE, "CHE" },
-    { Currency::CHW, "CHW" },
-    { Currency::TRY, "TRY" },
-    { Currency::XAF, "XAF" },
-    { Currency::XCD, "XCD" },
-    { Currency::XOF, "XOF" },
-    { Currency::XPF, "XPF" },
-    { Currency::XBA, "XBA" },
-    { Currency::XBB, "XBB" },
-    { Currency::XBC, "XBC" },
-    { Currency::XBD, "XBD" },
-    { Currency::XAU, "XAU" },
-    { Currency::XDR, "XDR" },
-    { Currency::XAG, "XAG" },
-    { Currency::XPT, "XPT" },
-    { Currency::XTS, "XTS" },
-    { Currency::XPD, "XPD" },
-    { Currency::XUA, "XUA" },
-    { Currency::ZMW, "ZMW" },
-    { Currency::SRD, "SRD" },
-    { Currency::MGA, "MGA" },
-    { Currency::COU, "COU" },
-    { Currency::AFN, "AFN" },
-    { Currency::TJS, "TJS" },
-    { Currency::AOA, "AOA" },
-    { Currency::BGN, "BGN" },
-    { Currency::CDF, "CDF" },
-    { Currency::BAM, "BAM" },
-    { Currency::EUR, "EUR" },
-    { Currency::MXV, "MXV" },
-    { Currency::UAH, "UAH" },
-    { Currency::GEL, "GEL" },
-    { Currency::BOV, "BOV" },
-    { Currency::PLN, "PLN" },
-    { Currency::BRL, "BRL" },
-    { Currency::CLF, "CLF" },
-    { Currency::XSU, "XSU" },
-    { Currency::USN, "USN" },
-    { Currency::XXX, "XXX" }
-};
-
-using AnsiChar = uint8_t;
-using MarketSegmentID = AnsiChar[2];
-using SecurityAltID = AnsiChar[12];
-
-enum class SecurityIdSource: uint8_t {
-    CUSIP = 1,
-    SEDOL = 2,
-    ISIN = 4,
-    ExchangeSymbol = 8
-};
-
-static const std::map<std::string, SecurityIdSource> Name2SecurityIdSource {
-    { "CUSIP", SecurityIdSource::CUSIP },
-    { "SEDOL", SecurityIdSource::SEDOL },
-    { "ISIN", SecurityIdSource::ISIN },
-    { "ExchangeSymbol", SecurityIdSource::ExchangeSymbol }
-};
-
-static const std::map<SecurityIdSource, std::string> SecurityIdSource2Name {
-    { SecurityIdSource::CUSIP, "CUSIP" },
-    { SecurityIdSource::SEDOL, "SEDOL" },
-    { SecurityIdSource::ISIN, "ISIN" },
-    { SecurityIdSource::ExchangeSymbol, "ExchangeSymbol" }
-};
-
-
-enum class NoSides: uint8_t {
-    OneSide = 1,
-    BothSides = 2
-};
-
-static const std::map<std::string, NoSides> Name2NoSides {
-    { "OneSide", NoSides::OneSide },
-    { "BothSides", NoSides::BothSides }
-};
-
-static const std::map<NoSides, std::string> NoSides2Name {
-    { NoSides::OneSide, "OneSide" },
-    { NoSides::BothSides, "BothSides" }
-};
-
-
-enum class PartyId: uint8_t {
-    NONE = 1,
-    AGGR = 2,
-    PNAL = 3,
-    NORE = 4
-};
-
-static const std::map<std::string, PartyId> Name2PartyId {
-    { "NONE", PartyId::NONE },
-    { "AGGR", PartyId::AGGR },
-    { "PNAL", PartyId::PNAL },
-    { "NORE", PartyId::NORE }
-};
-
-static const std::map<PartyId, std::string> PartyId2Name {
-    { PartyId::NONE, "NONE" },
-    { PartyId::AGGR, "AGGR" },
-    { PartyId::PNAL, "PNAL" },
-    { PartyId::NORE, "NORE" }
-};
-
-
-enum class PartyIdSource: uint8_t {
-    Proprietary = 68,
-    ShortCode = 80
-};
-
-static const std::map<std::string, PartyIdSource> Name2PartyIdSource {
-    { "Proprietary", PartyIdSource::Proprietary },
-    { "ShortCode", PartyIdSource::ShortCode }
-};
-
-static const std::map<PartyIdSource, std::string> PartyIdSource2Name {
-    { PartyIdSource::Proprietary, "Proprietary" },
-    { PartyIdSource::ShortCode, "ShortCode" }
-};
-
-
-enum class ElementType: uint8_t {
-    MarketStructure = 1,
-    Instrument = 2
-};
-
-static const std::map<std::string, ElementType> Name2ElementType {
-    { "MarketStructure", ElementType::MarketStructure },
-    { "Instrument", ElementType::Instrument }
-};
-
-static const std::map<ElementType, std::string> ElementType2Name {
-    { ElementType::MarketStructure, "MarketStructure" },
-    { ElementType::Instrument, "Instrument" }
-};
-
 // primitive built-in: uint16_t
 using MsgLength = uint16_t;
 
@@ -686,7 +39,10 @@ enum class MsgType: uint16_t {
     MassQuote = 24,
     MassQuoteResponse = 25,
     InitiateState = 26,
+    InitiateStateResponse = 27,
     RequestForExecution = 28,
+    OrderMassCancel = 29,
+    OrderMassCancelResponse = 30,
     TestEvent = 255
 };
 
@@ -716,7 +72,10 @@ static const std::map<std::string, MsgType> Name2MsgType {
     { "MassQuote", MsgType::MassQuote },
     { "MassQuoteResponse", MsgType::MassQuoteResponse },
     { "InitiateState", MsgType::InitiateState },
+    { "InitiateStateResponse", MsgType::InitiateStateResponse },
     { "RequestForExecution", MsgType::RequestForExecution },
+    { "OrderMassCancel", MsgType::OrderMassCancel },
+    { "OrderMassCancelResponse", MsgType::OrderMassCancelResponse },
     { "TestEvent", MsgType::TestEvent }
 };
 
@@ -746,10 +105,14 @@ static const std::map<MsgType, std::string> MsgType2Name {
     { MsgType::MassQuote, "MassQuote" },
     { MsgType::MassQuoteResponse, "MassQuoteResponse" },
     { MsgType::InitiateState, "InitiateState" },
+    { MsgType::InitiateStateResponse, "InitiateStateResponse" },
     { MsgType::RequestForExecution, "RequestForExecution" },
+    { MsgType::OrderMassCancel, "OrderMassCancel" },
+    { MsgType::OrderMassCancelResponse, "OrderMassCancelResponse" },
     { MsgType::TestEvent, "TestEvent" }
 };
 
+// primitive built-in: uint32_t
 using SeqNum = uint32_t;
 // primitive built-in: uint64_t
 using Timestamp = uint64_t;
@@ -770,6 +133,7 @@ struct Test {
     friend std::ostream &operator << (std::ostream &, const Test &);
 };
 using MsgVersion = uint16_t;
+using AnsiChar = uint8_t;
 using Token = AnsiChar[8];
 using ConnectionId = uint16_t;
 
@@ -832,7 +196,7 @@ struct LoginResponse {
     friend std::ostream &operator << (std::ostream &, const LoginResponse &);
 };
 using OnBehalfOf = uint16_t;
-using STPId = uint16_t;
+using STPId = uint8_t;
 using ElementId = uint32_t;
 
 enum class OrderType: uint8_t {
@@ -1119,13 +483,16 @@ enum class OrderRejectionReason: uint16_t {
     OrderPriceMustBeNonzero = 1029,
     OrderValueMustBeGreaterThanMinimumValue = 1030,
     OrderValueMustBeLowerThanMaximumValue = 1031,
-    MarketOrderNotAllowedInAuction = 1032,
+    InvalidOrdTypeForSelectedMarketModel = 1032,
     LeavesQuantityMustBeGreaterThanZeroAfterModification = 1034,
     PriceNotAllowed = 1035,
-    InvalidMarketOrderTimeInForce = 1039,
-    InvalidAuctionTimeInForce = 1040,
-    InvalidIcebergAndStopOrderTimeInForce = 1041,
+    InvalidTimeInForceForOrderType = 1039,
+    InvalidTimeInForceForCurrentMarketPhase = 1040,
+    InvalidTimeInForceForSelectedMarketModel = 1041,
+    ExpireTimeCannotBeModified = 1043,
+    ObsoleteExpireDate = 1044,
     ExpireDateInPast = 1045,
+    ObsoleteExpireTime = 1046,
     ExpireTimeInPast = 1047,
     AmbigousExpire = 1048,
     ExpireDateExceedsLimit = 1049,
@@ -1137,11 +504,16 @@ enum class OrderRejectionReason: uint16_t {
     TriggerPriceLowerThanPrice = 1066,
     TriggerPriceHigherThanPrice = 1067,
     TriggerPriceModifiedForActivatedOrder = 1068,
+    TriggerPriceMustBeGreaterThanZero = 1069,
     InvalidPartyIdForClientId = 1070,
     InvalidPartyIdForExecutingTrader = 1071,
     InvalidPartyIdForInvestmentDecisionMaker = 1072,
     InvalidPartyRoleQualifierForPartyId = 1075,
+    UnknownInstrument = 1201,
+    InstrumentClosed = 1203,
     InvalidBidAskSpread = 1208,
+    BuyOrderNotAllowed = 1301,
+    OnlyOneSellOrderIsAllowedForIpo = 1401,
     RequestNotAllowedForBlockInstrument = 2026,
     RequestNotAllowedForCrossInstrument = 2028,
     RiskLimitNotDefined = 7000,
@@ -1174,13 +546,16 @@ static const std::map<std::string, OrderRejectionReason> Name2OrderRejectionReas
     { "OrderPriceMustBeNonzero", OrderRejectionReason::OrderPriceMustBeNonzero },
     { "OrderValueMustBeGreaterThanMinimumValue", OrderRejectionReason::OrderValueMustBeGreaterThanMinimumValue },
     { "OrderValueMustBeLowerThanMaximumValue", OrderRejectionReason::OrderValueMustBeLowerThanMaximumValue },
-    { "MarketOrderNotAllowedInAuction", OrderRejectionReason::MarketOrderNotAllowedInAuction },
+    { "InvalidOrdTypeForSelectedMarketModel", OrderRejectionReason::InvalidOrdTypeForSelectedMarketModel },
     { "LeavesQuantityMustBeGreaterThanZeroAfterModification", OrderRejectionReason::LeavesQuantityMustBeGreaterThanZeroAfterModification },
     { "PriceNotAllowed", OrderRejectionReason::PriceNotAllowed },
-    { "InvalidMarketOrderTimeInForce", OrderRejectionReason::InvalidMarketOrderTimeInForce },
-    { "InvalidAuctionTimeInForce", OrderRejectionReason::InvalidAuctionTimeInForce },
-    { "InvalidIcebergAndStopOrderTimeInForce", OrderRejectionReason::InvalidIcebergAndStopOrderTimeInForce },
+    { "InvalidTimeInForceForOrderType", OrderRejectionReason::InvalidTimeInForceForOrderType },
+    { "InvalidTimeInForceForCurrentMarketPhase", OrderRejectionReason::InvalidTimeInForceForCurrentMarketPhase },
+    { "InvalidTimeInForceForSelectedMarketModel", OrderRejectionReason::InvalidTimeInForceForSelectedMarketModel },
+    { "ExpireTimeCannotBeModified", OrderRejectionReason::ExpireTimeCannotBeModified },
+    { "ObsoleteExpireDate", OrderRejectionReason::ObsoleteExpireDate },
     { "ExpireDateInPast", OrderRejectionReason::ExpireDateInPast },
+    { "ObsoleteExpireTime", OrderRejectionReason::ObsoleteExpireTime },
     { "ExpireTimeInPast", OrderRejectionReason::ExpireTimeInPast },
     { "AmbigousExpire", OrderRejectionReason::AmbigousExpire },
     { "ExpireDateExceedsLimit", OrderRejectionReason::ExpireDateExceedsLimit },
@@ -1192,11 +567,16 @@ static const std::map<std::string, OrderRejectionReason> Name2OrderRejectionReas
     { "TriggerPriceLowerThanPrice", OrderRejectionReason::TriggerPriceLowerThanPrice },
     { "TriggerPriceHigherThanPrice", OrderRejectionReason::TriggerPriceHigherThanPrice },
     { "TriggerPriceModifiedForActivatedOrder", OrderRejectionReason::TriggerPriceModifiedForActivatedOrder },
+    { "TriggerPriceMustBeGreaterThanZero", OrderRejectionReason::TriggerPriceMustBeGreaterThanZero },
     { "InvalidPartyIdForClientId", OrderRejectionReason::InvalidPartyIdForClientId },
     { "InvalidPartyIdForExecutingTrader", OrderRejectionReason::InvalidPartyIdForExecutingTrader },
     { "InvalidPartyIdForInvestmentDecisionMaker", OrderRejectionReason::InvalidPartyIdForInvestmentDecisionMaker },
     { "InvalidPartyRoleQualifierForPartyId", OrderRejectionReason::InvalidPartyRoleQualifierForPartyId },
+    { "UnknownInstrument", OrderRejectionReason::UnknownInstrument },
+    { "InstrumentClosed", OrderRejectionReason::InstrumentClosed },
     { "InvalidBidAskSpread", OrderRejectionReason::InvalidBidAskSpread },
+    { "BuyOrderNotAllowed", OrderRejectionReason::BuyOrderNotAllowed },
+    { "OnlyOneSellOrderIsAllowedForIpo", OrderRejectionReason::OnlyOneSellOrderIsAllowedForIpo },
     { "RequestNotAllowedForBlockInstrument", OrderRejectionReason::RequestNotAllowedForBlockInstrument },
     { "RequestNotAllowedForCrossInstrument", OrderRejectionReason::RequestNotAllowedForCrossInstrument },
     { "RiskLimitNotDefined", OrderRejectionReason::RiskLimitNotDefined },
@@ -1229,13 +609,16 @@ static const std::map<OrderRejectionReason, std::string> OrderRejectionReason2Na
     { OrderRejectionReason::OrderPriceMustBeNonzero, "OrderPriceMustBeNonzero" },
     { OrderRejectionReason::OrderValueMustBeGreaterThanMinimumValue, "OrderValueMustBeGreaterThanMinimumValue" },
     { OrderRejectionReason::OrderValueMustBeLowerThanMaximumValue, "OrderValueMustBeLowerThanMaximumValue" },
-    { OrderRejectionReason::MarketOrderNotAllowedInAuction, "MarketOrderNotAllowedInAuction" },
+    { OrderRejectionReason::InvalidOrdTypeForSelectedMarketModel, "InvalidOrdTypeForSelectedMarketModel" },
     { OrderRejectionReason::LeavesQuantityMustBeGreaterThanZeroAfterModification, "LeavesQuantityMustBeGreaterThanZeroAfterModification" },
     { OrderRejectionReason::PriceNotAllowed, "PriceNotAllowed" },
-    { OrderRejectionReason::InvalidMarketOrderTimeInForce, "InvalidMarketOrderTimeInForce" },
-    { OrderRejectionReason::InvalidAuctionTimeInForce, "InvalidAuctionTimeInForce" },
-    { OrderRejectionReason::InvalidIcebergAndStopOrderTimeInForce, "InvalidIcebergAndStopOrderTimeInForce" },
+    { OrderRejectionReason::InvalidTimeInForceForOrderType, "InvalidTimeInForceForOrderType" },
+    { OrderRejectionReason::InvalidTimeInForceForCurrentMarketPhase, "InvalidTimeInForceForCurrentMarketPhase" },
+    { OrderRejectionReason::InvalidTimeInForceForSelectedMarketModel, "InvalidTimeInForceForSelectedMarketModel" },
+    { OrderRejectionReason::ExpireTimeCannotBeModified, "ExpireTimeCannotBeModified" },
+    { OrderRejectionReason::ObsoleteExpireDate, "ObsoleteExpireDate" },
     { OrderRejectionReason::ExpireDateInPast, "ExpireDateInPast" },
+    { OrderRejectionReason::ObsoleteExpireTime, "ObsoleteExpireTime" },
     { OrderRejectionReason::ExpireTimeInPast, "ExpireTimeInPast" },
     { OrderRejectionReason::AmbigousExpire, "AmbigousExpire" },
     { OrderRejectionReason::ExpireDateExceedsLimit, "ExpireDateExceedsLimit" },
@@ -1247,11 +630,16 @@ static const std::map<OrderRejectionReason, std::string> OrderRejectionReason2Na
     { OrderRejectionReason::TriggerPriceLowerThanPrice, "TriggerPriceLowerThanPrice" },
     { OrderRejectionReason::TriggerPriceHigherThanPrice, "TriggerPriceHigherThanPrice" },
     { OrderRejectionReason::TriggerPriceModifiedForActivatedOrder, "TriggerPriceModifiedForActivatedOrder" },
+    { OrderRejectionReason::TriggerPriceMustBeGreaterThanZero, "TriggerPriceMustBeGreaterThanZero" },
     { OrderRejectionReason::InvalidPartyIdForClientId, "InvalidPartyIdForClientId" },
     { OrderRejectionReason::InvalidPartyIdForExecutingTrader, "InvalidPartyIdForExecutingTrader" },
     { OrderRejectionReason::InvalidPartyIdForInvestmentDecisionMaker, "InvalidPartyIdForInvestmentDecisionMaker" },
     { OrderRejectionReason::InvalidPartyRoleQualifierForPartyId, "InvalidPartyRoleQualifierForPartyId" },
+    { OrderRejectionReason::UnknownInstrument, "UnknownInstrument" },
+    { OrderRejectionReason::InstrumentClosed, "InstrumentClosed" },
     { OrderRejectionReason::InvalidBidAskSpread, "InvalidBidAskSpread" },
+    { OrderRejectionReason::BuyOrderNotAllowed, "BuyOrderNotAllowed" },
+    { OrderRejectionReason::OnlyOneSellOrderIsAllowedForIpo, "OnlyOneSellOrderIsAllowedForIpo" },
     { OrderRejectionReason::RequestNotAllowedForBlockInstrument, "RequestNotAllowedForBlockInstrument" },
     { OrderRejectionReason::RequestNotAllowedForCrossInstrument, "RequestNotAllowedForCrossInstrument" },
     { OrderRejectionReason::RiskLimitNotDefined, "RiskLimitNotDefined" },
@@ -1272,7 +660,8 @@ enum class OrderSource: uint8_t {
     OrderBookRebuild = 8,
     Activated = 9,
     Stp = 10,
-    CorporateAction = 11
+    CorporateAction = 11,
+    MassCancel = 12
 };
 
 static const std::map<std::string, OrderSource> Name2OrderSource {
@@ -1286,7 +675,8 @@ static const std::map<std::string, OrderSource> Name2OrderSource {
     { "OrderBookRebuild", OrderSource::OrderBookRebuild },
     { "Activated", OrderSource::Activated },
     { "Stp", OrderSource::Stp },
-    { "CorporateAction", OrderSource::CorporateAction }
+    { "CorporateAction", OrderSource::CorporateAction },
+    { "MassCancel", OrderSource::MassCancel }
 };
 
 static const std::map<OrderSource, std::string> OrderSource2Name {
@@ -1300,7 +690,8 @@ static const std::map<OrderSource, std::string> OrderSource2Name {
     { OrderSource::OrderBookRebuild, "OrderBookRebuild" },
     { OrderSource::Activated, "Activated" },
     { OrderSource::Stp, "Stp" },
-    { OrderSource::CorporateAction, "CorporateAction" }
+    { OrderSource::CorporateAction, "CorporateAction" },
+    { OrderSource::MassCancel, "MassCancel" }
 };
 
 
@@ -1338,6 +729,7 @@ struct OrderModify {
     Price triggerPrice;
     Quantity quantity;
     Quantity displayQty;
+    Timestamp expire;
 
     friend std::ostream &operator << (std::ostream &, const OrderModify &);
 };
@@ -1555,6 +947,7 @@ static const std::map<AlgorithmicTradeIndicator, std::string> AlgorithmicTradeIn
 enum class ExecType: uint8_t {
     New = 1,
     Rejected = 8,
+    Expired = 12,
     Trade = 15,
     TradeCorrect = 16,
     TradeCancel = 17
@@ -1563,6 +956,7 @@ enum class ExecType: uint8_t {
 static const std::map<std::string, ExecType> Name2ExecType {
     { "New", ExecType::New },
     { "Rejected", ExecType::Rejected },
+    { "Expired", ExecType::Expired },
     { "Trade", ExecType::Trade },
     { "TradeCorrect", ExecType::TradeCorrect },
     { "TradeCancel", ExecType::TradeCancel }
@@ -1571,6 +965,7 @@ static const std::map<std::string, ExecType> Name2ExecType {
 static const std::map<ExecType, std::string> ExecType2Name {
     { ExecType::New, "New" },
     { ExecType::Rejected, "Rejected" },
+    { ExecType::Expired, "Expired" },
     { ExecType::Trade, "Trade" },
     { ExecType::TradeCorrect, "TradeCorrect" },
     { ExecType::TradeCancel, "TradeCancel" }
@@ -2109,7 +1504,14 @@ struct Quote {
 
     friend std::ostream &operator << (std::ostream &, const Quote &);
 };
-using Quotes = Quote[30];
+using QuotesArray = Quote[30];
+
+struct Quotes {
+    uint8_t count;
+    QuotesArray items;
+
+    friend std::ostream &operator << (std::ostream &, const Quotes &);
+};
 
 struct MassQuote {
     Header header;
@@ -2122,7 +1524,6 @@ struct MassQuote {
     Memo memo;
     ClearingCode clearingMemberCode;
     ClearingIdentifier clearingMemberClearingIdentifier;
-    uint8_t count;
     Quotes quotes;
 
     friend std::ostream &operator << (std::ostream &, const MassQuote &);
@@ -2137,7 +1538,14 @@ struct QuoteOrderResponse {
 
     friend std::ostream &operator << (std::ostream &, const QuoteOrderResponse &);
 };
-using QuoteOrderResponses = QuoteOrderResponse[30];
+using QuoteOrderResponseArray = QuoteOrderResponse[30];
+
+struct QuoteOrderResponses {
+    uint8_t count;
+    QuoteOrderResponseArray items;
+
+    friend std::ostream &operator << (std::ostream &, const QuoteOrderResponses &);
+};
 
 enum class MassQuoteStatus: uint8_t {
     Accepted = 1,
@@ -2216,7 +1624,6 @@ static const std::map<MassQuoteRejectionReason, std::string> MassQuoteRejectionR
 struct MassQuoteResponse {
     Header header;
     OrderId massQuoteId;
-    uint8_t count;
     QuoteOrderResponses responses;
     MassQuoteStatus status;
     MassQuoteRejectionReason reason;
@@ -2248,14 +1655,127 @@ struct InitiateState {
     friend std::ostream &operator << (std::ostream &, const InitiateState &);
 };
 
+enum class InitiateStateResult: uint8_t {
+    Success = 1,
+    Failure = 2
+};
+
+static const std::map<std::string, InitiateStateResult> Name2InitiateStateResult {
+    { "Success", InitiateStateResult::Success },
+    { "Failure", InitiateStateResult::Failure }
+};
+
+static const std::map<InitiateStateResult, std::string> InitiateStateResult2Name {
+    { InitiateStateResult::Success, "Success" },
+    { InitiateStateResult::Failure, "Failure" }
+};
+
+
+struct InitiateStateResponse {
+    Header header;
+    InitiateStateResult result;
+
+    friend std::ostream &operator << (std::ostream &, const InitiateStateResponse &);
+};
+
 struct RequestForExecution {
     Header header;
     ElementId instrumentId;
-    OrderSide side;
-    Price price;
-    Quantity quantity;
 
     friend std::ostream &operator << (std::ostream &, const RequestForExecution &);
+};
+
+enum class MassCancelRequestType: uint8_t {
+    CancelForSecurity = 1,
+    CancelAllOrders = 7,
+    CancelOrdersForMarketSegment = 9
+};
+
+static const std::map<std::string, MassCancelRequestType> Name2MassCancelRequestType {
+    { "CancelForSecurity", MassCancelRequestType::CancelForSecurity },
+    { "CancelAllOrders", MassCancelRequestType::CancelAllOrders },
+    { "CancelOrdersForMarketSegment", MassCancelRequestType::CancelOrdersForMarketSegment }
+};
+
+static const std::map<MassCancelRequestType, std::string> MassCancelRequestType2Name {
+    { MassCancelRequestType::CancelForSecurity, "CancelForSecurity" },
+    { MassCancelRequestType::CancelAllOrders, "CancelAllOrders" },
+    { MassCancelRequestType::CancelOrdersForMarketSegment, "CancelOrdersForMarketSegment" }
+};
+
+
+enum class TargetPartyRole: uint8_t {
+    None = 0,
+    LiquidityProvider = 35,
+    SenderLocation = 54,
+    MarketMaker = 66,
+    ClientID = 3,
+    ExecutingTrader = 12,
+    InvestmentDecisionMaker = 122
+};
+
+static const std::map<std::string, TargetPartyRole> Name2TargetPartyRole {
+    { "None", TargetPartyRole::None },
+    { "LiquidityProvider", TargetPartyRole::LiquidityProvider },
+    { "SenderLocation", TargetPartyRole::SenderLocation },
+    { "MarketMaker", TargetPartyRole::MarketMaker },
+    { "ClientID", TargetPartyRole::ClientID },
+    { "ExecutingTrader", TargetPartyRole::ExecutingTrader },
+    { "InvestmentDecisionMaker", TargetPartyRole::InvestmentDecisionMaker }
+};
+
+static const std::map<TargetPartyRole, std::string> TargetPartyRole2Name {
+    { TargetPartyRole::None, "None" },
+    { TargetPartyRole::LiquidityProvider, "LiquidityProvider" },
+    { TargetPartyRole::SenderLocation, "SenderLocation" },
+    { TargetPartyRole::MarketMaker, "MarketMaker" },
+    { TargetPartyRole::ClientID, "ClientID" },
+    { TargetPartyRole::ExecutingTrader, "ExecutingTrader" },
+    { TargetPartyRole::InvestmentDecisionMaker, "InvestmentDecisionMaker" }
+};
+
+
+struct OrderMassCancel {
+    Header header;
+    MassCancelRequestType massCancelRequestType;
+    TargetPartyRole targetPartyRole;
+    uint32_t targetPartyId;
+    ElementId marketSegmentId;
+    ElementId instrumentId;
+
+    friend std::ostream &operator << (std::ostream &, const OrderMassCancel &);
+};
+
+enum class MassCancelRejectionReason: uint16_t {
+    NA = 101,
+    UnknownInstrumentId = 100,
+    UnknownMarketSegmentId = 1016
+};
+
+static const std::map<std::string, MassCancelRejectionReason> Name2MassCancelRejectionReason {
+    { "NA", MassCancelRejectionReason::NA },
+    { "UnknownInstrumentId", MassCancelRejectionReason::UnknownInstrumentId },
+    { "UnknownMarketSegmentId", MassCancelRejectionReason::UnknownMarketSegmentId }
+};
+
+static const std::map<MassCancelRejectionReason, std::string> MassCancelRejectionReason2Name {
+    { MassCancelRejectionReason::NA, "NA" },
+    { MassCancelRejectionReason::UnknownInstrumentId, "UnknownInstrumentId" },
+    { MassCancelRejectionReason::UnknownMarketSegmentId, "UnknownMarketSegmentId" }
+};
+
+
+struct OrderMassCancelResponse {
+    Header header;
+    uint64_t totalAffectedOrders;
+    MassCancelRequestType massCancelRequestType;
+    OrderId massCancelId;
+    TargetPartyRole targetPartyRole;
+    uint32_t targetPartyId;
+    ElementId marketSegmentId;
+    MassCancelRejectionReason reason;
+
+    friend std::ostream &operator << (std::ostream &, const OrderMassCancelResponse &);
 };
 using ScenarioName = AnsiChar[200];
 
@@ -2312,7 +1832,10 @@ union Message {
     MassQuote uMassQuote;
     MassQuoteResponse uMassQuoteResponse;
     InitiateState uInitiateState;
+    InitiateStateResponse uInitiateStateResponse;
     RequestForExecution uRequestForExecution;
+    OrderMassCancel uOrderMassCancel;
+    OrderMassCancelResponse uOrderMassCancelResponse;
     TestEvent uTestEvent;
 };
   
