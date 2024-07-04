@@ -46,6 +46,7 @@ const tradingPortTypes = {
       'TradeCaptureReportSingle': ['Default'],
       'TradeCaptureReportDual': ['Default'],
       'TcrParty': ['Default'],
+      'ExecInst': ['Default']
     },
     meta: {
       'OrderId': {

@@ -43,7 +43,7 @@ int main() {
     trading_port.handle([&](btp::messages::OrderAddResponse message) {
 
         if (message.orderId == order_id) {
-            if (message.status != btp::messages::OrderStatus::Ack && 
+            if (message.status != btp::messages::OrderStatus::New &&
                 message.status != btp::messages::OrderStatus::Filled) {
                 test_result = EXIT_FAILURE;
                 trading_port.logout();

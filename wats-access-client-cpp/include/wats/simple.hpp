@@ -26,22 +26,73 @@ inline btp::messages::OrderAdd simple_order_add(
         .mifidFields = {
             .flags = btp::messages::MifidFlags::None,
             .client = {
-                .shortCode = 12345678,
-                .qualifier = btp::messages::PartyRoleQualifier::FirmOrLegalEntity,
+                .shortCode = 1,
+                .qualifier = btp::messages::PartyRoleQualifier::NA,
             },
             .executingTrader = {
-                .shortCode = 12345678,
+                .shortCode = 4,
                 .qualifier = btp::messages::PartyRoleQualifier::Algorithm,
             },
             .investmentDecisionMaker = {
-                .shortCode = 12345678,
+                .shortCode = 17,
                 .qualifier = btp::messages::PartyRoleQualifier::NaturalPerson,
             }
         },
-        .memo = { 0 },
-        .clearingMemberCode = { 0 },
+        .memo = "",
+        .clearingMemberCode = "",
         .clearingMemberClearingIdentifier =
-            btp::messages::ClearingIdentifier::NotApplicable
+            btp::messages::ClearingIdentifier::NotApplicable,
+        .execInst = btp::messages::ExecInst::CancelOnConnectionLoss
+    };
+}
+
+inline btp::messages::OrderModify simple_order_modify(
+    btp::messages::OrderId order_id,
+    btp::messages::Price price,
+    btp::messages::Quantity quantity) {
+
+    return btp::messages::OrderModify {
+        .orderId = order_id,
+        .price = price,
+        .quantity = quantity,
+        .mifidFields = {
+            .flags = btp::messages::MifidFlags::None,
+            .client = {
+                .shortCode = 1,
+                .qualifier = btp::messages::PartyRoleQualifier::NA,
+            },
+            .executingTrader = {
+                .shortCode = 4,
+                .qualifier = btp::messages::PartyRoleQualifier::Algorithm,
+            },
+            .investmentDecisionMaker = {
+                .shortCode = 17,
+                .qualifier = btp::messages::PartyRoleQualifier::NaturalPerson,
+            }
+        }
+    };
+}
+
+inline btp::messages::OrderCancel simple_order_cancel(
+    btp::messages::OrderId order_id) {
+
+    return btp::messages::OrderCancel {
+        .orderId = order_id,
+        .mifidFields = {
+            .flags = btp::messages::MifidFlags::None,
+            .client = {
+                .shortCode = 1,
+                .qualifier = btp::messages::PartyRoleQualifier::NA,
+            },
+            .executingTrader = {
+                .shortCode = 4,
+                .qualifier = btp::messages::PartyRoleQualifier::Algorithm,
+            },
+            .investmentDecisionMaker = {
+                .shortCode = 17,
+                .qualifier = btp::messages::PartyRoleQualifier::NaturalPerson,
+            }
+        }
     };
 }
 
@@ -64,12 +115,11 @@ inline btp::messages::TradeCaptureReportDual simple_trade_capture_report_dual(
         .tradeReportTransType = btp::messages::TradeReportTransType::New,
         .tradeReportType = btp::messages::TradeReportType::Submit,
         .tradeType = btp::messages::TradeType::BlockTrade,
-        .algorithmicTradeIndicator = btp::messages::AlgorithmicTradeIndicator::NonAlgorithmicTrade,
+        .algorithmicTradeIndicator = btp::messages::AlgorithmicTradeIndicator::NA,
         .execType = exec_type,
         .lastQty = last_qty,
         .lastPx = last_px,
         .settlementDate = settlement_date,
-        .matchStatus = btp::messages::MatchStatus::NA,
         .tcrPartyBuy = {
             .mifidFields = {
                 .flags = btp::messages::MifidFlags::None,
@@ -86,6 +136,8 @@ inline btp::messages::TradeCaptureReportDual simple_trade_capture_report_dual(
                     .qualifier = btp::messages::PartyRoleQualifier::NaturalPerson,
                 }
             },
+            .clearingMemberCode = "",
+            .clearingMemberClearingIdentifier = btp::messages::ClearingIdentifier::NotApplicable,
             .account = "",
             .accountType = btp::messages::AccountType::Customer,
             .orderCapacity = btp::messages::Capacity::Agency,
@@ -109,6 +161,8 @@ inline btp::messages::TradeCaptureReportDual simple_trade_capture_report_dual(
                     .qualifier = btp::messages::PartyRoleQualifier::NaturalPerson,
                 }
             },
+            .clearingMemberCode = "",
+            .clearingMemberClearingIdentifier = btp::messages::ClearingIdentifier::NotApplicable,
             .account = "",
             .accountType = btp::messages::AccountType::Customer,
             .orderCapacity = btp::messages::Capacity::Agency,

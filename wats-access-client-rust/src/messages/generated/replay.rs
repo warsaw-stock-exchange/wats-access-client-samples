@@ -12,6 +12,10 @@ use crate::messages::bytes_validator::BytesValidator;
 pub type SeqNum = u32;
 
 
+/// ID of the md stream.
+pub type StreamId = u8;
+
+
 /// Length of the message.
 pub type MsgLength = u16;
 
@@ -47,12 +51,14 @@ pub struct ReplayRequest {
   pub seq_num: SeqNum,
   /// Final sequence number for the requested range.
   pub end_seq_num: SeqNum,
+  /// ID of the md stream.
+  pub stream_id: StreamId,
 }
 impl BytesValidator for ReplayRequest {
     #[inline]
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      ReplayHeader::is_valid(bytes.get_unchecked(memoffset::span_of!(ReplayRequest, header))) && SeqNum::is_valid(bytes.get_unchecked(memoffset::span_of!(ReplayRequest, seq_num))) && SeqNum::is_valid(bytes.get_unchecked(memoffset::span_of!(ReplayRequest, end_seq_num)))
+      ReplayHeader::is_valid(bytes.get_unchecked(memoffset::span_of!(ReplayRequest, header))) && SeqNum::is_valid(bytes.get_unchecked(memoffset::span_of!(ReplayRequest, seq_num))) && SeqNum::is_valid(bytes.get_unchecked(memoffset::span_of!(ReplayRequest, end_seq_num))) && StreamId::is_valid(bytes.get_unchecked(memoffset::span_of!(ReplayRequest, stream_id)))
     }
   }
 

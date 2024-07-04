@@ -31,6 +31,9 @@ pub type MsgVersion = u16;
 /// ID of the session. Must fit into 14 bits, see OrderId for details.
 pub type SessionId = u16;
 
+/// ID of the md stream.
+pub type StreamId = u8;
+
 /// Order count (number of orders).
 pub type OrderCount = u16;
 
@@ -161,36 +164,20 @@ impl ProductIdentification {
 crate::char_array!(30, ProductIdentification);
 
 
-/// A text message.
+/// Type for long, 64-character long description for market structure messages.
 #[derive(Clone, Copy)]
-pub struct TextMessage(pub(crate) [AnsiChar; 50]);
-impl TextMessage {
-  pub fn new(v: [AnsiChar; 50]) -> Self {
-    Self(v)
-  }
-}
-impl TextMessage {
-  pub fn as_inner(&self) -> [AnsiChar; 50] {
-    self.0
-  }
-}
-crate::char_array!(50, TextMessage);
-
-
-/// Type for long, 64-character long code for market structure messages.
-#[derive(Clone, Copy)]
-pub struct InstrumentCode(pub(crate) [AnsiChar; 64]);
-impl InstrumentCode {
+pub struct InstrumentDescription(pub(crate) [AnsiChar; 64]);
+impl InstrumentDescription {
   pub fn new(v: [AnsiChar; 64]) -> Self {
     Self(v)
   }
 }
-impl InstrumentCode {
+impl InstrumentDescription {
   pub fn as_inner(&self) -> [AnsiChar; 64] {
     self.0
   }
 }
-crate::char_array!(64, InstrumentCode);
+crate::char_array!(64, InstrumentDescription);
 
 
 /// Change to an index expressed in percent.
@@ -403,7 +390,7 @@ impl std::convert::TryFrom<u8> for CouponType {
   }
 }
 
-/// Currency - ISO 4217 (2022/04/01) code (e.g. PLN)
+/// Currency - ISO 4217 code (e.g. PLN)
 #[repr(u16)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum Currency {
@@ -679,7 +666,7 @@ pub enum Currency {
   GHS = 0x03a8,
   /// Sudanese Pound
   SDG = 0x03aa,
-  /// [object Object]
+  /// Uruguay Peso en Unidades Indexadas (URUIURUI)
   UYI = 0x03ac,
   /// Serbian Dinar
   RSD = 0x03ad,
@@ -689,9 +676,9 @@ pub enum Currency {
   AZN = 0x03b0,
   /// Romanian Leu
   RON = 0x03b2,
-  /// [object Object]
+  /// WIR Euro
   CHE = 0x03b3,
-  /// [object Object]
+  /// WIR Franc
   CHW = 0x03b4,
   /// Turkish Lira
   TRY = 0x03b5,
@@ -731,7 +718,7 @@ pub enum Currency {
   SRD = 0x03c8,
   /// Malagasy Ariary
   MGA = 0x03c9,
-  /// [object Object]
+  /// Unidad de Valor Real
   COU = 0x03ca,
   /// Afghani
   AFN = 0x03cb,
@@ -747,23 +734,23 @@ pub enum Currency {
   BAM = 0x03d1,
   /// Euro
   EUR = 0x03d2,
-  /// [object Object]
+  /// Unidad de inversion (UDI)
   MXV = 0x03d3,
   /// Hryvnia
   UAH = 0x03d4,
   /// Lari
   GEL = 0x03d5,
-  /// [object Object]
+  /// Mvdol
   BOV = 0x03d8,
   /// Zloty
   PLN = 0x03d9,
   /// Brazilian Real
   BRL = 0x03da,
-  /// [object Object]
+  /// Unidad de Fomento
   CLF = 0x03de,
   /// Sucre
   XSU = 0x03e2,
-  /// [object Object]
+  /// US Dollar (next day)
   USN = 0x03e5,
   /// The codes assigned for transactions where no currency is involved
   XXX = 0x03e7,
@@ -1016,6 +1003,8 @@ impl std::convert::TryFrom<u8> for OrderSide {
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum PriceExpressionType {
+  /// Not applicable.
+  NotApplicable = 0x0003,
   /// Price expressed as absolute value.
   Price = 0x0001,
   /// Price expressed as percentage.
@@ -1023,13 +1012,14 @@ pub enum PriceExpressionType {
 }
 impl Default for PriceExpressionType {
   fn default() -> Self {
-    Self::Price
+    Self::NotApplicable
   }
 }
 impl std::convert::TryFrom<u8> for PriceExpressionType {
   type Error = InvalidVariant;
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
+      0x0003 => Ok(Self::NotApplicable),
       0x0001 => Ok(Self::Price),
       0x0002 => Ok(Self::Percentage),
       other => Err(InvalidVariant::new(other as u32, "PriceExpressionType")),
@@ -1088,34 +1078,218 @@ impl std::convert::TryFrom<u8> for ProductIdentificationType {
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum ProductType {
   /// Equity
-  FinancialProductShare = 0x0001,
+  Equity = 0x0001,
   /// Fixed income
-  FinancialProductBond = 0x0002,
-  /// Futures
-  FinancialProductDerivativeFutures = 0x0003,
-  /// Options
-  FinancialProductDerivativeOptions = 0x0004,
+  FixedIncome = 0x0002,
+  /// Derivative Futures
+  DerivativeFutures = 0x0003,
+  /// Derivative Options
+  DerivativeOptions = 0x0004,
   /// Index
-  FinancialProductIndex = 0x0005,
+  Index = 0x0005,
   /// Currency
-  FinancialProductCurrency = 0x0006,
+  Currency = 0x0006,
+  /// Structured Product
+  StructuredProduct = 0x0007,
 }
 impl Default for ProductType {
   fn default() -> Self {
-    Self::FinancialProductShare
+    Self::Equity
   }
 }
 impl std::convert::TryFrom<u8> for ProductType {
   type Error = InvalidVariant;
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
-      0x0001 => Ok(Self::FinancialProductShare),
-      0x0002 => Ok(Self::FinancialProductBond),
-      0x0003 => Ok(Self::FinancialProductDerivativeFutures),
-      0x0004 => Ok(Self::FinancialProductDerivativeOptions),
-      0x0005 => Ok(Self::FinancialProductIndex),
-      0x0006 => Ok(Self::FinancialProductCurrency),
+      0x0001 => Ok(Self::Equity),
+      0x0002 => Ok(Self::FixedIncome),
+      0x0003 => Ok(Self::DerivativeFutures),
+      0x0004 => Ok(Self::DerivativeOptions),
+      0x0005 => Ok(Self::Index),
+      0x0006 => Ok(Self::Currency),
+      0x0007 => Ok(Self::StructuredProduct),
       other => Err(InvalidVariant::new(other as u32, "ProductType")),
+    }
+  }
+}
+
+/// Product Subtype.
+#[repr(u8)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum ProductSubtype {
+  /// Share
+  Share = 0x0001,
+  /// Allotment Right
+  AllotmentRight = 0x0002,
+  /// Subscription Right
+  SubscriptionRight = 0x0003,
+  /// Tender Offer
+  TenderOffer = 0x0004,
+  /// Issue Right
+  IssueRight = 0x0005,
+  /// Subscription Warrant
+  SubscriptionWarrant = 0x0006,
+  /// Bank Securities
+  BankSecurities = 0x0007,
+  /// Bond
+  Bond = 0x0008,
+  /// Treasury Bond
+  TreasuryBond = 0x0009,
+  /// Bond issued by a government institution
+  IssuedBond = 0x000a,
+  /// Municipal Bond
+  MunicipalBond = 0x000b,
+  /// Corporate Bond - bank
+  CorporateBankBond = 0x000c,
+  /// Corporate Bond - firm
+  CorporateFirmBond = 0x000d,
+  /// Convertible Bond
+  ConvertibleBond = 0x000e,
+  /// Mortgage Bond
+  MortgageBond = 0x000f,
+  /// Mortgage Backed Bond
+  MortgageBackedBond = 0x0010,
+  /// Public Mortgage Bond
+  PublicMortgageBond = 0x0011,
+  /// Bill
+  Bill = 0x0012,
+  /// Treasury Bill
+  TreasuryBill = 0x0013,
+  /// Commercial Bill
+  CommercialBill = 0x0014,
+  /// ETF - Exchange Traded Fund
+  ExchangeTradedFund = 0x0015,
+  /// ETN - Exchange Traded Note
+  ExchangeTradedNote = 0x0016,
+  /// ETC - Exchange Traded Commodity
+  ExchangeTradedCommodity = 0x0017,
+  /// Investment Certificate
+  InvestmentCertificate = 0x0018,
+  /// Index Futures
+  IndexFutures = 0x0019,
+  /// Stock Futures
+  StockFutures = 0x001a,
+  /// Currency Futures
+  CurrencyFutures = 0x001b,
+  /// Bond Futures
+  BondFutures = 0x001c,
+  /// Interest Rate Futures
+  InterestRateFutures = 0x001d,
+  /// Index Options
+  IndexOptions = 0x001e,
+  /// Stock Options
+  StockOptions = 0x001f,
+  /// Option warrants
+  OptionWarrants = 0x0020,
+  /// Factor certificates
+  FactorCertificates = 0x0021,
+  /// Turbo certificates
+  TurboCertificates = 0x0022,
+  /// Capital protection certificates
+  CapitalProtectionCertificates = 0x0023,
+  /// Bonus certificates
+  BonusCertificates = 0x0024,
+  /// Reverse convertible certificates
+  ReverseConvertibleCertificates = 0x0025,
+  /// Express certificates
+  ExpressCertificates = 0x0026,
+  /// Discount certificates
+  DiscountCertificates = 0x0027,
+  /// Index/tracker certificates
+  IndexTrackerCertificates = 0x0028,
+  /// Other investment certificates (non leveraged)
+  OtherInvestmentCertificates = 0x0029,
+  /// Structured notes
+  StructuredNotes = 0x002a,
+  /// Reference rate
+  ReferenceRate = 0x002b,
+  /// Interest rate
+  InterestRate = 0x002c,
+  /// Exchange rate
+  ExchangeRate = 0x002d,
+  /// Price index
+  PriceIndex = 0x002e,
+  /// Total return index
+  TotalReturnIndex = 0x002f,
+  /// Sector price index
+  SectorPriceIndex = 0x0030,
+  /// Sector total return index
+  SectorTotalReturnIndex = 0x0031,
+  /// Dividend index
+  DividendIndex = 0x0032,
+  /// Strategy price index
+  StrategyPriceIndex = 0x0033,
+  /// Strategy total return index
+  StrategyTotalReturnIndex = 0x0034,
+  /// Commodity index
+  CommodityIndex = 0x0035,
+  /// Bond total return index
+  BondTotalReturnIndex = 0x0036,
+}
+impl Default for ProductSubtype {
+  fn default() -> Self {
+    Self::Share
+  }
+}
+impl std::convert::TryFrom<u8> for ProductSubtype {
+  type Error = InvalidVariant;
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      0x0001 => Ok(Self::Share),
+      0x0002 => Ok(Self::AllotmentRight),
+      0x0003 => Ok(Self::SubscriptionRight),
+      0x0004 => Ok(Self::TenderOffer),
+      0x0005 => Ok(Self::IssueRight),
+      0x0006 => Ok(Self::SubscriptionWarrant),
+      0x0007 => Ok(Self::BankSecurities),
+      0x0008 => Ok(Self::Bond),
+      0x0009 => Ok(Self::TreasuryBond),
+      0x000a => Ok(Self::IssuedBond),
+      0x000b => Ok(Self::MunicipalBond),
+      0x000c => Ok(Self::CorporateBankBond),
+      0x000d => Ok(Self::CorporateFirmBond),
+      0x000e => Ok(Self::ConvertibleBond),
+      0x000f => Ok(Self::MortgageBond),
+      0x0010 => Ok(Self::MortgageBackedBond),
+      0x0011 => Ok(Self::PublicMortgageBond),
+      0x0012 => Ok(Self::Bill),
+      0x0013 => Ok(Self::TreasuryBill),
+      0x0014 => Ok(Self::CommercialBill),
+      0x0015 => Ok(Self::ExchangeTradedFund),
+      0x0016 => Ok(Self::ExchangeTradedNote),
+      0x0017 => Ok(Self::ExchangeTradedCommodity),
+      0x0018 => Ok(Self::InvestmentCertificate),
+      0x0019 => Ok(Self::IndexFutures),
+      0x001a => Ok(Self::StockFutures),
+      0x001b => Ok(Self::CurrencyFutures),
+      0x001c => Ok(Self::BondFutures),
+      0x001d => Ok(Self::InterestRateFutures),
+      0x001e => Ok(Self::IndexOptions),
+      0x001f => Ok(Self::StockOptions),
+      0x0020 => Ok(Self::OptionWarrants),
+      0x0021 => Ok(Self::FactorCertificates),
+      0x0022 => Ok(Self::TurboCertificates),
+      0x0023 => Ok(Self::CapitalProtectionCertificates),
+      0x0024 => Ok(Self::BonusCertificates),
+      0x0025 => Ok(Self::ReverseConvertibleCertificates),
+      0x0026 => Ok(Self::ExpressCertificates),
+      0x0027 => Ok(Self::DiscountCertificates),
+      0x0028 => Ok(Self::IndexTrackerCertificates),
+      0x0029 => Ok(Self::OtherInvestmentCertificates),
+      0x002a => Ok(Self::StructuredNotes),
+      0x002b => Ok(Self::ReferenceRate),
+      0x002c => Ok(Self::InterestRate),
+      0x002d => Ok(Self::ExchangeRate),
+      0x002e => Ok(Self::PriceIndex),
+      0x002f => Ok(Self::TotalReturnIndex),
+      0x0030 => Ok(Self::SectorPriceIndex),
+      0x0031 => Ok(Self::SectorTotalReturnIndex),
+      0x0032 => Ok(Self::DividendIndex),
+      0x0033 => Ok(Self::StrategyPriceIndex),
+      0x0034 => Ok(Self::StrategyTotalReturnIndex),
+      0x0035 => Ok(Self::CommodityIndex),
+      0x0036 => Ok(Self::BondTotalReturnIndex),
+      other => Err(InvalidVariant::new(other as u32, "ProductSubtype")),
     }
   }
 }
@@ -1360,31 +1534,34 @@ impl std::convert::TryFrom<u8> for IndexType {
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum ClosingPriceType {
-  /// 0 = LTP
-  LTP = 0x0001,
-  /// 1 = Last ACP
-  LastACP = 0x0002,
-  /// 2 = Fair Value
-  FairValue = 0x0003,
-  /// 3 = Daily Settlement Price
-  DailySettlementPrice = 0x0004,
-  /// 4 = Final Settlement Price
-  FinalSettlementPrice = 0x0005,
+  /// Initial price of the instrument
+  InitialPrice = 0x0001,
+  /// Last traded price
+  LTP = 0x0002,
+  /// Last adjusted closing price
+  LastACP = 0x0003,
+  /// Fair value
+  FairValue = 0x0004,
+  /// Daily Settlement Price
+  DailySettlementPrice = 0x0005,
+  /// Final Settlement Price
+  FinalSettlementPrice = 0x0006,
 }
 impl Default for ClosingPriceType {
   fn default() -> Self {
-    Self::LTP
+    Self::InitialPrice
   }
 }
 impl std::convert::TryFrom<u8> for ClosingPriceType {
   type Error = InvalidVariant;
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
-      0x0001 => Ok(Self::LTP),
-      0x0002 => Ok(Self::LastACP),
-      0x0003 => Ok(Self::FairValue),
-      0x0004 => Ok(Self::DailySettlementPrice),
-      0x0005 => Ok(Self::FinalSettlementPrice),
+      0x0001 => Ok(Self::InitialPrice),
+      0x0002 => Ok(Self::LTP),
+      0x0003 => Ok(Self::LastACP),
+      0x0004 => Ok(Self::FairValue),
+      0x0005 => Ok(Self::DailySettlementPrice),
+      0x0006 => Ok(Self::FinalSettlementPrice),
       other => Err(InvalidVariant::new(other as u32, "ClosingPriceType")),
     }
   }
@@ -1394,37 +1571,40 @@ impl std::convert::TryFrom<u8> for ClosingPriceType {
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum AdjustedClosingPriceReason {
-  /// 0 = Regular
-  Regular = 0x0001,
-  /// 1 = Dividend
-  Dividend = 0x0002,
-  /// 2 = Issue Right
-  IssueRight = 0x0003,
-  /// 3 = Split
-  Split = 0x0004,
-  /// 4 = Reverse Split
-  ReverseSplit = 0x0005,
-  /// 5 = Bonus
-  Bonus = 0x0006,
-  /// 6 = Spin-Off
-  SpinOff = 0x0007,
+  /// Not applicable.
+  NotApplicable = 0x0001,
+  /// Regular
+  Regular = 0x0002,
+  /// Dividend
+  Dividend = 0x0003,
+  /// Issue Right
+  IssueRight = 0x0004,
+  /// Split
+  Split = 0x0005,
+  /// Reverse Split
+  ReverseSplit = 0x0006,
+  /// Bonus
+  Bonus = 0x0007,
+  /// Spin-Off
+  SpinOff = 0x0008,
 }
 impl Default for AdjustedClosingPriceReason {
   fn default() -> Self {
-    Self::Regular
+    Self::NotApplicable
   }
 }
 impl std::convert::TryFrom<u8> for AdjustedClosingPriceReason {
   type Error = InvalidVariant;
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
-      0x0001 => Ok(Self::Regular),
-      0x0002 => Ok(Self::Dividend),
-      0x0003 => Ok(Self::IssueRight),
-      0x0004 => Ok(Self::Split),
-      0x0005 => Ok(Self::ReverseSplit),
-      0x0006 => Ok(Self::Bonus),
-      0x0007 => Ok(Self::SpinOff),
+      0x0001 => Ok(Self::NotApplicable),
+      0x0002 => Ok(Self::Regular),
+      0x0003 => Ok(Self::Dividend),
+      0x0004 => Ok(Self::IssueRight),
+      0x0005 => Ok(Self::Split),
+      0x0006 => Ok(Self::ReverseSplit),
+      0x0007 => Ok(Self::Bonus),
+      0x0008 => Ok(Self::SpinOff),
       other => Err(InvalidVariant::new(other as u32, "AdjustedClosingPriceReason")),
     }
   }
@@ -1470,7 +1650,7 @@ impl std::convert::TryFrom<u8> for Market {
   }
 }
 
-/// Defines a vaule change indicator (e.g. market price).
+/// Defines a value change indicator (e.g. market price).
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum ChangeIndicator {
@@ -1532,7 +1712,7 @@ impl std::convert::TryFrom<u8> for QuotationSystem {
 /// Dictionary with option exercise styles
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
-pub enum ExcerciseType {
+pub enum ExerciseType {
   /// AMER
   AMER = 0x0001,
   /// EURO
@@ -1540,19 +1720,19 @@ pub enum ExcerciseType {
   /// Not applicable
   NA = 0x0003,
 }
-impl Default for ExcerciseType {
+impl Default for ExerciseType {
   fn default() -> Self {
     Self::AMER
   }
 }
-impl std::convert::TryFrom<u8> for ExcerciseType {
+impl std::convert::TryFrom<u8> for ExerciseType {
   type Error = InvalidVariant;
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
       0x0001 => Ok(Self::AMER),
       0x0002 => Ok(Self::EURO),
       0x0003 => Ok(Self::NA),
-      other => Err(InvalidVariant::new(other as u32, "ExcerciseType")),
+      other => Err(InvalidVariant::new(other as u32, "ExerciseType")),
     }
   }
 }
@@ -1561,97 +1741,763 @@ impl std::convert::TryFrom<u8> for ExcerciseType {
 #[repr(u16)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum Country {
+  /// Afghanistan
+  AFG = 0x0004,
+  /// Albania
+  ALB = 0x0008,
+  /// Antarctica
+  ATA = 0x000a,
+  /// Algeria
+  DZA = 0x000c,
+  /// American Samoa
+  ASM = 0x0010,
+  /// Andorra
+  AND = 0x0014,
+  /// Angola
+  AGO = 0x0018,
+  /// Antigua and Barbuda
+  ATG = 0x001c,
+  /// Azerbaijan
+  AZE = 0x001f,
+  /// Argentina
+  ARG = 0x0020,
   /// Australia
   AUS = 0x0024,
   /// Austria
   AUT = 0x0028,
+  /// Bahamas
+  BHS = 0x002c,
+  /// Bahrain
+  BHR = 0x0030,
+  /// Bangladesh
+  BGD = 0x0032,
+  /// Armenia
+  ARM = 0x0033,
+  /// Barbados
+  BRB = 0x0034,
   /// Belgium
   BEL = 0x0038,
+  /// Bermuda
+  BMU = 0x003c,
+  /// Bhutan
+  BTN = 0x0040,
+  /// Bolivia
+  BOL = 0x0044,
+  /// Bosnia and Herzegovina
+  BIH = 0x0046,
+  /// Botswana
+  BWA = 0x0048,
+  /// Bouvet Island
+  BVT = 0x004a,
+  /// Brazil
+  BRA = 0x004c,
+  /// Belize
+  BLZ = 0x0054,
+  /// British Indian Ocean Territory
+  IOT = 0x0056,
+  /// Solomon Islands
+  SLB = 0x005a,
+  /// Virgin Islands (British)
+  VGB = 0x005c,
+  /// Brunei Darussalam
+  BRN = 0x0060,
   /// Bulgaria
   BGR = 0x0064,
+  /// Myanmar
+  MMR = 0x0068,
+  /// Burundi
+  BDI = 0x006c,
+  /// Belarus
+  BLR = 0x0070,
+  /// Cambodia
+  KHM = 0x0074,
+  /// Cameroon
+  CMR = 0x0078,
   /// Canada
   CAN = 0x007c,
+  /// Cabo Verde
+  CPV = 0x0084,
+  /// Cayman Islands
+  CYM = 0x0088,
+  /// Central African Republic
+  CAF = 0x008c,
+  /// Sri Lanka
+  LKA = 0x0090,
+  /// Chad
+  TCD = 0x0094,
+  /// Chile
+  CHL = 0x0098,
+  /// China
+  CHN = 0x009c,
+  /// Taiwan
+  TWN = 0x009e,
+  /// Christmas Island
+  CXR = 0x00a2,
+  /// Cocos (Keeling) Islands
+  CCK = 0x00a6,
+  /// Colombia
+  COL = 0x00aa,
+  /// Comoros
+  COM = 0x00ae,
+  /// Mayotte
+  MYT = 0x00af,
+  /// Congo
+  COG = 0x00b2,
+  /// Democratic Republic of the Congo
+  COD = 0x00b4,
+  /// Cook Islands
+  COK = 0x00b8,
+  /// Costa Rica
+  CRI = 0x00bc,
+  /// Croatia
+  HRV = 0x00bf,
+  /// Cuba
+  CUB = 0x00c0,
   /// Cyprus
   CYP = 0x00c4,
   /// Czechia
   CZE = 0x00cb,
+  /// Benin
+  BEN = 0x00cc,
+  /// Denmark
+  DNK = 0x00d0,
+  /// Dominica
+  DMA = 0x00d4,
+  /// Dominican Republic
+  DOM = 0x00d6,
+  /// Ecuador
+  ECU = 0x00da,
+  /// El Salvador
+  SLV = 0x00de,
+  /// Equatorial Guinea
+  GNQ = 0x00e2,
+  /// Ethiopia
+  ETH = 0x00e7,
+  /// Eritrea
+  ERI = 0x00e8,
   /// Estonia
   EST = 0x00e9,
+  /// Faroe Islands
+  FRO = 0x00ea,
+  /// Falkland Islands (Malvinas)
+  FLK = 0x00ee,
+  /// South Georgia and the South Sandwich Islands
+  SGS = 0x00ef,
+  /// Fiji
+  FJI = 0x00f2,
+  /// Finland
+  FIN = 0x00f6,
+  /// AlandIslands
+  ALA = 0x00f8,
   /// France
   FRA = 0x00fa,
+  /// French Guiana
+  GUF = 0x00fe,
+  /// French Polynesia
+  PYF = 0x0102,
+  /// French Southern Territories
+  ATF = 0x0104,
+  /// Djibouti
+  DJI = 0x0106,
+  /// Gabon
+  GAB = 0x010a,
+  /// Georgia
+  GEO = 0x010c,
+  /// Gambia
+  GMB = 0x010e,
+  /// Palestine
+  PSE = 0x0113,
   /// Germany
   DEU = 0x0114,
+  /// Ghana
+  GHA = 0x0120,
+  /// Gibraltar
+  GIB = 0x0124,
+  /// Kiribati
+  KIR = 0x0128,
+  /// Greece
+  GRC = 0x012c,
+  /// Greenland
+  GRL = 0x0130,
+  /// Grenada
+  GRD = 0x0134,
+  /// Guadeloupe
+  GLP = 0x0138,
+  /// Guam
+  GUM = 0x013c,
+  /// Guatemala
+  GTM = 0x0140,
+  /// Guinea
+  GIN = 0x0144,
+  /// Guyana
+  GUY = 0x0148,
+  /// Haiti
+  HTI = 0x014c,
+  /// Heard Island and McDonald Islands
+  HMD = 0x014e,
+  /// Holy See
+  VAT = 0x0150,
+  /// Honduras
+  HND = 0x0154,
+  /// Hong Kong
+  HKG = 0x0158,
   /// Hungary
   HUN = 0x015c,
+  /// Iceland
+  ISL = 0x0160,
+  /// India
+  IND = 0x0164,
+  /// Indonesia
+  IDN = 0x0168,
+  /// Iran
+  IRN = 0x016c,
+  /// Iraq
+  IRQ = 0x0170,
   /// Ireland
   IRL = 0x0174,
   /// Israel
   ISR = 0x0178,
   /// Italy
   ITA = 0x017c,
+  /// Cote d'Ivoire
+  CIV = 0x0180,
+  /// Jamaica
+  JAM = 0x0184,
+  /// Japan
+  JPN = 0x0188,
+  /// Kazakhstan
+  KAZ = 0x018e,
+  /// Jordan
+  JOR = 0x0190,
+  /// Kenya
+  KEN = 0x0194,
+  /// Democratic People's Republic of Korea
+  PRK = 0x0198,
+  /// Republic of Korea
+  KOR = 0x019a,
+  /// Kuwait
+  KWT = 0x019e,
+  /// Kyrgyzstan
+  KGZ = 0x01a1,
+  /// Lao People's Democratic Republic
+  LAO = 0x01a2,
+  /// Lebanon
+  LBN = 0x01a6,
+  /// Lesotho
+  LSO = 0x01aa,
+  /// Latvia
+  LVA = 0x01ac,
+  /// Liberia
+  LBR = 0x01ae,
+  /// Libya
+  LBY = 0x01b2,
+  /// Liechtenstein
+  LIE = 0x01b6,
   /// Lithuania
   LTU = 0x01b8,
   /// Luxembourg
   LUX = 0x01ba,
+  /// Macao
+  MAC = 0x01be,
+  /// Madagascar
+  MDG = 0x01c2,
+  /// Malawi
+  MWI = 0x01c6,
+  /// Malaysia
+  MYS = 0x01ca,
+  /// Maldives
+  MDV = 0x01ce,
+  /// Mali
+  MLI = 0x01d2,
+  /// Malta
+  MLT = 0x01d6,
+  /// Martinique
+  MTQ = 0x01da,
+  /// Mauritania
+  MRT = 0x01de,
+  /// Mauritius
+  MUS = 0x01e0,
+  /// Mexico
+  MEX = 0x01e4,
+  /// Monaco
+  MCO = 0x01ec,
+  /// Mongolia
+  MNG = 0x01f0,
+  /// Republic of Moldova
+  MDA = 0x01f2,
+  /// Montenegro
+  MNE = 0x01f3,
+  /// Montserrat
+  MSR = 0x01f4,
+  /// Morocco
+  MAR = 0x01f8,
+  /// Mozambique
+  MOZ = 0x01fc,
+  /// Oman
+  OMN = 0x0200,
+  /// Namibia
+  NAM = 0x0204,
+  /// Nauru
+  NRU = 0x0208,
+  /// Nepal
+  NPL = 0x020c,
   /// Netherlands (the)
   NLD = 0x0210,
+  /// Curacao
+  CUW = 0x0213,
+  /// Aruba
+  ABW = 0x0215,
+  /// Sint Maarten (Dutch part)
+  SXM = 0x0216,
+  /// Bonaire, Sint Eustatius and Saba
+  BES = 0x0217,
+  /// New Caledonia
+  NCL = 0x021c,
+  /// Vanuatu
+  VUT = 0x0224,
+  /// New Zealand
+  NZL = 0x022a,
+  /// Nicaragua
+  NIC = 0x022e,
+  /// Niger
+  NER = 0x0232,
+  /// Nigeria
+  NGA = 0x0236,
+  /// Niue
+  NIU = 0x023a,
+  /// Norfolk Island
+  NFK = 0x023e,
+  /// Norway
+  NOR = 0x0242,
+  /// Northern Mariana Islands
+  MNP = 0x0244,
+  /// United States Minor Outlying Islands
+  UMI = 0x0245,
+  /// Micronesia, Federated States of
+  FSM = 0x0247,
+  /// Marshall Islands
+  MHL = 0x0248,
+  /// Palau
+  PLW = 0x0249,
+  /// Pakistan
+  PAK = 0x024a,
+  /// Panama
+  PAN = 0x024f,
+  /// Papua New Guinea
+  PNG = 0x0256,
+  /// Paraguay
+  PRY = 0x0258,
+  /// Peru
+  PER = 0x025c,
+  /// Philippines
+  PHL = 0x0260,
+  /// Pitcairn
+  PCN = 0x0264,
   /// Poland
   POL = 0x0268,
   /// Portugal
   PRT = 0x026c,
+  /// Guinea-Bissau
+  GNB = 0x0270,
+  /// Timor-Leste
+  TLS = 0x0272,
+  /// Puerto Rico
+  PRI = 0x0276,
+  /// Qatar
+  QAT = 0x027a,
+  /// Réunion
+  REU = 0x027e,
   /// Romania
   ROU = 0x0282,
+  /// Russian Federation
+  RUS = 0x0283,
+  /// Rwanda
+  RWA = 0x0286,
+  /// Saint Barthélemy
+  BLM = 0x028c,
+  /// Saint Helena, Ascension and Tristan da Cunha
+  SHN = 0x028e,
+  /// Saint Kitts and Nevis
+  KNA = 0x0293,
+  /// Anguilla
+  AIA = 0x0294,
+  /// Saint Lucia
+  LCA = 0x0296,
+  /// Saint Martin (French part)
+  MAF = 0x0297,
+  /// Saint Pierre and Miquelon
+  SPM = 0x029a,
+  /// Saint Vincent and the Grenadines
+  VCT = 0x029e,
+  /// San Marino
+  SMR = 0x02a2,
+  /// Sao Tome and Principe
+  STP = 0x02a6,
+  /// Saudi Arabia
+  SAU = 0x02aa,
+  /// Senegal
+  SEN = 0x02ae,
+  /// Serbia
+  SRB = 0x02b0,
+  /// Seychelles
+  SYC = 0x02b2,
+  /// Sierra Leone
+  SLE = 0x02b6,
+  /// Singapore
+  SGP = 0x02be,
   /// Slovakia
   SVK = 0x02bf,
+  /// Viet Nam
+  VNM = 0x02c0,
   /// Slovenia
   SVN = 0x02c1,
+  /// Somalia
+  SOM = 0x02c2,
+  /// South Africa
+  ZAF = 0x02c6,
+  /// Zimbabwe
+  ZWE = 0x02cc,
   /// Spain
   ESP = 0x02d4,
+  /// South Sudan
+  SSD = 0x02d8,
+  /// Sudan
+  SDN = 0x02d9,
+  /// Western Sahara
+  ESH = 0x02dc,
+  /// Suriname
+  SUR = 0x02e4,
+  /// Svalbard and Jan Mayen
+  SJM = 0x02e8,
+  /// Eswatini
+  SWZ = 0x02ec,
   /// Sweden
   SWE = 0x02f0,
+  /// Switzerland
+  CHE = 0x02f4,
+  /// Syrian Arab Republic
+  SYR = 0x02f8,
+  /// Tajikistan
+  TJK = 0x02fa,
+  /// Thailand
+  THA = 0x02fc,
+  /// Togo
+  TGO = 0x0300,
+  /// Tokelau
+  TKL = 0x0304,
+  /// Tonga
+  TON = 0x0308,
+  /// Trinidad and Tobago
+  TTO = 0x030c,
+  /// United Arab Emirates
+  ARE = 0x0310,
+  /// Tunisia
+  TUN = 0x0314,
+  /// Türkiye
+  TUR = 0x0318,
+  /// Turkmenistan
+  TKM = 0x031b,
+  /// Turks and Caicos Islands
+  TCA = 0x031c,
+  /// Tuvalu
+  TUV = 0x031e,
+  /// Uganda
+  UGA = 0x0320,
   /// Ukraine
   UKR = 0x0324,
+  /// North Macedonia
+  MKD = 0x0327,
+  /// Egypt
+  EGY = 0x0332,
   /// United Kingdom of Great Britain and Northern Ireland (the)
   GBR = 0x033a,
+  /// Guernsey
+  GGY = 0x033f,
+  /// Jersey
+  JEY = 0x0340,
+  /// Isle of Man
+  IMN = 0x0341,
+  /// Tanzania, United Republic of
+  TZA = 0x0342,
   /// United States of America (the)
   USA = 0x0348,
+  /// Virgin Islands (U.S.)
+  VIR = 0x0352,
+  /// Burkina Faso
+  BFA = 0x0356,
+  /// Uruguay
+  URY = 0x035a,
+  /// Uzbekistan
+  UZB = 0x035c,
+  /// Venezuela
+  VEN = 0x035e,
+  /// Wallis and Futuna
+  WLF = 0x036c,
+  /// Samoa
+  WSM = 0x0372,
+  /// Yemen
+  YEM = 0x0377,
+  /// Zambia
+  ZMB = 0x037e,
 }
 impl Default for Country {
   fn default() -> Self {
-    Self::AUS
+    Self::AFG
   }
 }
 impl std::convert::TryFrom<u16> for Country {
   type Error = InvalidVariant;
   fn try_from(value: u16) -> Result<Self, Self::Error> {
     match value {
+      0x0004 => Ok(Self::AFG),
+      0x0008 => Ok(Self::ALB),
+      0x000a => Ok(Self::ATA),
+      0x000c => Ok(Self::DZA),
+      0x0010 => Ok(Self::ASM),
+      0x0014 => Ok(Self::AND),
+      0x0018 => Ok(Self::AGO),
+      0x001c => Ok(Self::ATG),
+      0x001f => Ok(Self::AZE),
+      0x0020 => Ok(Self::ARG),
       0x0024 => Ok(Self::AUS),
       0x0028 => Ok(Self::AUT),
+      0x002c => Ok(Self::BHS),
+      0x0030 => Ok(Self::BHR),
+      0x0032 => Ok(Self::BGD),
+      0x0033 => Ok(Self::ARM),
+      0x0034 => Ok(Self::BRB),
       0x0038 => Ok(Self::BEL),
+      0x003c => Ok(Self::BMU),
+      0x0040 => Ok(Self::BTN),
+      0x0044 => Ok(Self::BOL),
+      0x0046 => Ok(Self::BIH),
+      0x0048 => Ok(Self::BWA),
+      0x004a => Ok(Self::BVT),
+      0x004c => Ok(Self::BRA),
+      0x0054 => Ok(Self::BLZ),
+      0x0056 => Ok(Self::IOT),
+      0x005a => Ok(Self::SLB),
+      0x005c => Ok(Self::VGB),
+      0x0060 => Ok(Self::BRN),
       0x0064 => Ok(Self::BGR),
+      0x0068 => Ok(Self::MMR),
+      0x006c => Ok(Self::BDI),
+      0x0070 => Ok(Self::BLR),
+      0x0074 => Ok(Self::KHM),
+      0x0078 => Ok(Self::CMR),
       0x007c => Ok(Self::CAN),
+      0x0084 => Ok(Self::CPV),
+      0x0088 => Ok(Self::CYM),
+      0x008c => Ok(Self::CAF),
+      0x0090 => Ok(Self::LKA),
+      0x0094 => Ok(Self::TCD),
+      0x0098 => Ok(Self::CHL),
+      0x009c => Ok(Self::CHN),
+      0x009e => Ok(Self::TWN),
+      0x00a2 => Ok(Self::CXR),
+      0x00a6 => Ok(Self::CCK),
+      0x00aa => Ok(Self::COL),
+      0x00ae => Ok(Self::COM),
+      0x00af => Ok(Self::MYT),
+      0x00b2 => Ok(Self::COG),
+      0x00b4 => Ok(Self::COD),
+      0x00b8 => Ok(Self::COK),
+      0x00bc => Ok(Self::CRI),
+      0x00bf => Ok(Self::HRV),
+      0x00c0 => Ok(Self::CUB),
       0x00c4 => Ok(Self::CYP),
       0x00cb => Ok(Self::CZE),
+      0x00cc => Ok(Self::BEN),
+      0x00d0 => Ok(Self::DNK),
+      0x00d4 => Ok(Self::DMA),
+      0x00d6 => Ok(Self::DOM),
+      0x00da => Ok(Self::ECU),
+      0x00de => Ok(Self::SLV),
+      0x00e2 => Ok(Self::GNQ),
+      0x00e7 => Ok(Self::ETH),
+      0x00e8 => Ok(Self::ERI),
       0x00e9 => Ok(Self::EST),
+      0x00ea => Ok(Self::FRO),
+      0x00ee => Ok(Self::FLK),
+      0x00ef => Ok(Self::SGS),
+      0x00f2 => Ok(Self::FJI),
+      0x00f6 => Ok(Self::FIN),
+      0x00f8 => Ok(Self::ALA),
       0x00fa => Ok(Self::FRA),
+      0x00fe => Ok(Self::GUF),
+      0x0102 => Ok(Self::PYF),
+      0x0104 => Ok(Self::ATF),
+      0x0106 => Ok(Self::DJI),
+      0x010a => Ok(Self::GAB),
+      0x010c => Ok(Self::GEO),
+      0x010e => Ok(Self::GMB),
+      0x0113 => Ok(Self::PSE),
       0x0114 => Ok(Self::DEU),
+      0x0120 => Ok(Self::GHA),
+      0x0124 => Ok(Self::GIB),
+      0x0128 => Ok(Self::KIR),
+      0x012c => Ok(Self::GRC),
+      0x0130 => Ok(Self::GRL),
+      0x0134 => Ok(Self::GRD),
+      0x0138 => Ok(Self::GLP),
+      0x013c => Ok(Self::GUM),
+      0x0140 => Ok(Self::GTM),
+      0x0144 => Ok(Self::GIN),
+      0x0148 => Ok(Self::GUY),
+      0x014c => Ok(Self::HTI),
+      0x014e => Ok(Self::HMD),
+      0x0150 => Ok(Self::VAT),
+      0x0154 => Ok(Self::HND),
+      0x0158 => Ok(Self::HKG),
       0x015c => Ok(Self::HUN),
+      0x0160 => Ok(Self::ISL),
+      0x0164 => Ok(Self::IND),
+      0x0168 => Ok(Self::IDN),
+      0x016c => Ok(Self::IRN),
+      0x0170 => Ok(Self::IRQ),
       0x0174 => Ok(Self::IRL),
       0x0178 => Ok(Self::ISR),
       0x017c => Ok(Self::ITA),
+      0x0180 => Ok(Self::CIV),
+      0x0184 => Ok(Self::JAM),
+      0x0188 => Ok(Self::JPN),
+      0x018e => Ok(Self::KAZ),
+      0x0190 => Ok(Self::JOR),
+      0x0194 => Ok(Self::KEN),
+      0x0198 => Ok(Self::PRK),
+      0x019a => Ok(Self::KOR),
+      0x019e => Ok(Self::KWT),
+      0x01a1 => Ok(Self::KGZ),
+      0x01a2 => Ok(Self::LAO),
+      0x01a6 => Ok(Self::LBN),
+      0x01aa => Ok(Self::LSO),
+      0x01ac => Ok(Self::LVA),
+      0x01ae => Ok(Self::LBR),
+      0x01b2 => Ok(Self::LBY),
+      0x01b6 => Ok(Self::LIE),
       0x01b8 => Ok(Self::LTU),
       0x01ba => Ok(Self::LUX),
+      0x01be => Ok(Self::MAC),
+      0x01c2 => Ok(Self::MDG),
+      0x01c6 => Ok(Self::MWI),
+      0x01ca => Ok(Self::MYS),
+      0x01ce => Ok(Self::MDV),
+      0x01d2 => Ok(Self::MLI),
+      0x01d6 => Ok(Self::MLT),
+      0x01da => Ok(Self::MTQ),
+      0x01de => Ok(Self::MRT),
+      0x01e0 => Ok(Self::MUS),
+      0x01e4 => Ok(Self::MEX),
+      0x01ec => Ok(Self::MCO),
+      0x01f0 => Ok(Self::MNG),
+      0x01f2 => Ok(Self::MDA),
+      0x01f3 => Ok(Self::MNE),
+      0x01f4 => Ok(Self::MSR),
+      0x01f8 => Ok(Self::MAR),
+      0x01fc => Ok(Self::MOZ),
+      0x0200 => Ok(Self::OMN),
+      0x0204 => Ok(Self::NAM),
+      0x0208 => Ok(Self::NRU),
+      0x020c => Ok(Self::NPL),
       0x0210 => Ok(Self::NLD),
+      0x0213 => Ok(Self::CUW),
+      0x0215 => Ok(Self::ABW),
+      0x0216 => Ok(Self::SXM),
+      0x0217 => Ok(Self::BES),
+      0x021c => Ok(Self::NCL),
+      0x0224 => Ok(Self::VUT),
+      0x022a => Ok(Self::NZL),
+      0x022e => Ok(Self::NIC),
+      0x0232 => Ok(Self::NER),
+      0x0236 => Ok(Self::NGA),
+      0x023a => Ok(Self::NIU),
+      0x023e => Ok(Self::NFK),
+      0x0242 => Ok(Self::NOR),
+      0x0244 => Ok(Self::MNP),
+      0x0245 => Ok(Self::UMI),
+      0x0247 => Ok(Self::FSM),
+      0x0248 => Ok(Self::MHL),
+      0x0249 => Ok(Self::PLW),
+      0x024a => Ok(Self::PAK),
+      0x024f => Ok(Self::PAN),
+      0x0256 => Ok(Self::PNG),
+      0x0258 => Ok(Self::PRY),
+      0x025c => Ok(Self::PER),
+      0x0260 => Ok(Self::PHL),
+      0x0264 => Ok(Self::PCN),
       0x0268 => Ok(Self::POL),
       0x026c => Ok(Self::PRT),
+      0x0270 => Ok(Self::GNB),
+      0x0272 => Ok(Self::TLS),
+      0x0276 => Ok(Self::PRI),
+      0x027a => Ok(Self::QAT),
+      0x027e => Ok(Self::REU),
       0x0282 => Ok(Self::ROU),
+      0x0283 => Ok(Self::RUS),
+      0x0286 => Ok(Self::RWA),
+      0x028c => Ok(Self::BLM),
+      0x028e => Ok(Self::SHN),
+      0x0293 => Ok(Self::KNA),
+      0x0294 => Ok(Self::AIA),
+      0x0296 => Ok(Self::LCA),
+      0x0297 => Ok(Self::MAF),
+      0x029a => Ok(Self::SPM),
+      0x029e => Ok(Self::VCT),
+      0x02a2 => Ok(Self::SMR),
+      0x02a6 => Ok(Self::STP),
+      0x02aa => Ok(Self::SAU),
+      0x02ae => Ok(Self::SEN),
+      0x02b0 => Ok(Self::SRB),
+      0x02b2 => Ok(Self::SYC),
+      0x02b6 => Ok(Self::SLE),
+      0x02be => Ok(Self::SGP),
       0x02bf => Ok(Self::SVK),
+      0x02c0 => Ok(Self::VNM),
       0x02c1 => Ok(Self::SVN),
+      0x02c2 => Ok(Self::SOM),
+      0x02c6 => Ok(Self::ZAF),
+      0x02cc => Ok(Self::ZWE),
       0x02d4 => Ok(Self::ESP),
+      0x02d8 => Ok(Self::SSD),
+      0x02d9 => Ok(Self::SDN),
+      0x02dc => Ok(Self::ESH),
+      0x02e4 => Ok(Self::SUR),
+      0x02e8 => Ok(Self::SJM),
+      0x02ec => Ok(Self::SWZ),
       0x02f0 => Ok(Self::SWE),
+      0x02f4 => Ok(Self::CHE),
+      0x02f8 => Ok(Self::SYR),
+      0x02fa => Ok(Self::TJK),
+      0x02fc => Ok(Self::THA),
+      0x0300 => Ok(Self::TGO),
+      0x0304 => Ok(Self::TKL),
+      0x0308 => Ok(Self::TON),
+      0x030c => Ok(Self::TTO),
+      0x0310 => Ok(Self::ARE),
+      0x0314 => Ok(Self::TUN),
+      0x0318 => Ok(Self::TUR),
+      0x031b => Ok(Self::TKM),
+      0x031c => Ok(Self::TCA),
+      0x031e => Ok(Self::TUV),
+      0x0320 => Ok(Self::UGA),
       0x0324 => Ok(Self::UKR),
+      0x0327 => Ok(Self::MKD),
+      0x0332 => Ok(Self::EGY),
       0x033a => Ok(Self::GBR),
+      0x033f => Ok(Self::GGY),
+      0x0340 => Ok(Self::JEY),
+      0x0341 => Ok(Self::IMN),
+      0x0342 => Ok(Self::TZA),
       0x0348 => Ok(Self::USA),
+      0x0352 => Ok(Self::VIR),
+      0x0356 => Ok(Self::BFA),
+      0x035a => Ok(Self::URY),
+      0x035c => Ok(Self::UZB),
+      0x035e => Ok(Self::VEN),
+      0x036c => Ok(Self::WLF),
+      0x0372 => Ok(Self::WSM),
+      0x0377 => Ok(Self::YEM),
+      0x037e => Ok(Self::ZMB),
       other => Err(InvalidVariant::new(other as u32, "Country")),
     }
   }
@@ -1777,12 +2623,16 @@ pub struct Header {
   pub encryption_offset: u64,
   /// Reference to an EncryptionKey message.
   pub encryption_key_id: ElementId,
+  /// ID of the session.
+  pub session_id: SessionId,
+  /// ID of the md stream.
+  pub stream_id: StreamId,
 }
 impl BytesValidator for Header {
     #[inline]
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      MsgLength::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, length))) && MsgType::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, msg_type))) && MsgVersion::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, version))) && SeqNum::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, seq_num))) && Timestamp::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, timestamp))) && Timestamp::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, source_timestamp))) && bool::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, is_encrypted))) && u64::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, encryption_offset))) && ElementId::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, encryption_key_id)))
+      MsgLength::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, length))) && MsgType::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, msg_type))) && MsgVersion::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, version))) && SeqNum::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, seq_num))) && Timestamp::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, timestamp))) && Timestamp::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, source_timestamp))) && bool::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, is_encrypted))) && u64::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, encryption_offset))) && ElementId::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, encryption_key_id))) && SessionId::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, session_id))) && StreamId::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, stream_id)))
     }
   }
 
@@ -1907,18 +2757,6 @@ pub struct EncryptionKey {
   pub secret_key: EncryptionGroupKey,
 }
 
-/// End of a technical session.
-#[repr(C, packed)]
-#[derive(Serialize, Deserialize, Clone, Copy)]
-#[serde(deny_unknown_fields)]
-#[serde(rename_all = "camelCase")]
-pub struct EndOfTechnicalSession {
-  /// Message header.
-  pub header: Header,
-  /// ID of the session.
-  pub session_id: SessionId,
-}
-
 /// A message type used to check connectivity.
 #[repr(C, packed)]
 #[derive(Serialize, Deserialize, Clone, Copy)]
@@ -1983,6 +2821,8 @@ pub struct OrderAdd {
   pub price: Price,
   /// Order quantity.
   pub quantity: Quantity,
+  /// Market maker quote flag.
+  pub mm_quote: bool,
 }
 
 /// Order deleted.
@@ -2073,6 +2913,10 @@ pub struct PriceLevelSnapshot {
   pub instrument_id: ElementId,
   /// The number of BBO levels contained in the message.
   pub max_depth: u8,
+  /// Id of an level on which mm quote rests (0 means no mm).
+  pub mm_buy_quote_level: u8,
+  /// Id of an level on which mm quote rests (0 means no mm).
+  pub mm_sell_quote_level: u8,
   /// Price levels for buy side.
   pub buy: PriceLevels,
   /// Price levels for sell side.
@@ -2103,43 +2947,92 @@ pub struct PriceLevel {
   pub order_count: OrderCount,
 }
 
-/// Price type.
+/// Price update message variant.
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
-pub enum PriceType {
+pub enum PriceUpdateType {
+  /// Reference price placed in the vale field
   ReferencePrice = 0x0001,
+  /// MidPoint price placed in the vale field
   MidPoint = 0x0002,
+  /// The first fixing prices fixing prices appropriately placed in the value field as the average price, valueBid as the bid price, and valueAsk as the ask price.
+  Fixing1Price = 0x0003,
+  /// The second fixing prices fixing prices appropriately placed in the value field as the average price, valueBid as the bid price, and valueAsk as the ask price.
+  Fixing2Price = 0x0004,
+  /// The first fixing YTM (e.i. yield to maturity)  appropriately placed in the value field as the average YTM, valueBid as the bid YTM, and valueAsk as the ask YTM.
+  Fixing1Ytm = 0x0005,
+  /// The second fixing YTM (e.i. yield to maturity)  appropriately placed in the value field as the average YTM, valueBid as the bid YTM, and valueAsk as the ask YTM.
+  Fixing2Ytm = 0x0006,
 }
-impl Default for PriceType {
+impl Default for PriceUpdateType {
   fn default() -> Self {
     Self::ReferencePrice
   }
 }
-impl std::convert::TryFrom<u8> for PriceType {
+impl std::convert::TryFrom<u8> for PriceUpdateType {
   type Error = InvalidVariant;
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
       0x0001 => Ok(Self::ReferencePrice),
       0x0002 => Ok(Self::MidPoint),
-      other => Err(InvalidVariant::new(other as u32, "PriceType")),
+      0x0003 => Ok(Self::Fixing1Price),
+      0x0004 => Ok(Self::Fixing2Price),
+      0x0005 => Ok(Self::Fixing1Ytm),
+      0x0006 => Ok(Self::Fixing2Ytm),
+      other => Err(InvalidVariant::new(other as u32, "PriceUpdateType")),
     }
   }
 }
 
-/// Message indicating a price update
+bitflags::bitflags! {
+  /// Bit flags indicating the filling of 'value', 'valueAsk', 'valueBid' attributes in the price update message.
+  #[derive(Serialize, Deserialize)]
+  #[serde(transparent)]
+  #[repr(transparent)]
+  pub struct PriceYtmPresence: u16 {
+/// No values provided.
+    const NONE            = 0b0000000000000000;
+/// A price was provided.
+    const PRICE           = 0b0000000000000001;
+/// A bid price was provided.
+    const PRICE_BID       = 0b0000000000000010;
+/// A ask price was provided.
+    const PRICE_ASK       = 0b0000000000000100;
+/// YTM was provided.
+    const YTM             = 0b0000000000001000;
+/// Bid YTM was provided.
+    const YTM_BID         = 0b0000000000010000;
+/// Ask YTM was provided.
+    const YTM_ASK         = 0b0000000000100000;
+/// YTM was not provided due to the absence of its calculation.
+    const YTM_NO_CALC     = 0b0000000001000000;
+/// Bid YTM was not provided due to the absence of its calculation.
+    const YTM_BID_NO_CALC = 0b0000000010000000;
+/// Ask YTM was not provided due to the absence of its calculation.
+    const YTM_ASK_NO_CALC = 0b0000000100000000;
+  }
+}
+
+/// Message indicating a price or YTM update
 #[repr(C, packed)]
 #[derive(Serialize, Deserialize, Clone, Copy)]
 #[serde(deny_unknown_fields)]
 #[serde(rename_all = "camelCase")]
 pub struct PriceUpdate {
-  /// Message header.
+  /// Message Header.
   pub header: Header,
-  /// Instrument to which the price update refers.
+  /// Instrument to which the update refers.
   pub instrument_id: ElementId,
-  /// Price type.
-  pub price_type: PriceType,
-  /// Indicates the updated price.
-  pub price: Price,
+  /// Indicates price update message variant.
+  pub price_update_type: PriceUpdateType,
+  /// Indicates the filling of fields: value, valueBid, valueAsk.
+  pub price_ytm_presence: PriceYtmPresence,
+  /// Indicates the updated price or YTM.
+  pub value: Price,
+  /// Indicates the updated bid price or bid YTM.
+  pub value_bid: Price,
+  /// Indicates the updated ask price or ask YTM.
+  pub value_ask: Price,
 }
 
 /// Collar type can be dynamic or static.
@@ -2209,66 +3102,90 @@ pub struct TradeCollars {
   pub upper: Bound,
 }
 
-/// Marks the end of the reference data.
+/// State of the trading session.
+#[repr(u8)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum TradingSessionState {
+  /// Unknown (off).
+  Unknown = 0x0001,
+  /// Open.
+  Open = 0x0002,
+  /// Close.
+  Close = 0x0003,
+}
+impl Default for TradingSessionState {
+  fn default() -> Self {
+    Self::Unknown
+  }
+}
+impl std::convert::TryFrom<u8> for TradingSessionState {
+  type Error = InvalidVariant;
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      0x0001 => Ok(Self::Unknown),
+      0x0002 => Ok(Self::Open),
+      0x0003 => Ok(Self::Close),
+      other => Err(InvalidVariant::new(other as u32, "TradingSessionState")),
+    }
+  }
+}
+
+/// Identifies an event related to the trading status of a trading session.
+#[repr(u8)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum TradingSessionEvent {
+  /// Not applicable.
+  NA = 0x0001,
+  /// Start of technical session.
+  StartOfTechnicalSession = 0x0002,
+  /// End of technical session.
+  EndOfTechnicalSession = 0x0003,
+  /// Initial reference data start.
+  InitialReferenceDataStart = 0x0004,
+  /// Initial reference data end.
+  InitialReferenceDataEnd = 0x0005,
+  /// Previous day restate start.
+  PreviousDayRestateStart = 0x0006,
+  /// Previous day restate end.
+  PreviousDayRestateEnd = 0x0007,
+}
+impl Default for TradingSessionEvent {
+  fn default() -> Self {
+    Self::NA
+  }
+}
+impl std::convert::TryFrom<u8> for TradingSessionEvent {
+  type Error = InvalidVariant;
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      0x0001 => Ok(Self::NA),
+      0x0002 => Ok(Self::StartOfTechnicalSession),
+      0x0003 => Ok(Self::EndOfTechnicalSession),
+      0x0004 => Ok(Self::InitialReferenceDataStart),
+      0x0005 => Ok(Self::InitialReferenceDataEnd),
+      0x0006 => Ok(Self::PreviousDayRestateStart),
+      0x0007 => Ok(Self::PreviousDayRestateEnd),
+      other => Err(InvalidVariant::new(other as u32, "TradingSessionEvent")),
+    }
+  }
+}
+
+/// The Trading Session Status provides information on the status of a market and on a trading day events.
 #[repr(C, packed)]
 #[derive(Serialize, Deserialize, Clone, Copy)]
 #[serde(deny_unknown_fields)]
 #[serde(rename_all = "camelCase")]
-pub struct ReferenceDataEnd {
+pub struct TradingSessionStatus {
   /// Message header.
   pub header: Header,
-}
-
-/// Marks the start of the reference data.
-#[repr(C, packed)]
-#[derive(Serialize, Deserialize, Clone, Copy)]
-#[serde(deny_unknown_fields)]
-#[serde(rename_all = "camelCase")]
-pub struct ReferenceDataStart {
-  /// Message header.
-  pub header: Header,
-}
-
-/// Start of a technical session.
-#[repr(C, packed)]
-#[derive(Serialize, Deserialize, Clone, Copy)]
-#[serde(deny_unknown_fields)]
-#[serde(rename_all = "camelCase")]
-pub struct StartOfTechnicalSession {
-  /// Message header.
-  pub header: Header,
-  /// ID of the session.
-  pub session_id: SessionId,
-}
-
-/// A message used to test system operation.
-#[repr(C, packed)]
-#[derive(Serialize, Deserialize, Clone, Copy, Default)]
-#[serde(deny_unknown_fields, default)]
-#[serde(rename_all = "camelCase")]
-pub struct Test {
-  /// Message header.
-  pub header: Header,
-  /// First Core Bus timestamp.
-  pub timestamp_a: Timestamp,
-  /// Sequencer timestamp.
-  pub timestamp_b: Timestamp,
-  /// Market Data timestamp.
-  pub timestamp_c: Timestamp,
-  /// Consumer timestamp.
-  pub timestamp_d: Timestamp,
-}
-
-/// A text message.
-#[repr(C, packed)]
-#[derive(Serialize, Deserialize, Clone, Copy)]
-#[serde(deny_unknown_fields)]
-#[serde(rename_all = "camelCase")]
-pub struct Text {
-  /// Message header.
-  pub header: Header,
-  /// Arbitrary text.
-  pub text: TextMessage,
+  /// Market structure's Market Identifier Code (MIC) as specified in ISO 10383.
+  pub market_id: MicCode,
+  /// ID of the financial instrument's market segment.
+  pub market_structure_id: ElementId,
+  /// State of the trading session.
+  pub trading_session_state: TradingSessionState,
+  /// Identifies an event related to the trading status of a trading session.
+  pub trading_session_event: TradingSessionEvent,
 }
 
 /// Tick size definition.
@@ -2287,6 +3204,34 @@ pub struct TickTableEntry {
   pub tick_table_id: ElementId,
 }
 
+/// Identifier of leverage instruments
+#[repr(u8)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum LeverageFlag {
+  /// Not applicable
+  NotApplicable = 0x0001,
+  /// Leveraged
+  Yes = 0x0002,
+  /// Not leveraged
+  No = 0x0003,
+}
+impl Default for LeverageFlag {
+  fn default() -> Self {
+    Self::NotApplicable
+  }
+}
+impl std::convert::TryFrom<u8> for LeverageFlag {
+  type Error = InvalidVariant;
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      0x0001 => Ok(Self::NotApplicable),
+      0x0002 => Ok(Self::Yes),
+      0x0003 => Ok(Self::No),
+      other => Err(InvalidVariant::new(other as u32, "LeverageFlag")),
+    }
+  }
+}
+
 /// Definition of a financial instrument.
 #[repr(C, packed)]
 #[derive(Serialize, Deserialize, Clone, Copy)]
@@ -2299,6 +3244,8 @@ pub struct Instrument {
   pub instrument_id: ElementId,
   /// Type of the product.
   pub product_type: ProductType,
+  /// Subtype of the product.
+  pub product_subtype: ProductSubtype,
   /// First trading day of the financial instrument.
   pub first_trading_date: Date,
   /// Last trading day of the financial instrument.
@@ -2307,6 +3254,8 @@ pub struct Instrument {
   pub product_id: ElementId,
   /// Trading currency (e.g. USD).
   pub currency: Currency,
+  /// Minimum iceberg order value.
+  pub iceberg_min_value: Value,
   /// Lot size for the instrument.
   pub lot_size: LotSize,
   /// Price expression type for the financial instrument.
@@ -2322,7 +3271,7 @@ pub struct Instrument {
   /// Trading schedule ID.
   pub trading_schedule_id: ElementId,
   /// Financial instrument code.
-  pub code: InstrumentCode,
+  pub description: InstrumentDescription,
   /// Market structure's Market Identifier Code (MIC) as specified in ISO 10383.
   pub mic: MicCode,
   /// Nominal value of the financial instrument.
@@ -2333,6 +3282,8 @@ pub struct Instrument {
   pub multiplier: Multiplier,
   /// Product strike price.
   pub strike_price: Price,
+  /// Strike Price Currency
+  pub strike_price_currency: Currency,
   /// Product identification, e.g. ISIN number.
   pub product_identification: ProductIdentification,
   /// Type of product identification.
@@ -2384,7 +3335,7 @@ pub struct Instrument {
   /// Identifier of option type.
   pub option_type: OptionType,
   /// Identifier of exercise style.
-  pub excercise_type: ExcerciseType,
+  pub exercise_type: ExerciseType,
   /// Name of the product.
   pub product_name: Name,
   /// Reference price
@@ -2393,6 +3344,12 @@ pub struct Instrument {
   pub status: InstrumentStatus,
   /// Id of starting phase for the instrument
   pub initial_phase_id: ElementId,
+  /// upper threshold for leveraged instruments
+  pub threshold_max: Price,
+  /// lower threshold for leveraged instruments
+  pub threshold_min: Price,
+  /// Identifier of leverage instruments
+  pub is_leverage: LeverageFlag,
 }
 
 /// Start of a new trading phase.
@@ -2407,6 +3364,8 @@ pub struct InstrumentStatusChange {
   pub instrument_id: ElementId,
   /// Trading phase ID.
   pub trading_phase_id: ElementId,
+  /// Type of matching algorithm.
+  pub trading_phase_type: TradingPhaseType,
   /// Financial instrument status.
   pub status: InstrumentStatus,
   /// Stressed market conditions is called for when instrument experience high and short term intraday volatility.
@@ -2451,14 +3410,30 @@ pub struct Trade {
   pub trade_id: TradeId,
   /// Code to identify whether the transaction will be cleared.
   pub trade_to_be_cleared: bool,
+  /// Percentage change.
+  pub pct_change: PercentageChange,
+  /// Volume-weighted average price.
+  pub vwap: Price,
+  /// Total number of transactions.
+  pub no_trades: u64,
+  /// Total transaction volume.
+  pub total_volume: Quantity,
+  /// Total transaction value.
+  pub total_value: Value,
+  /// The price of the first trade on the current trading day.
+  pub opening_price: Price,
+  /// Highest price of the instrument on the current trading day.
+  pub max_price: Price,
+  /// Lowest price of the instrument on the current trading day.
+  pub min_price: Price,
   /// MMT Market Mechanism
   pub mmt_market_mechanism: MmtMarketMechanism,
   /// MMT Trading Mode
   pub mmt_trading_mode: MmtTradingMode,
   /// MMT Transaction Category
-  pub mmt_transation_category: MmtTransationCategory,
-  /// MMT Negotitation Indicator
-  pub mmt_negotitation_indicator: MmtNegotitationIndicator,
+  pub mmt_transaction_category: MmtTransactionCategory,
+  /// MMT Negotiation Indicator
+  pub mmt_negotiation_indicator: MmtNegotiationIndicator,
   /// MMT Agency Cross Trade Indicator
   pub mmt_agency_cross_trade_indicator: MmtAgencyCrossTradeIndicator,
   /// MMT Modification Indicator
@@ -2503,8 +3478,6 @@ pub struct TradingPhaseScheduleEntry {
   pub trading_phase_start_time: Timestamp,
   /// Type of matching algorithm.
   pub trading_phase_type: TradingPhaseType,
-  /// Type of auction.
-  pub auction_type: AuctionType,
   /// True if the phase includes an uncrossing.
   pub uncrossing: bool,
   /// ID of Static Collar Volatility Auction.
@@ -2572,6 +3545,10 @@ pub enum LoginResult {
   InvalidToken = 0x0002,
   /// Already logged in.
   AlreadyLoggedIn = 0x0003,
+  /// Login is currently unavailable due to reasons such as service unavailability.
+  LoginNotAllowed = 0x0004,
+  /// Other errors.
+  Other = 0x0005,
 }
 impl Default for LoginResult {
   fn default() -> Self {
@@ -2585,6 +3562,8 @@ impl std::convert::TryFrom<u8> for LoginResult {
       0x0001 => Ok(Self::Ok),
       0x0002 => Ok(Self::InvalidToken),
       0x0003 => Ok(Self::AlreadyLoggedIn),
+      0x0004 => Ok(Self::LoginNotAllowed),
+      0x0005 => Ok(Self::Other),
       other => Err(InvalidVariant::new(other as u32, "LoginResult")),
     }
   }
@@ -2794,7 +3773,7 @@ pub struct IndexParams {
   pub publication_order: u16,
   /// Currency (e.g. USD).
   pub currency: Currency,
-  /// Date of validity of index.
+  /// Date of validity of index portfolio.
   pub date_validity: Date,
 }
 
@@ -2806,8 +3785,48 @@ pub struct IndexParams {
 pub struct InstrumentSummary {
   /// Message header.
   pub header: Header,
-  /// Identifier of the CLOB instrument.
+  /// Identifier of the instrument.
   pub instrument_id: ElementId,
+  /// Last Traded Price (LTP).
+  pub last_traded_price: Price,
+  /// Closing Price (CP).
+  pub closing_price: Price,
+  /// Closing Price Type. For OffBook means last transaction price.
+  pub closing_price_type: ClosingPriceType,
+  /// Adjusted Closing Price (ACP).
+  pub adjusted_closing_price: Price,
+  /// Reason for adjusting the Closing Price.
+  pub adjusted_closing_price_reason: AdjustedClosingPriceReason,
+  /// Percentage change from last session closing price.
+  pub pct_change: PercentageChange,
+  /// Volume-weighted average price for the market model in which there is an instrument.
+  pub vwap: Price,
+  /// Total number of transactions on the current trading day.
+  pub no_trades: u64,
+  /// Total transaction volume.
+  pub total_volume: Quantity,
+  /// Total transaction value.
+  pub total_value: Value,
+  /// The price of the first trade on the current trading day.
+  pub opening_price: Price,
+  /// Highest price of the instrument on the current trading day.
+  pub max_price: Price,
+  /// Lowest price of the instrument on the current trading day.
+  pub min_price: Price,
+  /// Previous message correction flag.
+  pub is_correction: bool,
+}
+
+/// Provides brief instrument summary.
+#[repr(C, packed)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
+#[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
+pub struct SingleInstrumentSummary {
+  /// Identifier of the instrument.
+  pub instrument_id: ElementId,
+  /// Market model type.
+  pub market_model_type: MarketModelType,
   /// Last Traded Price (LTP).
   pub last_traded_price: Price,
   /// Closing Price (CP).
@@ -2816,13 +3835,13 @@ pub struct InstrumentSummary {
   pub closing_price_type: ClosingPriceType,
   /// Adjusted Closing Price (ACP).
   pub adjusted_closing_price: Price,
-  /// Adjusted Closing Price Reason.
+  /// Reason for adjusting the Closing Price.
   pub adjusted_closing_price_reason: AdjustedClosingPriceReason,
-  /// Percentage change.
+  /// Percentage change from last session closing price.
   pub pct_change: PercentageChange,
-  /// Volume-weighted average price.
+  /// Volume-weighted average price for the market model in which there is an instrument.
   pub vwap: Price,
-  /// Total number of transations on the current trading day.
+  /// Total number of transactions on the current trading day.
   pub no_trades: u64,
   /// Total transaction volume.
   pub total_volume: Quantity,
@@ -2830,94 +3849,62 @@ pub struct InstrumentSummary {
   pub total_value: Value,
   /// The price of the first trade on the current trading day.
   pub opening_price: Price,
-  /// Highest price of the instrument on the current trading day
+  /// Highest price of the instrument on the current trading day.
   pub max_price: Price,
-  /// Lowest price of the instrument on the current trading day
+  /// Lowest price of the instrument on the current trading day.
   pub min_price: Price,
-}
-
-/// Session day instrument summary.
-#[repr(C, packed)]
-#[derive(Serialize, Deserialize, Clone, Copy)]
-#[serde(deny_unknown_fields)]
-#[serde(rename_all = "camelCase")]
-pub struct SessionSummary {
-  /// Message header.
-  pub header: Header,
-  /// Identifier of the CLOB instrument.
-  pub instrument_id: ElementId,
-  /// Last Traded Price (LTP).
-  pub last_traded_price: Price,
-  /// Closing Price (CP).
-  pub closing_price: Price,
-  /// Closing Price Type.
-  pub closing_price_type: ClosingPriceType,
-  /// Percentage change.
-  pub pct_change: PercentageChange,
-  /// Volume-weighted average price.
-  pub vwap: Price,
-  /// Total number of transations on the current trading day.
-  pub no_trades: u64,
-  /// Total transaction volume.
-  pub total_volume: Quantity,
-  /// Total transaction value.
-  pub total_value: Value,
-  /// The price of the first trade on the current trading day.
-  pub opening_price: Price,
-  /// Highest price of the instrument on the current trading day
-  pub max_price: Price,
-  /// Lowest price of the instrument on the current trading day
-  pub min_price: Price,
-  /// Type of product identification.
-  pub product_identification_type: ProductIdentificationType,
-  /// Product identification, e.g. ISIN number.
-  pub product_identification: ProductIdentification,
-  /// Accumulated interest on the bonds or for mortgage-backed bonds on the day of settling the transaction.
-  pub accumulated_interest: Number,
-  /// Interest rate is determined on the basis of WIBOR/WIBID/WIRON rates for each expiration date of options and futures.
-  pub interest_rate: Number,
-  /// Initial reference price (at the start of session day).
-  pub reference_price: Price,
   /// Settlement price.
   pub settlement_price: Price,
   /// Settlement value.
   pub settlement_value: Price,
-  /// Price currency (e.g. USD).
-  pub currency: Currency,
-  /// Number of open positions after the end of the session.
-  pub open_positions: u32,
-  /// Stock Exchange session date.
-  pub session_date: Date,
   /// End of trading date.
   pub end_trading_date: Date,
   /// The date of execution of the last trade for the given instrument.
   pub last_trade_date: Date,
-  /// Number of instruments admitted to trading.
-  pub number_of_instruments: u64,
+}
+
+/// Session day product summary.
+#[repr(C, packed)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
+#[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
+pub struct ProductSummary {
+  /// Message header.
+  pub header: Header,
+  /// Provides brief CLOB instrument summary.
+  pub clob_instrument: SingleInstrumentSummary,
+  /// Provides brief CROSS instrument summary.
+  pub cross_instrument: SingleInstrumentSummary,
+  /// Provides brief BLOCK instrument summary.
+  pub block_instrument: SingleInstrumentSummary,
+  /// Provides brief HYBRID instrument summary.
+  pub hybrid_instrument: SingleInstrumentSummary,
+  /// Type of product identification.
+  pub product_identification_type: ProductIdentificationType,
+  /// Product identification, e.g. ISIN number.
+  pub product_identification: ProductIdentification,
+  /// ID of the product.
+  pub product_id: ElementId,
+  /// Market structure's Market Identifier Code (MIC) as specified in ISO 10383.
+  pub mic: MicCode,
+  /// Accumulated interest on the bonds or for mortgage-backed bonds on the day of settling the transaction.
+  pub accumulated_interest: Number,
+  /// Interest rate is determined on the basis of WIBOR/WIBID/WIRON rates for each expiration date of options and futures.
+  pub interest_rate: Number,
+  /// Price currency (e.g. USD).
+  pub currency: Currency,
+  /// Stock Exchange session date.
+  pub session_date: Date,
   /// The field comprises the trading value expressed in trading currency.
   pub trading_value_currency: Value,
-  /// The total number of block trades concluded on a particular instrument during the current trading session.
-  pub block_no_trades: u64,
-  /// The total turnover volume of block trades concluded on a particular instrument during the current trading session.
-  pub block_volume: Quantity,
-  /// The total turnover value of block trades concluded on a particular instrument during the current trading session.
-  pub block_value: Value,
-  /// Minimum price of block trades in the instrument during the current trading session. If no block trades were concluded during the trading session, the field is completed with zeros.
-  pub block_min_price: Price,
-  /// Maximum price of block trades in the instrument during the current trading session. If no block trades were concluded during the trading session, the field is completed with zeros.
-  pub block_max_price: Price,
-  /// Volume weighted average price of block trades for a particular instrument during a particular trading session.
-  pub vwap_block_trade: Price,
   /// Financial instrument status.
   pub status: InstrumentStatus,
-  /// Defines the sector of the economy that the company belongs to. Possible values for shares, the field assumes were described in the WATS Market Data documetation.
+  /// Defines the sector of the economy that the company belongs to. Possible values for shares, the field assumes were described in the WATS Market Data documentation.
   pub sector: u16,
   /// Defines the market the instrument belongs to.
   pub market: Market,
   /// The field contains the market of the percentage change of the instrument closing price from the current session in relation to the reference price.
   pub marker_price_change: ChangeIndicator,
-  /// ID of the financial instrument’s market segment.
-  pub market_structure_id: ElementId,
   /// The positive field value (true) informs if the company was qualified to Lower Liquidity Space. A negative value has the opposite meaning.
   pub lower_liquidity: bool,
   /// Instrument multiplier.
@@ -2954,6 +3941,14 @@ pub struct SessionSummary {
   pub liquidity_support_pge: bool,
 }
 
+/// News title.
+pub type NewsTitle = [AnsiChar; 80];
+
+
+/// News text.
+pub type NewsText = [AnsiChar; 800];
+
+
 /// News message.
 #[repr(C, packed)]
 #[derive(Serialize, Deserialize, Clone, Copy)]
@@ -2966,14 +3961,14 @@ pub struct News {
   pub market_structure_id: ElementId,
   /// News title, unique per message.
   #[serde(with = "BigArray")]
-  pub title: [AnsiChar; 80],
+  pub title: NewsTitle,
   /// News entry number.
   pub entry_number: u8,
   /// Total number of news entries.
   pub total: u8,
   /// News text.
   #[serde(with = "BigArray")]
-  pub text: [AnsiChar; 800],
+  pub text: NewsText,
 }
 
 /// MMT Market Mechanism
@@ -3071,7 +4066,7 @@ impl std::convert::TryFrom<u8> for MmtTradingMode {
 /// MMT Transaction Category
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
-pub enum MmtTransationCategory {
+pub enum MmtTransactionCategory {
   /// D = Dark Trade
   DarkTrade = 0x0001,
   /// R = Trade that has received price improvement
@@ -3083,12 +4078,12 @@ pub enum MmtTransationCategory {
   /// - = None apply (a standard trade for the Market Mechanism and Trading Mode)
   None = 0x0005,
 }
-impl Default for MmtTransationCategory {
+impl Default for MmtTransactionCategory {
   fn default() -> Self {
     Self::DarkTrade
   }
 }
-impl std::convert::TryFrom<u8> for MmtTransationCategory {
+impl std::convert::TryFrom<u8> for MmtTransactionCategory {
   type Error = InvalidVariant;
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
@@ -3097,15 +4092,15 @@ impl std::convert::TryFrom<u8> for MmtTransationCategory {
       0x0003 => Ok(Self::PackageTrade),
       0x0004 => Ok(Self::ExchangeForPhysicalsTrade),
       0x0005 => Ok(Self::None),
-      other => Err(InvalidVariant::new(other as u32, "MmtTransationCategory")),
+      other => Err(InvalidVariant::new(other as u32, "MmtTransactionCategory")),
     }
   }
 }
 
-/// MMT Negotitation Indicator
+/// MMT Negotiation Indicator
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
-pub enum MmtNegotitationIndicator {
+pub enum MmtNegotiationIndicator {
   /// N = Negotiated Trade
   NegotiatedTrade = 0x0001,
   /// 1 = Negotiated Trade in Liquid Financial Instruments
@@ -3123,12 +4118,12 @@ pub enum MmtNegotitationIndicator {
   /// 6 = Pre-Trade Transparency Waivers of ILQD and SIZE (for RTS 1 only)
   PreTradeTransparencyWaiversIlqdAndSize = 0x0008,
 }
-impl Default for MmtNegotitationIndicator {
+impl Default for MmtNegotiationIndicator {
   fn default() -> Self {
     Self::NegotiatedTrade
   }
 }
-impl std::convert::TryFrom<u8> for MmtNegotitationIndicator {
+impl std::convert::TryFrom<u8> for MmtNegotiationIndicator {
   type Error = InvalidVariant;
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
@@ -3140,7 +4135,7 @@ impl std::convert::TryFrom<u8> for MmtNegotitationIndicator {
       0x0006 => Ok(Self::PreTradeTransparencyWaiverIlliquidInstrument),
       0x0007 => Ok(Self::PreTradeTransparencyWaiverStandardMarketSize),
       0x0008 => Ok(Self::PreTradeTransparencyWaiversIlqdAndSize),
-      other => Err(InvalidVariant::new(other as u32, "MmtNegotitationIndicator")),
+      other => Err(InvalidVariant::new(other as u32, "MmtNegotiationIndicator")),
     }
   }
 }
@@ -3420,10 +4415,6 @@ impl std::convert::TryFrom<u8> for MmtPostTradeDeferralType {
 pub enum MsgType {
   /// A message type used to check connectivity.
   Heartbeat = 0x0001,
-  /// A text message.
-  Text = 0x0002,
-  /// A message used to test system operation.
-  Test = 0x0003,
   /// New (limit) order added to order book.
   OrderAdd = 0x0009,
   /// Order modified.
@@ -3432,14 +4423,8 @@ pub enum MsgType {
   OrderDelete = 0x000b,
   /// Execution report.
   OrderExecute = 0x000c,
-  /// Start of a technical session.
-  StartOfTechnicalSession = 0x0014,
-  /// End of a technical session.
-  EndOfTechnicalSession = 0x0015,
-  /// Marks the start of the reference data.
-  ReferenceDataStart = 0x0016,
-  /// Marks the end of the reference data.
-  ReferenceDataEnd = 0x0017,
+  /// The Trading Session Status provides information on the status of a market and on a trading day events.
+  TradingSessionStatus = 0x0017,
   /// Encryption key and ID.
   EncryptionKey = 0x0018,
   /// Start of a new trading phase.
@@ -3502,8 +4487,10 @@ pub enum MsgType {
   EndOfSnapshot = 0x029e,
   /// Instrument summary.
   InstrumentSummary = 0x029f,
-  /// Session summary.
-  SessionSummary = 0x02a0,
+  /// Product summary.
+  ProductSummary = 0x02a0,
+  /// Report of open positions.
+  PositionReport = 0x0321,
   /// A message to relay test scenario information
   TestEvent = 0x2000,
 }
@@ -3517,16 +4504,11 @@ impl std::convert::TryFrom<u16> for MsgType {
   fn try_from(value: u16) -> Result<Self, Self::Error> {
     match value {
       0x0001 => Ok(Self::Heartbeat),
-      0x0002 => Ok(Self::Text),
-      0x0003 => Ok(Self::Test),
       0x0009 => Ok(Self::OrderAdd),
       0x000a => Ok(Self::OrderModify),
       0x000b => Ok(Self::OrderDelete),
       0x000c => Ok(Self::OrderExecute),
-      0x0014 => Ok(Self::StartOfTechnicalSession),
-      0x0015 => Ok(Self::EndOfTechnicalSession),
-      0x0016 => Ok(Self::ReferenceDataStart),
-      0x0017 => Ok(Self::ReferenceDataEnd),
+      0x0017 => Ok(Self::TradingSessionStatus),
       0x0018 => Ok(Self::EncryptionKey),
       0x001a => Ok(Self::InstrumentStatusChange),
       0x001b => Ok(Self::TradingPhaseScheduleEntry),
@@ -3558,7 +4540,8 @@ impl std::convert::TryFrom<u16> for MsgType {
       0x029d => Ok(Self::Logout),
       0x029e => Ok(Self::EndOfSnapshot),
       0x029f => Ok(Self::InstrumentSummary),
-      0x02a0 => Ok(Self::SessionSummary),
+      0x02a0 => Ok(Self::ProductSummary),
+      0x0321 => Ok(Self::PositionReport),
       0x2000 => Ok(Self::TestEvent),
       other => Err(InvalidVariant::new(other as u32, "MsgType")),
     }
@@ -3568,16 +4551,11 @@ pub struct MsgTypeInt;
 #[allow(non_upper_case_globals, dead_code)]
 impl MsgTypeInt {
   pub const Heartbeat: u16 = 0x0001;
-  pub const Text: u16 = 0x0002;
-  pub const Test: u16 = 0x0003;
   pub const OrderAdd: u16 = 0x0009;
   pub const OrderModify: u16 = 0x000a;
   pub const OrderDelete: u16 = 0x000b;
   pub const OrderExecute: u16 = 0x000c;
-  pub const StartOfTechnicalSession: u16 = 0x0014;
-  pub const EndOfTechnicalSession: u16 = 0x0015;
-  pub const ReferenceDataStart: u16 = 0x0016;
-  pub const ReferenceDataEnd: u16 = 0x0017;
+  pub const TradingSessionStatus: u16 = 0x0017;
   pub const EncryptionKey: u16 = 0x0018;
   pub const InstrumentStatusChange: u16 = 0x001a;
   pub const TradingPhaseScheduleEntry: u16 = 0x001b;
@@ -3609,7 +4587,8 @@ impl MsgTypeInt {
   pub const Logout: u16 = 0x029d;
   pub const EndOfSnapshot: u16 = 0x029e;
   pub const InstrumentSummary: u16 = 0x029f;
-  pub const SessionSummary: u16 = 0x02a0;
+  pub const ProductSummary: u16 = 0x02a0;
+  pub const PositionReport: u16 = 0x0321;
   pub const TestEvent: u16 = 0x2000;
 }
 
@@ -3621,7 +4600,7 @@ impl BytesValidator for MsgType {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u16::from_le_bytes).unwrap_unchecked();
-  matches!(disc, MsgTypeInt::Heartbeat | MsgTypeInt::Text | MsgTypeInt::Test | MsgTypeInt::OrderAdd | MsgTypeInt::OrderModify | MsgTypeInt::OrderDelete | MsgTypeInt::OrderExecute | MsgTypeInt::StartOfTechnicalSession | MsgTypeInt::EndOfTechnicalSession | MsgTypeInt::ReferenceDataStart | MsgTypeInt::ReferenceDataEnd | MsgTypeInt::EncryptionKey | MsgTypeInt::InstrumentStatusChange | MsgTypeInt::TradingPhaseScheduleEntry | MsgTypeInt::TickTableEntry | MsgTypeInt::WeekPlan | MsgTypeInt::CalendarException | MsgTypeInt::AccruedInterestTableEntry | MsgTypeInt::IndexationTableEntry | MsgTypeInt::Trade | MsgTypeInt::CollarTableEntry | MsgTypeInt::TopPriceLevelUpdate | MsgTypeInt::PriceLevelSnapshot | MsgTypeInt::AuctionUpdate | MsgTypeInt::AuctionSummary | MsgTypeInt::PriceUpdate | MsgTypeInt::OrderCollars | MsgTypeInt::TradeCollars | MsgTypeInt::MarketStructure | MsgTypeInt::Instrument | MsgTypeInt::CollarGroup | MsgTypeInt::OrderBookEvent | MsgTypeInt::RealTimeIndex | MsgTypeInt::IndexSummary | MsgTypeInt::IndexPortfolioEntry | MsgTypeInt::IndexParams | MsgTypeInt::News | MsgTypeInt::Login | MsgTypeInt::LoginResponse | MsgTypeInt::Logout | MsgTypeInt::EndOfSnapshot | MsgTypeInt::InstrumentSummary | MsgTypeInt::SessionSummary | MsgTypeInt::TestEvent)
+  matches!(disc, MsgTypeInt::Heartbeat | MsgTypeInt::OrderAdd | MsgTypeInt::OrderModify | MsgTypeInt::OrderDelete | MsgTypeInt::OrderExecute | MsgTypeInt::TradingSessionStatus | MsgTypeInt::EncryptionKey | MsgTypeInt::InstrumentStatusChange | MsgTypeInt::TradingPhaseScheduleEntry | MsgTypeInt::TickTableEntry | MsgTypeInt::WeekPlan | MsgTypeInt::CalendarException | MsgTypeInt::AccruedInterestTableEntry | MsgTypeInt::IndexationTableEntry | MsgTypeInt::Trade | MsgTypeInt::CollarTableEntry | MsgTypeInt::TopPriceLevelUpdate | MsgTypeInt::PriceLevelSnapshot | MsgTypeInt::AuctionUpdate | MsgTypeInt::AuctionSummary | MsgTypeInt::PriceUpdate | MsgTypeInt::OrderCollars | MsgTypeInt::TradeCollars | MsgTypeInt::MarketStructure | MsgTypeInt::Instrument | MsgTypeInt::CollarGroup | MsgTypeInt::OrderBookEvent | MsgTypeInt::RealTimeIndex | MsgTypeInt::IndexSummary | MsgTypeInt::IndexPortfolioEntry | MsgTypeInt::IndexParams | MsgTypeInt::News | MsgTypeInt::Login | MsgTypeInt::LoginResponse | MsgTypeInt::Logout | MsgTypeInt::EndOfSnapshot | MsgTypeInt::InstrumentSummary | MsgTypeInt::ProductSummary | MsgTypeInt::PositionReport | MsgTypeInt::TestEvent)
     }
   }
 
@@ -3641,6 +4620,10 @@ pub enum MarketModelType {
   CROSS = 0x0005,
   /// Initial public offering
   IPO = 0x0006,
+  /// Tender offer
+  TenderOffer = 0x0007,
+  /// Redistribution
+  Redistribution = 0x0008,
 }
 impl Default for MarketModelType {
   fn default() -> Self {
@@ -3657,6 +4640,8 @@ impl std::convert::TryFrom<u8> for MarketModelType {
       0x0004 => Ok(Self::HYBRID),
       0x0005 => Ok(Self::CROSS),
       0x0006 => Ok(Self::IPO),
+      0x0007 => Ok(Self::TenderOffer),
+      0x0008 => Ok(Self::Redistribution),
       other => Err(InvalidVariant::new(other as u32, "MarketModelType")),
     }
   }
@@ -3709,19 +4694,60 @@ pub struct TestEvent {
   pub event_type: EventType,
 }
 
+/// Identifies type of quantity returned.
+#[repr(u8)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum PosType {
+  /// Start-of-Day Qty.
+  SOD = 0x0001,
+  /// Intraday Qty.
+  ITD = 0x0002,
+  /// End-of-Day Qty.
+  FIN = 0x0003,
+}
+impl Default for PosType {
+  fn default() -> Self {
+    Self::SOD
+  }
+}
+impl std::convert::TryFrom<u8> for PosType {
+  type Error = InvalidVariant;
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      0x0001 => Ok(Self::SOD),
+      0x0002 => Ok(Self::ITD),
+      0x0003 => Ok(Self::FIN),
+      other => Err(InvalidVariant::new(other as u32, "PosType")),
+    }
+  }
+}
+
+/// Report of open positions.
+#[repr(C, packed)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
+#[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
+pub struct PositionReport {
+  /// Message Header.
+  pub header: Header,
+  /// Product identification, for example its ISIN number.
+  pub public_product_identification: PublicProductIdentification,
+  /// Type of quantity returned.
+  pub pos_type: PosType,
+  /// Number of open positions.
+  pub open_positions: u32,
+  /// Trade ID.
+  pub trade_id: TradeId,
+}
+
 
 pub union Message {
   pub heartbeat: Heartbeat,
-  pub text: Text,
-  pub test: Test,
   pub order_add: OrderAdd,
   pub order_modify: OrderModify,
   pub order_delete: OrderDelete,
   pub order_execute: OrderExecute,
-  pub start_of_technical_session: StartOfTechnicalSession,
-  pub end_of_technical_session: EndOfTechnicalSession,
-  pub reference_data_start: ReferenceDataStart,
-  pub reference_data_end: ReferenceDataEnd,
+  pub trading_session_status: TradingSessionStatus,
   pub encryption_key: EncryptionKey,
   pub instrument_status_change: InstrumentStatusChange,
   pub trading_phase_schedule_entry: TradingPhaseScheduleEntry,
@@ -3752,9 +4778,10 @@ pub union Message {
   pub index_portfolio_entry: IndexPortfolioEntry,
   pub index_params: IndexParams,
   pub instrument_summary: InstrumentSummary,
-  pub session_summary: SessionSummary,
+  pub product_summary: ProductSummary,
   pub news: News,
   pub test_event: TestEvent,
+  pub position_report: PositionReport,
 }
 
 impl Serialize for Message {
@@ -3765,16 +4792,11 @@ impl Serialize for Message {
     unsafe {
       match self.heartbeat.header.msg_type {
         MsgType::Heartbeat => self.heartbeat.serialize(serializer),
-        MsgType::Text => self.text.serialize(serializer),
-        MsgType::Test => self.test.serialize(serializer),
         MsgType::OrderAdd => self.order_add.serialize(serializer),
         MsgType::OrderModify => self.order_modify.serialize(serializer),
         MsgType::OrderDelete => self.order_delete.serialize(serializer),
         MsgType::OrderExecute => self.order_execute.serialize(serializer),
-        MsgType::StartOfTechnicalSession => self.start_of_technical_session.serialize(serializer),
-        MsgType::EndOfTechnicalSession => self.end_of_technical_session.serialize(serializer),
-        MsgType::ReferenceDataStart => self.reference_data_start.serialize(serializer),
-        MsgType::ReferenceDataEnd => self.reference_data_end.serialize(serializer),
+        MsgType::TradingSessionStatus => self.trading_session_status.serialize(serializer),
         MsgType::EncryptionKey => self.encryption_key.serialize(serializer),
         MsgType::InstrumentStatusChange => self.instrument_status_change.serialize(serializer),
         MsgType::TradingPhaseScheduleEntry => self.trading_phase_schedule_entry.serialize(serializer),
@@ -3805,9 +4827,10 @@ impl Serialize for Message {
         MsgType::IndexPortfolioEntry => self.index_portfolio_entry.serialize(serializer),
         MsgType::IndexParams => self.index_params.serialize(serializer),
         MsgType::InstrumentSummary => self.instrument_summary.serialize(serializer),
-        MsgType::SessionSummary => self.session_summary.serialize(serializer),
+        MsgType::ProductSummary => self.product_summary.serialize(serializer),
         MsgType::News => self.news.serialize(serializer),
-        MsgType::TestEvent => self.test_event.serialize(serializer), 
+        MsgType::TestEvent => self.test_event.serialize(serializer),
+        MsgType::PositionReport => self.position_report.serialize(serializer), 
       }
     }
   }
@@ -3820,16 +4843,11 @@ impl Message {
   {
     match disc {
       MsgType::Heartbeat => Heartbeat::deserialize(de).map(|v| Message { heartbeat: v }),
-      MsgType::Text => Text::deserialize(de).map(|v| Message { text: v }),
-      MsgType::Test => Test::deserialize(de).map(|v| Message { test: v }),
       MsgType::OrderAdd => OrderAdd::deserialize(de).map(|v| Message { order_add: v }),
       MsgType::OrderModify => OrderModify::deserialize(de).map(|v| Message { order_modify: v }),
       MsgType::OrderDelete => OrderDelete::deserialize(de).map(|v| Message { order_delete: v }),
       MsgType::OrderExecute => OrderExecute::deserialize(de).map(|v| Message { order_execute: v }),
-      MsgType::StartOfTechnicalSession => StartOfTechnicalSession::deserialize(de).map(|v| Message { start_of_technical_session: v }),
-      MsgType::EndOfTechnicalSession => EndOfTechnicalSession::deserialize(de).map(|v| Message { end_of_technical_session: v }),
-      MsgType::ReferenceDataStart => ReferenceDataStart::deserialize(de).map(|v| Message { reference_data_start: v }),
-      MsgType::ReferenceDataEnd => ReferenceDataEnd::deserialize(de).map(|v| Message { reference_data_end: v }),
+      MsgType::TradingSessionStatus => TradingSessionStatus::deserialize(de).map(|v| Message { trading_session_status: v }),
       MsgType::EncryptionKey => EncryptionKey::deserialize(de).map(|v| Message { encryption_key: v }),
       MsgType::InstrumentStatusChange => InstrumentStatusChange::deserialize(de).map(|v| Message { instrument_status_change: v }),
       MsgType::TradingPhaseScheduleEntry => TradingPhaseScheduleEntry::deserialize(de).map(|v| Message { trading_phase_schedule_entry: v }),
@@ -3860,9 +4878,10 @@ impl Message {
       MsgType::IndexPortfolioEntry => IndexPortfolioEntry::deserialize(de).map(|v| Message { index_portfolio_entry: v }),
       MsgType::IndexParams => IndexParams::deserialize(de).map(|v| Message { index_params: v }),
       MsgType::InstrumentSummary => InstrumentSummary::deserialize(de).map(|v| Message { instrument_summary: v }),
-      MsgType::SessionSummary => SessionSummary::deserialize(de).map(|v| Message { session_summary: v }),
+      MsgType::ProductSummary => ProductSummary::deserialize(de).map(|v| Message { product_summary: v }),
       MsgType::News => News::deserialize(de).map(|v| Message { news: v }),
       MsgType::TestEvent => TestEvent::deserialize(de).map(|v| Message { test_event: v }),
+      MsgType::PositionReport => PositionReport::deserialize(de).map(|v| Message { position_report: v }),
     }
   }
 }
@@ -3871,16 +4890,11 @@ impl Message {
   pub const fn size_of(disc: MsgType) -> usize {
     match disc {
       MsgType::Heartbeat => std::mem::size_of::<Heartbeat>(),
-      MsgType::Text => std::mem::size_of::<Text>(),
-      MsgType::Test => std::mem::size_of::<Test>(),
       MsgType::OrderAdd => std::mem::size_of::<OrderAdd>(),
       MsgType::OrderModify => std::mem::size_of::<OrderModify>(),
       MsgType::OrderDelete => std::mem::size_of::<OrderDelete>(),
       MsgType::OrderExecute => std::mem::size_of::<OrderExecute>(),
-      MsgType::StartOfTechnicalSession => std::mem::size_of::<StartOfTechnicalSession>(),
-      MsgType::EndOfTechnicalSession => std::mem::size_of::<EndOfTechnicalSession>(),
-      MsgType::ReferenceDataStart => std::mem::size_of::<ReferenceDataStart>(),
-      MsgType::ReferenceDataEnd => std::mem::size_of::<ReferenceDataEnd>(),
+      MsgType::TradingSessionStatus => std::mem::size_of::<TradingSessionStatus>(),
       MsgType::EncryptionKey => std::mem::size_of::<EncryptionKey>(),
       MsgType::InstrumentStatusChange => std::mem::size_of::<InstrumentStatusChange>(),
       MsgType::TradingPhaseScheduleEntry => std::mem::size_of::<TradingPhaseScheduleEntry>(),
@@ -3911,9 +4925,10 @@ impl Message {
       MsgType::IndexPortfolioEntry => std::mem::size_of::<IndexPortfolioEntry>(),
       MsgType::IndexParams => std::mem::size_of::<IndexParams>(),
       MsgType::InstrumentSummary => std::mem::size_of::<InstrumentSummary>(),
-      MsgType::SessionSummary => std::mem::size_of::<SessionSummary>(),
+      MsgType::ProductSummary => std::mem::size_of::<ProductSummary>(),
       MsgType::News => std::mem::size_of::<News>(),
       MsgType::TestEvent => std::mem::size_of::<TestEvent>(),
+      MsgType::PositionReport => std::mem::size_of::<PositionReport>(),
     }
   }
 }

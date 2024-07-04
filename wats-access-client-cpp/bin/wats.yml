@@ -7,7 +7,7 @@ services: &services_default
     stream:
       host: 224.3.1.1
       port: 10009
-      interface: 172.20.100.65
+      interface: 127.0.0.1
     replay:
       host: 127.0.0.1
       port: 10011
@@ -15,7 +15,7 @@ services: &services_default
     stream:
       host: 224.4.1.1
       port: 10031
-      interface: 172.20.100.65
+      interface: 127.0.0.1
     replay:
       host: 127.0.0.1
       port: 10034
@@ -26,7 +26,7 @@ services: &services_default
     stream:
       host: 224.3.1.1
       port: 10031
-      interface: 172.20.100.65
+      interface: 127.0.0.1
     replay:
       host: 127.0.0.1
       port: 10032
@@ -43,7 +43,7 @@ connections:
     connection_id: 595
     token: ABCDEFGH
   best_bid_offer_connection_0: &best_bid_offer_connection_0_default
-    connection_id: 587
+    connection_id: 609
     token: ABCDEFGH
   trading_port_connection_0: &trading_port_connection_0_default
     connection_id: 581
@@ -63,10 +63,11 @@ products:
   order_cancel: &order_cancel_default 4669
   order_cancel_bad_order_ref_id: &order_cancel_bad_order_ref_id_default 4669
   price_violates_tick_table: &price_violates_tick_table_default 4669
-  bbo_price_level: &bbo_price_level_default 4679
+  bbo_price_level: &bbo_price_level_default 4688
   ptc_verification: &ptc_verification_default 4697
   order_book_based_on_omd: &order_book_based_on_omd_default 4685
   block_dual: &block_dual_default 4701
+  block_dual_clob_reference: &block_dual_clob_reference_default 4700
 
 # C++ spdlog levels: trace, debug, info, warning, error, critical, off
 log_level: &log_level_default debug
@@ -153,27 +154,27 @@ orders_in_phase:
   connections:
     trading_port: *trading_port_connection_0_default
   orders:
-    - product: 4687
+    - product: 4685
       side: Buy
       quantity: 200000
       price: 103
-    - product: 4687
+    - product: 4685
       side: Sell
       quantity: 200000
       price: 104
-    - product: 4687
+    - product: 4685
       side: Buy
       quantity: 300000
       price: 101
-    - product: 4687
+    - product: 4685
       side: Sell
       quantity: 100000
       price: 99
-    - product: 4687
+    - product: 4685
       side: Buy
       quantity: 200000
       price: 98
-    - product: 4687
+    - product: 4685
       side: Sell
       quantity: 400000
       price: 99
@@ -208,3 +209,4 @@ block_dual:
     trading_port: *trading_port_connection_0_default
     market_data: *market_data_connection_0_default
   product: *block_dual_default
+  product_clob_reference: *block_dual_clob_reference_default

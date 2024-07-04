@@ -98,63 +98,11 @@ Below table summarizes the connectivity data for core services on the ISV develo
 
 Initially encryption of Market Data streams will not be enabled. After enabling, encryption keys will be distributed through `EncryptionKey` messages of Market Data Snapshot (DDS::OMD::Snapshot) service which should be read as first of all Market Data streams.
 
-## FIX protocol helpers
-
-Repository contains messages definitions for FIX protocol in XML format, complaint with QuickFIX library:
-
-* [FIX50SP2.xml](quickfix/FIX50SP2.xml)
-* [FIXT11.xml](quickfix/FIXT11.xml)
-
 ## Reference Documents
-Documentation of the trading protocols supported by the WATS system:
 
-### Introduction
+Reference documentation and contract definitions can be found under the following link:
 
-* [GPW WATS 1.01 Trading System](docs/GPW%20WATS%201.01%20Trading%20System%20v0.62.pdf)
-* [Changelog for GPW WATS 1.01 Trading System](docs/Changelog%20for%20GPW%20WATS%201.01%20Trading%20System.pdf)
-* [GPW WATS 1.02 Glossary](docs/GPW%20WATS%201.02%20Glossary%20v0.62.pdf)
-* [Changelog for GPW WATS 1.02 Glossary](docs/Changelog%20for%20GPW%20WATS%201.02%20Glossary.pdf)
-
-### Trading Protocols
-
-* [GPW WATS 2.01 Native Order Gateway Specification](docs/GPW%20WATS%202.01%20Native%20Order%20Gateway%20Specification%20v0.62.pdf)
-* [Changelog for GPW WATS 2.01 Native Order Gateway Specification](docs/Changelog%20for%20GPW%20WATS%202.01%20Native%20Order%20Gateway%20Specification.pdf)
-* [GPW WATS 2.02 FIX Order Gateway Specification](docs/GPW%20WATS%202.02%20FIX%20Order%20Gateway%20Specification%20v0.62.pdf)
-* [Changelog for GPW WATS 2.02 FIX Order Gateway Specification](docs/Changelog%20for%20GPW%20WATS%202.02%20FIX%20Order%20Gateway%20Specification.pdf)
-
-### Data Distribution Service
-
-* [GPW WATS 3.01 Market Data Protocol](docs/GPW%20WATS%203.01%20Market%20Data%20Protocol%20v0.62.pdf)
-* [Changelog for GPW WATS 3.01 Market Data Protocol](docs/Changelog%20for%20GPW%20WATS%203.01%20Market%20Data%20Protocol.pdf)
-* [GPW WATS 3.02 Internet Data Distribution System](docs/GPW%20WATS%203.02%20Internet%20Data%20Distribution%20System%20v0.62.pdf)
-* [GPW WATS 3.03 Streaming Messages](docs/GPW%20WATS%203.03%20Streaming%20Messages.pdf)
-* [Changelog for GPW WATS 3.03 Streaming Messages](docs/Changelog%20for%20GPW%20WATS%203.03%20Streaming%20Messages%20for%20IDDS.pdf)
-* [GPW WATS 3.04 Rest API Messages for IDDS](docs/GPW%20WATS%203.04%20Rest%20API%20Messages%20for%20IDDS%20v0.62.pdf)
-* [Changelog GPW WATS 3.04 Rest API Messages for IDDS](docs/Changelog%20for%20GPW%20WATS%203.04%20Rest%20API%20Messages%20for%20IDDS.pdf)
-
-### Other Services
-
-* [GPW WATS 4.01 Drop Copy Gateway](docs/GPW%20WATS%204.01%20Drop%20Copy%20Gateway%20v0.62.pdf)
-* [Changelog for GPW WATS 4.01 Drop Copy Gateway](docs/Changelog%20for%20GPW%20WATS%204.01%20Drop%20Copy%20Gateway.pdf)
-* [GPW WATS 4.02 Post Trade Gateway](docs/GPW%20WATS%204.02%20Post%20Trade%20Gateway%20v0.62.pdf)
-* [Changelog for GPW WATS 4.02 Post Trade Gateway](docs/Changelog%20for%20GPW%20WATS%204.02%20Post%20Trade%20Gateway.pdf)
-* [GPW WATS 4.03 Contract Notes](docs/GPW%20WATS%204.03%20Contract%20Notes%20v0.62.pdf)
-* [GPW WATS 5.01 Risk Management Gateway](docs/GPW%20WATS%205.01%20Risk%20Management%20Gateway%20v0.62.pdf)
-* [Changelog for GPW WATS 5.01 Risk Management Gateway](docs/Changelog%20for%20GPW%20WATS%205.01%20Risk%20Management%20Gateway.pdf)
-
-### Additional Documentation
-
-* [GPW WATS 2.03 Rejection Codes](docs/GPW%20WATS%202.03%20Rejection%20Codes%20v0.62.pdf)
-* [Changelog for GPW WATS 2.03 Rejection Codes](docs/Changelog%20for%20GPW%20WATS%202.03%20Rejection%20Codes.pdf)
-* [GPW WATS 2.04 BenDec Message Definition Format](docs/GPW%20WATS%202.04%20BenDec%20Message%20Definition%20Format%20v0.62.pdf)
-* [GPW WATS 6.01 Connectivity](docs/GPW%20WATS%206.01%20Connectivity%20v0.62.pdf)
-* [Changelog for GPW WATS 6.01 Connectivity](docs/Changelog%20for%20GPW%20WATS%206.01%20Connectivity.pdf)
-* [GPW WATS 6.02(ENG) Short Code Record Keeping](docs/GPW%20WATS%206.02(ENG)%20Short%20Code%20Record%20Keeping.pdf)
-* [Changelog for GPW WATS 6.02(ENG) Short Code Record Keeping](docs/Changelog%20for%20GPW%20WATS%206.02(ENG)%20Short%20Code%20Record%20Keeping.pdf)
-* [GPW WATS 6.02(PL) Mapowanie Short Code](docs/GPW%20WATS%206.02(PL)%20Mapowanie%20Short%20Code.pdf)
-* [Protokół zmian dla GPW WATS 6.02(PL) Mapowanie Short Code](docs/Protokół%20zmian%20dla%20GPW%20WATS%206.02(PL)%20Mapowanie%20Short%20Code.pdf)
-* [GPW WATS 6.03 Short-Long Mapper User Guide](docs/GPW%20WATS%206.03%20Short-Long%20Mapper%20User%20Guide.pdf)
-* [Changelog for GPW WATS 6.03 Short-Long Mapper User Guide](docs/Changelog%20for%20GPW%20WATS%206.03%20Short-Long%20Mapper%20User%20Guide.pdf)
+[GPW WATS - Dokumentacja](https://gpwwats.pl/dokumentacja-i-faq)
 
 ## Support
 If you have any doubts please feel free to contact support for WATS Access Client development environment for ISVs:

@@ -1,10 +1,7 @@
 package pl.gpw.wats.client.tp.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.nio.ByteBuffer;
 
 /**
@@ -44,59 +41,62 @@ public enum RejectReason {
      * Missing report id (SecondaryTradeReportId or TradeReportRefId).
      */
     MISSINGREPORTIDSECONDARYTRADEREPORTIDORTRADEREPORTREFID(7),
-    UNKNOWN(99999);
-
+    /**
+     * Invalid trade ID.
+     */
+    INVALIDTRADEID(8),
+    /**
+     * Invalid algorithmic trade indicator.
+     */
+    INVALIDALGORITHMICTRADEINDICATOR(9);
+    
     private final int value;
-
     private final int byteLength = 1;
-
-
+    
     private static final Map<Integer, RejectReason> TYPES = new HashMap<>();
     static {
         for (RejectReason type : RejectReason.values()) {
             TYPES.put(type.value, type);
         }
     }
-
-
+    
     RejectReason(int newValue) {
         value = newValue;
     }
-
+    
     /**
-     Get RejectReason from java input
-     * @param newValue
-     * @return RejectReason enum
+     * Get RejectReason by attribute
+     * @param val
+     * @return RejectReason enum or null if variant is undefined
      */
-    public static RejectReason getRejectReason(int newValue) {
-        RejectReason val = TYPES.get(newValue);
-        return val == null ? RejectReason.UNKNOWN : val;
+    public static RejectReason getRejectReason(int val) {
+        return TYPES.get(val);
     }
-
+    
     /**
      * Get RejectReason int value
      * @return int value
      */
-    public int getRejectReasonValue() { return value; }
-
-
+    public int getRejectReasonValue() {
+        return value; 
+    }
+    
     /**
-     Get RejectReason from bytes
+     * Get RejectReason from bytes
      * @param bytes byte[]
      * @param offset - int
      */
     public static RejectReason getRejectReason(byte[] bytes, int offset) {
         return getRejectReason(BendecUtils.uInt8FromByteArray(bytes, offset));
     }
-
+    
     byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
         return buffer.array();
     }
-
+    
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
     }
-
 }

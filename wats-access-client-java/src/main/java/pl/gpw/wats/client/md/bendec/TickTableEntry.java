@@ -1,110 +1,103 @@
 package pl.gpw.wats.client.md.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.nio.ByteBuffer;
-
 
 /**
  * <h2>TickTableEntry</h2>
  * <p>Tick size definition.</p>
- * <p>Byte length: 59</p>
- * <p>Header header - Message header. | size 39</p>
+ * <p>Byte length: 62</p>
+ * <p>Header header - Message header. | size 42</p>
  * <p>TickSize > long (i64) tickSize - Size of the tick. | size 8</p>
  * <p>Bound > long (i64) lowerBound - Tick size lower bound. | size 8</p>
  * <p>ElementId > long (u32) tickTableId - Tick table ID. | size 4</p>
- * */
-
+ */
 public class TickTableEntry implements ByteSerializable, Message {
-
     private Header header;
     private long tickSize;
     private long lowerBound;
     private long tickTableId;
-    public static final int byteLength = 59;
-
+    public static final int byteLength = 62;
+    
     public TickTableEntry(Header header, long tickSize, long lowerBound, long tickTableId) {
         this.header = header;
         this.tickSize = tickSize;
         this.lowerBound = lowerBound;
         this.tickTableId = tickTableId;
-        this.header.setLength(this.byteLength);
-        this.header.setMsgType(MsgType.TICKTABLEENTRY);
     }
-
+    
     public TickTableEntry(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
-        this.tickSize = BendecUtils.int64FromByteArray(bytes, offset + 39);
-        this.lowerBound = BendecUtils.int64FromByteArray(bytes, offset + 47);
-        this.tickTableId = BendecUtils.uInt32FromByteArray(bytes, offset + 55);
-        this.header.setLength(this.byteLength);
-        this.header.setMsgType(MsgType.TICKTABLEENTRY);
+        this.tickSize = BendecUtils.int64FromByteArray(bytes, offset + 42);
+        this.lowerBound = BendecUtils.int64FromByteArray(bytes, offset + 50);
+        this.tickTableId = BendecUtils.uInt32FromByteArray(bytes, offset + 58);
     }
-
+    
     public TickTableEntry(byte[] bytes) {
         this(bytes, 0);
     }
-
+    
     public TickTableEntry() {
     }
-
-
-
+    
     /**
      * @return Message header.
      */
     public Header getHeader() {
         return this.header;
-    };
+    }
+    
     /**
      * @return Size of the tick.
      */
     public long getTickSize() {
         return this.tickSize;
-    };
+    }
+    
     /**
      * @return Tick size lower bound.
      */
     public long getLowerBound() {
         return this.lowerBound;
-    };
+    }
+    
     /**
      * @return Tick table ID.
      */
     public long getTickTableId() {
         return this.tickTableId;
-    };
-
+    }
+    
     /**
      * @param header Message header.
      */
     public void setHeader(Header header) {
         this.header = header;
-    };
+    }
+    
     /**
      * @param tickSize Size of the tick.
      */
     public void setTickSize(long tickSize) {
         this.tickSize = tickSize;
-    };
+    }
+    
     /**
      * @param lowerBound Tick size lower bound.
      */
     public void setLowerBound(long lowerBound) {
         this.lowerBound = lowerBound;
-    };
+    }
+    
     /**
      * @param tickTableId Tick table ID.
      */
     public void setTickTableId(long tickTableId) {
         this.tickTableId = tickTableId;
-    };
-
-
-    @Override  
+    }
+    
+    @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         header.toBytes(buffer);
@@ -113,7 +106,7 @@ public class TickTableEntry implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt32ToByteArray(this.tickTableId));
         return buffer.array();
     }
-
+    
     @Override  
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
@@ -121,19 +114,22 @@ public class TickTableEntry implements ByteSerializable, Message {
         buffer.put(BendecUtils.int64ToByteArray(this.lowerBound));
         buffer.put(BendecUtils.uInt32ToByteArray(this.tickTableId));
     }
-
+    
     @Override
     public int hashCode() {
-        return Objects.hash(header, tickSize, lowerBound, tickTableId);
+        return Objects.hash(header,
+        tickSize,
+        lowerBound,
+        tickTableId);
     }
-
+    
     @Override
     public String toString() {
-        return "TickTableEntry{" +
+        return "TickTableEntry {" +
             "header=" + header +
             ", tickSize=" + tickSize +
             ", lowerBound=" + lowerBound +
             ", tickTableId=" + tickTableId +
-            '}';
-        }
+            "}";
+    }
 }

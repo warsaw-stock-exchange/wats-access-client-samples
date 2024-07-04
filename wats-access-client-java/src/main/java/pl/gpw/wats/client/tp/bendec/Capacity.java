@@ -1,10 +1,7 @@
 package pl.gpw.wats.client.tp.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.nio.ByteBuffer;
 
 /**
@@ -23,60 +20,55 @@ public enum Capacity {
     /**
      * Riskless Principal (mapped to MTCH)
      */
-    RISKLESSPRINCIPAL(3),
-    UNKNOWN(99999);
-
+    RISKLESSPRINCIPAL(3);
+    
     private final int value;
-
     private final int byteLength = 1;
-
-
+    
     private static final Map<Integer, Capacity> TYPES = new HashMap<>();
     static {
         for (Capacity type : Capacity.values()) {
             TYPES.put(type.value, type);
         }
     }
-
-
+    
     Capacity(int newValue) {
         value = newValue;
     }
-
+    
     /**
-     Get Capacity from java input
-     * @param newValue
-     * @return Capacity enum
+     * Get Capacity by attribute
+     * @param val
+     * @return Capacity enum or null if variant is undefined
      */
-    public static Capacity getCapacity(int newValue) {
-        Capacity val = TYPES.get(newValue);
-        return val == null ? Capacity.UNKNOWN : val;
+    public static Capacity getCapacity(int val) {
+        return TYPES.get(val);
     }
-
+    
     /**
      * Get Capacity int value
      * @return int value
      */
-    public int getCapacityValue() { return value; }
-
-
+    public int getCapacityValue() {
+        return value; 
+    }
+    
     /**
-     Get Capacity from bytes
+     * Get Capacity from bytes
      * @param bytes byte[]
      * @param offset - int
      */
     public static Capacity getCapacity(byte[] bytes, int offset) {
         return getCapacity(BendecUtils.uInt8FromByteArray(bytes, offset));
     }
-
+    
     byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
         return buffer.array();
     }
-
+    
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
     }
-
 }

@@ -8,6 +8,7 @@
   #pragma pack(1)
   
   
+// primitive built-in: bool
 // primitive built-in: uint8_t
 using BulkSeqNum = uint8_t;
 // primitive built-in: uint16_t
@@ -29,20 +30,18 @@ enum class MsgType: uint16_t {
     Heartbeat = 13,
     LogoutResponse = 14,
     Reject = 15,
-    RiskLimitDefinition = 16,
-    RiskLimitDefinitionResponse = 17,
     TradeCaptureReportSingle = 18,
     TradeCaptureReportDual = 19,
     TradeCaptureReportResponse = 20,
-    RiskLimitBreach = 21,
     TradeBust = 23,
     MassQuote = 24,
     MassQuoteResponse = 25,
-    InitiateState = 26,
-    InitiateStateResponse = 27,
     RequestForExecution = 28,
     OrderMassCancel = 29,
     OrderMassCancelResponse = 30,
+    BidOfferUpdate = 31,
+    MarketMakerCommand = 32,
+    MarketMakerCommandResponse = 33,
     TestEvent = 255
 };
 
@@ -62,20 +61,18 @@ static const std::map<std::string, MsgType> Name2MsgType {
     { "Heartbeat", MsgType::Heartbeat },
     { "LogoutResponse", MsgType::LogoutResponse },
     { "Reject", MsgType::Reject },
-    { "RiskLimitDefinition", MsgType::RiskLimitDefinition },
-    { "RiskLimitDefinitionResponse", MsgType::RiskLimitDefinitionResponse },
     { "TradeCaptureReportSingle", MsgType::TradeCaptureReportSingle },
     { "TradeCaptureReportDual", MsgType::TradeCaptureReportDual },
     { "TradeCaptureReportResponse", MsgType::TradeCaptureReportResponse },
-    { "RiskLimitBreach", MsgType::RiskLimitBreach },
     { "TradeBust", MsgType::TradeBust },
     { "MassQuote", MsgType::MassQuote },
     { "MassQuoteResponse", MsgType::MassQuoteResponse },
-    { "InitiateState", MsgType::InitiateState },
-    { "InitiateStateResponse", MsgType::InitiateStateResponse },
     { "RequestForExecution", MsgType::RequestForExecution },
     { "OrderMassCancel", MsgType::OrderMassCancel },
     { "OrderMassCancelResponse", MsgType::OrderMassCancelResponse },
+    { "BidOfferUpdate", MsgType::BidOfferUpdate },
+    { "MarketMakerCommand", MsgType::MarketMakerCommand },
+    { "MarketMakerCommandResponse", MsgType::MarketMakerCommandResponse },
     { "TestEvent", MsgType::TestEvent }
 };
 
@@ -95,20 +92,18 @@ static const std::map<MsgType, std::string> MsgType2Name {
     { MsgType::Heartbeat, "Heartbeat" },
     { MsgType::LogoutResponse, "LogoutResponse" },
     { MsgType::Reject, "Reject" },
-    { MsgType::RiskLimitDefinition, "RiskLimitDefinition" },
-    { MsgType::RiskLimitDefinitionResponse, "RiskLimitDefinitionResponse" },
     { MsgType::TradeCaptureReportSingle, "TradeCaptureReportSingle" },
     { MsgType::TradeCaptureReportDual, "TradeCaptureReportDual" },
     { MsgType::TradeCaptureReportResponse, "TradeCaptureReportResponse" },
-    { MsgType::RiskLimitBreach, "RiskLimitBreach" },
     { MsgType::TradeBust, "TradeBust" },
     { MsgType::MassQuote, "MassQuote" },
     { MsgType::MassQuoteResponse, "MassQuoteResponse" },
-    { MsgType::InitiateState, "InitiateState" },
-    { MsgType::InitiateStateResponse, "InitiateStateResponse" },
     { MsgType::RequestForExecution, "RequestForExecution" },
     { MsgType::OrderMassCancel, "OrderMassCancel" },
     { MsgType::OrderMassCancelResponse, "OrderMassCancelResponse" },
+    { MsgType::BidOfferUpdate, "BidOfferUpdate" },
+    { MsgType::MarketMakerCommand, "MarketMakerCommand" },
+    { MsgType::MarketMakerCommandResponse, "MarketMakerCommandResponse" },
     { MsgType::TestEvent, "TestEvent" }
 };
 
@@ -324,15 +319,13 @@ enum class MifidFlags: uint8_t {
     None = 0,
     LiquidityProvisionActivity = 1,
     DirectOrSponsoredAccess = 2,
-    AlgorithmicTrade = 4,
-    MarketMakerOrSpecialist = 8
+    MarketMakerOrSpecialist = 4
 };
 
 static const std::map<std::string, MifidFlags> Name2MifidFlags {
     { "None", MifidFlags::None },
     { "LiquidityProvisionActivity", MifidFlags::LiquidityProvisionActivity },
     { "DirectOrSponsoredAccess", MifidFlags::DirectOrSponsoredAccess },
-    { "AlgorithmicTrade", MifidFlags::AlgorithmicTrade },
     { "MarketMakerOrSpecialist", MifidFlags::MarketMakerOrSpecialist }
 };
 
@@ -340,7 +333,6 @@ static const std::map<MifidFlags, std::string> MifidFlags2Name {
     { MifidFlags::None, "None" },
     { MifidFlags::LiquidityProvisionActivity, "LiquidityProvisionActivity" },
     { MifidFlags::DirectOrSponsoredAccess, "DirectOrSponsoredAccess" },
-    { MifidFlags::AlgorithmicTrade, "AlgorithmicTrade" },
     { MifidFlags::MarketMakerOrSpecialist, "MarketMakerOrSpecialist" }
 };
 
@@ -389,22 +381,35 @@ using ClearingCode = AnsiChar[20];
 enum class ClearingIdentifier: uint8_t {
     NotApplicable = 33,
     Lei = 78,
-    Bic = 66,
     Custom = 68
 };
 
 static const std::map<std::string, ClearingIdentifier> Name2ClearingIdentifier {
     { "NotApplicable", ClearingIdentifier::NotApplicable },
     { "Lei", ClearingIdentifier::Lei },
-    { "Bic", ClearingIdentifier::Bic },
     { "Custom", ClearingIdentifier::Custom }
 };
 
 static const std::map<ClearingIdentifier, std::string> ClearingIdentifier2Name {
     { ClearingIdentifier::NotApplicable, "NotApplicable" },
     { ClearingIdentifier::Lei, "Lei" },
-    { ClearingIdentifier::Bic, "Bic" },
     { ClearingIdentifier::Custom, "Custom" }
+};
+
+
+enum class ExecInst: uint8_t {
+    None = 0,
+    CancelOnConnectionLoss = 1
+};
+
+static const std::map<std::string, ExecInst> Name2ExecInst {
+    { "None", ExecInst::None },
+    { "CancelOnConnectionLoss", ExecInst::CancelOnConnectionLoss }
+};
+
+static const std::map<ExecInst, std::string> ExecInst2Name {
+    { ExecInst::None, "None" },
+    { ExecInst::CancelOnConnectionLoss, "CancelOnConnectionLoss" }
 };
 
 
@@ -428,6 +433,8 @@ struct OrderAdd {
     Memo memo;
     ClearingCode clearingMemberCode;
     ClearingIdentifier clearingMemberClearingIdentifier;
+    ExecInst execInst;
+    uint8_t feeStructureId;
 
     friend std::ostream &operator << (std::ostream &, const OrderAdd &);
 };
@@ -435,47 +442,51 @@ using OrderId = uint64_t;
 using PublicOrderId = uint64_t;
 
 enum class OrderStatus: uint8_t {
-    Ack = 1,
+    New = 1,
     Cancelled = 2,
     Rejected = 3,
     Filled = 4,
-    Modified = 5
+    PartiallyFilled = 5,
+    Expired = 6
 };
 
 static const std::map<std::string, OrderStatus> Name2OrderStatus {
-    { "Ack", OrderStatus::Ack },
+    { "New", OrderStatus::New },
     { "Cancelled", OrderStatus::Cancelled },
     { "Rejected", OrderStatus::Rejected },
     { "Filled", OrderStatus::Filled },
-    { "Modified", OrderStatus::Modified }
+    { "PartiallyFilled", OrderStatus::PartiallyFilled },
+    { "Expired", OrderStatus::Expired }
 };
 
 static const std::map<OrderStatus, std::string> OrderStatus2Name {
-    { OrderStatus::Ack, "Ack" },
+    { OrderStatus::New, "New" },
     { OrderStatus::Cancelled, "Cancelled" },
     { OrderStatus::Rejected, "Rejected" },
     { OrderStatus::Filled, "Filled" },
-    { OrderStatus::Modified, "Modified" }
+    { OrderStatus::PartiallyFilled, "PartiallyFilled" },
+    { OrderStatus::Expired, "Expired" }
 };
 
 
 enum class OrderRejectionReason: uint16_t {
-    NA = 1,
+    NA = 0,
+    UnknownOrder = 1,
     ExchangeClosed = 2,
     InvalidPriceIncrement = 18,
     Other = 99,
-    UnknownInstrumentId = 100,
     InstrumentPhaseNoTrading = 106,
-    UnknownOrder = 1001,
+    UnknownInstrument = 1001,
     InvalidExecutionTrader = 1005,
     InvalidDecisionMaker = 1006,
     InvalidClientId = 1007,
     InvalidPartyRoleQualifierForClientId = 1008,
     InvalidPartyRoleQualifierForExecutingTrader = 1009,
     InvalidPartyRoleQualifierForInvestmentDecisionMaker = 1010,
+    CannotModifyMifidFlags = 1012,
     WrongDisplayQtyValue = 1013,
     InvalidDisplayQty = 1014,
-    WrongIcebergOrderValue = 1015,
+    IcebergOrderValueLessThanRequired = 1015,
     OrderQuantityMustBeGreaterThanMinimumQuantity = 1025,
     OrderQuantityMustBeLowerThanMaximumQuantity = 1026,
     OrderPriceMustBeGreaterThanMinimumPrice = 1027,
@@ -498,6 +509,10 @@ enum class OrderRejectionReason: uint16_t {
     ExpireDateExceedsLimit = 1049,
     PriceBelowLowCollar = 1037,
     PriceAboveHighCollar = 1038,
+    OperationOnRedistributedInstrumentsForbidden = 1056,
+    FirmNotAuthorizedToBuyAndSellTheInstrument = 1057,
+    FirmNotAuthorizedToBuyTheInstrument = 1058,
+    FirmNotAuthorizedToSellTheInstrument = 1059,
     TriggerPriceNotAllowed = 1063,
     TriggerPriceNotHigherThanLTP = 1064,
     TriggerPriceNotLowerThanLTP = 1065,
@@ -509,7 +524,7 @@ enum class OrderRejectionReason: uint16_t {
     InvalidPartyIdForExecutingTrader = 1071,
     InvalidPartyIdForInvestmentDecisionMaker = 1072,
     InvalidPartyRoleQualifierForPartyId = 1075,
-    UnknownInstrument = 1201,
+    MassQuoteNotAllowedForSelectedMarketModel = 1201,
     InstrumentClosed = 1203,
     InvalidBidAskSpread = 1208,
     BuyOrderNotAllowed = 1301,
@@ -524,21 +539,22 @@ enum class OrderRejectionReason: uint16_t {
 
 static const std::map<std::string, OrderRejectionReason> Name2OrderRejectionReason {
     { "NA", OrderRejectionReason::NA },
+    { "UnknownOrder", OrderRejectionReason::UnknownOrder },
     { "ExchangeClosed", OrderRejectionReason::ExchangeClosed },
     { "InvalidPriceIncrement", OrderRejectionReason::InvalidPriceIncrement },
     { "Other", OrderRejectionReason::Other },
-    { "UnknownInstrumentId", OrderRejectionReason::UnknownInstrumentId },
     { "InstrumentPhaseNoTrading", OrderRejectionReason::InstrumentPhaseNoTrading },
-    { "UnknownOrder", OrderRejectionReason::UnknownOrder },
+    { "UnknownInstrument", OrderRejectionReason::UnknownInstrument },
     { "InvalidExecutionTrader", OrderRejectionReason::InvalidExecutionTrader },
     { "InvalidDecisionMaker", OrderRejectionReason::InvalidDecisionMaker },
     { "InvalidClientId", OrderRejectionReason::InvalidClientId },
     { "InvalidPartyRoleQualifierForClientId", OrderRejectionReason::InvalidPartyRoleQualifierForClientId },
     { "InvalidPartyRoleQualifierForExecutingTrader", OrderRejectionReason::InvalidPartyRoleQualifierForExecutingTrader },
     { "InvalidPartyRoleQualifierForInvestmentDecisionMaker", OrderRejectionReason::InvalidPartyRoleQualifierForInvestmentDecisionMaker },
+    { "CannotModifyMifidFlags", OrderRejectionReason::CannotModifyMifidFlags },
     { "WrongDisplayQtyValue", OrderRejectionReason::WrongDisplayQtyValue },
     { "InvalidDisplayQty", OrderRejectionReason::InvalidDisplayQty },
-    { "WrongIcebergOrderValue", OrderRejectionReason::WrongIcebergOrderValue },
+    { "IcebergOrderValueLessThanRequired", OrderRejectionReason::IcebergOrderValueLessThanRequired },
     { "OrderQuantityMustBeGreaterThanMinimumQuantity", OrderRejectionReason::OrderQuantityMustBeGreaterThanMinimumQuantity },
     { "OrderQuantityMustBeLowerThanMaximumQuantity", OrderRejectionReason::OrderQuantityMustBeLowerThanMaximumQuantity },
     { "OrderPriceMustBeGreaterThanMinimumPrice", OrderRejectionReason::OrderPriceMustBeGreaterThanMinimumPrice },
@@ -561,6 +577,10 @@ static const std::map<std::string, OrderRejectionReason> Name2OrderRejectionReas
     { "ExpireDateExceedsLimit", OrderRejectionReason::ExpireDateExceedsLimit },
     { "PriceBelowLowCollar", OrderRejectionReason::PriceBelowLowCollar },
     { "PriceAboveHighCollar", OrderRejectionReason::PriceAboveHighCollar },
+    { "OperationOnRedistributedInstrumentsForbidden", OrderRejectionReason::OperationOnRedistributedInstrumentsForbidden },
+    { "FirmNotAuthorizedToBuyAndSellTheInstrument", OrderRejectionReason::FirmNotAuthorizedToBuyAndSellTheInstrument },
+    { "FirmNotAuthorizedToBuyTheInstrument", OrderRejectionReason::FirmNotAuthorizedToBuyTheInstrument },
+    { "FirmNotAuthorizedToSellTheInstrument", OrderRejectionReason::FirmNotAuthorizedToSellTheInstrument },
     { "TriggerPriceNotAllowed", OrderRejectionReason::TriggerPriceNotAllowed },
     { "TriggerPriceNotHigherThanLTP", OrderRejectionReason::TriggerPriceNotHigherThanLTP },
     { "TriggerPriceNotLowerThanLTP", OrderRejectionReason::TriggerPriceNotLowerThanLTP },
@@ -572,7 +592,7 @@ static const std::map<std::string, OrderRejectionReason> Name2OrderRejectionReas
     { "InvalidPartyIdForExecutingTrader", OrderRejectionReason::InvalidPartyIdForExecutingTrader },
     { "InvalidPartyIdForInvestmentDecisionMaker", OrderRejectionReason::InvalidPartyIdForInvestmentDecisionMaker },
     { "InvalidPartyRoleQualifierForPartyId", OrderRejectionReason::InvalidPartyRoleQualifierForPartyId },
-    { "UnknownInstrument", OrderRejectionReason::UnknownInstrument },
+    { "MassQuoteNotAllowedForSelectedMarketModel", OrderRejectionReason::MassQuoteNotAllowedForSelectedMarketModel },
     { "InstrumentClosed", OrderRejectionReason::InstrumentClosed },
     { "InvalidBidAskSpread", OrderRejectionReason::InvalidBidAskSpread },
     { "BuyOrderNotAllowed", OrderRejectionReason::BuyOrderNotAllowed },
@@ -587,21 +607,22 @@ static const std::map<std::string, OrderRejectionReason> Name2OrderRejectionReas
 
 static const std::map<OrderRejectionReason, std::string> OrderRejectionReason2Name {
     { OrderRejectionReason::NA, "NA" },
+    { OrderRejectionReason::UnknownOrder, "UnknownOrder" },
     { OrderRejectionReason::ExchangeClosed, "ExchangeClosed" },
     { OrderRejectionReason::InvalidPriceIncrement, "InvalidPriceIncrement" },
     { OrderRejectionReason::Other, "Other" },
-    { OrderRejectionReason::UnknownInstrumentId, "UnknownInstrumentId" },
     { OrderRejectionReason::InstrumentPhaseNoTrading, "InstrumentPhaseNoTrading" },
-    { OrderRejectionReason::UnknownOrder, "UnknownOrder" },
+    { OrderRejectionReason::UnknownInstrument, "UnknownInstrument" },
     { OrderRejectionReason::InvalidExecutionTrader, "InvalidExecutionTrader" },
     { OrderRejectionReason::InvalidDecisionMaker, "InvalidDecisionMaker" },
     { OrderRejectionReason::InvalidClientId, "InvalidClientId" },
     { OrderRejectionReason::InvalidPartyRoleQualifierForClientId, "InvalidPartyRoleQualifierForClientId" },
     { OrderRejectionReason::InvalidPartyRoleQualifierForExecutingTrader, "InvalidPartyRoleQualifierForExecutingTrader" },
     { OrderRejectionReason::InvalidPartyRoleQualifierForInvestmentDecisionMaker, "InvalidPartyRoleQualifierForInvestmentDecisionMaker" },
+    { OrderRejectionReason::CannotModifyMifidFlags, "CannotModifyMifidFlags" },
     { OrderRejectionReason::WrongDisplayQtyValue, "WrongDisplayQtyValue" },
     { OrderRejectionReason::InvalidDisplayQty, "InvalidDisplayQty" },
-    { OrderRejectionReason::WrongIcebergOrderValue, "WrongIcebergOrderValue" },
+    { OrderRejectionReason::IcebergOrderValueLessThanRequired, "IcebergOrderValueLessThanRequired" },
     { OrderRejectionReason::OrderQuantityMustBeGreaterThanMinimumQuantity, "OrderQuantityMustBeGreaterThanMinimumQuantity" },
     { OrderRejectionReason::OrderQuantityMustBeLowerThanMaximumQuantity, "OrderQuantityMustBeLowerThanMaximumQuantity" },
     { OrderRejectionReason::OrderPriceMustBeGreaterThanMinimumPrice, "OrderPriceMustBeGreaterThanMinimumPrice" },
@@ -624,6 +645,10 @@ static const std::map<OrderRejectionReason, std::string> OrderRejectionReason2Na
     { OrderRejectionReason::ExpireDateExceedsLimit, "ExpireDateExceedsLimit" },
     { OrderRejectionReason::PriceBelowLowCollar, "PriceBelowLowCollar" },
     { OrderRejectionReason::PriceAboveHighCollar, "PriceAboveHighCollar" },
+    { OrderRejectionReason::OperationOnRedistributedInstrumentsForbidden, "OperationOnRedistributedInstrumentsForbidden" },
+    { OrderRejectionReason::FirmNotAuthorizedToBuyAndSellTheInstrument, "FirmNotAuthorizedToBuyAndSellTheInstrument" },
+    { OrderRejectionReason::FirmNotAuthorizedToBuyTheInstrument, "FirmNotAuthorizedToBuyTheInstrument" },
+    { OrderRejectionReason::FirmNotAuthorizedToSellTheInstrument, "FirmNotAuthorizedToSellTheInstrument" },
     { OrderRejectionReason::TriggerPriceNotAllowed, "TriggerPriceNotAllowed" },
     { OrderRejectionReason::TriggerPriceNotHigherThanLTP, "TriggerPriceNotHigherThanLTP" },
     { OrderRejectionReason::TriggerPriceNotLowerThanLTP, "TriggerPriceNotLowerThanLTP" },
@@ -635,7 +660,7 @@ static const std::map<OrderRejectionReason, std::string> OrderRejectionReason2Na
     { OrderRejectionReason::InvalidPartyIdForExecutingTrader, "InvalidPartyIdForExecutingTrader" },
     { OrderRejectionReason::InvalidPartyIdForInvestmentDecisionMaker, "InvalidPartyIdForInvestmentDecisionMaker" },
     { OrderRejectionReason::InvalidPartyRoleQualifierForPartyId, "InvalidPartyRoleQualifierForPartyId" },
-    { OrderRejectionReason::UnknownInstrument, "UnknownInstrument" },
+    { OrderRejectionReason::MassQuoteNotAllowedForSelectedMarketModel, "MassQuoteNotAllowedForSelectedMarketModel" },
     { OrderRejectionReason::InstrumentClosed, "InstrumentClosed" },
     { OrderRejectionReason::InvalidBidAskSpread, "InvalidBidAskSpread" },
     { OrderRejectionReason::BuyOrderNotAllowed, "BuyOrderNotAllowed" },
@@ -649,49 +674,58 @@ static const std::map<OrderRejectionReason, std::string> OrderRejectionReason2Na
 };
 
 
-enum class OrderSource: uint8_t {
-    Submitted = 1,
-    Cod = 2,
+enum class ExecTypeReason: uint8_t {
+    NA = 1,
+    CancelOnDisconnect = 2,
     Expired = 3,
-    StopOrder = 4,
-    Suspended = 5,
-    Reinstated = 6,
-    IcebergRefill = 7,
-    OrderBookRebuild = 8,
-    Activated = 9,
-    Stp = 10,
-    CorporateAction = 11,
-    MassCancel = 12
+    Triggered = 4,
+    CancelOnSuspension = 5,
+    OrderRestatement = 6,
+    IcebergOrderRefill = 7,
+    CancelByStp = 8,
+    CancelByCorporateAction = 9,
+    CancelByMassCancel = 10,
+    CancelIocFokOrder = 11,
+    CancelByMarketOperations = 12,
+    Replaced = 13,
+    FirstTradeOnAggressiveOrder = 14,
+    Rejected = 15
 };
 
-static const std::map<std::string, OrderSource> Name2OrderSource {
-    { "Submitted", OrderSource::Submitted },
-    { "Cod", OrderSource::Cod },
-    { "Expired", OrderSource::Expired },
-    { "StopOrder", OrderSource::StopOrder },
-    { "Suspended", OrderSource::Suspended },
-    { "Reinstated", OrderSource::Reinstated },
-    { "IcebergRefill", OrderSource::IcebergRefill },
-    { "OrderBookRebuild", OrderSource::OrderBookRebuild },
-    { "Activated", OrderSource::Activated },
-    { "Stp", OrderSource::Stp },
-    { "CorporateAction", OrderSource::CorporateAction },
-    { "MassCancel", OrderSource::MassCancel }
+static const std::map<std::string, ExecTypeReason> Name2ExecTypeReason {
+    { "NA", ExecTypeReason::NA },
+    { "CancelOnDisconnect", ExecTypeReason::CancelOnDisconnect },
+    { "Expired", ExecTypeReason::Expired },
+    { "Triggered", ExecTypeReason::Triggered },
+    { "CancelOnSuspension", ExecTypeReason::CancelOnSuspension },
+    { "OrderRestatement", ExecTypeReason::OrderRestatement },
+    { "IcebergOrderRefill", ExecTypeReason::IcebergOrderRefill },
+    { "CancelByStp", ExecTypeReason::CancelByStp },
+    { "CancelByCorporateAction", ExecTypeReason::CancelByCorporateAction },
+    { "CancelByMassCancel", ExecTypeReason::CancelByMassCancel },
+    { "CancelIocFokOrder", ExecTypeReason::CancelIocFokOrder },
+    { "CancelByMarketOperations", ExecTypeReason::CancelByMarketOperations },
+    { "Replaced", ExecTypeReason::Replaced },
+    { "FirstTradeOnAggressiveOrder", ExecTypeReason::FirstTradeOnAggressiveOrder },
+    { "Rejected", ExecTypeReason::Rejected }
 };
 
-static const std::map<OrderSource, std::string> OrderSource2Name {
-    { OrderSource::Submitted, "Submitted" },
-    { OrderSource::Cod, "Cod" },
-    { OrderSource::Expired, "Expired" },
-    { OrderSource::StopOrder, "StopOrder" },
-    { OrderSource::Suspended, "Suspended" },
-    { OrderSource::Reinstated, "Reinstated" },
-    { OrderSource::IcebergRefill, "IcebergRefill" },
-    { OrderSource::OrderBookRebuild, "OrderBookRebuild" },
-    { OrderSource::Activated, "Activated" },
-    { OrderSource::Stp, "Stp" },
-    { OrderSource::CorporateAction, "CorporateAction" },
-    { OrderSource::MassCancel, "MassCancel" }
+static const std::map<ExecTypeReason, std::string> ExecTypeReason2Name {
+    { ExecTypeReason::NA, "NA" },
+    { ExecTypeReason::CancelOnDisconnect, "CancelOnDisconnect" },
+    { ExecTypeReason::Expired, "Expired" },
+    { ExecTypeReason::Triggered, "Triggered" },
+    { ExecTypeReason::CancelOnSuspension, "CancelOnSuspension" },
+    { ExecTypeReason::OrderRestatement, "OrderRestatement" },
+    { ExecTypeReason::IcebergOrderRefill, "IcebergOrderRefill" },
+    { ExecTypeReason::CancelByStp, "CancelByStp" },
+    { ExecTypeReason::CancelByCorporateAction, "CancelByCorporateAction" },
+    { ExecTypeReason::CancelByMassCancel, "CancelByMassCancel" },
+    { ExecTypeReason::CancelIocFokOrder, "CancelIocFokOrder" },
+    { ExecTypeReason::CancelByMarketOperations, "CancelByMarketOperations" },
+    { ExecTypeReason::Replaced, "Replaced" },
+    { ExecTypeReason::FirstTradeOnAggressiveOrder, "FirstTradeOnAggressiveOrder" },
+    { ExecTypeReason::Rejected, "Rejected" }
 };
 
 
@@ -699,9 +733,11 @@ struct OrderAddResponse {
     Header header;
     OrderId orderId;
     PublicOrderId publicOrderId;
+    Quantity displayQty;
+    Quantity filled;
     OrderStatus status;
     OrderRejectionReason reason;
-    OrderSource source;
+    ExecTypeReason execTypeReason;
 
     friend std::ostream &operator << (std::ostream &, const OrderAddResponse &);
 };
@@ -709,6 +745,7 @@ struct OrderAddResponse {
 struct OrderCancel {
     Header header;
     OrderId orderId;
+    MifidFields mifidFields;
 
     friend std::ostream &operator << (std::ostream &, const OrderCancel &);
 };
@@ -716,8 +753,9 @@ struct OrderCancel {
 struct OrderCancelResponse {
     Header header;
     OrderId orderId;
+    OrderStatus status;
     OrderRejectionReason reason;
-    OrderSource source;
+    ExecTypeReason execTypeReason;
 
     friend std::ostream &operator << (std::ostream &, const OrderCancelResponse &);
 };
@@ -730,6 +768,7 @@ struct OrderModify {
     Quantity quantity;
     Quantity displayQty;
     Timestamp expire;
+    MifidFields mifidFields;
 
     friend std::ostream &operator << (std::ostream &, const OrderModify &);
 };
@@ -753,6 +792,7 @@ static const std::map<PriorityFlag, std::string> PriorityFlag2Name {
 struct OrderModifyResponse {
     Header header;
     OrderId orderId;
+    Quantity filled;
     OrderStatus status;
     PriorityFlag priorityFlag;
     OrderRejectionReason reason;
@@ -783,7 +823,9 @@ enum class ConnectionCloseReason: uint8_t {
     InvalidSeqNum = 2,
     EndOfDay = 3,
     SyncFail = 4,
-    AntiFloodingThresholdExceeded = 5
+    AntiFloodingThresholdExceeded = 5,
+    ConnectionConfigChanged = 6,
+    CloseOps = 7
 };
 
 static const std::map<std::string, ConnectionCloseReason> Name2ConnectionCloseReason {
@@ -791,7 +833,9 @@ static const std::map<std::string, ConnectionCloseReason> Name2ConnectionCloseRe
     { "InvalidSeqNum", ConnectionCloseReason::InvalidSeqNum },
     { "EndOfDay", ConnectionCloseReason::EndOfDay },
     { "SyncFail", ConnectionCloseReason::SyncFail },
-    { "AntiFloodingThresholdExceeded", ConnectionCloseReason::AntiFloodingThresholdExceeded }
+    { "AntiFloodingThresholdExceeded", ConnectionCloseReason::AntiFloodingThresholdExceeded },
+    { "ConnectionConfigChanged", ConnectionCloseReason::ConnectionConfigChanged },
+    { "CloseOps", ConnectionCloseReason::CloseOps }
 };
 
 static const std::map<ConnectionCloseReason, std::string> ConnectionCloseReason2Name {
@@ -799,7 +843,9 @@ static const std::map<ConnectionCloseReason, std::string> ConnectionCloseReason2
     { ConnectionCloseReason::InvalidSeqNum, "InvalidSeqNum" },
     { ConnectionCloseReason::EndOfDay, "EndOfDay" },
     { ConnectionCloseReason::SyncFail, "SyncFail" },
-    { ConnectionCloseReason::AntiFloodingThresholdExceeded, "AntiFloodingThresholdExceeded" }
+    { ConnectionCloseReason::AntiFloodingThresholdExceeded, "AntiFloodingThresholdExceeded" },
+    { ConnectionCloseReason::ConnectionConfigChanged, "ConnectionConfigChanged" },
+    { ConnectionCloseReason::CloseOps, "CloseOps" }
 };
 
 
@@ -830,7 +876,9 @@ enum class RejectReason: uint8_t {
     InvalidSettlementDate = 4,
     SettlementDateRequired = 5,
     TradeReportIdRequired = 6,
-    MissingReportIdSecondaryTradeReportIdOrTradeReportRefId = 7
+    MissingReportIdSecondaryTradeReportIdOrTradeReportRefId = 7,
+    InvalidTradeId = 8,
+    InvalidAlgorithmicTradeIndicator = 9
 };
 
 static const std::map<std::string, RejectReason> Name2RejectReason {
@@ -841,7 +889,9 @@ static const std::map<std::string, RejectReason> Name2RejectReason {
     { "InvalidSettlementDate", RejectReason::InvalidSettlementDate },
     { "SettlementDateRequired", RejectReason::SettlementDateRequired },
     { "TradeReportIdRequired", RejectReason::TradeReportIdRequired },
-    { "MissingReportIdSecondaryTradeReportIdOrTradeReportRefId", RejectReason::MissingReportIdSecondaryTradeReportIdOrTradeReportRefId }
+    { "MissingReportIdSecondaryTradeReportIdOrTradeReportRefId", RejectReason::MissingReportIdSecondaryTradeReportIdOrTradeReportRefId },
+    { "InvalidTradeId", RejectReason::InvalidTradeId },
+    { "InvalidAlgorithmicTradeIndicator", RejectReason::InvalidAlgorithmicTradeIndicator }
 };
 
 static const std::map<RejectReason, std::string> RejectReason2Name {
@@ -852,7 +902,9 @@ static const std::map<RejectReason, std::string> RejectReason2Name {
     { RejectReason::InvalidSettlementDate, "InvalidSettlementDate" },
     { RejectReason::SettlementDateRequired, "SettlementDateRequired" },
     { RejectReason::TradeReportIdRequired, "TradeReportIdRequired" },
-    { RejectReason::MissingReportIdSecondaryTradeReportIdOrTradeReportRefId, "MissingReportIdSecondaryTradeReportIdOrTradeReportRefId" }
+    { RejectReason::MissingReportIdSecondaryTradeReportIdOrTradeReportRefId, "MissingReportIdSecondaryTradeReportIdOrTradeReportRefId" },
+    { RejectReason::InvalidTradeId, "InvalidTradeId" },
+    { RejectReason::InvalidAlgorithmicTradeIndicator, "InvalidAlgorithmicTradeIndicator" }
 };
 
 
@@ -945,7 +997,7 @@ static const std::map<AlgorithmicTradeIndicator, std::string> AlgorithmicTradeIn
 
 
 enum class ExecType: uint8_t {
-    New = 1,
+    NA = 0,
     Rejected = 8,
     Expired = 12,
     Trade = 15,
@@ -954,7 +1006,7 @@ enum class ExecType: uint8_t {
 };
 
 static const std::map<std::string, ExecType> Name2ExecType {
-    { "New", ExecType::New },
+    { "NA", ExecType::NA },
     { "Rejected", ExecType::Rejected },
     { "Expired", ExecType::Expired },
     { "Trade", ExecType::Trade },
@@ -963,7 +1015,7 @@ static const std::map<std::string, ExecType> Name2ExecType {
 };
 
 static const std::map<ExecType, std::string> ExecType2Name {
-    { ExecType::New, "New" },
+    { ExecType::NA, "NA" },
     { ExecType::Rejected, "Rejected" },
     { ExecType::Expired, "Expired" },
     { ExecType::Trade, "Trade" },
@@ -973,34 +1025,18 @@ static const std::map<ExecType, std::string> ExecType2Name {
 
 using TradeReportRefID = AnsiChar[20];
 using Date = uint32_t;
-
-enum class MatchStatus: uint8_t {
-    NA = 0,
-    Matched = 1,
-    Unmatched = 2
-};
-
-static const std::map<std::string, MatchStatus> Name2MatchStatus {
-    { "NA", MatchStatus::NA },
-    { "Matched", MatchStatus::Matched },
-    { "Unmatched", MatchStatus::Unmatched }
-};
-
-static const std::map<MatchStatus, std::string> MatchStatus2Name {
-    { MatchStatus::NA, "NA" },
-    { MatchStatus::Matched, "Matched" },
-    { MatchStatus::Unmatched, "Unmatched" }
-};
-
 using CcpCode = AnsiChar[16];
 
 struct TcrParty {
     MifidFields mifidFields;
+    ClearingCode clearingMemberCode;
+    ClearingIdentifier clearingMemberClearingIdentifier;
     Account account;
     AccountType accountType;
     Capacity orderCapacity;
     ElementId orderRestrictions;
     ElementId orderOrigination;
+    uint8_t feeStructureId;
     Memo memo;
 
     friend std::ostream &operator << (std::ostream &, const TcrParty &);
@@ -1021,7 +1057,6 @@ struct TradeCaptureReportSingle {
     Quantity lastQty;
     Price lastPx;
     Date settlementDate;
-    MatchStatus matchStatus;
     OrderSide side;
     CcpCode counterpartyCode;
     TcrParty tcrParty;
@@ -1043,7 +1078,6 @@ struct TradeCaptureReportDual {
     Quantity lastQty;
     Price lastPx;
     Date settlementDate;
-    MatchStatus matchStatus;
     TcrParty tcrPartyBuy;
     TcrParty tcrPartySell;
 
@@ -1084,8 +1118,8 @@ enum class TcrRejectionReason: uint16_t {
     ExchangeClosed = 2,
     InvalidPriceIncrement = 18,
     Other = 99,
-    UnknownInstrumentId = 100,
     InstrumentPhaseNoTrading = 106,
+    UnknownInstrument = 1001,
     InvalidExecutionTrader = 1005,
     InvalidDecisionMaker = 1006,
     InvalidClientId = 1007,
@@ -1101,6 +1135,10 @@ enum class TcrRejectionReason: uint16_t {
     OrderValueMustBeLowerThanMaximumValue = 1031,
     PriceBelowLowCollar = 1037,
     PriceAboveHighCollar = 1038,
+    OperationOnRedistributedInstrumentsForbidden = 1056,
+    FirmNotAuthorizedToBuyAndSellTheInstrument = 1057,
+    FirmNotAuthorizedToBuyTheInstrument = 1058,
+    FirmNotAuthorizedToSellTheInstrument = 1059,
     InvalidPartyIdForClientId = 1070,
     InvalidPartyIdForExecutingTrader = 1071,
     InvalidPartyIdForInvestmentDecisionMaker = 1072,
@@ -1117,12 +1155,12 @@ enum class TcrRejectionReason: uint16_t {
     RequestNotAllowedForBlockInstrument = 2026,
     RequestNotAllowedForClobInstrument = 2027,
     RequestNotAllowedForCrossInstrument = 2028,
-    InvalidMatchStatus = 2029,
     CrossNotAllowedOutsideOfClobInstrumentSpread = 2030,
     CrossPriceNotEqualToTheReferencePrice = 2031,
     CrossNotAllowedDuringClobInstrumentAuctionOrSuspension = 2032,
     ForbiddenSecondaryTradereportId = 2033,
-    UnknownSecondaryTradereportId = 2034
+    UnknownSecondaryTradereportId = 2034,
+    NoTradeForClobReferenceInstrument = 2035
 };
 
 static const std::map<std::string, TcrRejectionReason> Name2TcrRejectionReason {
@@ -1130,8 +1168,8 @@ static const std::map<std::string, TcrRejectionReason> Name2TcrRejectionReason {
     { "ExchangeClosed", TcrRejectionReason::ExchangeClosed },
     { "InvalidPriceIncrement", TcrRejectionReason::InvalidPriceIncrement },
     { "Other", TcrRejectionReason::Other },
-    { "UnknownInstrumentId", TcrRejectionReason::UnknownInstrumentId },
     { "InstrumentPhaseNoTrading", TcrRejectionReason::InstrumentPhaseNoTrading },
+    { "UnknownInstrument", TcrRejectionReason::UnknownInstrument },
     { "InvalidExecutionTrader", TcrRejectionReason::InvalidExecutionTrader },
     { "InvalidDecisionMaker", TcrRejectionReason::InvalidDecisionMaker },
     { "InvalidClientId", TcrRejectionReason::InvalidClientId },
@@ -1147,6 +1185,10 @@ static const std::map<std::string, TcrRejectionReason> Name2TcrRejectionReason {
     { "OrderValueMustBeLowerThanMaximumValue", TcrRejectionReason::OrderValueMustBeLowerThanMaximumValue },
     { "PriceBelowLowCollar", TcrRejectionReason::PriceBelowLowCollar },
     { "PriceAboveHighCollar", TcrRejectionReason::PriceAboveHighCollar },
+    { "OperationOnRedistributedInstrumentsForbidden", TcrRejectionReason::OperationOnRedistributedInstrumentsForbidden },
+    { "FirmNotAuthorizedToBuyAndSellTheInstrument", TcrRejectionReason::FirmNotAuthorizedToBuyAndSellTheInstrument },
+    { "FirmNotAuthorizedToBuyTheInstrument", TcrRejectionReason::FirmNotAuthorizedToBuyTheInstrument },
+    { "FirmNotAuthorizedToSellTheInstrument", TcrRejectionReason::FirmNotAuthorizedToSellTheInstrument },
     { "InvalidPartyIdForClientId", TcrRejectionReason::InvalidPartyIdForClientId },
     { "InvalidPartyIdForExecutingTrader", TcrRejectionReason::InvalidPartyIdForExecutingTrader },
     { "InvalidPartyIdForInvestmentDecisionMaker", TcrRejectionReason::InvalidPartyIdForInvestmentDecisionMaker },
@@ -1163,12 +1205,12 @@ static const std::map<std::string, TcrRejectionReason> Name2TcrRejectionReason {
     { "RequestNotAllowedForBlockInstrument", TcrRejectionReason::RequestNotAllowedForBlockInstrument },
     { "RequestNotAllowedForClobInstrument", TcrRejectionReason::RequestNotAllowedForClobInstrument },
     { "RequestNotAllowedForCrossInstrument", TcrRejectionReason::RequestNotAllowedForCrossInstrument },
-    { "InvalidMatchStatus", TcrRejectionReason::InvalidMatchStatus },
     { "CrossNotAllowedOutsideOfClobInstrumentSpread", TcrRejectionReason::CrossNotAllowedOutsideOfClobInstrumentSpread },
     { "CrossPriceNotEqualToTheReferencePrice", TcrRejectionReason::CrossPriceNotEqualToTheReferencePrice },
     { "CrossNotAllowedDuringClobInstrumentAuctionOrSuspension", TcrRejectionReason::CrossNotAllowedDuringClobInstrumentAuctionOrSuspension },
     { "ForbiddenSecondaryTradereportId", TcrRejectionReason::ForbiddenSecondaryTradereportId },
-    { "UnknownSecondaryTradereportId", TcrRejectionReason::UnknownSecondaryTradereportId }
+    { "UnknownSecondaryTradereportId", TcrRejectionReason::UnknownSecondaryTradereportId },
+    { "NoTradeForClobReferenceInstrument", TcrRejectionReason::NoTradeForClobReferenceInstrument }
 };
 
 static const std::map<TcrRejectionReason, std::string> TcrRejectionReason2Name {
@@ -1176,8 +1218,8 @@ static const std::map<TcrRejectionReason, std::string> TcrRejectionReason2Name {
     { TcrRejectionReason::ExchangeClosed, "ExchangeClosed" },
     { TcrRejectionReason::InvalidPriceIncrement, "InvalidPriceIncrement" },
     { TcrRejectionReason::Other, "Other" },
-    { TcrRejectionReason::UnknownInstrumentId, "UnknownInstrumentId" },
     { TcrRejectionReason::InstrumentPhaseNoTrading, "InstrumentPhaseNoTrading" },
+    { TcrRejectionReason::UnknownInstrument, "UnknownInstrument" },
     { TcrRejectionReason::InvalidExecutionTrader, "InvalidExecutionTrader" },
     { TcrRejectionReason::InvalidDecisionMaker, "InvalidDecisionMaker" },
     { TcrRejectionReason::InvalidClientId, "InvalidClientId" },
@@ -1193,6 +1235,10 @@ static const std::map<TcrRejectionReason, std::string> TcrRejectionReason2Name {
     { TcrRejectionReason::OrderValueMustBeLowerThanMaximumValue, "OrderValueMustBeLowerThanMaximumValue" },
     { TcrRejectionReason::PriceBelowLowCollar, "PriceBelowLowCollar" },
     { TcrRejectionReason::PriceAboveHighCollar, "PriceAboveHighCollar" },
+    { TcrRejectionReason::OperationOnRedistributedInstrumentsForbidden, "OperationOnRedistributedInstrumentsForbidden" },
+    { TcrRejectionReason::FirmNotAuthorizedToBuyAndSellTheInstrument, "FirmNotAuthorizedToBuyAndSellTheInstrument" },
+    { TcrRejectionReason::FirmNotAuthorizedToBuyTheInstrument, "FirmNotAuthorizedToBuyTheInstrument" },
+    { TcrRejectionReason::FirmNotAuthorizedToSellTheInstrument, "FirmNotAuthorizedToSellTheInstrument" },
     { TcrRejectionReason::InvalidPartyIdForClientId, "InvalidPartyIdForClientId" },
     { TcrRejectionReason::InvalidPartyIdForExecutingTrader, "InvalidPartyIdForExecutingTrader" },
     { TcrRejectionReason::InvalidPartyIdForInvestmentDecisionMaker, "InvalidPartyIdForInvestmentDecisionMaker" },
@@ -1209,12 +1255,12 @@ static const std::map<TcrRejectionReason, std::string> TcrRejectionReason2Name {
     { TcrRejectionReason::RequestNotAllowedForBlockInstrument, "RequestNotAllowedForBlockInstrument" },
     { TcrRejectionReason::RequestNotAllowedForClobInstrument, "RequestNotAllowedForClobInstrument" },
     { TcrRejectionReason::RequestNotAllowedForCrossInstrument, "RequestNotAllowedForCrossInstrument" },
-    { TcrRejectionReason::InvalidMatchStatus, "InvalidMatchStatus" },
     { TcrRejectionReason::CrossNotAllowedOutsideOfClobInstrumentSpread, "CrossNotAllowedOutsideOfClobInstrumentSpread" },
     { TcrRejectionReason::CrossPriceNotEqualToTheReferencePrice, "CrossPriceNotEqualToTheReferencePrice" },
     { TcrRejectionReason::CrossNotAllowedDuringClobInstrumentAuctionOrSuspension, "CrossNotAllowedDuringClobInstrumentAuctionOrSuspension" },
     { TcrRejectionReason::ForbiddenSecondaryTradereportId, "ForbiddenSecondaryTradereportId" },
-    { TcrRejectionReason::UnknownSecondaryTradereportId, "UnknownSecondaryTradereportId" }
+    { TcrRejectionReason::UnknownSecondaryTradereportId, "UnknownSecondaryTradereportId" },
+    { TcrRejectionReason::NoTradeForClobReferenceInstrument, "NoTradeForClobReferenceInstrument" }
 };
 
 
@@ -1228,266 +1274,6 @@ struct TradeCaptureReportResponse {
     TcrRejectionReason reason;
 
     friend std::ostream &operator << (std::ostream &, const TradeCaptureReportResponse &);
-};
-using RiskDefinitionId = uint64_t;
-using MicCode = AnsiChar[4];
-
-enum class RiskLimitAction: uint8_t {
-    ToReject = 1
-};
-
-static const std::map<std::string, RiskLimitAction> Name2RiskLimitAction {
-    { "ToReject", RiskLimitAction::ToReject }
-};
-
-static const std::map<RiskLimitAction, std::string> RiskLimitAction2Name {
-    { RiskLimitAction::ToReject, "ToReject" }
-};
-
-using RiskLimitAmount = uint64_t;
-
-enum class RiskLimitType: uint16_t {
-    PerBuyOrderVolume = 301,
-    PerBuyOrderNotionalValue = 302,
-    PerSellOrderVolume = 311,
-    PerSellOrderNotionalValue = 312,
-    PerBuyPriceLimit = 313,
-    PerSellPriceLimit = 314,
-    PerTotalBuyTradedValue = 315,
-    PerTotalSellTradedValue = 316,
-    PerTotalTradedValue = 317,
-    PerTotalBuyOpenOrdersValue = 318,
-    PerTotalSellOpenOrdersValue = 319,
-    PerTotalOpenOrdersValue = 320,
-    PerTotalBuyRiskValue = 321,
-    PerTotalSellRiskValue = 322,
-    PerTotalRiskValue = 323,
-    PerTotalNetRiskValue = 324,
-    PerTotalDailyNumberOfOrders = 325,
-    RiskLimitNotDefined = 326
-};
-
-static const std::map<std::string, RiskLimitType> Name2RiskLimitType {
-    { "PerBuyOrderVolume", RiskLimitType::PerBuyOrderVolume },
-    { "PerBuyOrderNotionalValue", RiskLimitType::PerBuyOrderNotionalValue },
-    { "PerSellOrderVolume", RiskLimitType::PerSellOrderVolume },
-    { "PerSellOrderNotionalValue", RiskLimitType::PerSellOrderNotionalValue },
-    { "PerBuyPriceLimit", RiskLimitType::PerBuyPriceLimit },
-    { "PerSellPriceLimit", RiskLimitType::PerSellPriceLimit },
-    { "PerTotalBuyTradedValue", RiskLimitType::PerTotalBuyTradedValue },
-    { "PerTotalSellTradedValue", RiskLimitType::PerTotalSellTradedValue },
-    { "PerTotalTradedValue", RiskLimitType::PerTotalTradedValue },
-    { "PerTotalBuyOpenOrdersValue", RiskLimitType::PerTotalBuyOpenOrdersValue },
-    { "PerTotalSellOpenOrdersValue", RiskLimitType::PerTotalSellOpenOrdersValue },
-    { "PerTotalOpenOrdersValue", RiskLimitType::PerTotalOpenOrdersValue },
-    { "PerTotalBuyRiskValue", RiskLimitType::PerTotalBuyRiskValue },
-    { "PerTotalSellRiskValue", RiskLimitType::PerTotalSellRiskValue },
-    { "PerTotalRiskValue", RiskLimitType::PerTotalRiskValue },
-    { "PerTotalNetRiskValue", RiskLimitType::PerTotalNetRiskValue },
-    { "PerTotalDailyNumberOfOrders", RiskLimitType::PerTotalDailyNumberOfOrders },
-    { "RiskLimitNotDefined", RiskLimitType::RiskLimitNotDefined }
-};
-
-static const std::map<RiskLimitType, std::string> RiskLimitType2Name {
-    { RiskLimitType::PerBuyOrderVolume, "PerBuyOrderVolume" },
-    { RiskLimitType::PerBuyOrderNotionalValue, "PerBuyOrderNotionalValue" },
-    { RiskLimitType::PerSellOrderVolume, "PerSellOrderVolume" },
-    { RiskLimitType::PerSellOrderNotionalValue, "PerSellOrderNotionalValue" },
-    { RiskLimitType::PerBuyPriceLimit, "PerBuyPriceLimit" },
-    { RiskLimitType::PerSellPriceLimit, "PerSellPriceLimit" },
-    { RiskLimitType::PerTotalBuyTradedValue, "PerTotalBuyTradedValue" },
-    { RiskLimitType::PerTotalSellTradedValue, "PerTotalSellTradedValue" },
-    { RiskLimitType::PerTotalTradedValue, "PerTotalTradedValue" },
-    { RiskLimitType::PerTotalBuyOpenOrdersValue, "PerTotalBuyOpenOrdersValue" },
-    { RiskLimitType::PerTotalSellOpenOrdersValue, "PerTotalSellOpenOrdersValue" },
-    { RiskLimitType::PerTotalOpenOrdersValue, "PerTotalOpenOrdersValue" },
-    { RiskLimitType::PerTotalBuyRiskValue, "PerTotalBuyRiskValue" },
-    { RiskLimitType::PerTotalSellRiskValue, "PerTotalSellRiskValue" },
-    { RiskLimitType::PerTotalRiskValue, "PerTotalRiskValue" },
-    { RiskLimitType::PerTotalNetRiskValue, "PerTotalNetRiskValue" },
-    { RiskLimitType::PerTotalDailyNumberOfOrders, "PerTotalDailyNumberOfOrders" },
-    { RiskLimitType::RiskLimitNotDefined, "RiskLimitNotDefined" }
-};
-
-using LeiCode = AnsiChar[20];
-
-enum class RiskOperation: uint8_t {
-    Add = 1,
-    Modify = 2,
-    Delete = 3
-};
-
-static const std::map<std::string, RiskOperation> Name2RiskOperation {
-    { "Add", RiskOperation::Add },
-    { "Modify", RiskOperation::Modify },
-    { "Delete", RiskOperation::Delete }
-};
-
-static const std::map<RiskOperation, std::string> RiskOperation2Name {
-    { RiskOperation::Add, "Add" },
-    { RiskOperation::Modify, "Modify" },
-    { RiskOperation::Delete, "Delete" }
-};
-
-
-struct RiskLimitDefinition {
-    Header header;
-    RiskDefinitionId id;
-    RiskDefinitionId RiskLimitId;
-    ElementId instrumentId;
-    MicCode Mic;
-    RiskLimitAction action;
-    RiskLimitAmount amount;
-    RiskLimitType limitType;
-    LeiCode riskMemberCode;
-    LeiCode memberPartyId;
-    ShortCode clientPartyId;
-    PartyRoleQualifier clientRoleQualifier;
-    RiskOperation operation;
-    ElementId marketSegmentId;
-    Capacity capacity;
-
-    friend std::ostream &operator << (std::ostream &, const RiskLimitDefinition &);
-};
-
-enum class RiskDefinitionStatus: uint8_t {
-    Ack = 1,
-    Rejected = 3
-};
-
-static const std::map<std::string, RiskDefinitionStatus> Name2RiskDefinitionStatus {
-    { "Ack", RiskDefinitionStatus::Ack },
-    { "Rejected", RiskDefinitionStatus::Rejected }
-};
-
-static const std::map<RiskDefinitionStatus, std::string> RiskDefinitionStatus2Name {
-    { RiskDefinitionStatus::Ack, "Ack" },
-    { RiskDefinitionStatus::Rejected, "Rejected" }
-};
-
-
-enum class RiskLimitDefinitionRejectionReason: uint8_t {
-    NA = 0,
-    InvalidParty = 1,
-    InvalidRelatedParty = 2,
-    InvalidRiskLimitType = 3,
-    InvalidRiskLimitID = 4,
-    InvalidRiskLimitAmount = 5,
-    InvalidRiskWarningLevelAction = 6,
-    InvalidRiskInstrumentScope = 7,
-    RiskLimitActionsNotSupported = 8,
-    WarningLevelsNotSupported = 9,
-    WarningLevelActionsNotSupported = 10,
-    RiskInstrumentScopeNotSupported = 11,
-    RiskLimitNotApprovedForParty = 12,
-    RiskLimitAlreadyDefinedForParty = 13,
-    InstrumentNotApprovedForParty = 14,
-    NotAuthorized = 98,
-    Other = 99,
-    MissingMicCode = 101,
-    InvalidPartyRoleQualifier = 102
-};
-
-static const std::map<std::string, RiskLimitDefinitionRejectionReason> Name2RiskLimitDefinitionRejectionReason {
-    { "NA", RiskLimitDefinitionRejectionReason::NA },
-    { "InvalidParty", RiskLimitDefinitionRejectionReason::InvalidParty },
-    { "InvalidRelatedParty", RiskLimitDefinitionRejectionReason::InvalidRelatedParty },
-    { "InvalidRiskLimitType", RiskLimitDefinitionRejectionReason::InvalidRiskLimitType },
-    { "InvalidRiskLimitID", RiskLimitDefinitionRejectionReason::InvalidRiskLimitID },
-    { "InvalidRiskLimitAmount", RiskLimitDefinitionRejectionReason::InvalidRiskLimitAmount },
-    { "InvalidRiskWarningLevelAction", RiskLimitDefinitionRejectionReason::InvalidRiskWarningLevelAction },
-    { "InvalidRiskInstrumentScope", RiskLimitDefinitionRejectionReason::InvalidRiskInstrumentScope },
-    { "RiskLimitActionsNotSupported", RiskLimitDefinitionRejectionReason::RiskLimitActionsNotSupported },
-    { "WarningLevelsNotSupported", RiskLimitDefinitionRejectionReason::WarningLevelsNotSupported },
-    { "WarningLevelActionsNotSupported", RiskLimitDefinitionRejectionReason::WarningLevelActionsNotSupported },
-    { "RiskInstrumentScopeNotSupported", RiskLimitDefinitionRejectionReason::RiskInstrumentScopeNotSupported },
-    { "RiskLimitNotApprovedForParty", RiskLimitDefinitionRejectionReason::RiskLimitNotApprovedForParty },
-    { "RiskLimitAlreadyDefinedForParty", RiskLimitDefinitionRejectionReason::RiskLimitAlreadyDefinedForParty },
-    { "InstrumentNotApprovedForParty", RiskLimitDefinitionRejectionReason::InstrumentNotApprovedForParty },
-    { "NotAuthorized", RiskLimitDefinitionRejectionReason::NotAuthorized },
-    { "Other", RiskLimitDefinitionRejectionReason::Other },
-    { "MissingMicCode", RiskLimitDefinitionRejectionReason::MissingMicCode },
-    { "InvalidPartyRoleQualifier", RiskLimitDefinitionRejectionReason::InvalidPartyRoleQualifier }
-};
-
-static const std::map<RiskLimitDefinitionRejectionReason, std::string> RiskLimitDefinitionRejectionReason2Name {
-    { RiskLimitDefinitionRejectionReason::NA, "NA" },
-    { RiskLimitDefinitionRejectionReason::InvalidParty, "InvalidParty" },
-    { RiskLimitDefinitionRejectionReason::InvalidRelatedParty, "InvalidRelatedParty" },
-    { RiskLimitDefinitionRejectionReason::InvalidRiskLimitType, "InvalidRiskLimitType" },
-    { RiskLimitDefinitionRejectionReason::InvalidRiskLimitID, "InvalidRiskLimitID" },
-    { RiskLimitDefinitionRejectionReason::InvalidRiskLimitAmount, "InvalidRiskLimitAmount" },
-    { RiskLimitDefinitionRejectionReason::InvalidRiskWarningLevelAction, "InvalidRiskWarningLevelAction" },
-    { RiskLimitDefinitionRejectionReason::InvalidRiskInstrumentScope, "InvalidRiskInstrumentScope" },
-    { RiskLimitDefinitionRejectionReason::RiskLimitActionsNotSupported, "RiskLimitActionsNotSupported" },
-    { RiskLimitDefinitionRejectionReason::WarningLevelsNotSupported, "WarningLevelsNotSupported" },
-    { RiskLimitDefinitionRejectionReason::WarningLevelActionsNotSupported, "WarningLevelActionsNotSupported" },
-    { RiskLimitDefinitionRejectionReason::RiskInstrumentScopeNotSupported, "RiskInstrumentScopeNotSupported" },
-    { RiskLimitDefinitionRejectionReason::RiskLimitNotApprovedForParty, "RiskLimitNotApprovedForParty" },
-    { RiskLimitDefinitionRejectionReason::RiskLimitAlreadyDefinedForParty, "RiskLimitAlreadyDefinedForParty" },
-    { RiskLimitDefinitionRejectionReason::InstrumentNotApprovedForParty, "InstrumentNotApprovedForParty" },
-    { RiskLimitDefinitionRejectionReason::NotAuthorized, "NotAuthorized" },
-    { RiskLimitDefinitionRejectionReason::Other, "Other" },
-    { RiskLimitDefinitionRejectionReason::MissingMicCode, "MissingMicCode" },
-    { RiskLimitDefinitionRejectionReason::InvalidPartyRoleQualifier, "InvalidPartyRoleQualifier" }
-};
-
-
-struct RiskLimitDefinitionResponse {
-    Header header;
-    RiskDefinitionId id;
-    RiskDefinitionStatus status;
-    RiskLimitDefinitionRejectionReason reason;
-
-    friend std::ostream &operator << (std::ostream &, const RiskLimitDefinitionResponse &);
-};
-
-enum class RiskLimitRequestType: uint8_t {
-    Definitions = 1,
-    Utilization = 2,
-    DefinitionsAndUtilizations = 3
-};
-
-static const std::map<std::string, RiskLimitRequestType> Name2RiskLimitRequestType {
-    { "Definitions", RiskLimitRequestType::Definitions },
-    { "Utilization", RiskLimitRequestType::Utilization },
-    { "DefinitionsAndUtilizations", RiskLimitRequestType::DefinitionsAndUtilizations }
-};
-
-static const std::map<RiskLimitRequestType, std::string> RiskLimitRequestType2Name {
-    { RiskLimitRequestType::Definitions, "Definitions" },
-    { RiskLimitRequestType::Utilization, "Utilization" },
-    { RiskLimitRequestType::DefinitionsAndUtilizations, "DefinitionsAndUtilizations" }
-};
-
-// primitive built-in: bool
-
-enum class RiskWarningLevelAction: uint8_t {
-    Reject = 3
-};
-
-static const std::map<std::string, RiskWarningLevelAction> Name2RiskWarningLevelAction {
-    { "Reject", RiskWarningLevelAction::Reject }
-};
-
-static const std::map<RiskWarningLevelAction, std::string> RiskWarningLevelAction2Name {
-    { RiskWarningLevelAction::Reject, "Reject" }
-};
-
-using Percentage = int64_t;
-
-struct RiskLimitBreach {
-    Header header;
-    RiskDefinitionId id;
-    RiskLimitAmount amount;
-    RiskLimitRequestType riskLimitRequestType;
-    bool unsolicitedIndicator;
-    RiskLimitType limitType;
-    RiskWarningLevelAction riskWarningLevelAction;
-    RiskLimitAmount riskLimitUtilizationAmount;
-    Percentage riskLimitUtilizationPercent;
-
-    friend std::ostream &operator << (std::ostream &, const RiskLimitBreach &);
 };
 
 struct QuoteOrder {
@@ -1631,56 +1417,103 @@ struct MassQuoteResponse {
     friend std::ostream &operator << (std::ostream &, const MassQuoteResponse &);
 };
 
-enum class HybridMarketState: uint8_t {
-    Regular = 1,
-    BuyOnly = 2
+enum class CommandAction: uint8_t {
+    ChangeToHybridBuyOnly = 1,
+    ChangeToKnockOut = 2,
+    RevokeKnockOut = 3
 };
 
-static const std::map<std::string, HybridMarketState> Name2HybridMarketState {
-    { "Regular", HybridMarketState::Regular },
-    { "BuyOnly", HybridMarketState::BuyOnly }
+static const std::map<std::string, CommandAction> Name2CommandAction {
+    { "ChangeToHybridBuyOnly", CommandAction::ChangeToHybridBuyOnly },
+    { "ChangeToKnockOut", CommandAction::ChangeToKnockOut },
+    { "RevokeKnockOut", CommandAction::RevokeKnockOut }
 };
 
-static const std::map<HybridMarketState, std::string> HybridMarketState2Name {
-    { HybridMarketState::Regular, "Regular" },
-    { HybridMarketState::BuyOnly, "BuyOnly" }
+static const std::map<CommandAction, std::string> CommandAction2Name {
+    { CommandAction::ChangeToHybridBuyOnly, "ChangeToHybridBuyOnly" },
+    { CommandAction::ChangeToKnockOut, "ChangeToKnockOut" },
+    { CommandAction::RevokeKnockOut, "RevokeKnockOut" }
 };
 
 
-struct InitiateState {
+struct MarketMakerCommand {
     Header header;
     ElementId instrumentId;
-    HybridMarketState state;
+    CommandAction action;
 
-    friend std::ostream &operator << (std::ostream &, const InitiateState &);
+    friend std::ostream &operator << (std::ostream &, const MarketMakerCommand &);
 };
 
-enum class InitiateStateResult: uint8_t {
+enum class CommandResult: uint8_t {
     Success = 1,
     Failure = 2
 };
 
-static const std::map<std::string, InitiateStateResult> Name2InitiateStateResult {
-    { "Success", InitiateStateResult::Success },
-    { "Failure", InitiateStateResult::Failure }
+static const std::map<std::string, CommandResult> Name2CommandResult {
+    { "Success", CommandResult::Success },
+    { "Failure", CommandResult::Failure }
 };
 
-static const std::map<InitiateStateResult, std::string> InitiateStateResult2Name {
-    { InitiateStateResult::Success, "Success" },
-    { InitiateStateResult::Failure, "Failure" }
+static const std::map<CommandResult, std::string> CommandResult2Name {
+    { CommandResult::Success, "Success" },
+    { CommandResult::Failure, "Failure" }
 };
 
 
-struct InitiateStateResponse {
+enum class CommandRejectionCode: uint16_t {
+    Other = 99,
+    UnknownInstrument = 1001,
+    ExchangeClosed = 3002,
+    FirmNotAuthorizedToQuoteInstrument = 3009,
+    CommandNotAllowedInCurrentState = 3020
+};
+
+static const std::map<std::string, CommandRejectionCode> Name2CommandRejectionCode {
+    { "Other", CommandRejectionCode::Other },
+    { "UnknownInstrument", CommandRejectionCode::UnknownInstrument },
+    { "ExchangeClosed", CommandRejectionCode::ExchangeClosed },
+    { "FirmNotAuthorizedToQuoteInstrument", CommandRejectionCode::FirmNotAuthorizedToQuoteInstrument },
+    { "CommandNotAllowedInCurrentState", CommandRejectionCode::CommandNotAllowedInCurrentState }
+};
+
+static const std::map<CommandRejectionCode, std::string> CommandRejectionCode2Name {
+    { CommandRejectionCode::Other, "Other" },
+    { CommandRejectionCode::UnknownInstrument, "UnknownInstrument" },
+    { CommandRejectionCode::ExchangeClosed, "ExchangeClosed" },
+    { CommandRejectionCode::FirmNotAuthorizedToQuoteInstrument, "FirmNotAuthorizedToQuoteInstrument" },
+    { CommandRejectionCode::CommandNotAllowedInCurrentState, "CommandNotAllowedInCurrentState" }
+};
+
+
+struct MarketMakerCommandResponse {
     Header header;
-    InitiateStateResult result;
+    uint32_t refId;
+    CommandResult result;
+    CommandRejectionCode rejectionCode;
 
-    friend std::ostream &operator << (std::ostream &, const InitiateStateResponse &);
+    friend std::ostream &operator << (std::ostream &, const MarketMakerCommandResponse &);
 };
+
+enum class RequestForExecutionReason: uint8_t {
+    PassiveQuote = 1,
+    AggressiveQuote = 2
+};
+
+static const std::map<std::string, RequestForExecutionReason> Name2RequestForExecutionReason {
+    { "PassiveQuote", RequestForExecutionReason::PassiveQuote },
+    { "AggressiveQuote", RequestForExecutionReason::AggressiveQuote }
+};
+
+static const std::map<RequestForExecutionReason, std::string> RequestForExecutionReason2Name {
+    { RequestForExecutionReason::PassiveQuote, "PassiveQuote" },
+    { RequestForExecutionReason::AggressiveQuote, "AggressiveQuote" }
+};
+
 
 struct RequestForExecution {
     Header header;
     ElementId instrumentId;
+    RequestForExecutionReason reason;
 
     friend std::ostream &operator << (std::ostream &, const RequestForExecution &);
 };
@@ -1742,26 +1575,42 @@ struct OrderMassCancel {
     uint32_t targetPartyId;
     ElementId marketSegmentId;
     ElementId instrumentId;
+    MifidField executingTrader;
 
     friend std::ostream &operator << (std::ostream &, const OrderMassCancel &);
 };
 
 enum class MassCancelRejectionReason: uint16_t {
     NA = 101,
-    UnknownInstrumentId = 100,
-    UnknownMarketSegmentId = 1016
+    UnknownInstrument = 1001,
+    InvalidExecutionTrader = 1005,
+    UnknownMarketSegmentId = 1016,
+    UnknownConnectionId = 1017,
+    InstrumentForbidden = 1053,
+    MarketSegmentIdForbidden = 1054,
+    OperationOnRedistributedInstrumentsForbidden = 1056
 };
 
 static const std::map<std::string, MassCancelRejectionReason> Name2MassCancelRejectionReason {
     { "NA", MassCancelRejectionReason::NA },
-    { "UnknownInstrumentId", MassCancelRejectionReason::UnknownInstrumentId },
-    { "UnknownMarketSegmentId", MassCancelRejectionReason::UnknownMarketSegmentId }
+    { "UnknownInstrument", MassCancelRejectionReason::UnknownInstrument },
+    { "InvalidExecutionTrader", MassCancelRejectionReason::InvalidExecutionTrader },
+    { "UnknownMarketSegmentId", MassCancelRejectionReason::UnknownMarketSegmentId },
+    { "UnknownConnectionId", MassCancelRejectionReason::UnknownConnectionId },
+    { "InstrumentForbidden", MassCancelRejectionReason::InstrumentForbidden },
+    { "MarketSegmentIdForbidden", MassCancelRejectionReason::MarketSegmentIdForbidden },
+    { "OperationOnRedistributedInstrumentsForbidden", MassCancelRejectionReason::OperationOnRedistributedInstrumentsForbidden }
 };
 
 static const std::map<MassCancelRejectionReason, std::string> MassCancelRejectionReason2Name {
     { MassCancelRejectionReason::NA, "NA" },
-    { MassCancelRejectionReason::UnknownInstrumentId, "UnknownInstrumentId" },
-    { MassCancelRejectionReason::UnknownMarketSegmentId, "UnknownMarketSegmentId" }
+    { MassCancelRejectionReason::UnknownInstrument, "UnknownInstrument" },
+    { MassCancelRejectionReason::InvalidExecutionTrader, "InvalidExecutionTrader" },
+    { MassCancelRejectionReason::UnknownMarketSegmentId, "UnknownMarketSegmentId" },
+    { MassCancelRejectionReason::UnknownConnectionId, "UnknownConnectionId" },
+    { MassCancelRejectionReason::InstrumentForbidden, "InstrumentForbidden" },
+    { MassCancelRejectionReason::MarketSegmentIdForbidden, "MarketSegmentIdForbidden" },
+    { MassCancelRejectionReason::OperationOnRedistributedInstrumentsForbidden, "OperationOnRedistributedInstrumentsForbidden" }
 };
 
 
@@ -1776,6 +1625,34 @@ struct OrderMassCancelResponse {
     MassCancelRejectionReason reason;
 
     friend std::ostream &operator << (std::ostream &, const OrderMassCancelResponse &);
+};
+
+enum class BidOfferUpdateType: uint8_t {
+    Ipo = 1,
+    TenderOffer = 2
+};
+
+static const std::map<std::string, BidOfferUpdateType> Name2BidOfferUpdateType {
+    { "Ipo", BidOfferUpdateType::Ipo },
+    { "TenderOffer", BidOfferUpdateType::TenderOffer }
+};
+
+static const std::map<BidOfferUpdateType, std::string> BidOfferUpdateType2Name {
+    { BidOfferUpdateType::Ipo, "Ipo" },
+    { BidOfferUpdateType::TenderOffer, "TenderOffer" }
+};
+
+
+struct BidOfferUpdate {
+    Header header;
+    ElementId instrumentId;
+    BidOfferUpdateType updateType;
+    Quantity totalBidSize;
+    Quantity totalOfferSize;
+    uint32_t bidOrders;
+    uint32_t offerOrders;
+
+    friend std::ostream &operator << (std::ostream &, const BidOfferUpdate &);
 };
 using ScenarioName = AnsiChar[200];
 
@@ -1826,16 +1703,14 @@ union Message {
     TradeCaptureReportDual uTradeCaptureReportDual;
     TradeBust uTradeBust;
     TradeCaptureReportResponse uTradeCaptureReportResponse;
-    RiskLimitDefinition uRiskLimitDefinition;
-    RiskLimitDefinitionResponse uRiskLimitDefinitionResponse;
-    RiskLimitBreach uRiskLimitBreach;
     MassQuote uMassQuote;
     MassQuoteResponse uMassQuoteResponse;
-    InitiateState uInitiateState;
-    InitiateStateResponse uInitiateStateResponse;
+    MarketMakerCommand uMarketMakerCommand;
+    MarketMakerCommandResponse uMarketMakerCommandResponse;
     RequestForExecution uRequestForExecution;
     OrderMassCancel uOrderMassCancel;
     OrderMassCancelResponse uOrderMassCancelResponse;
+    BidOfferUpdate uBidOfferUpdate;
     TestEvent uTestEvent;
 };
   

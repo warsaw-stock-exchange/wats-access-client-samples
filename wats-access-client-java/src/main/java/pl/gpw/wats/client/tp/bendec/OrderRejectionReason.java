@@ -1,10 +1,7 @@
 package pl.gpw.wats.client.tp.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.nio.ByteBuffer;
 
 /**
@@ -15,7 +12,11 @@ public enum OrderRejectionReason {
     /**
      * Not applicable.
      */
-    NA(1),
+    NA(0),
+    /**
+     * Order id not recognized by the system.
+     */
+    UNKNOWNORDER(1),
     /**
      * Exchange closed.
      */
@@ -29,17 +30,13 @@ public enum OrderRejectionReason {
      */
     OTHER(99),
     /**
-     * Unknown instrument.
-     */
-    UNKNOWNINSTRUMENTID(100),
-    /**
      * Trading is not available for the instrument in its current phase.
      */
     INSTRUMENTPHASENOTRADING(106),
     /**
-     * The order id is unrecognized.
+     * Unknown instrument.
      */
-    UNKNOWNORDER(1001),
+    UNKNOWNINSTRUMENT(1001),
     /**
      * Invalid execution trader.
      */
@@ -65,6 +62,10 @@ public enum OrderRejectionReason {
      */
     INVALIDPARTYROLEQUALIFIERFORINVESTMENTDECISIONMAKER(1010),
     /**
+     * Cannot modify MiFID flags.
+     */
+    CANNOTMODIFYMIFIDFLAGS(1012),
+    /**
      * The display quantity (displayQty) cannot exceed the order quantity.
      */
     WRONGDISPLAYQTYVALUE(1013),
@@ -75,7 +76,7 @@ public enum OrderRejectionReason {
     /**
      * The value of the iceberg order is less than the required.
      */
-    WRONGICEBERGORDERVALUE(1015),
+    ICEBERGORDERVALUELESSTHANREQUIRED(1015),
     /**
      * The order quantity must be greater than the minimum quanity.
      */
@@ -165,6 +166,22 @@ public enum OrderRejectionReason {
      */
     PRICEABOVEHIGHCOLLAR(1038),
     /**
+     * Operation on redistributed instruments forbidden.
+     */
+    OPERATIONONREDISTRIBUTEDINSTRUMENTSFORBIDDEN(1056),
+    /**
+     * Firm has not been granted permission to buy and sell the selected instrument. Order entry/modification/cancellation is not possible.
+     */
+    FIRMNOTAUTHORIZEDTOBUYANDSELLTHEINSTRUMENT(1057),
+    /**
+     * Firm has not been granted permission to buy the selected instrument (only selling is allowed). Order entry/modification/cancellation on the buy side is not possible.
+     */
+    FIRMNOTAUTHORIZEDTOBUYTHEINSTRUMENT(1058),
+    /**
+     * Firm has not been granted permission to sell the selected instrument (only buying is allowed). Order entry/modification/cancellation on the sell side is not possible.
+     */
+    FIRMNOTAUTHORIZEDTOSELLTHEINSTRUMENT(1059),
+    /**
      * The trigger price not allowed for a specified order type.
      */
     TRIGGERPRICENOTALLOWED(1063),
@@ -209,9 +226,9 @@ public enum OrderRejectionReason {
      */
     INVALIDPARTYROLEQUALIFIERFORPARTYID(1075),
     /**
-     * SecurityID (48) not recognized by the system.
+     * Mass Quote not allowed for selected Market Model.
      */
-    UNKNOWNINSTRUMENT(1201),
+    MASSQUOTENOTALLOWEDFORSELECTEDMARKETMODEL(1201),
     /**
      * Instrument closed for trading.
      */
@@ -251,60 +268,55 @@ public enum OrderRejectionReason {
     /**
      * The order price has exceeded the risk limit.
      */
-    RISKORDERPRICECOLLAREXCEEDED(7003),
-    UNKNOWN(99999);
-
+    RISKORDERPRICECOLLAREXCEEDED(7003);
+    
     private final int value;
-
     private final int byteLength = 2;
-
-
+    
     private static final Map<Integer, OrderRejectionReason> TYPES = new HashMap<>();
     static {
         for (OrderRejectionReason type : OrderRejectionReason.values()) {
             TYPES.put(type.value, type);
         }
     }
-
-
+    
     OrderRejectionReason(int newValue) {
         value = newValue;
     }
-
+    
     /**
-     Get OrderRejectionReason from java input
-     * @param newValue
-     * @return OrderRejectionReason enum
+     * Get OrderRejectionReason by attribute
+     * @param val
+     * @return OrderRejectionReason enum or null if variant is undefined
      */
-    public static OrderRejectionReason getOrderRejectionReason(int newValue) {
-        OrderRejectionReason val = TYPES.get(newValue);
-        return val == null ? OrderRejectionReason.UNKNOWN : val;
+    public static OrderRejectionReason getOrderRejectionReason(int val) {
+        return TYPES.get(val);
     }
-
+    
     /**
      * Get OrderRejectionReason int value
      * @return int value
      */
-    public int getOrderRejectionReasonValue() { return value; }
-
-
+    public int getOrderRejectionReasonValue() {
+        return value; 
+    }
+    
     /**
-     Get OrderRejectionReason from bytes
+     * Get OrderRejectionReason from bytes
      * @param bytes byte[]
      * @param offset - int
      */
     public static OrderRejectionReason getOrderRejectionReason(byte[] bytes, int offset) {
         return getOrderRejectionReason(BendecUtils.uInt16FromByteArray(bytes, offset));
     }
-
+    
     byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         buffer.put(BendecUtils.uInt16ToByteArray(this.value));
         return buffer.array();
     }
-
+    
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt16ToByteArray(this.value));
     }
-
 }

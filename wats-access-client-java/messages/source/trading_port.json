@@ -1,12 +1,6 @@
 {
-  "version": 1043,
+  "version": 1076,
   "typeDefinitions": [
-    {
-      "kind": "Alias",
-      "name": "Percentage",
-      "alias": "i64",
-      "description": "Percentage number/ratio."
-    },
     {
       "kind": "Primitive",
       "name": "bool",
@@ -69,19 +63,6 @@
     },
     {
       "kind": "Enum",
-      "name": "RiskWarningLevelAction",
-      "description": "Action that was take because warning level was exceeded.",
-      "underlying": "u8",
-      "variants": [
-        [
-          "Reject",
-          3,
-          "Reject."
-        ]
-      ]
-    },
-    {
-      "kind": "Enum",
       "name": "MifidFlags",
       "underlying": "u8",
       "description": "Mifid related flags.",
@@ -100,12 +81,8 @@
           "0b0010"
         ],
         [
-          "AlgorithmicTrade",
-          "0b0100"
-        ],
-        [
           "MarketMakerOrSpecialist",
-          "0b1000"
+          "0b0100"
         ]
       ]
     },
@@ -297,6 +274,16 @@
           "AntiFloodingThresholdExceeded",
           5,
           "The second level of the throttling limit has been exceeded."
+        ],
+        [
+          "ConnectionConfigChanged",
+          6,
+          "Connection configuration has changed"
+        ],
+        [
+          "CloseOps",
+          7,
+          "Service closed the connection because of an exchange operation  (e.g. supervision operation)."
         ]
       ]
     },
@@ -378,9 +365,9 @@
       "underlying": "u8",
       "variants": [
         [
-          "Ack",
+          "New",
           1,
-          "Order acknowledged by system."
+          "New order."
         ],
         [
           "Cancelled",
@@ -398,9 +385,14 @@
           "Order filled."
         ],
         [
-          "Modified",
+          "PartiallyFilled",
           5,
-          "Order modified."
+          "Order partially filled."
+        ],
+        [
+          "Expired",
+          6,
+          "Order expired."
         ]
       ]
     },
@@ -468,8 +460,13 @@
       "variants": [
         [
           "NA",
-          1,
+          0,
           "Not applicable."
+        ],
+        [
+          "UnknownOrder",
+          1,
+          "Order id not recognized by the system."
         ],
         [
           "ExchangeClosed",
@@ -487,19 +484,14 @@
           "Other."
         ],
         [
-          "UnknownInstrumentId",
-          100,
-          "Unknown instrument."
-        ],
-        [
           "InstrumentPhaseNoTrading",
           106,
           "Trading is not available for the instrument in its current phase."
         ],
         [
-          "UnknownOrder",
+          "UnknownInstrument",
           1001,
-          "The order id is unrecognized."
+          "Unknown instrument."
         ],
         [
           "InvalidExecutionTrader",
@@ -532,6 +524,11 @@
           "Invalid Party Role Qualifier for Investment Decision Maker Party group"
         ],
         [
+          "CannotModifyMifidFlags",
+          1012,
+          "Cannot modify MiFID flags."
+        ],
+        [
           "WrongDisplayQtyValue",
           1013,
           "The display quantity (displayQty) cannot exceed the order quantity."
@@ -542,7 +539,7 @@
           "The Display quantity (displayQty) not allowed for specified order type - only for Iceberg."
         ],
         [
-          "WrongIcebergOrderValue",
+          "IcebergOrderValueLessThanRequired",
           1015,
           "The value of the iceberg order is less than the required."
         ],
@@ -657,6 +654,26 @@
           "The validation for collars has failed. The price is too high."
         ],
         [
+          "OperationOnRedistributedInstrumentsForbidden",
+          1056,
+          "Operation on redistributed instruments forbidden."
+        ],
+        [
+          "FirmNotAuthorizedToBuyAndSellTheInstrument",
+          1057,
+          "Firm has not been granted permission to buy and sell the selected instrument. Order entry/modification/cancellation is not possible."
+        ],
+        [
+          "FirmNotAuthorizedToBuyTheInstrument",
+          1058,
+          "Firm has not been granted permission to buy the selected instrument (only selling is allowed). Order entry/modification/cancellation on the buy side is not possible."
+        ],
+        [
+          "FirmNotAuthorizedToSellTheInstrument",
+          1059,
+          "Firm has not been granted permission to sell the selected instrument (only buying is allowed). Order entry/modification/cancellation on the sell side is not possible."
+        ],
+        [
           "TriggerPriceNotAllowed",
           1063,
           "The trigger price not allowed for a specified order type."
@@ -712,9 +729,9 @@
           "Invalid PartyRoleQualifier (2376) for PartyID (448)"
         ],
         [
-          "UnknownInstrument",
+          "MassQuoteNotAllowedForSelectedMarketModel",
           1201,
-          "SecurityID (48) not recognized by the system."
+          "Mass Quote not allowed for selected Market Model."
         ],
         [
           "InstrumentClosed",
@@ -792,12 +809,12 @@
         [
           "FOK",
           4,
-          "A Fill or Kill order must be filled or canceled."
+          "A Fill or Kill order must be immediately fully filled or canceled."
         ],
         [
           "VFA",
           5,
-          "A market or limit-price order to be executed at the opening of the stock or not at all; all or part of any order not executed at the opening is treated as canceled."
+          "Valid For Auction."
         ],
         [
           "GTD",
@@ -807,7 +824,7 @@
         [
           "VFC",
           7,
-          "Indicated price is to be around the closing price, however, not held to the closing price."
+          "Valid For Closing."
         ],
         [
           "GTT",
@@ -861,6 +878,16 @@
           "MissingReportIdSecondaryTradeReportIdOrTradeReportRefId",
           7,
           "Missing report id (SecondaryTradeReportId or TradeReportRefId)."
+        ],
+        [
+          "InvalidTradeId",
+          8,
+          "Invalid trade ID."
+        ],
+        [
+          "InvalidAlgorithmicTradeIndicator",
+          9,
+          "Invalid algorithmic trade indicator."
         ]
       ]
     },
@@ -981,11 +1008,6 @@
           "Lei",
           78,
           "Legal Entity Identifier."
-        ],
-        [
-          "Bic",
-          66,
-          "Business Identifier Code."
         ],
         [
           "Custom",
@@ -1117,6 +1139,23 @@
       ]
     },
     {
+      "kind": "Enum",
+      "name": "ExecInst",
+      "underlying": "u8",
+      "description": "Instructions for order handling on exchange trading floor.",
+      "bitflags": true,
+      "variants": [
+        [
+          "None",
+          "0b00000000"
+        ],
+        [
+          "CancelOnConnectionLoss",
+          "0b00000001"
+        ]
+      ]
+    },
+    {
       "kind": "Struct",
       "name": "OrderAdd",
       "description": "Message used to add new orders to the system.",
@@ -1215,6 +1254,16 @@
           "name": "clearingMemberClearingIdentifier",
           "type": "ClearingIdentifier",
           "description": "Clearing member's clearing identifier."
+        },
+        {
+          "name": "execInst",
+          "type": "ExecInst",
+          "description": "Instructions for order handling on exchange trading floor."
+        },
+        {
+          "name": "feeStructureId",
+          "type": "u8",
+          "description": "Optional identifier of a fee scheme for billing purposes."
         }
       ]
     },
@@ -1239,6 +1288,16 @@
           "description": "Unique for single trading day order identifier assigned by the trading system and shared publicly in market data (public information)."
         },
         {
+          "name": "displayQty",
+          "type": "Quantity",
+          "description": "Used only for iceberg order. The quantity to be displayed."
+        },
+        {
+          "name": "filled",
+          "type": "Quantity",
+          "description": "Indicates the quantity of the order which has already been filled."
+        },
+        {
           "name": "status",
           "type": "OrderStatus",
           "description": "Status of the given order."
@@ -1249,9 +1308,9 @@
           "description": "Reason for rejecting the given order."
         },
         {
-          "name": "source",
-          "type": "OrderSource",
-          "description": "Response message sources can include trading ports, order cancellation mechanisms, and more."
+          "name": "execTypeReason",
+          "type": "ExecTypeReason",
+          "description": "Describes why an order was executed and the events related to its lifecycle."
         }
       ]
     },
@@ -1269,6 +1328,11 @@
           "name": "orderId",
           "type": "OrderId",
           "description": "Unique for each trading day order identifier based on the sequence number of order message, bulk sequence number, session ID and connection ID."
+        },
+        {
+          "name": "mifidFields",
+          "type": "MifidFields",
+          "description": "MifidFields structure."
         }
       ]
     },
@@ -1288,14 +1352,19 @@
           "description": "Unique for each trading day order identifier based on the sequence number of order message, bulk sequence number, session ID and connection ID."
         },
         {
+          "name": "status",
+          "type": "OrderStatus",
+          "description": "Status of the given order."
+        },
+        {
           "name": "reason",
           "type": "OrderRejectionReason",
           "description": "Reason for rejecting the given order."
         },
         {
-          "name": "source",
-          "type": "OrderSource",
-          "description": "Response message sources can include trading ports, order cancellation mechanisms, and more."
+          "name": "execTypeReason",
+          "type": "ExecTypeReason",
+          "description": "Describes why an order was executed and the events related to its lifecycle."
         }
       ]
     },
@@ -1338,6 +1407,11 @@
           "name": "expire",
           "type": "Timestamp",
           "description": "Expiration time indicating the validity of the order - relevant only when TimeInForce is set to GTD (Good Till Date)."
+        },
+        {
+          "name": "mifidFields",
+          "type": "MifidFields",
+          "description": "MifidFields structure."
         }
       ]
     },
@@ -1355,6 +1429,11 @@
           "name": "orderId",
           "type": "OrderId",
           "description": "Unique for each trading day order identifier based on the sequence number of order message, bulk sequence number, session ID and connection ID."
+        },
+        {
+          "name": "filled",
+          "type": "Quantity",
+          "description": "Indicates the quantity of the order which has already been filled."
         },
         {
           "name": "status",
@@ -1385,14 +1464,39 @@
           "Not applicable."
         ],
         [
-          "UnknownInstrumentId",
-          100,
-          "Unknown instrument ID."
+          "UnknownInstrument",
+          1001,
+          "Unknown instrument."
+        ],
+        [
+          "InvalidExecutionTrader",
+          1005,
+          "Missing Executing Trader repeating group"
         ],
         [
           "UnknownMarketSegmentId",
           1016,
           "Unknown market segment ID."
+        ],
+        [
+          "UnknownConnectionId",
+          1017,
+          "Unknown connection ID."
+        ],
+        [
+          "InstrumentForbidden",
+          1053,
+          "Instrument forbidden."
+        ],
+        [
+          "MarketSegmentIdForbidden",
+          1054,
+          "Market segment ID forbidden."
+        ],
+        [
+          "OperationOnRedistributedInstrumentsForbidden",
+          1056,
+          "Operation on redistributed instruments forbidden."
         ]
       ]
     },
@@ -1430,6 +1534,11 @@
           "name": "instrumentId",
           "type": "ElementId",
           "description:": "ID of the instrument to cancel, valid only for CancelForSecurity."
+        },
+        {
+          "name": "executingTrader",
+          "type": "MifidField",
+          "description": "MifidField of Executing Trader."
         }
       ]
     },
@@ -1596,13 +1705,6 @@
       "description": "Date (YYYYMMDD) as integer value. In case of undefined date value of '0' (zero) is used."
     },
     {
-      "kind": "Array",
-      "name": "MicCode",
-      "type": "AnsiChar",
-      "length": 4,
-      "description": "Market Identifier Code (MIC) as specified in ISO 10383."
-    },
-    {
       "kind": "Enum",
       "name": "TradeReportTransType",
       "description": "Identifies Trade Report message transaction type.",
@@ -1698,14 +1800,14 @@
           "Other."
         ],
         [
-          "UnknownInstrumentId",
-          100,
-          "Unknown instrument."
-        ],
-        [
           "InstrumentPhaseNoTrading",
           106,
           "Trading is not available for the instrument in its current phase."
+        ],
+        [
+          "UnknownInstrument",
+          1001,
+          "Unknown instrument."
         ],
         [
           "InvalidExecutionTrader",
@@ -1781,6 +1883,26 @@
           "PriceAboveHighCollar",
           1038,
           "The validation for collars has failed. The price is too high."
+        ],
+        [
+          "OperationOnRedistributedInstrumentsForbidden",
+          1056,
+          "Operation on redistributed instruments forbidden."
+        ],
+        [
+          "FirmNotAuthorizedToBuyAndSellTheInstrument",
+          1057,
+          "Firm has not been granted permission to buy and sell the selected instrument. Order entry/modification/cancellation is not possible."
+        ],
+        [
+          "FirmNotAuthorizedToBuyTheInstrument",
+          1058,
+          "Firm has not been granted permission to buy the selected instrument (only selling is allowed). Order entry/modification/cancellation on the buy side is not possible."
+        ],
+        [
+          "FirmNotAuthorizedToSellTheInstrument",
+          1059,
+          "Firm has not been granted permission to sell the selected instrument (only buying is allowed). Order entry/modification/cancellation on the sell side is not possible."
         ],
         [
           "InvalidPartyIdForClientId",
@@ -1863,11 +1985,6 @@
           "Request not allowed for CROSS instrument"
         ],
         [
-          "InvalidMatchStatus",
-          2029,
-          "Invalid MatchStatus"
-        ],
-        [
           "CrossNotAllowedOutsideOfClobInstrumentSpread",
           2030,
           "Cross not allowed outside of CLOB instrument spread"
@@ -1891,6 +2008,11 @@
           "UnknownSecondaryTradereportId",
           2034,
           "Unknown SecondaryTradeReportID"
+        ],
+        [
+          "NoTradeForClobReferenceInstrument",
+          2035,
+          "Trading on BLOCK and CROSS instruments is not alllowed, because linked CLOB instrument has not been traded yet."
         ]
       ]
     },
@@ -1903,6 +2025,16 @@
           "name": "mifidFields",
           "type": "MifidFields",
           "description": "Fields related to the MiFID directive."
+        },
+        {
+          "name": "clearingMemberCode",
+          "type": "ClearingCode",
+          "description": "Clearing member code."
+        },
+        {
+          "name": "clearingMemberClearingIdentifier",
+          "type": "ClearingIdentifier",
+          "description": "Clearing member's clearing identifier."
         },
         {
           "name": "account",
@@ -1928,6 +2060,11 @@
           "name": "orderOrigination",
           "type": "ElementId",
           "description": "Identifies the origin of the order."
+        },
+        {
+          "name": "feeStructureId",
+          "type": "u8",
+          "description": "Optional identifier of a fee scheme for billing purposes."
         },
         {
           "name": "memo",
@@ -1980,9 +2117,9 @@
       "underlying": "u8",
       "variants": [
         [
-          "New",
-          1,
-          "New."
+          "NA",
+          0,
+          "Not applicable"
         ],
         [
           "Rejected",
@@ -2008,29 +2145,6 @@
           "TradeCancel",
           17,
           "Trade Cancel."
-        ]
-      ]
-    },
-    {
-      "kind": "Enum",
-      "name": "MatchStatus",
-      "description": "The status of this trade with respect to matching or comparison.",
-      "underlying": "u8",
-      "variants": [
-        [
-          "NA",
-          0,
-          "Not applicable."
-        ],
-        [
-          "Matched",
-          1,
-          "Compared, matched or affirmed."
-        ],
-        [
-          "Unmatched",
-          2,
-          "Uncompared, unmatched, or unaffirmed."
         ]
       ]
     },
@@ -2127,11 +2241,6 @@
           "description": "Settlement date of the trade is equal to current date plus actual settlement offset calendar days."
         },
         {
-          "name": "matchStatus",
-          "type": "MatchStatus",
-          "description": "The status of this trade with respect to matching or comparison."
-        },
-        {
           "name": "side",
           "type": "OrderSide",
           "description": "Side of order."
@@ -2219,11 +2328,6 @@
           "description": "Settlement date of the trade is equal to current date plus actual settlement offset calendar days."
         },
         {
-          "name": "matchStatus",
-          "type": "MatchStatus",
-          "description": "The status of this trade with respect to matching or comparison."
-        },
-        {
           "name": "tcrPartyBuy",
           "type": "TcrParty",
           "description": "TCR party - buy side."
@@ -2275,456 +2379,6 @@
           "type": "TcrRejectionReason",
           "description": "Reason for rejecting the given TCR."
         }
-      ]
-    },
-    {
-      "kind": "Alias",
-      "name": "RiskLimitAmount",
-      "alias": "u64",
-      "description": "Risk Limit Amount."
-    },
-    {
-      "kind": "Alias",
-      "name": "RiskDefinitionId",
-      "alias": "u64",
-      "description": "Risk limit definition id."
-    },
-    {
-      "kind": "Enum",
-      "name": "RiskLimitType",
-      "description": "Indicates the risk controls.",
-      "underlying": "u16",
-      "variants": [
-        [
-          "PerBuyOrderVolume",
-          301,
-          "Per buy order volume."
-        ],
-        [
-          "PerBuyOrderNotionalValue",
-          302,
-          "Per buy order notional value."
-        ],
-        [
-          "PerSellOrderVolume",
-          311,
-          "Per sell order volume."
-        ],
-        [
-          "PerSellOrderNotionalValue",
-          312,
-          "Per sell order notional value."
-        ],
-        [
-          "PerBuyPriceLimit",
-          313,
-          "Per buy price limit."
-        ],
-        [
-          "PerSellPriceLimit",
-          314,
-          "Per Sell Price Limit."
-        ],
-        [
-          "PerTotalBuyTradedValue",
-          315,
-          "Per total buy traded value."
-        ],
-        [
-          "PerTotalSellTradedValue",
-          316,
-          "Per total sell traded value."
-        ],
-        [
-          "PerTotalTradedValue",
-          317,
-          "Per total traded value."
-        ],
-        [
-          "PerTotalBuyOpenOrdersValue",
-          318,
-          "Per total buy open orders value."
-        ],
-        [
-          "PerTotalSellOpenOrdersValue",
-          319,
-          "Per total sell open orders value."
-        ],
-        [
-          "PerTotalOpenOrdersValue",
-          320,
-          "Per total open orders value."
-        ],
-        [
-          "PerTotalBuyRiskValue",
-          321,
-          "Per total buy risk value."
-        ],
-        [
-          "PerTotalSellRiskValue",
-          322,
-          "Per total sell risk value."
-        ],
-        [
-          "PerTotalRiskValue",
-          323,
-          "Per total risk value."
-        ],
-        [
-          "PerTotalNetRiskValue",
-          324,
-          "Per total net risk value."
-        ],
-        [
-          "PerTotalDailyNumberOfOrders",
-          325,
-          "Per total daily number Of orders."
-        ],
-        [
-          "RiskLimitNotDefined",
-          326,
-          "Requiered risk limits are missing."
-        ]
-      ]
-    },
-    {
-      "kind": "Enum",
-      "name": "RiskOperation",
-      "description": "Risk limit definition message operation type.",
-      "underlying": "u8",
-      "variants": [
-        [
-          "Add",
-          1,
-          "Add operation."
-        ],
-        [
-          "Modify",
-          2,
-          "Modify operation."
-        ],
-        [
-          "Delete",
-          3,
-          "Delete operation."
-        ]
-      ]
-    },
-    {
-      "kind": "Enum",
-      "name": "RiskLimitAction",
-      "description": "Risk limit definition, request action type.",
-      "underlying": "u8",
-      "variants": [
-        [
-          "ToReject",
-          1,
-          "Reject when limits are exceeded."
-        ]
-      ]
-    },
-    {
-      "kind": "Enum",
-      "name": "RiskDefinitionStatus",
-      "description": "Risk limit definition request status.",
-      "underlying": "u8",
-      "variants": [
-        [
-          "Ack",
-          1,
-          "Ack"
-        ],
-        [
-          "Rejected",
-          3,
-          "Rejected"
-        ]
-      ]
-    },
-    {
-      "kind": "Enum",
-      "name": "RiskLimitDefinitionRejectionReason",
-      "description": "Indicates the reason why the RiskLimitDefinition message was rejected.",
-      "underlying": "u8",
-      "variants": [
-        [
-          "NA",
-          0,
-          "Not applicable."
-        ],
-        [
-          "InvalidParty",
-          1,
-          "Invalid party."
-        ],
-        [
-          "InvalidRelatedParty",
-          2,
-          "Invalid related party."
-        ],
-        [
-          "InvalidRiskLimitType",
-          3,
-          "Invalid risk limit type."
-        ],
-        [
-          "InvalidRiskLimitID",
-          4,
-          "Invalid risk limit ID."
-        ],
-        [
-          "InvalidRiskLimitAmount",
-          5,
-          "Invalid risk limit amount."
-        ],
-        [
-          "InvalidRiskWarningLevelAction",
-          6,
-          "Invalid risk warning level action."
-        ],
-        [
-          "InvalidRiskInstrumentScope",
-          7,
-          "Invalid risk instrument scope."
-        ],
-        [
-          "RiskLimitActionsNotSupported",
-          8,
-          "Risk limit actions not supported."
-        ],
-        [
-          "WarningLevelsNotSupported",
-          9,
-          "Warning levels not supported."
-        ],
-        [
-          "WarningLevelActionsNotSupported",
-          10,
-          "Warning level actions not supported."
-        ],
-        [
-          "RiskInstrumentScopeNotSupported",
-          11,
-          "Risk instrument scope not supported."
-        ],
-        [
-          "RiskLimitNotApprovedForParty",
-          12,
-          "Risk limit not approved for party."
-        ],
-        [
-          "RiskLimitAlreadyDefinedForParty",
-          13,
-          "Risk limit already defined for party."
-        ],
-        [
-          "InstrumentNotApprovedForParty",
-          14,
-          "Instrument not approved for party."
-        ],
-        [
-          "NotAuthorized",
-          98,
-          "Not authorized."
-        ],
-        [
-          "Other",
-          99,
-          "Other."
-        ],
-        [
-          "MissingMicCode",
-          101,
-          "Missing Mic code."
-        ],
-        [
-          "InvalidPartyRoleQualifier",
-          102,
-          "Invalid party role qualifier."
-        ]
-      ]
-    },
-    {
-      "kind": "Struct",
-      "name": "RiskLimitDefinition",
-      "description": "Risk limit definition message.",
-      "fields": [
-        {
-          "name": "header",
-          "type": "Header",
-          "description": "Header."
-        },
-        {
-          "name": "id",
-          "type": "RiskDefinitionId",
-          "description": "RiskLimitDefinition message identifier."
-        },
-        {
-          "name": "RiskLimitId",
-          "type": "RiskDefinitionId",
-          "description": "Risk limit row identifier."
-        },
-        {
-          "name": "instrumentId",
-          "type": "ElementId",
-          "description": "Id of an instrument."
-        },
-        {
-          "name": "Mic",
-          "type": "MicCode",
-          "description": "Mic code is replacing instrument and market segment."
-        },
-        {
-          "name": "action",
-          "type": "RiskLimitAction",
-          "description": "Risk limit definition action after breach."
-        },
-        {
-          "name": "amount",
-          "type": "RiskLimitAmount",
-          "description": "Risk limit definition amount"
-        },
-        {
-          "name": "limitType",
-          "type": "RiskLimitType",
-          "description": "Risk limit definition limit type."
-        },
-        {
-          "name": "riskMemberCode",
-          "type": "LeiCode",
-          "description": "LEI code of the participant imposing the Limits and managing the risk."
-        },
-        {
-          "name": "memberPartyId",
-          "type": "LeiCode",
-          "description": "Exchange member risk entity identifier, should be LEI."
-        },
-        {
-          "name": "clientPartyId",
-          "type": "ShortCode",
-          "description": "Exchange member client risk identifier, is optional."
-        },
-        {
-          "name": "clientRoleQualifier",
-          "type": "PartyRoleQualifier",
-          "description": "Risk entity role qualifier."
-        },
-        {
-          "name": "operation",
-          "type": "RiskOperation",
-          "description": "Risk limit definition operation type."
-        },
-        {
-          "name": "marketSegmentId",
-          "type": "ElementId",
-          "description": "A market segment id."
-        },
-        {
-          "name": "capacity",
-          "type": "Capacity",
-          "description": "Capacity of the party making the order (either principal or agency)."
-        }
-      ]
-    },
-    {
-      "kind": "Struct",
-      "name": "RiskLimitDefinitionResponse",
-      "description": "Risk limit definition response message.",
-      "fields": [
-        {
-          "name": "header",
-          "type": "Header",
-          "description": "Header."
-        },
-        {
-          "name": "id",
-          "type": "RiskDefinitionId",
-          "description": "Risk limit definition message Id."
-        },
-        {
-          "name": "status",
-          "type": "RiskDefinitionStatus",
-          "description": "Risk limit definition status."
-        },
-        {
-          "name": "reason",
-          "type": "RiskLimitDefinitionRejectionReason",
-          "description": "Risk limit definition rejection reason."
-        }
-      ]
-    },
-    {
-      "kind": "Struct",
-      "name": "RiskLimitBreach",
-      "description": "Message to inform about violation of risk limit.",
-      "fields": [
-        {
-          "name": "header",
-          "type": "Header",
-          "description": "Header."
-        },
-        {
-          "name": "id",
-          "type": "RiskDefinitionId",
-          "description": "Risk limit definition id."
-        },
-        {
-          "name": "amount",
-          "type": "RiskLimitAmount",
-          "description": "Amount of the overrun."
-        },
-        {
-          "name": "riskLimitRequestType",
-          "type": "RiskLimitRequestType",
-          "description": "Type of risk limit information."
-        },
-        {
-          "name": "unsolicitedIndicator",
-          "type": "bool",
-          "description": "Indicates whether or not message is being sent as a result of a subscription request or not."
-        },
-        {
-          "name": "limitType",
-          "type": "RiskLimitType",
-          "description": "Risk limit definition limit type."
-        },
-        {
-          "name": "riskWarningLevelAction",
-          "type": "RiskWarningLevelAction",
-          "description": "Action that was take because warning level was exceeded."
-        },
-        {
-          "name": "riskLimitUtilizationAmount",
-          "type": "RiskLimitAmount",
-          "description": "Absolute amount of utilization of a party's set risk limit."
-        },
-        {
-          "name": "riskLimitUtilizationPercent",
-          "type": "Percentage",
-          "description": "Percentage of utilization of a party's set risk limit."
-        }
-      ]
-    },
-    {
-      "kind": "Enum",
-      "name": "RiskLimitRequestType",
-      "underlying": "u8",
-      "variants": [
-        [
-          "Definitions",
-          1,
-          "Definitions."
-        ],
-        [
-          "Utilization",
-          2,
-          "Utilization."
-        ],
-        [
-          "DefinitionsAndUtilizations",
-          3,
-          "Definitions and utilization."
-        ]
       ]
     },
     {
@@ -2874,16 +2528,6 @@
           "The reject message is sent by the trading port service when receiving an erroneous message that cannot be further processed."
         ],
         [
-          "RiskLimitDefinition",
-          16,
-          "The risk limit definition message."
-        ],
-        [
-          "RiskLimitDefinitionResponse",
-          17,
-          "The risk limit definition response message."
-        ],
-        [
           "TradeCaptureReportSingle",
           18,
           "Trade Capture Report - single side."
@@ -2897,11 +2541,6 @@
           "TradeCaptureReportResponse",
           20,
           "The message is a response to an Trade Capture Report message, containing the state of TCR execution."
-        ],
-        [
-          "RiskLimitBreach",
-          21,
-          "Risk limit breach notification message."
         ],
         [
           "TradeBust",
@@ -2919,16 +2558,6 @@
           "MassQuoteResponse."
         ],
         [
-          "InitiateState",
-          26,
-          "Market maker initiates state transition."
-        ],
-        [
-          "InitiateStateResponse",
-          27,
-          "A response to the Market maker initiating state transition."
-        ],
-        [
           "RequestForExecution",
           28,
           "Informs MM that execution has been requested."
@@ -2944,18 +2573,26 @@
           "Response to message used to cancel multiple existing orders."
         ],
         [
+          "BidOfferUpdate",
+          31,
+          "Message send during the IPO to the sell side or during the Tender Offer to the buy side."
+        ],
+        [
+          "MarketMakerCommand",
+          32,
+          "Market Maker command request."
+        ],
+        [
+          "MarketMakerCommandResponse",
+          33,
+          "The response to the Market Maker command."
+        ],
+        [
           "TestEvent",
           255,
           "A message to relay test scenario information"
         ]
       ]
-    },
-    {
-      "kind": "Array",
-      "name": "LeiCode",
-      "type": "AnsiChar",
-      "length": 20,
-      "description": "Legal Entity Identifier as specified in ISO 17422."
     },
     {
       "kind": "Array",
@@ -3032,16 +2669,14 @@
         "TradeCaptureReportDual",
         "TradeBust",
         "TradeCaptureReportResponse",
-        "RiskLimitDefinition",
-        "RiskLimitDefinitionResponse",
-        "RiskLimitBreach",
         "MassQuote",
         "MassQuoteResponse",
-        "InitiateState",
-        "InitiateStateResponse",
+        "MarketMakerCommand",
+        "MarketMakerCommandResponse",
         "RequestForExecution",
         "OrderMassCancel",
         "OrderMassCancelResponse",
+        "BidOfferUpdate",
         "TestEvent"
       ],
       "discriminator": [
@@ -3051,17 +2686,17 @@
     },
     {
       "kind": "Enum",
-      "name": "OrderSource",
+      "name": "ExecTypeReason",
       "underlying": "u8",
-      "description": "The message source of the order response.",
+      "description": "Describes why an order was executed and the events related to its lifecycle.",
       "variants": [
         [
-          "Submitted",
+          "NA",
           1,
-          "Order message coming from the trading port."
+          "Not applicable."
         ],
         [
-          "Cod",
+          "CancelOnDisconnect",
           2,
           "Order cancelled by the canceller on client disconnect."
         ],
@@ -3071,49 +2706,64 @@
           "Order cancelled by the canceller due to expiration."
         ],
         [
-          "StopOrder",
+          "Triggered",
           4,
-          "Order message coming from the stop order subsystem, after the stop order got triggered."
+          "Notification of Stop or VFA/VFC order activation."
         ],
         [
-          "Suspended",
+          "CancelOnSuspension",
           5,
           "Order cancelled by canceller due to instrument suspension."
         ],
         [
-          "Reinstated",
+          "OrderRestatement",
           6,
-          "Order reinstated"
+          "Order reinstated."
         ],
         [
-          "IcebergRefill",
+          "IcebergOrderRefill",
           7,
-          "Iceberg order refill"
+          "Iceberg order refill."
         ],
         [
-          "OrderBookRebuild",
+          "CancelByStp",
           8,
-          "Order book rebuild after auction"
+          "Order cancelled due to self-trade prevention."
         ],
         [
-          "Activated",
+          "CancelByCorporateAction",
           9,
-          "VFA/C order got activated, from now on it will take part in matching"
-        ],
-        [
-          "Stp",
-          10,
-          "Order cancelled due to self-trade prevention"
-        ],
-        [
-          "CorporateAction",
-          11,
           "Order cancelled due to submitted Corporate Action."
         ],
         [
-          "MassCancel",
-          12,
+          "CancelByMassCancel",
+          10,
           "Order cancelled due to mass cancel"
+        ],
+        [
+          "CancelIocFokOrder",
+          11,
+          "Order cancelled due to IOC/FOK."
+        ],
+        [
+          "CancelByMarketOperations",
+          12,
+          "Order cancelled due to market operations."
+        ],
+        [
+          "Replaced",
+          13,
+          "Order replaced."
+        ],
+        [
+          "FirstTradeOnAggressiveOrder",
+          14,
+          "First trade on aggressive order."
+        ],
+        [
+          "Rejected",
+          15,
+          "Order rejected."
         ]
       ]
     },
@@ -3435,26 +3085,36 @@
     },
     {
       "kind": "Enum",
-      "name": "HybridMarketState",
-      "description": "Enumeration of possible hybrid market states that mm can initiate the transition to.",
-      "underlying": "u8",
+      "name": "CommandRejectionCode",
+      "description": "Reason for rejecting the Market Maker command.",
+      "underlying": "u16",
       "variants": [
         [
-          "Regular",
-          1,
-          "Regular trading."
+          "Other",
+          99
         ],
         [
-          "BuyOnly",
-          2,
-          "Buy only trading."
+          "UnknownInstrument",
+          1001
+        ],
+        [
+          "ExchangeClosed",
+          3002
+        ],
+        [
+          "FirmNotAuthorizedToQuoteInstrument",
+          3009
+        ],
+        [
+          "CommandNotAllowedInCurrentState",
+          3020
         ]
       ]
     },
     {
       "kind": "Struct",
-      "name": "InitiateState",
-      "description": "Initiate state change to Regular or BuyOnly.",
+      "name": "MarketMakerCommand",
+      "description": "Market Maker command request.",
       "fields": [
         {
           "name": "header",
@@ -3464,19 +3124,39 @@
         {
           "name": "instrumentId",
           "type": "ElementId",
-          "description": "Instrument ID"
+          "description": "Instrument ID."
         },
         {
-          "name": "state",
-          "type": "HybridMarketState",
-          "description": "The state the mm wants the hybrid market to switch to."
+          "name": "action",
+          "type": "CommandAction",
+          "description": "The action for the Market Maker command request."
         }
       ]
     },
     {
       "kind": "Enum",
-      "name": "InitiateStateResult",
-      "description": "The result of the state change.",
+      "name": "CommandAction",
+      "description": "The action for the Market Maker command request.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "ChangeToHybridBuyOnly",
+          1
+        ],
+        [
+          "ChangeToKnockOut",
+          2
+        ],
+        [
+          "RevokeKnockOut",
+          3
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "CommandResult",
+      "description": "Confirmation of achieving the intended action. If the action (e.g., Buy Only state) has already been achieved before the command, the result will be positive.",
       "underlying": "u8",
       "variants": [
         [
@@ -3491,8 +3171,8 @@
     },
     {
       "kind": "Struct",
-      "name": "InitiateStateResponse",
-      "description": "The response to the attempt at state change.",
+      "name": "MarketMakerCommandResponse",
+      "description": "The response to the Market Maker command.",
       "fields": [
         {
           "name": "header",
@@ -3500,10 +3180,36 @@
           "description": "Message header."
         },
         {
+          "name": "refId",
+          "type": "u32",
+          "description": "A reference id to the Market Maker command request message."
+        },
+        {
           "name": "result",
-          "type": "InitiateStateResult",
-          "description": "The result of an attempt at changing phase."
+          "type": "CommandResult",
+          "description": "Confirmation of achieving the intended action. If the action (e.g., Buy Only state) has already been achieved before the command, the result will be positive."
+        },
+        {
+          "name": "rejectionCode",
+          "type": "CommandRejectionCode",
+          "description": "Reason for rejecting the Market Maker command."
         }
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "RequestForExecutionReason",
+      "description": "The reason for this RFE.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "PassiveQuote",
+          1
+        ],
+        [
+          "AggressiveQuote",
+          2
+        ]
       ]
     },
     {
@@ -3520,7 +3226,72 @@
           "name": "instrumentId",
           "type": "ElementId",
           "description": "Instrument ID"
+        },
+        {
+          "name": "reason",
+          "type": "RequestForExecutionReason",
+          "description": "The reason for this RFE."
         }
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "BidOfferUpdate",
+      "description": "Message send during the IPO to the sell side or during the Tender Offer to the buy side.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Message header."
+        },
+        {
+          "name": "instrumentId",
+          "type": "ElementId",
+          "description": "Instrument ID."
+        },
+        {
+          "name": "updateType",
+          "type": "BidOfferUpdateType",
+          "description": "Indicates a type of the BidOfferUpdate message."
+        },
+        {
+          "name": "totalBidSize",
+          "type": "Quantity",
+          "description": "Specifies the total bid size."
+        },
+        {
+          "name": "totalOfferSize",
+          "type": "Quantity",
+          "description": "Specifies the total offer size."
+        },
+        {
+          "name": "bidOrders",
+          "type": "u32",
+          "description": "Number of bid orders."
+        },
+        {
+          "name": "offerOrders",
+          "type": "u32",
+          "description": "Number of offer orders."
+        }
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "BidOfferUpdateType",
+      "description": "Indicates a type of the BidOfferUpdate message.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "Ipo",
+          1,
+          "Ipo."
+        ],
+        [
+          "TenderOffer",
+          2,
+          "Tender Offer."
+        ]
       ]
     }
   ]

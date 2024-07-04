@@ -1,10 +1,7 @@
 package pl.gpw.wats.client.md.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.nio.ByteBuffer;
 
 /**
@@ -13,86 +10,85 @@ import java.nio.ByteBuffer;
  */
 public enum AdjustedClosingPriceReason {
     /**
-     * 0 = Regular
+     * Not applicable.
      */
-    REGULAR(1),
+    NOTAPPLICABLE(1),
     /**
-     * 1 = Dividend
+     * Regular
      */
-    DIVIDEND(2),
+    REGULAR(2),
     /**
-     * 2 = Issue Right
+     * Dividend
      */
-    ISSUERIGHT(3),
+    DIVIDEND(3),
     /**
-     * 3 = Split
+     * Issue Right
      */
-    SPLIT(4),
+    ISSUERIGHT(4),
     /**
-     * 4 = Reverse Split
+     * Split
      */
-    REVERSESPLIT(5),
+    SPLIT(5),
     /**
-     * 5 = Bonus
+     * Reverse Split
      */
-    BONUS(6),
+    REVERSESPLIT(6),
     /**
-     * 6 = Spin-Off
+     * Bonus
      */
-    SPINOFF(7),
-    UNKNOWN(99999);
-
+    BONUS(7),
+    /**
+     * Spin-Off
+     */
+    SPINOFF(8);
+    
     private final int value;
-
     private final int byteLength = 1;
-
-
+    
     private static final Map<Integer, AdjustedClosingPriceReason> TYPES = new HashMap<>();
     static {
         for (AdjustedClosingPriceReason type : AdjustedClosingPriceReason.values()) {
             TYPES.put(type.value, type);
         }
     }
-
-
+    
     AdjustedClosingPriceReason(int newValue) {
         value = newValue;
     }
-
+    
     /**
-     Get AdjustedClosingPriceReason from java input
-     * @param newValue
-     * @return AdjustedClosingPriceReason enum
+     * Get AdjustedClosingPriceReason by attribute
+     * @param val
+     * @return AdjustedClosingPriceReason enum or null if variant is undefined
      */
-    public static AdjustedClosingPriceReason getAdjustedClosingPriceReason(int newValue) {
-        AdjustedClosingPriceReason val = TYPES.get(newValue);
-        return val == null ? AdjustedClosingPriceReason.UNKNOWN : val;
+    public static AdjustedClosingPriceReason getAdjustedClosingPriceReason(int val) {
+        return TYPES.get(val);
     }
-
+    
     /**
      * Get AdjustedClosingPriceReason int value
      * @return int value
      */
-    public int getAdjustedClosingPriceReasonValue() { return value; }
-
-
+    public int getAdjustedClosingPriceReasonValue() {
+        return value; 
+    }
+    
     /**
-     Get AdjustedClosingPriceReason from bytes
+     * Get AdjustedClosingPriceReason from bytes
      * @param bytes byte[]
      * @param offset - int
      */
     public static AdjustedClosingPriceReason getAdjustedClosingPriceReason(byte[] bytes, int offset) {
         return getAdjustedClosingPriceReason(BendecUtils.uInt8FromByteArray(bytes, offset));
     }
-
+    
     byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
         return buffer.array();
     }
-
+    
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
     }
-
 }

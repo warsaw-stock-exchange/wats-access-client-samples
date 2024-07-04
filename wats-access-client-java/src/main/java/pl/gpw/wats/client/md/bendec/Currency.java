@@ -1,15 +1,12 @@
 package pl.gpw.wats.client.md.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.nio.ByteBuffer;
 
 /**
  * Enum: Currency
- * Currency - ISO 4217 (2022/04/01) code (e.g. PLN)
+ * Currency - ISO 4217 code (e.g. PLN)
  */
 public enum Currency {
     /**
@@ -557,7 +554,7 @@ public enum Currency {
      */
     SDG(938),
     /**
-     * [object Object]
+     * Uruguay Peso en Unidades Indexadas (URUIURUI)
      */
     UYI(940),
     /**
@@ -577,11 +574,11 @@ public enum Currency {
      */
     RON(946),
     /**
-     * [object Object]
+     * WIR Euro
      */
     CHE(947),
     /**
-     * [object Object]
+     * WIR Franc
      */
     CHW(948),
     /**
@@ -661,7 +658,7 @@ public enum Currency {
      */
     MGA(969),
     /**
-     * [object Object]
+     * Unidad de Valor Real
      */
     COU(970),
     /**
@@ -693,7 +690,7 @@ public enum Currency {
      */
     EUR(978),
     /**
-     * [object Object]
+     * Unidad de inversion (UDI)
      */
     MXV(979),
     /**
@@ -705,7 +702,7 @@ public enum Currency {
      */
     GEL(981),
     /**
-     * [object Object]
+     * Mvdol
      */
     BOV(984),
     /**
@@ -717,7 +714,7 @@ public enum Currency {
      */
     BRL(986),
     /**
-     * [object Object]
+     * Unidad de Fomento
      */
     CLF(990),
     /**
@@ -725,66 +722,61 @@ public enum Currency {
      */
     XSU(994),
     /**
-     * [object Object]
+     * US Dollar (next day)
      */
     USN(997),
     /**
      * The codes assigned for transactions where no currency is involved
      */
-    XXX(999),
-    UNKNOWN(99999);
-
+    XXX(999);
+    
     private final int value;
-
     private final int byteLength = 2;
-
-
+    
     private static final Map<Integer, Currency> TYPES = new HashMap<>();
     static {
         for (Currency type : Currency.values()) {
             TYPES.put(type.value, type);
         }
     }
-
-
+    
     Currency(int newValue) {
         value = newValue;
     }
-
+    
     /**
-     Get Currency from java input
-     * @param newValue
-     * @return Currency enum
+     * Get Currency by attribute
+     * @param val
+     * @return Currency enum or null if variant is undefined
      */
-    public static Currency getCurrency(int newValue) {
-        Currency val = TYPES.get(newValue);
-        return val == null ? Currency.UNKNOWN : val;
+    public static Currency getCurrency(int val) {
+        return TYPES.get(val);
     }
-
+    
     /**
      * Get Currency int value
      * @return int value
      */
-    public int getCurrencyValue() { return value; }
-
-
+    public int getCurrencyValue() {
+        return value; 
+    }
+    
     /**
-     Get Currency from bytes
+     * Get Currency from bytes
      * @param bytes byte[]
      * @param offset - int
      */
     public static Currency getCurrency(byte[] bytes, int offset) {
         return getCurrency(BendecUtils.uInt16FromByteArray(bytes, offset));
     }
-
+    
     byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         buffer.put(BendecUtils.uInt16ToByteArray(this.value));
         return buffer.array();
     }
-
+    
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt16ToByteArray(this.value));
     }
-
 }

@@ -1,10 +1,7 @@
 package pl.gpw.wats.client.tp.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.nio.ByteBuffer;
 
 /**
@@ -29,13 +26,13 @@ public enum TcrRejectionReason {
      */
     OTHER(99),
     /**
-     * Unknown instrument.
-     */
-    UNKNOWNINSTRUMENTID(100),
-    /**
      * Trading is not available for the instrument in its current phase.
      */
     INSTRUMENTPHASENOTRADING(106),
+    /**
+     * Unknown instrument.
+     */
+    UNKNOWNINSTRUMENT(1001),
     /**
      * Invalid execution trader.
      */
@@ -96,6 +93,22 @@ public enum TcrRejectionReason {
      * The validation for collars has failed. The price is too high.
      */
     PRICEABOVEHIGHCOLLAR(1038),
+    /**
+     * Operation on redistributed instruments forbidden.
+     */
+    OPERATIONONREDISTRIBUTEDINSTRUMENTSFORBIDDEN(1056),
+    /**
+     * Firm has not been granted permission to buy and sell the selected instrument. Order entry/modification/cancellation is not possible.
+     */
+    FIRMNOTAUTHORIZEDTOBUYANDSELLTHEINSTRUMENT(1057),
+    /**
+     * Firm has not been granted permission to buy the selected instrument (only selling is allowed). Order entry/modification/cancellation on the buy side is not possible.
+     */
+    FIRMNOTAUTHORIZEDTOBUYTHEINSTRUMENT(1058),
+    /**
+     * Firm has not been granted permission to sell the selected instrument (only buying is allowed). Order entry/modification/cancellation on the sell side is not possible.
+     */
+    FIRMNOTAUTHORIZEDTOSELLTHEINSTRUMENT(1059),
     /**
      * Invalid PartyID (448) for Client ID
      */
@@ -161,10 +174,6 @@ public enum TcrRejectionReason {
      */
     REQUESTNOTALLOWEDFORCROSSINSTRUMENT(2028),
     /**
-     * Invalid MatchStatus
-     */
-    INVALIDMATCHSTATUS(2029),
-    /**
      * Cross not allowed outside of CLOB instrument spread
      */
     CROSSNOTALLOWEDOUTSIDEOFCLOBINSTRUMENTSPREAD(2030),
@@ -184,59 +193,58 @@ public enum TcrRejectionReason {
      * Unknown SecondaryTradeReportID
      */
     UNKNOWNSECONDARYTRADEREPORTID(2034),
-    UNKNOWN(99999);
-
+    /**
+     * Trading on BLOCK and CROSS instruments is not alllowed, because linked CLOB instrument has not been traded yet.
+     */
+    NOTRADEFORCLOBREFERENCEINSTRUMENT(2035);
+    
     private final int value;
-
     private final int byteLength = 2;
-
-
+    
     private static final Map<Integer, TcrRejectionReason> TYPES = new HashMap<>();
     static {
         for (TcrRejectionReason type : TcrRejectionReason.values()) {
             TYPES.put(type.value, type);
         }
     }
-
-
+    
     TcrRejectionReason(int newValue) {
         value = newValue;
     }
-
+    
     /**
-     Get TcrRejectionReason from java input
-     * @param newValue
-     * @return TcrRejectionReason enum
+     * Get TcrRejectionReason by attribute
+     * @param val
+     * @return TcrRejectionReason enum or null if variant is undefined
      */
-    public static TcrRejectionReason getTcrRejectionReason(int newValue) {
-        TcrRejectionReason val = TYPES.get(newValue);
-        return val == null ? TcrRejectionReason.UNKNOWN : val;
+    public static TcrRejectionReason getTcrRejectionReason(int val) {
+        return TYPES.get(val);
     }
-
+    
     /**
      * Get TcrRejectionReason int value
      * @return int value
      */
-    public int getTcrRejectionReasonValue() { return value; }
-
-
+    public int getTcrRejectionReasonValue() {
+        return value; 
+    }
+    
     /**
-     Get TcrRejectionReason from bytes
+     * Get TcrRejectionReason from bytes
      * @param bytes byte[]
      * @param offset - int
      */
     public static TcrRejectionReason getTcrRejectionReason(byte[] bytes, int offset) {
         return getTcrRejectionReason(BendecUtils.uInt16FromByteArray(bytes, offset));
     }
-
+    
     byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         buffer.put(BendecUtils.uInt16ToByteArray(this.value));
         return buffer.array();
     }
-
+    
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt16ToByteArray(this.value));
     }
-
 }

@@ -1,10 +1,7 @@
 package pl.gpw.wats.client.md.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.nio.ByteBuffer;
 
 /**
@@ -38,60 +35,55 @@ public enum AuctionType {
     VOLATILITYAUCTIONDYNAMIC(6),
     EXTENDEDVOLATILITYAUCTIONSTATIC(7),
     EXTENDEDVOLATILITYAUCTIONDYNAMIC(8),
-    UNSUSPENSIONAUCTION(9),
-    UNKNOWN(99999);
-
+    UNSUSPENSIONAUCTION(9);
+    
     private final int value;
-
     private final int byteLength = 1;
-
-
+    
     private static final Map<Integer, AuctionType> TYPES = new HashMap<>();
     static {
         for (AuctionType type : AuctionType.values()) {
             TYPES.put(type.value, type);
         }
     }
-
-
+    
     AuctionType(int newValue) {
         value = newValue;
     }
-
+    
     /**
-     Get AuctionType from java input
-     * @param newValue
-     * @return AuctionType enum
+     * Get AuctionType by attribute
+     * @param val
+     * @return AuctionType enum or null if variant is undefined
      */
-    public static AuctionType getAuctionType(int newValue) {
-        AuctionType val = TYPES.get(newValue);
-        return val == null ? AuctionType.UNKNOWN : val;
+    public static AuctionType getAuctionType(int val) {
+        return TYPES.get(val);
     }
-
+    
     /**
      * Get AuctionType int value
      * @return int value
      */
-    public int getAuctionTypeValue() { return value; }
-
-
+    public int getAuctionTypeValue() {
+        return value; 
+    }
+    
     /**
-     Get AuctionType from bytes
+     * Get AuctionType from bytes
      * @param bytes byte[]
      * @param offset - int
      */
     public static AuctionType getAuctionType(byte[] bytes, int offset) {
         return getAuctionType(BendecUtils.uInt8FromByteArray(bytes, offset));
     }
-
+    
     byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
         return buffer.array();
     }
-
+    
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
     }
-
 }

@@ -1,10 +1,7 @@
 package pl.gpw.wats.client.md.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.nio.ByteBuffer;
 
 /**
@@ -16,14 +13,6 @@ public enum MsgType {
      * A message type used to check connectivity.
      */
     HEARTBEAT(1),
-    /**
-     * A text message.
-     */
-    TEXT(2),
-    /**
-     * A message used to test system operation.
-     */
-    TEST(3),
     /**
      * New (limit) order added to order book.
      */
@@ -41,21 +30,9 @@ public enum MsgType {
      */
     ORDEREXECUTE(12),
     /**
-     * Start of a technical session.
+     * The Trading Session Status provides information on the status of a market and on a trading day events.
      */
-    STARTOFTECHNICALSESSION(20),
-    /**
-     * End of a technical session.
-     */
-    ENDOFTECHNICALSESSION(21),
-    /**
-     * Marks the start of the reference data.
-     */
-    REFERENCEDATASTART(22),
-    /**
-     * Marks the end of the reference data.
-     */
-    REFERENCEDATAEND(23),
+    TRADINGSESSIONSTATUS(23),
     /**
      * Encryption key and ID.
      */
@@ -181,66 +158,65 @@ public enum MsgType {
      */
     INSTRUMENTSUMMARY(671),
     /**
-     * Session summary.
+     * Product summary.
      */
-    SESSIONSUMMARY(672),
+    PRODUCTSUMMARY(672),
+    /**
+     * Report of open positions.
+     */
+    POSITIONREPORT(801),
     /**
      * A message to relay test scenario information
      */
-    TESTEVENT(8192),
-    UNKNOWN(99999);
-
+    TESTEVENT(8192);
+    
     private final int value;
-
     private final int byteLength = 2;
-
-
+    
     private static final Map<Integer, MsgType> TYPES = new HashMap<>();
     static {
         for (MsgType type : MsgType.values()) {
             TYPES.put(type.value, type);
         }
     }
-
-
+    
     MsgType(int newValue) {
         value = newValue;
     }
-
+    
     /**
-     Get MsgType from java input
-     * @param newValue
-     * @return MsgType enum
+     * Get MsgType by attribute
+     * @param val
+     * @return MsgType enum or null if variant is undefined
      */
-    public static MsgType getMsgType(int newValue) {
-        MsgType val = TYPES.get(newValue);
-        return val == null ? MsgType.UNKNOWN : val;
+    public static MsgType getMsgType(int val) {
+        return TYPES.get(val);
     }
-
+    
     /**
      * Get MsgType int value
      * @return int value
      */
-    public int getMsgTypeValue() { return value; }
-
-
+    public int getMsgTypeValue() {
+        return value; 
+    }
+    
     /**
-     Get MsgType from bytes
+     * Get MsgType from bytes
      * @param bytes byte[]
      * @param offset - int
      */
     public static MsgType getMsgType(byte[] bytes, int offset) {
         return getMsgType(BendecUtils.uInt16FromByteArray(bytes, offset));
     }
-
+    
     byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         buffer.put(BendecUtils.uInt16ToByteArray(this.value));
         return buffer.array();
     }
-
+    
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt16ToByteArray(this.value));
     }
-
 }

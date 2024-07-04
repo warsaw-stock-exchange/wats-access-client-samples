@@ -164,6 +164,9 @@ struct ProductBucket {
 
     /// A product TradeCaptureReportDual
     block_dual: u32,
+
+    /// A reference product TradeCaptureReportDual
+    block_dual_reference: u32,
   }
 
 impl Config {
@@ -313,6 +316,11 @@ impl Config {
 
     /// A product for Block Dual test
     pub(super) fn block_dual(&self) -> u32 {
-      self.product_bucket.block_dual as u32
-  }
+        self.product_bucket.block_dual as u32
+    }
+
+  /// A reference product for Block Dual test
+    pub(super) fn block_dual_reference(&self) -> u32 {
+        self.product_bucket.block_dual_reference as u32
+    }
 }

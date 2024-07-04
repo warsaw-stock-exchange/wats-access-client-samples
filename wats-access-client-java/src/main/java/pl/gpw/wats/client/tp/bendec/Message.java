@@ -1,12 +1,8 @@
 package pl.gpw.wats.client.tp.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import pl.gpw.wats.client.tp.bendec.MsgType;
-
 import java.util.Optional;
 
 public interface Message {
@@ -14,15 +10,15 @@ public interface Message {
         return this.getHeader().getMsgType();
     }
     Header getHeader();
-
+    
     static MsgType getMsgType(byte[] bytes) {
         return MsgType.getMsgType(bytes, 2);
     }
-
+    
     static Optional<Message> createObject(byte[] bytes) {
         return createObject(getMsgType(bytes), bytes);
     }
-
+    
     static Optional<Message> createObject(MsgType type, byte[] bytes) {
         switch (type) {
             case TEST:
@@ -63,41 +59,37 @@ public interface Message {
                 return Optional.of(new TradeBust(bytes));
             case TRADECAPTUREREPORTRESPONSE:
                 return Optional.of(new TradeCaptureReportResponse(bytes));
-            case RISKLIMITDEFINITION:
-                return Optional.of(new RiskLimitDefinition(bytes));
-            case RISKLIMITDEFINITIONRESPONSE:
-                return Optional.of(new RiskLimitDefinitionResponse(bytes));
-            case RISKLIMITBREACH:
-                return Optional.of(new RiskLimitBreach(bytes));
             case MASSQUOTE:
                 return Optional.of(new MassQuote(bytes));
             case MASSQUOTERESPONSE:
                 return Optional.of(new MassQuoteResponse(bytes));
-            case INITIATESTATE:
-                return Optional.of(new InitiateState(bytes));
-            case INITIATESTATERESPONSE:
-                return Optional.of(new InitiateStateResponse(bytes));
+            case MARKETMAKERCOMMAND:
+                return Optional.of(new MarketMakerCommand(bytes));
+            case MARKETMAKERCOMMANDRESPONSE:
+                return Optional.of(new MarketMakerCommandResponse(bytes));
             case REQUESTFOREXECUTION:
                 return Optional.of(new RequestForExecution(bytes));
             case ORDERMASSCANCEL:
                 return Optional.of(new OrderMassCancel(bytes));
             case ORDERMASSCANCELRESPONSE:
                 return Optional.of(new OrderMassCancelResponse(bytes));
+            case BIDOFFERUPDATE:
+                return Optional.of(new BidOfferUpdate(bytes));
             case TESTEVENT:
                 return Optional.of(new TestEvent(bytes));
             default:
                 return Optional.empty();
         }
     }
-
+    
     static Class findClassByDiscriminator(MsgType type) {
         return  typeToClassMap.get(type);
     }
-
+    
     static MsgType findDiscriminatorByClass(Class clazz) {
         return  classToTypeMap.get(clazz);
     }
-
+    
     HashMap<Class, MsgType> classToTypeMap = new HashMap<>(){{
         put(Test.class, MsgType.TEST);
         put(Login.class, MsgType.LOGIN);
@@ -118,19 +110,17 @@ public interface Message {
         put(TradeCaptureReportDual.class, MsgType.TRADECAPTUREREPORTDUAL);
         put(TradeBust.class, MsgType.TRADEBUST);
         put(TradeCaptureReportResponse.class, MsgType.TRADECAPTUREREPORTRESPONSE);
-        put(RiskLimitDefinition.class, MsgType.RISKLIMITDEFINITION);
-        put(RiskLimitDefinitionResponse.class, MsgType.RISKLIMITDEFINITIONRESPONSE);
-        put(RiskLimitBreach.class, MsgType.RISKLIMITBREACH);
         put(MassQuote.class, MsgType.MASSQUOTE);
         put(MassQuoteResponse.class, MsgType.MASSQUOTERESPONSE);
-        put(InitiateState.class, MsgType.INITIATESTATE);
-        put(InitiateStateResponse.class, MsgType.INITIATESTATERESPONSE);
+        put(MarketMakerCommand.class, MsgType.MARKETMAKERCOMMAND);
+        put(MarketMakerCommandResponse.class, MsgType.MARKETMAKERCOMMANDRESPONSE);
         put(RequestForExecution.class, MsgType.REQUESTFOREXECUTION);
         put(OrderMassCancel.class, MsgType.ORDERMASSCANCEL);
         put(OrderMassCancelResponse.class, MsgType.ORDERMASSCANCELRESPONSE);
+        put(BidOfferUpdate.class, MsgType.BIDOFFERUPDATE);
         put(TestEvent.class, MsgType.TESTEVENT);
     }};
-
+    
     HashMap<MsgType, Class> typeToClassMap = new HashMap<>() {{
         put(MsgType.TEST, Test.class);
         put(MsgType.LOGIN, Login.class);
@@ -151,16 +141,14 @@ public interface Message {
         put(MsgType.TRADECAPTUREREPORTDUAL, TradeCaptureReportDual.class);
         put(MsgType.TRADEBUST, TradeBust.class);
         put(MsgType.TRADECAPTUREREPORTRESPONSE, TradeCaptureReportResponse.class);
-        put(MsgType.RISKLIMITDEFINITION, RiskLimitDefinition.class);
-        put(MsgType.RISKLIMITDEFINITIONRESPONSE, RiskLimitDefinitionResponse.class);
-        put(MsgType.RISKLIMITBREACH, RiskLimitBreach.class);
         put(MsgType.MASSQUOTE, MassQuote.class);
         put(MsgType.MASSQUOTERESPONSE, MassQuoteResponse.class);
-        put(MsgType.INITIATESTATE, InitiateState.class);
-        put(MsgType.INITIATESTATERESPONSE, InitiateStateResponse.class);
+        put(MsgType.MARKETMAKERCOMMAND, MarketMakerCommand.class);
+        put(MsgType.MARKETMAKERCOMMANDRESPONSE, MarketMakerCommandResponse.class);
         put(MsgType.REQUESTFOREXECUTION, RequestForExecution.class);
         put(MsgType.ORDERMASSCANCEL, OrderMassCancel.class);
         put(MsgType.ORDERMASSCANCELRESPONSE, OrderMassCancelResponse.class);
+        put(MsgType.BIDOFFERUPDATE, BidOfferUpdate.class);
         put(MsgType.TESTEVENT, TestEvent.class);
     }};
 }

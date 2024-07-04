@@ -38,6 +38,8 @@ To run integrated tests you need a running WATS core services and proper configu
 cargo test -- --include-ignored --test-threads 1
 ```
 
+Particular tests may be context dependent, that is, they may not be able to run multiple times or in a situation when there are open trades in the system etc. Please refer to source code for details.
+
 ## Message definitions
 All messages used to communicate with WATS exist primarily, as a contract, in JSON definition files. Definitions required to communicate with the system are located in `messages` directory. They can be translated to library's native Rust language definitions using [bendec](https://github.com/fudini/bendec/) (Binary encoder/decoder). To re-generate native definitions run:
 

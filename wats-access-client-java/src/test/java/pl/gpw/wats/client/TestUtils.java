@@ -3,6 +3,8 @@ package pl.gpw.wats.client;
 import pl.gpw.wats.client.md.MdSnapshotConnectionConfig;
 import pl.gpw.wats.client.md.OnlineMarketDataSnapshotClient;
 import pl.gpw.wats.client.tp.bendec.*;
+import pl.gpw.wats.client.tp.bendec.ExecInst.ExecInstOptions;
+import pl.gpw.wats.client.tp.bendec.MifidFlags.MifidFlagsOptions;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -13,7 +15,12 @@ public class TestUtils {
 
     public static OrderAdd orderAdd(Long instrumentId, OrderSide side, Long price, BigInteger quantity) {
         return new OrderAdd(
-                new Header(OrderAdd.byteLength, MsgType.ORDERADD, 0, BigInteger.ZERO),
+                new Header(
+                    OrderAdd.byteLength,
+                    MsgType.ORDERADD,
+                    0,
+                    BigInteger.ZERO
+                ),
                 0,
                 0,
                 instrumentId,
@@ -27,31 +34,59 @@ public class TestUtils {
                 Capacity.AGENCY,
                 "TEST",
                 AccountType.MISSING,
-                new MifidFields(MifidFlags.NONE,
-                    new MifidField(1234567, PartyRoleQualifier.FIRMORLEGALENTITY),
-                    new MifidField(1234567, PartyRoleQualifier.ALGORITHM),
-                    new MifidField(1234567, PartyRoleQualifier.NATURALPERSON)),
+                new MifidFields(
+                    new MifidFlags(MifidFlagsOptions.NONE.getOptionValue()),
+                    new MifidField(1, PartyRoleQualifier.NA),
+                    new MifidField(4, PartyRoleQualifier.ALGORITHM),
+                    new MifidField(17, PartyRoleQualifier.NATURALPERSON)
+                ),
                 BigInteger.TEN,
                 "",
                 "",
-                ClearingIdentifier.NOTAPPLICABLE);
+                ClearingIdentifier.NOTAPPLICABLE,
+                new ExecInst(ExecInstOptions.CANCELONCONNECTIONLOSS.getOptionValue()),
+                0
+            );
     }
 
     public static OrderModify orderModify(BigInteger orderId, Long price, BigInteger quantity) {
         return new OrderModify(
-                new Header(OrderModify.byteLength, MsgType.ORDERMODIFY, 0, BigInteger.ZERO),
+                new Header(
+                    OrderModify.byteLength,
+                    MsgType.ORDERMODIFY,
+                    0,
+                    BigInteger.ZERO
+                ),
                 orderId,
                 price,
                 0,
                 quantity,
                 BigInteger.ZERO,
-                BigInteger.ZERO);
+                BigInteger.ZERO,
+                new MifidFields(
+                    new MifidFlags(MifidFlagsOptions.NONE.getOptionValue()),
+                    new MifidField(1, PartyRoleQualifier.NA),
+                    new MifidField(4, PartyRoleQualifier.ALGORITHM),
+                    new MifidField(17, PartyRoleQualifier.NATURALPERSON)
+                )
+            );
     }
 
     public static OrderCancel orderCancel(BigInteger orderId) {
         return new OrderCancel(
-                new Header(OrderCancel.byteLength, MsgType.ORDERCANCEL, 0, BigInteger.ZERO),
-                orderId);
+                new Header(
+                    OrderCancel.byteLength,
+                    MsgType.ORDERCANCEL,
+                    0,
+                    BigInteger.ZERO
+                ),
+                orderId,
+                new MifidFields(
+                    new MifidFlags(MifidFlagsOptions.NONE.getOptionValue()),
+                    new MifidField(1, PartyRoleQualifier.NA),
+                    new MifidField(4, PartyRoleQualifier.ALGORITHM),
+                    new MifidField(17, PartyRoleQualifier.NATURALPERSON)
+                ));
     }
 
     public static TradeCaptureReportDual tradeCaptureReportDual(
@@ -62,7 +97,12 @@ public class TestUtils {
             BigInteger lastQty,
             Long settlement_date) {
         return new TradeCaptureReportDual(
-                new Header(OrderCancel.byteLength, MsgType.ORDERCANCEL, 0, BigInteger.ZERO),
+                new Header(
+                   TradeCaptureReportDual.byteLength,
+                   MsgType.TRADECAPTUREREPORTDUAL,
+            0,
+                   BigInteger.ZERO
+                ),
                 instrumentId,
                 tradeReportId,
                 0,
@@ -75,31 +115,41 @@ public class TestUtils {
                 lastQty,
                 lastPx,
                 settlement_date,
-                MatchStatus.NA,
                 new TcrParty(
-                    new MifidFields(MifidFlags.NONE,
+                    new MifidFields(
+                        new MifidFlags(MifidFlagsOptions.NONE.getOptionValue()),
                         new MifidField(1, PartyRoleQualifier.NA),
                         new MifidField(4, PartyRoleQualifier.ALGORITHM),
-                        new MifidField(17, PartyRoleQualifier.NATURALPERSON)),
+                        new MifidField(17, PartyRoleQualifier.NATURALPERSON)
+                    ),
+                    "",
+                    ClearingIdentifier.NOTAPPLICABLE,
                     "",
                     AccountType.CUSTOMER,
                     Capacity.AGENCY,
+                    0,
                     0,
                     0,
                     ""
                 ),
                 new TcrParty(
-                    new MifidFields(MifidFlags.NONE,
+                    new MifidFields(
+                        new MifidFlags(MifidFlagsOptions.NONE.getOptionValue()),
                         new MifidField(1, PartyRoleQualifier.NA),
                         new MifidField(4, PartyRoleQualifier.ALGORITHM),
-                        new MifidField(17, PartyRoleQualifier.NATURALPERSON)),
+                        new MifidField(17, PartyRoleQualifier.NATURALPERSON)
+                    ),
+                    "",
+                    ClearingIdentifier.NOTAPPLICABLE,
                     "",
                     AccountType.CUSTOMER,
                     Capacity.AGENCY,
                     0,
                     0,
+                    0,
                     ""
-                ));
+                )
+            );
     }
 
     public static Long toDate(LocalDate d) {

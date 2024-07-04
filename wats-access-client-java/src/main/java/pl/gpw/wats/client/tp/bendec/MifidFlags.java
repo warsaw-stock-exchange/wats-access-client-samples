@@ -1,75 +1,91 @@
 package pl.gpw.wats.client.tp.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.nio.ByteBuffer;
 
 /**
- * Enum: MifidFlags
+ * MifidFlags
  * Mifid related flags.
  */
-public enum MifidFlags {
-    NONE(0),
-    LIQUIDITYPROVISIONACTIVITY(1),
-    DIRECTORSPONSOREDACCESS(2),
-    ALGORITHMICTRADE(4),
-    MARKETMAKERORSPECIALIST(8),
-    UNKNOWN(99999);
-
-    private final int value;
-
+public class MifidFlags {
+    private int value;
     private final int byteLength = 1;
+    
+    public MifidFlags(int value) {
+        this.value = value;
+    }
 
+    public MifidFlags(byte[] bytes, int offset) {
+        this(BendecUtils.uInt8FromByteArray(bytes, offset));
+    }
 
-    private static final Map<Integer, MifidFlags> TYPES = new HashMap<>();
-    static {
-        for (MifidFlags type : MifidFlags.values()) {
-            TYPES.put(type.value, type);
+    public void add(MifidFlagsOptions flag) {
+        this.value = this.value | flag.getOptionValue();
+    }
+    
+    public void remove(MifidFlagsOptions flag) {
+        this.value = this.value ^ flag.getOptionValue();
+    }
+
+    public Set<MifidFlagsOptions> getFlags() {
+        HashSet<MifidFlagsOptions> options = new HashSet<>();
+        for (MifidFlagsOptions option : MifidFlagsOptions.values()) {
+            if (isAdded(option))
+                options.add(option);
         }
+        if (options.size() > 1)
+            options.remove(MifidFlagsOptions.TYPES.get(0));
+        return options;
     }
 
-
-    MifidFlags(int newValue) {
-        value = newValue;
+    public boolean isAdded(MifidFlagsOptions flag) {
+        return (this.value | flag.getOptionValue()) == this.value;
     }
 
-    /**
-     Get MifidFlags from java input
-     * @param newValue
-     * @return MifidFlags enum
-     */
-    public static MifidFlags getMifidFlags(int newValue) {
-        MifidFlags val = TYPES.get(newValue);
-        return val == null ? MifidFlags.UNKNOWN : val;
+    public int getValue() {
+        return value;
     }
-
-    /**
-     * Get MifidFlags int value
-     * @return int value
-     */
-    public int getMifidFlagsValue() { return value; }
-
-
-    /**
-     Get MifidFlags from bytes
-     * @param bytes byte[]
-     * @param offset - int
-     */
-    public static MifidFlags getMifidFlags(byte[] bytes, int offset) {
-        return getMifidFlags(BendecUtils.uInt8FromByteArray(bytes, offset));
-    }
-
+    
     byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
         return buffer.array();
     }
-
+    
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
     }
-
+    
+    public enum MifidFlagsOptions {
+        NONE(0),
+        LIQUIDITYPROVISIONACTIVITY(1),
+        DIRECTORSPONSOREDACCESS(2),
+        MARKETMAKERORSPECIALIST(4);
+        
+        private final int optionValue;
+        private static final Map<Integer, MifidFlagsOptions> TYPES = new HashMap<>();
+        static {
+            for (MifidFlagsOptions type : MifidFlagsOptions.values()) {
+                TYPES.put(type.optionValue, type);
+            }
+        }
+        
+        /**
+         * Get MifidFlagsOptions by attribute
+         * @param val
+         * @return MifidFlagsOptions enum or null if variant is undefined
+         */
+        public static MifidFlagsOptions getMifidFlags(int val) {
+            return TYPES.get(val);
+        }
+        
+        MifidFlagsOptions(int newValue) {
+            this.optionValue = newValue;
+        }
+        
+        public int getOptionValue() {
+            return optionValue;
+        }
+    }
 }

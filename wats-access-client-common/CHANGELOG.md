@@ -1,4 +1,9 @@
-# Changes history for WATS DEV-ISV environment
+# Changes history for WATS Access Client common data
+
+## 1.0.0
+
+* **Change:** Documentation updated to version 1.0.0
+* **Change:** QuickFIX XML templates updated to 1.0.0
 
 ## 0.62
 

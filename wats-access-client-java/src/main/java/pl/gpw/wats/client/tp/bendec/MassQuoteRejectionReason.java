@@ -1,10 +1,7 @@
 package pl.gpw.wats.client.tp.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.nio.ByteBuffer;
 
 /**
@@ -75,60 +72,55 @@ public enum MassQuoteRejectionReason {
     /**
      * Forbidden OrderCapacity (528) value for Mass Quote.
      */
-    FORBIDDENORDERCAPACITYVALUE(1210),
-    UNKNOWN(99999);
-
+    FORBIDDENORDERCAPACITYVALUE(1210);
+    
     private final int value;
-
     private final int byteLength = 2;
-
-
+    
     private static final Map<Integer, MassQuoteRejectionReason> TYPES = new HashMap<>();
     static {
         for (MassQuoteRejectionReason type : MassQuoteRejectionReason.values()) {
             TYPES.put(type.value, type);
         }
     }
-
-
+    
     MassQuoteRejectionReason(int newValue) {
         value = newValue;
     }
-
+    
     /**
-     Get MassQuoteRejectionReason from java input
-     * @param newValue
-     * @return MassQuoteRejectionReason enum
+     * Get MassQuoteRejectionReason by attribute
+     * @param val
+     * @return MassQuoteRejectionReason enum or null if variant is undefined
      */
-    public static MassQuoteRejectionReason getMassQuoteRejectionReason(int newValue) {
-        MassQuoteRejectionReason val = TYPES.get(newValue);
-        return val == null ? MassQuoteRejectionReason.UNKNOWN : val;
+    public static MassQuoteRejectionReason getMassQuoteRejectionReason(int val) {
+        return TYPES.get(val);
     }
-
+    
     /**
      * Get MassQuoteRejectionReason int value
      * @return int value
      */
-    public int getMassQuoteRejectionReasonValue() { return value; }
-
-
+    public int getMassQuoteRejectionReasonValue() {
+        return value; 
+    }
+    
     /**
-     Get MassQuoteRejectionReason from bytes
+     * Get MassQuoteRejectionReason from bytes
      * @param bytes byte[]
      * @param offset - int
      */
     public static MassQuoteRejectionReason getMassQuoteRejectionReason(byte[] bytes, int offset) {
         return getMassQuoteRejectionReason(BendecUtils.uInt16FromByteArray(bytes, offset));
     }
-
+    
     byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         buffer.put(BendecUtils.uInt16ToByteArray(this.value));
         return buffer.array();
     }
-
+    
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt16ToByteArray(this.value));
     }
-
 }

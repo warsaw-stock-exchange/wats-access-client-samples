@@ -55,6 +55,7 @@ impl ReplayRequest {
       header: ReplayHeader::new(ReplayMsgType::ReplayRequest),
       seq_num,
       end_seq_num,
+      stream_id: 0
     }
   }
 }

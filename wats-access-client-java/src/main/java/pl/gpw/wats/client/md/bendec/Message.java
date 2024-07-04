@@ -1,12 +1,8 @@
 package pl.gpw.wats.client.md.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import pl.gpw.wats.client.md.bendec.MsgType;
-
 import java.util.Optional;
 
 public interface Message {
@@ -14,23 +10,19 @@ public interface Message {
         return this.getHeader().getMsgType();
     }
     Header getHeader();
-
+    
     static MsgType getMsgType(byte[] bytes) {
         return MsgType.getMsgType(bytes, 2);
     }
-
+    
     static Optional<Message> createObject(byte[] bytes) {
         return createObject(getMsgType(bytes), bytes);
     }
-
+    
     static Optional<Message> createObject(MsgType type, byte[] bytes) {
         switch (type) {
             case HEARTBEAT:
                 return Optional.of(new Heartbeat(bytes));
-            case TEXT:
-                return Optional.of(new Text(bytes));
-            case TEST:
-                return Optional.of(new Test(bytes));
             case ORDERADD:
                 return Optional.of(new OrderAdd(bytes));
             case ORDERMODIFY:
@@ -39,14 +31,8 @@ public interface Message {
                 return Optional.of(new OrderDelete(bytes));
             case ORDEREXECUTE:
                 return Optional.of(new OrderExecute(bytes));
-            case STARTOFTECHNICALSESSION:
-                return Optional.of(new StartOfTechnicalSession(bytes));
-            case ENDOFTECHNICALSESSION:
-                return Optional.of(new EndOfTechnicalSession(bytes));
-            case REFERENCEDATASTART:
-                return Optional.of(new ReferenceDataStart(bytes));
-            case REFERENCEDATAEND:
-                return Optional.of(new ReferenceDataEnd(bytes));
+            case TRADINGSESSIONSTATUS:
+                return Optional.of(new TradingSessionStatus(bytes));
             case ENCRYPTIONKEY:
                 return Optional.of(new EncryptionKey(bytes));
             case INSTRUMENTSTATUSCHANGE:
@@ -107,37 +93,34 @@ public interface Message {
                 return Optional.of(new IndexParams(bytes));
             case INSTRUMENTSUMMARY:
                 return Optional.of(new InstrumentSummary(bytes));
-            case SESSIONSUMMARY:
-                return Optional.of(new SessionSummary(bytes));
+            case PRODUCTSUMMARY:
+                return Optional.of(new ProductSummary(bytes));
             case NEWS:
                 return Optional.of(new News(bytes));
             case TESTEVENT:
                 return Optional.of(new TestEvent(bytes));
+            case POSITIONREPORT:
+                return Optional.of(new PositionReport(bytes));
             default:
                 return Optional.empty();
         }
     }
-
+    
     static Class findClassByDiscriminator(MsgType type) {
         return  typeToClassMap.get(type);
     }
-
+    
     static MsgType findDiscriminatorByClass(Class clazz) {
         return  classToTypeMap.get(clazz);
     }
-
+    
     HashMap<Class, MsgType> classToTypeMap = new HashMap<>(){{
         put(Heartbeat.class, MsgType.HEARTBEAT);
-        put(Text.class, MsgType.TEXT);
-        put(Test.class, MsgType.TEST);
         put(OrderAdd.class, MsgType.ORDERADD);
         put(OrderModify.class, MsgType.ORDERMODIFY);
         put(OrderDelete.class, MsgType.ORDERDELETE);
         put(OrderExecute.class, MsgType.ORDEREXECUTE);
-        put(StartOfTechnicalSession.class, MsgType.STARTOFTECHNICALSESSION);
-        put(EndOfTechnicalSession.class, MsgType.ENDOFTECHNICALSESSION);
-        put(ReferenceDataStart.class, MsgType.REFERENCEDATASTART);
-        put(ReferenceDataEnd.class, MsgType.REFERENCEDATAEND);
+        put(TradingSessionStatus.class, MsgType.TRADINGSESSIONSTATUS);
         put(EncryptionKey.class, MsgType.ENCRYPTIONKEY);
         put(InstrumentStatusChange.class, MsgType.INSTRUMENTSTATUSCHANGE);
         put(TradingPhaseScheduleEntry.class, MsgType.TRADINGPHASESCHEDULEENTRY);
@@ -168,23 +151,19 @@ public interface Message {
         put(IndexPortfolioEntry.class, MsgType.INDEXPORTFOLIOENTRY);
         put(IndexParams.class, MsgType.INDEXPARAMS);
         put(InstrumentSummary.class, MsgType.INSTRUMENTSUMMARY);
-        put(SessionSummary.class, MsgType.SESSIONSUMMARY);
+        put(ProductSummary.class, MsgType.PRODUCTSUMMARY);
         put(News.class, MsgType.NEWS);
         put(TestEvent.class, MsgType.TESTEVENT);
+        put(PositionReport.class, MsgType.POSITIONREPORT);
     }};
-
+    
     HashMap<MsgType, Class> typeToClassMap = new HashMap<>() {{
         put(MsgType.HEARTBEAT, Heartbeat.class);
-        put(MsgType.TEXT, Text.class);
-        put(MsgType.TEST, Test.class);
         put(MsgType.ORDERADD, OrderAdd.class);
         put(MsgType.ORDERMODIFY, OrderModify.class);
         put(MsgType.ORDERDELETE, OrderDelete.class);
         put(MsgType.ORDEREXECUTE, OrderExecute.class);
-        put(MsgType.STARTOFTECHNICALSESSION, StartOfTechnicalSession.class);
-        put(MsgType.ENDOFTECHNICALSESSION, EndOfTechnicalSession.class);
-        put(MsgType.REFERENCEDATASTART, ReferenceDataStart.class);
-        put(MsgType.REFERENCEDATAEND, ReferenceDataEnd.class);
+        put(MsgType.TRADINGSESSIONSTATUS, TradingSessionStatus.class);
         put(MsgType.ENCRYPTIONKEY, EncryptionKey.class);
         put(MsgType.INSTRUMENTSTATUSCHANGE, InstrumentStatusChange.class);
         put(MsgType.TRADINGPHASESCHEDULEENTRY, TradingPhaseScheduleEntry.class);
@@ -215,8 +194,9 @@ public interface Message {
         put(MsgType.INDEXPORTFOLIOENTRY, IndexPortfolioEntry.class);
         put(MsgType.INDEXPARAMS, IndexParams.class);
         put(MsgType.INSTRUMENTSUMMARY, InstrumentSummary.class);
-        put(MsgType.SESSIONSUMMARY, SessionSummary.class);
+        put(MsgType.PRODUCTSUMMARY, ProductSummary.class);
         put(MsgType.NEWS, News.class);
         put(MsgType.TESTEVENT, TestEvent.class);
+        put(MsgType.POSITIONREPORT, PositionReport.class);
     }};
 }

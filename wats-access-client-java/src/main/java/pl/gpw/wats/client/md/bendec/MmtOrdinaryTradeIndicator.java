@@ -1,10 +1,7 @@
 package pl.gpw.wats.client.md.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.nio.ByteBuffer;
 
 /**
@@ -27,60 +24,55 @@ public enum MmtOrdinaryTradeIndicator {
     /**
      * N = Price is currently not available but pending
      */
-    PRICEPENDING(4),
-    UNKNOWN(99999);
-
+    PRICEPENDING(4);
+    
     private final int value;
-
     private final int byteLength = 1;
-
-
+    
     private static final Map<Integer, MmtOrdinaryTradeIndicator> TYPES = new HashMap<>();
     static {
         for (MmtOrdinaryTradeIndicator type : MmtOrdinaryTradeIndicator.values()) {
             TYPES.put(type.value, type);
         }
     }
-
-
+    
     MmtOrdinaryTradeIndicator(int newValue) {
         value = newValue;
     }
-
+    
     /**
-     Get MmtOrdinaryTradeIndicator from java input
-     * @param newValue
-     * @return MmtOrdinaryTradeIndicator enum
+     * Get MmtOrdinaryTradeIndicator by attribute
+     * @param val
+     * @return MmtOrdinaryTradeIndicator enum or null if variant is undefined
      */
-    public static MmtOrdinaryTradeIndicator getMmtOrdinaryTradeIndicator(int newValue) {
-        MmtOrdinaryTradeIndicator val = TYPES.get(newValue);
-        return val == null ? MmtOrdinaryTradeIndicator.UNKNOWN : val;
+    public static MmtOrdinaryTradeIndicator getMmtOrdinaryTradeIndicator(int val) {
+        return TYPES.get(val);
     }
-
+    
     /**
      * Get MmtOrdinaryTradeIndicator int value
      * @return int value
      */
-    public int getMmtOrdinaryTradeIndicatorValue() { return value; }
-
-
+    public int getMmtOrdinaryTradeIndicatorValue() {
+        return value; 
+    }
+    
     /**
-     Get MmtOrdinaryTradeIndicator from bytes
+     * Get MmtOrdinaryTradeIndicator from bytes
      * @param bytes byte[]
      * @param offset - int
      */
     public static MmtOrdinaryTradeIndicator getMmtOrdinaryTradeIndicator(byte[] bytes, int offset) {
         return getMmtOrdinaryTradeIndicator(BendecUtils.uInt8FromByteArray(bytes, offset));
     }
-
+    
     byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
         return buffer.array();
     }
-
+    
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
     }
-
 }

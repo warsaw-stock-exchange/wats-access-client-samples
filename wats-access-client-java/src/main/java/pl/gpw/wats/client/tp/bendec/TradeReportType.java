@@ -1,10 +1,7 @@
 package pl.gpw.wats.client.tp.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.nio.ByteBuffer;
 
 /**
@@ -31,60 +28,55 @@ public enum TradeReportType {
     /**
      * Trade Report Cancel
      */
-    TRADEREPORTCANCEL(7),
-    UNKNOWN(99999);
-
+    TRADEREPORTCANCEL(7);
+    
     private final int value;
-
     private final int byteLength = 1;
-
-
+    
     private static final Map<Integer, TradeReportType> TYPES = new HashMap<>();
     static {
         for (TradeReportType type : TradeReportType.values()) {
             TYPES.put(type.value, type);
         }
     }
-
-
+    
     TradeReportType(int newValue) {
         value = newValue;
     }
-
+    
     /**
-     Get TradeReportType from java input
-     * @param newValue
-     * @return TradeReportType enum
+     * Get TradeReportType by attribute
+     * @param val
+     * @return TradeReportType enum or null if variant is undefined
      */
-    public static TradeReportType getTradeReportType(int newValue) {
-        TradeReportType val = TYPES.get(newValue);
-        return val == null ? TradeReportType.UNKNOWN : val;
+    public static TradeReportType getTradeReportType(int val) {
+        return TYPES.get(val);
     }
-
+    
     /**
      * Get TradeReportType int value
      * @return int value
      */
-    public int getTradeReportTypeValue() { return value; }
-
-
+    public int getTradeReportTypeValue() {
+        return value; 
+    }
+    
     /**
-     Get TradeReportType from bytes
+     * Get TradeReportType from bytes
      * @param bytes byte[]
      * @param offset - int
      */
     public static TradeReportType getTradeReportType(byte[] bytes, int offset) {
         return getTradeReportType(BendecUtils.uInt8FromByteArray(bytes, offset));
     }
-
+    
     byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
         return buffer.array();
     }
-
+    
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
     }
-
 }

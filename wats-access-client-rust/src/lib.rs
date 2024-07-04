@@ -235,7 +235,6 @@ impl Client {
                 tp::MsgType::Heartbeat => continue,
                 tp::MsgType::Trade => continue,
                 _ => continue,
-                // anyhow::bail!("If not TradeCaptureReportResponse then it should be a heartbeat"),
             }
         }
     }
@@ -252,9 +251,7 @@ impl Client {
             bulk_seq_num, last_seq_num).unwrap()
     }
 
-    /// Submit order modify for last order submitted to WATS.
-    #[instrument(skip_all, fields(connection_id = self.tp_connection_id()))]
-    pub async fn mod_last_order(&mut self, mut order: tp::OrderModify) -> Result<()> {
+    pub async fn modify_order(&mut self, mut order: tp::OrderModify, order_id: tp::OrderId) -> Result<()> {
         // Assert that order's header is correct
         debug_assert_eq!(
             usize::from(order.header.length),
@@ -262,7 +259,7 @@ impl Client {
         );
         debug_assert_eq!({ order.header.msg_type }, tp::MsgType::OrderModify);
 
-        order.order_id = self.last_order_ref_id();
+        order.order_id = order_id;
         order.header.seq_num = self.next_expected_seq_num;
         self.tx
             .write_all_buf(&mut order.as_slice())
@@ -277,6 +274,12 @@ impl Client {
         self.next_expected_seq_num = self.next_expected_seq_num.saturating_add(1);
 
         Ok(())
+    }
+
+    /// Submit order modify for last order submitted to WATS.
+    #[instrument(skip_all, fields(connection_id = self.tp_connection_id()))]
+    pub async fn mod_last_order(&mut self, order: tp::OrderModify) -> Result<()> {
+        self.modify_order(order, self.last_order_ref_id()).await
     }
 
     /// Cancel order earlier submitted to WATS.
@@ -952,6 +955,7 @@ impl Snapshot {
             header: replay::ReplayHeader::new(replay::ReplayMsgType::ReplayRequest),
             seq_num,
             end_seq_num: range.end,
+            stream_id: 0
         };
 
         stream

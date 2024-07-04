@@ -99,7 +99,7 @@ int main() {
     trading_port.handle([&](btp::messages::OrderAddResponse message) {
 
         if (message.orderId == order_ref_id_1) {
-            if (message.status != btp::messages::OrderStatus::Ack) {
+            if (message.status != btp::messages::OrderStatus::New) {
                 test_result = EXIT_FAILURE;
             }
         } else if (message.orderId == order_ref_id_2) {

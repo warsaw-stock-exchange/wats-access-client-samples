@@ -58,6 +58,8 @@ cd build
 ctest [-C Debug|Release]
 ```
 
+Particular tests may be context dependent, that is, they may not be able to run multiple times or in a situation when there are open trades in the system etc. Please refer to source code for details.
+
 ## Message definitions
 All messages used to communicate with WATS exist primarily, as a contract, in JSON definition files. Definitions required to communicate with the system are located in `messages/source` directory. They can be translated to library's native language definitions (C++ headers) using [bendec](https://github.com/fudini/bendec/) (Binary encoder/decoder). To re-generate native definitions run:
 

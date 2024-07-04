@@ -1,10 +1,7 @@
 package pl.gpw.wats.client.tp.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.nio.ByteBuffer;
 
 /**
@@ -73,14 +70,6 @@ public enum MsgType {
      */
     REJECT(15),
     /**
-     * The risk limit definition message.
-     */
-    RISKLIMITDEFINITION(16),
-    /**
-     * The risk limit definition response message.
-     */
-    RISKLIMITDEFINITIONRESPONSE(17),
-    /**
      * Trade Capture Report - single side.
      */
     TRADECAPTUREREPORTSINGLE(18),
@@ -92,10 +81,6 @@ public enum MsgType {
      * The message is a response to an Trade Capture Report message, containing the state of TCR execution.
      */
     TRADECAPTUREREPORTRESPONSE(20),
-    /**
-     * Risk limit breach notification message.
-     */
-    RISKLIMITBREACH(21),
     /**
      * TradeBust.
      */
@@ -109,14 +94,6 @@ public enum MsgType {
      */
     MASSQUOTERESPONSE(25),
     /**
-     * Market maker initiates state transition.
-     */
-    INITIATESTATE(26),
-    /**
-     * A response to the Market maker initiating state transition.
-     */
-    INITIATESTATERESPONSE(27),
-    /**
      * Informs MM that execution has been requested.
      */
     REQUESTFOREXECUTION(28),
@@ -129,62 +106,69 @@ public enum MsgType {
      */
     ORDERMASSCANCELRESPONSE(30),
     /**
+     * Message send during the IPO to the sell side or during the Tender Offer to the buy side.
+     */
+    BIDOFFERUPDATE(31),
+    /**
+     * Market Maker command request.
+     */
+    MARKETMAKERCOMMAND(32),
+    /**
+     * The response to the Market Maker command.
+     */
+    MARKETMAKERCOMMANDRESPONSE(33),
+    /**
      * A message to relay test scenario information
      */
-    TESTEVENT(255),
-    UNKNOWN(99999);
-
+    TESTEVENT(255);
+    
     private final int value;
-
     private final int byteLength = 2;
-
-
+    
     private static final Map<Integer, MsgType> TYPES = new HashMap<>();
     static {
         for (MsgType type : MsgType.values()) {
             TYPES.put(type.value, type);
         }
     }
-
-
+    
     MsgType(int newValue) {
         value = newValue;
     }
-
+    
     /**
-     Get MsgType from java input
-     * @param newValue
-     * @return MsgType enum
+     * Get MsgType by attribute
+     * @param val
+     * @return MsgType enum or null if variant is undefined
      */
-    public static MsgType getMsgType(int newValue) {
-        MsgType val = TYPES.get(newValue);
-        return val == null ? MsgType.UNKNOWN : val;
+    public static MsgType getMsgType(int val) {
+        return TYPES.get(val);
     }
-
+    
     /**
      * Get MsgType int value
      * @return int value
      */
-    public int getMsgTypeValue() { return value; }
-
-
+    public int getMsgTypeValue() {
+        return value; 
+    }
+    
     /**
-     Get MsgType from bytes
+     * Get MsgType from bytes
      * @param bytes byte[]
      * @param offset - int
      */
     public static MsgType getMsgType(byte[] bytes, int offset) {
         return getMsgType(BendecUtils.uInt16FromByteArray(bytes, offset));
     }
-
+    
     byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         buffer.put(BendecUtils.uInt16ToByteArray(this.value));
         return buffer.array();
     }
-
+    
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt16ToByteArray(this.value));
     }
-
 }

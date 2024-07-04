@@ -15,11 +15,10 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-
-import javax.swing.event.AncestorEvent;
 
 import java.time.LocalDate;
 
@@ -99,7 +98,7 @@ public class TradingPortClientTest {
         TradingPortClient tpcA = new TradingPortClient(configA, 10000, true);
         tpcA.addGeneralHandler(x -> {
             System.out.println(
-                    "Connector A received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
+                    "Connector A received: " + Message.createObject((byte[]) x).get());
         });
 
         ConnectionConfig configB = Config.createConnectionConfig(
@@ -108,7 +107,7 @@ public class TradingPortClientTest {
         TradingPortClient tpcB = new TradingPortClient(configB, 10000, true);
         tpcB.addGeneralHandler(x -> {
             System.out.println(
-                    "Connector B received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
+                    "Connector B received: " + Message.createObject((byte[]) x).get());
         });
 
         // Catch Trade message
@@ -164,10 +163,9 @@ public class TradingPortClientTest {
      * sent for the right OrderAdd.
      *
      * The important bit here is prior knowledge of order_ref_id that must be
-     * calculated on the client's side
-     * without waiting for a WATS response. The order_ref_id is formed from
-     * connection_id, session_id and seq_num
-     * concatenated together bitwise:
+     * calculated on the client's side without waiting for a WATS response.
+     * The order_ref_id is derived from: `connection_id`, `session_id` and `seq_num`
+     * concatenated together bitwise, that is:
      *
      * <connection_id> <session_id> <seq_num>
      * <63-48> <47-32> <31-0>
@@ -183,6 +181,7 @@ public class TradingPortClientTest {
         Long instrumentId = Long.valueOf((Integer) Config.get("modify_inflight.product"));
         AtomicBoolean waitForAck = new AtomicBoolean(true);
         AtomicBoolean waitForModifyAck = new AtomicBoolean(true);
+        AtomicInteger stage = new AtomicInteger(0);
         AtomicBoolean waitForLogoutResponse = new AtomicBoolean(true);
         AtomicReference<OrderAddResponse> orderAddResponse = new AtomicReference<>();
         AtomicReference<OrderModifyResponse> orderModifyResponse = new AtomicReference<>();
@@ -199,7 +198,7 @@ public class TradingPortClientTest {
 
         tpc.addGeneralHandler(x -> {
             System.out.println(
-                    "Connector received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
+                    "Connector received: " + Message.createObject((byte[]) x).get());
         });
         tpc.addHandler(MsgType.ORDERADDRESPONSE, x -> {
             orderAddResponse.set(new OrderAddResponse((byte[]) x));
@@ -208,29 +207,152 @@ public class TradingPortClientTest {
         tpc.addHandler(MsgType.ORDERMODIFYRESPONSE, x -> {
             orderModifyResponse.set(new OrderModifyResponse((byte[]) x));
             waitForModifyAck.set(false);
+            switch(stage.incrementAndGet()) {
+                case 1:
+                    assertEquals(OrderStatus.NEW, orderModifyResponse.get().getStatus());
+                    break;
+                case 2:
+                    assertEquals(OrderStatus.NEW, orderModifyResponse.get().getStatus());
+                    break;
+                case 3:
+                    assertEquals(OrderStatus.REJECTED, orderModifyResponse.get().getStatus());
+                    break;
+                case 4:
+                    assertEquals(OrderStatus.NEW, orderModifyResponse.get().getStatus());
+                    break;
+                case 5:
+                    assertEquals(OrderStatus.REJECTED, orderModifyResponse.get().getStatus());
+                    break;
+                case 6:
+                    assertEquals(OrderStatus.NEW, orderModifyResponse.get().getStatus());
+                    break;
+                default: break;
+            };
         });
 
         // Catch LogoutResponse
         tpc.addHandler(MsgType.LOGOUTRESPONSE, x -> waitForLogoutResponse.set(false));
 
         // Send Buy order to WATS
-        OrderAdd order = orderAdd(instrumentId, OrderSide.BUY, 100L * 100_000_000L, BigInteger.valueOf(1000L));
-        System.out.println("Sending order: " + order);
-        tpc.send(order);
+        OrderAdd order_buy = orderAdd(
+            instrumentId,
+            OrderSide.BUY,
+            100L * 100_000_000L,
+            BigInteger.valueOf(1000L)
+        );
+        System.out.println("Sending order: " + order_buy);
+        waitForAck.set(true);
+        tpc.send(order_buy);
 
         // Calculate oderRefId
         BigInteger orderRefId = calcuateRefId(config.connectionId(),
                 tpc.getConnectionStatus().getSessionId(),
                 tpc.getConnectionStatus().getNextExpectedSeqNum() - 1);
 
-        // Send Modify previous order to WATS
-        OrderModify modify = orderModify(orderRefId, 100L * 100_000_000L, BigInteger.valueOf(2000L));
-        System.out.println("Sending modify: " + modify);
-        tpc.send(modify);
+        while (waitForAck.get()) {
+            tpc.read();
+        }
+
+        // ModifyOrder #1
+        OrderModify modify1 = orderModify(
+            orderRefId,
+            100L * 100_000_000L,
+            BigInteger.valueOf(2000L)
+        );
+        System.out.println("Sending order-modify #1: " + modify1);
+        waitForModifyAck.set(true);
+        tpc.send(modify1);
 
         while (waitForModifyAck.get()) {
             tpc.read();
         }
+
+        // ModifyOrder #2
+        OrderModify modify2 = orderModify(
+            orderRefId,
+            101L * 100_000_000L,
+            BigInteger.valueOf(2000L)
+        );
+        System.out.println("Sending order-modify #2: " + modify2);
+        waitForModifyAck.set(true);
+        tpc.send(modify2);
+
+        while (waitForModifyAck.get()) {
+            tpc.read();
+        }
+
+        // ModifyOrder #3
+        OrderModify modify3 = orderModify(
+            orderRefId,
+            10001L * 100_000_000L,
+            BigInteger.valueOf(2000000000L)
+        );
+        System.out.println("Sending order-modify #3: " + modify3);
+        waitForModifyAck.set(true);
+        tpc.send(modify3);
+
+        while (waitForModifyAck.get()) {
+            tpc.read();
+        }
+
+        // ModifyOrder #4
+        OrderModify modify4 = orderModify(
+            orderRefId,
+            100L * 100_000_000L,
+            BigInteger.valueOf(1500L)
+        );
+        System.out.println("Sending order-modify #4: " + modify4);
+        waitForModifyAck.set(true);
+        tpc.send(modify4);
+
+        while (waitForModifyAck.get()) {
+            tpc.read();
+        }
+
+        // ModifyOrder #5
+        OrderModify modify5 = orderModify(
+            orderRefId,
+            100L * 100_000_000L,
+            BigInteger.valueOf(1500L)
+        );
+        modify5.setExpire(BigInteger.valueOf(toDate(LocalDate.now().plusDays(-1))));
+        System.out.println("Sending order-modify #5: " + modify5);
+        waitForModifyAck.set(true);
+        tpc.send(modify5);
+
+        while (waitForModifyAck.get()) {
+            tpc.read();
+        }
+
+        // ModifyOrder #6
+        OrderModify modify6 = orderModify(
+            orderRefId,
+            100L * 100_000_000L,
+            BigInteger.valueOf(3000L)
+        );
+        System.out.println("Sending order-modify #6: " + modify6);
+        waitForModifyAck.set(true);
+        tpc.send(modify6);
+
+        while (waitForModifyAck.get()) {
+            tpc.read();
+        }
+
+        // Send Sell order to clear stock
+        OrderAdd order_sell = orderAdd(
+            instrumentId,
+            OrderSide.SELL,
+            100L * 100_000_000L,
+            BigInteger.valueOf(3000L)
+        );
+        System.out.println("Sending order: " + order_sell);
+        waitForAck.set(true);
+        tpc.send(order_sell);
+
+        while (waitForAck.get()) {
+            tpc.read();
+        }
+
         tpc.logout();
 
         // Wait for LogoutResponse
@@ -239,9 +361,6 @@ public class TradingPortClientTest {
         }
 
         tpc.close();
-
-        assertEquals(OrderStatus.MODIFIED, orderModifyResponse.get().getStatus());
-        assertEquals(orderModifyResponse.get().getOrderId(), orderAddResponse.get().getOrderId());
     }
 
     /**
@@ -261,7 +380,7 @@ public class TradingPortClientTest {
         TradingPortClient tpc = new TradingPortClient(config, 10000, true);
         tpc.addGeneralHandler(x -> {
             System.out.println(
-                    "Connector received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
+                    "Connector received: " + Message.createObject((byte[]) x).get());
         });
 
         tpc.login();
@@ -295,7 +414,7 @@ public class TradingPortClientTest {
         tpc.close();
 
         assertEquals(OrderStatus.REJECTED, orderAddResponse.get().getStatus());
-        assertEquals(OrderRejectionReason.UNKNOWNINSTRUMENTID, orderAddResponse.get().getReason());
+        assertEquals(OrderRejectionReason.UNKNOWNINSTRUMENT, orderAddResponse.get().getReason());
     }
 
     /**
@@ -315,7 +434,7 @@ public class TradingPortClientTest {
         TradingPortClient tpc = new TradingPortClient(config, 500000, true);
         tpc.addGeneralHandler(x -> {
             System.out.println(
-                    "Connector received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
+                    "Connector received: " + Message.createObject((byte[]) x).get());
         });
 
         // Catch LogoutResponse
@@ -380,7 +499,7 @@ public class TradingPortClientTest {
 
         tpc.addGeneralHandler(x -> {
             System.out.println(
-                    "Connector received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
+                    "Connector received: " + Message.createObject((byte[]) x).get());
         });
         tpc.addHandler(MsgType.ORDERADDRESPONSE, x -> {
             orderAddResponse.set(new OrderAddResponse((byte[]) x));
@@ -449,7 +568,7 @@ public class TradingPortClientTest {
 
         tpc.addGeneralHandler(x -> {
             System.out.println(
-                    "Connector received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
+                    "Connector received: " + Message.createObject((byte[]) x).get());
         });
         tpc.addHandler(MsgType.ORDERADDRESPONSE, x -> {
             orderAddResponse.set(new OrderAddResponse((byte[]) x));
@@ -539,7 +658,7 @@ public class TradingPortClientTest {
         TradingPortClient tpc = new TradingPortClient(config, 10000, true);
         tpc.addGeneralHandler(x -> {
             System.out.println(
-                    "Connector received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
+                    "Connector received: " + Message.createObject((byte[]) x).get());
         });
         LinkedList<OrderAddResponse> tradeCaptureReportResponses = new LinkedList<>();
         tpc.login();
@@ -581,7 +700,7 @@ public class TradingPortClientTest {
         }
         tradeCaptureReportResponses.forEach(response -> {
             if (response.getOrderId().equals(orderRefId_ok)) {
-                assertEquals(OrderStatus.ACK, response.getStatus());
+                assertEquals(OrderStatus.NEW, response.getStatus());
             } else if (response.getOrderId().equals(orderRefId_tooHighValue)) {
                 assertEquals(OrderStatus.REJECTED, response.getStatus());
                 assertEquals(OrderRejectionReason.ORDERVALUEMUSTBELOWERTHANMAXIMUMVALUE, response.getReason());
@@ -623,7 +742,7 @@ public class TradingPortClientTest {
         ignoreMessagesFromPreviousTests(tpc);
         tpc.addHandler(MsgType.ORDERADDRESPONSE, byteResponse -> {
             OrderAddResponse orderAddResponse = new OrderAddResponse((byte[]) byteResponse);
-            assertTrue(orderAddResponse.getStatus().equals(OrderStatus.ACK) ||
+            assertTrue(orderAddResponse.getStatus().equals(OrderStatus.NEW) ||
                     orderAddResponse.getStatus().equals(OrderStatus.FILLED),
                     "Expected Ack or Filled but received " + orderAddResponse.getStatus() + " - "
                             + orderAddResponse.getReason());
@@ -673,7 +792,7 @@ public class TradingPortClientTest {
         TradingPortClient tpc = new TradingPortClient(config, 10000, true);
         tpc.addGeneralHandler(x -> {
             System.out.println(
-                    "Connector received: " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
+                    "Connector received: " + Message.createObject((byte[]) x).get());
         });
         tpc.login();
         while (!tpc.getConnectionStatus().isLogged()) {
@@ -711,10 +830,11 @@ public class TradingPortClientTest {
         tpc.send(tradeCaptureReportDual(
                 instrumentId,
                 "ID0000",
-                ExecType.NEW,
+                ExecType.NA,
                 100 * 100_000_000l,
                 BigInteger.valueOf(10),
-                toDate(LocalDate.now().plusDays(1))));
+                toDate(LocalDate.now().plusDays(1)))
+        );
 
         tpc.read();
 
@@ -724,34 +844,37 @@ public class TradingPortClientTest {
                 ExecType.TRADE,
                 100 * 100_000_000l,
                 BigInteger.valueOf(10),
-                toDate(LocalDate.now().plusDays(1))));
+                toDate(LocalDate.now().plusDays(1)))
+        );
 
         tpc.read();
 
         tpc.send(tradeCaptureReportDual(
                 instrumentId,
                 "ID0002",
-                ExecType.NEW,
+                ExecType.NA,
                 100 * 100_000_000l,
                 BigInteger.valueOf(10),
-                toDate(LocalDate.now().plusDays(1))));
+                toDate(LocalDate.now().plusDays(1)))
+        );
 
         tpc.read();
 
         tpc.send(tradeCaptureReportDual(
                 instrumentId,
                 "ID0002",
-                ExecType.NEW,
+                ExecType.NA,
                 100 * 100_000_000l,
                 BigInteger.valueOf(10),
-                toDate(LocalDate.now().plusDays(1))));
+                toDate(LocalDate.now().plusDays(1)))
+        );
 
         tpc.read();
 
         tpc.send(tradeCaptureReportDual(
                 instrumentId,
                 "ID0003",
-                ExecType.NEW,
+                ExecType.NA,
                 100 * 100_000_000l,
                 BigInteger.valueOf(1),
                 toDate(LocalDate.now().plusDays(1))));
@@ -761,7 +884,7 @@ public class TradingPortClientTest {
         tpc.send(tradeCaptureReportDual(
                 instrumentId,
                 "ID0004",
-                ExecType.NEW,
+                ExecType.NA,
                 100 * 100_000_000l,
                 BigInteger.valueOf(10),
                 toDate(LocalDate.now().plusDays(-1))));

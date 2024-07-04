@@ -8,7 +8,6 @@
   #pragma pack(1)
   
   
-// primitive built-in: uint8_t
 // primitive built-in: uint16_t
 using MsgLength = uint16_t;
 
@@ -33,11 +32,14 @@ struct ReplayHeader {
 };
 // primitive built-in: uint32_t
 using SeqNum = uint32_t;
+// primitive built-in: uint8_t
+using StreamId = uint8_t;
 
 struct ReplayRequest {
     ReplayHeader header;
     SeqNum seqNum;
     SeqNum endSeqNum;
+    StreamId streamId;
 
     friend std::ostream &operator << (std::ostream &, const ReplayRequest &);
 };

@@ -13,16 +13,11 @@ using MsgLength = uint16_t;
 
 enum class MsgType: uint16_t {
     Heartbeat = 1,
-    Text = 2,
-    Test = 3,
     OrderAdd = 9,
     OrderModify = 10,
     OrderDelete = 11,
     OrderExecute = 12,
-    StartOfTechnicalSession = 20,
-    EndOfTechnicalSession = 21,
-    ReferenceDataStart = 22,
-    ReferenceDataEnd = 23,
+    TradingSessionStatus = 23,
     EncryptionKey = 24,
     InstrumentStatusChange = 26,
     TradingPhaseScheduleEntry = 27,
@@ -54,22 +49,18 @@ enum class MsgType: uint16_t {
     Logout = 669,
     EndOfSnapshot = 670,
     InstrumentSummary = 671,
-    SessionSummary = 672,
+    ProductSummary = 672,
+    PositionReport = 801,
     TestEvent = 8192
 };
 
 static const std::map<std::string, MsgType> Name2MsgType {
     { "Heartbeat", MsgType::Heartbeat },
-    { "Text", MsgType::Text },
-    { "Test", MsgType::Test },
     { "OrderAdd", MsgType::OrderAdd },
     { "OrderModify", MsgType::OrderModify },
     { "OrderDelete", MsgType::OrderDelete },
     { "OrderExecute", MsgType::OrderExecute },
-    { "StartOfTechnicalSession", MsgType::StartOfTechnicalSession },
-    { "EndOfTechnicalSession", MsgType::EndOfTechnicalSession },
-    { "ReferenceDataStart", MsgType::ReferenceDataStart },
-    { "ReferenceDataEnd", MsgType::ReferenceDataEnd },
+    { "TradingSessionStatus", MsgType::TradingSessionStatus },
     { "EncryptionKey", MsgType::EncryptionKey },
     { "InstrumentStatusChange", MsgType::InstrumentStatusChange },
     { "TradingPhaseScheduleEntry", MsgType::TradingPhaseScheduleEntry },
@@ -101,22 +92,18 @@ static const std::map<std::string, MsgType> Name2MsgType {
     { "Logout", MsgType::Logout },
     { "EndOfSnapshot", MsgType::EndOfSnapshot },
     { "InstrumentSummary", MsgType::InstrumentSummary },
-    { "SessionSummary", MsgType::SessionSummary },
+    { "ProductSummary", MsgType::ProductSummary },
+    { "PositionReport", MsgType::PositionReport },
     { "TestEvent", MsgType::TestEvent }
 };
 
 static const std::map<MsgType, std::string> MsgType2Name {
     { MsgType::Heartbeat, "Heartbeat" },
-    { MsgType::Text, "Text" },
-    { MsgType::Test, "Test" },
     { MsgType::OrderAdd, "OrderAdd" },
     { MsgType::OrderModify, "OrderModify" },
     { MsgType::OrderDelete, "OrderDelete" },
     { MsgType::OrderExecute, "OrderExecute" },
-    { MsgType::StartOfTechnicalSession, "StartOfTechnicalSession" },
-    { MsgType::EndOfTechnicalSession, "EndOfTechnicalSession" },
-    { MsgType::ReferenceDataStart, "ReferenceDataStart" },
-    { MsgType::ReferenceDataEnd, "ReferenceDataEnd" },
+    { MsgType::TradingSessionStatus, "TradingSessionStatus" },
     { MsgType::EncryptionKey, "EncryptionKey" },
     { MsgType::InstrumentStatusChange, "InstrumentStatusChange" },
     { MsgType::TradingPhaseScheduleEntry, "TradingPhaseScheduleEntry" },
@@ -148,7 +135,8 @@ static const std::map<MsgType, std::string> MsgType2Name {
     { MsgType::Logout, "Logout" },
     { MsgType::EndOfSnapshot, "EndOfSnapshot" },
     { MsgType::InstrumentSummary, "InstrumentSummary" },
-    { MsgType::SessionSummary, "SessionSummary" },
+    { MsgType::ProductSummary, "ProductSummary" },
+    { MsgType::PositionReport, "PositionReport" },
     { MsgType::TestEvent, "TestEvent" }
 };
 
@@ -159,6 +147,9 @@ using SeqNum = uint32_t;
 using Timestamp = uint64_t;
 // primitive built-in: bool
 using ElementId = uint32_t;
+using SessionId = uint16_t;
+// primitive built-in: uint8_t
+using StreamId = uint8_t;
 
 struct Header {
     MsgLength length;
@@ -170,6 +161,8 @@ struct Header {
     bool isEncrypted;
     uint64_t encryptionOffset;
     ElementId encryptionKeyId;
+    SessionId sessionId;
+    StreamId streamId;
 
     friend std::ostream &operator << (std::ostream &, const Header &);
 };
@@ -178,26 +171,6 @@ struct Heartbeat {
     Header header;
 
     friend std::ostream &operator << (std::ostream &, const Heartbeat &);
-};
-// primitive built-in: uint8_t
-using AnsiChar = uint8_t;
-using TextMessage = AnsiChar[50];
-
-struct Text {
-    Header header;
-    TextMessage text;
-
-    friend std::ostream &operator << (std::ostream &, const Text &);
-};
-
-struct Test {
-    Header header;
-    Timestamp timestampA;
-    Timestamp timestampB;
-    Timestamp timestampC;
-    Timestamp timestampD;
-
-    friend std::ostream &operator << (std::ostream &, const Test &);
 };
 using PublicOrderId = uint64_t;
 
@@ -228,6 +201,7 @@ struct OrderAdd {
     OrderSide side;
     Price price;
     Quantity quantity;
+    bool mmQuote;
 
     friend std::ostream &operator << (std::ostream &, const OrderAdd &);
 };
@@ -279,32 +253,67 @@ struct OrderExecute {
 
     friend std::ostream &operator << (std::ostream &, const OrderExecute &);
 };
-using SessionId = uint16_t;
+using AnsiChar = uint8_t;
+using MicCode = AnsiChar[4];
 
-struct StartOfTechnicalSession {
-    Header header;
-    SessionId sessionId;
-
-    friend std::ostream &operator << (std::ostream &, const StartOfTechnicalSession &);
+enum class TradingSessionState: uint8_t {
+    Unknown = 1,
+    Open = 2,
+    Close = 3
 };
 
-struct EndOfTechnicalSession {
-    Header header;
-    SessionId sessionId;
-
-    friend std::ostream &operator << (std::ostream &, const EndOfTechnicalSession &);
+static const std::map<std::string, TradingSessionState> Name2TradingSessionState {
+    { "Unknown", TradingSessionState::Unknown },
+    { "Open", TradingSessionState::Open },
+    { "Close", TradingSessionState::Close }
 };
 
-struct ReferenceDataStart {
-    Header header;
-
-    friend std::ostream &operator << (std::ostream &, const ReferenceDataStart &);
+static const std::map<TradingSessionState, std::string> TradingSessionState2Name {
+    { TradingSessionState::Unknown, "Unknown" },
+    { TradingSessionState::Open, "Open" },
+    { TradingSessionState::Close, "Close" }
 };
 
-struct ReferenceDataEnd {
-    Header header;
 
-    friend std::ostream &operator << (std::ostream &, const ReferenceDataEnd &);
+enum class TradingSessionEvent: uint8_t {
+    NA = 1,
+    StartOfTechnicalSession = 2,
+    EndOfTechnicalSession = 3,
+    InitialReferenceDataStart = 4,
+    InitialReferenceDataEnd = 5,
+    PreviousDayRestateStart = 6,
+    PreviousDayRestateEnd = 7
+};
+
+static const std::map<std::string, TradingSessionEvent> Name2TradingSessionEvent {
+    { "NA", TradingSessionEvent::NA },
+    { "StartOfTechnicalSession", TradingSessionEvent::StartOfTechnicalSession },
+    { "EndOfTechnicalSession", TradingSessionEvent::EndOfTechnicalSession },
+    { "InitialReferenceDataStart", TradingSessionEvent::InitialReferenceDataStart },
+    { "InitialReferenceDataEnd", TradingSessionEvent::InitialReferenceDataEnd },
+    { "PreviousDayRestateStart", TradingSessionEvent::PreviousDayRestateStart },
+    { "PreviousDayRestateEnd", TradingSessionEvent::PreviousDayRestateEnd }
+};
+
+static const std::map<TradingSessionEvent, std::string> TradingSessionEvent2Name {
+    { TradingSessionEvent::NA, "NA" },
+    { TradingSessionEvent::StartOfTechnicalSession, "StartOfTechnicalSession" },
+    { TradingSessionEvent::EndOfTechnicalSession, "EndOfTechnicalSession" },
+    { TradingSessionEvent::InitialReferenceDataStart, "InitialReferenceDataStart" },
+    { TradingSessionEvent::InitialReferenceDataEnd, "InitialReferenceDataEnd" },
+    { TradingSessionEvent::PreviousDayRestateStart, "PreviousDayRestateStart" },
+    { TradingSessionEvent::PreviousDayRestateEnd, "PreviousDayRestateEnd" }
+};
+
+
+struct TradingSessionStatus {
+    Header header;
+    MicCode marketId;
+    ElementId marketStructureId;
+    TradingSessionState tradingSessionState;
+    TradingSessionEvent tradingSessionEvent;
+
+    friend std::ostream &operator << (std::ostream &, const TradingSessionStatus &);
 };
 using EncryptionGroupKey = uint8_t[32];
 
@@ -314,53 +323,6 @@ struct EncryptionKey {
     EncryptionGroupKey secretKey;
 
     friend std::ostream &operator << (std::ostream &, const EncryptionKey &);
-};
-
-enum class InstrumentStatus: uint8_t {
-    Active = 1,
-    Inactive = 2,
-    MarketOperationsSuspension = 3,
-    OutsideCollarsStatic = 4,
-    OutsideCollarsDynamic = 5,
-    RegulatorySuspension = 6,
-    TechnicalHalt = 7,
-    HybridNoQuotes = 8,
-    HybridPause = 9
-};
-
-static const std::map<std::string, InstrumentStatus> Name2InstrumentStatus {
-    { "Active", InstrumentStatus::Active },
-    { "Inactive", InstrumentStatus::Inactive },
-    { "MarketOperationsSuspension", InstrumentStatus::MarketOperationsSuspension },
-    { "OutsideCollarsStatic", InstrumentStatus::OutsideCollarsStatic },
-    { "OutsideCollarsDynamic", InstrumentStatus::OutsideCollarsDynamic },
-    { "RegulatorySuspension", InstrumentStatus::RegulatorySuspension },
-    { "TechnicalHalt", InstrumentStatus::TechnicalHalt },
-    { "HybridNoQuotes", InstrumentStatus::HybridNoQuotes },
-    { "HybridPause", InstrumentStatus::HybridPause }
-};
-
-static const std::map<InstrumentStatus, std::string> InstrumentStatus2Name {
-    { InstrumentStatus::Active, "Active" },
-    { InstrumentStatus::Inactive, "Inactive" },
-    { InstrumentStatus::MarketOperationsSuspension, "MarketOperationsSuspension" },
-    { InstrumentStatus::OutsideCollarsStatic, "OutsideCollarsStatic" },
-    { InstrumentStatus::OutsideCollarsDynamic, "OutsideCollarsDynamic" },
-    { InstrumentStatus::RegulatorySuspension, "RegulatorySuspension" },
-    { InstrumentStatus::TechnicalHalt, "TechnicalHalt" },
-    { InstrumentStatus::HybridNoQuotes, "HybridNoQuotes" },
-    { InstrumentStatus::HybridPause, "HybridPause" }
-};
-
-
-struct InstrumentStatusChange {
-    Header header;
-    ElementId instrumentId;
-    ElementId tradingPhaseId;
-    InstrumentStatus status;
-    bool stressedMarket;
-
-    friend std::ostream &operator << (std::ostream &, const InstrumentStatusChange &);
 };
 
 enum class TradingPhaseType: uint8_t {
@@ -436,42 +398,53 @@ static const std::map<TradingPhaseType, std::string> TradingPhaseType2Name {
 };
 
 
-enum class AuctionType: uint8_t {
-    NotApplicable = 1,
-    OpeningAuction = 2,
-    ClosingAuction = 3,
-    IntradayAuction = 4,
-    VolatilityAuctionStatic = 5,
-    VolatilityAuctionDynamic = 6,
-    ExtendedVolatilityAuctionStatic = 7,
-    ExtendedVolatilityAuctionDynamic = 8,
-    UnsuspensionAuction = 9
+enum class InstrumentStatus: uint8_t {
+    Active = 1,
+    Inactive = 2,
+    MarketOperationsSuspension = 3,
+    OutsideCollarsStatic = 4,
+    OutsideCollarsDynamic = 5,
+    RegulatorySuspension = 6,
+    TechnicalHalt = 7,
+    HybridNoQuotes = 8,
+    HybridPause = 9
 };
 
-static const std::map<std::string, AuctionType> Name2AuctionType {
-    { "NotApplicable", AuctionType::NotApplicable },
-    { "OpeningAuction", AuctionType::OpeningAuction },
-    { "ClosingAuction", AuctionType::ClosingAuction },
-    { "IntradayAuction", AuctionType::IntradayAuction },
-    { "VolatilityAuctionStatic", AuctionType::VolatilityAuctionStatic },
-    { "VolatilityAuctionDynamic", AuctionType::VolatilityAuctionDynamic },
-    { "ExtendedVolatilityAuctionStatic", AuctionType::ExtendedVolatilityAuctionStatic },
-    { "ExtendedVolatilityAuctionDynamic", AuctionType::ExtendedVolatilityAuctionDynamic },
-    { "UnsuspensionAuction", AuctionType::UnsuspensionAuction }
+static const std::map<std::string, InstrumentStatus> Name2InstrumentStatus {
+    { "Active", InstrumentStatus::Active },
+    { "Inactive", InstrumentStatus::Inactive },
+    { "MarketOperationsSuspension", InstrumentStatus::MarketOperationsSuspension },
+    { "OutsideCollarsStatic", InstrumentStatus::OutsideCollarsStatic },
+    { "OutsideCollarsDynamic", InstrumentStatus::OutsideCollarsDynamic },
+    { "RegulatorySuspension", InstrumentStatus::RegulatorySuspension },
+    { "TechnicalHalt", InstrumentStatus::TechnicalHalt },
+    { "HybridNoQuotes", InstrumentStatus::HybridNoQuotes },
+    { "HybridPause", InstrumentStatus::HybridPause }
 };
 
-static const std::map<AuctionType, std::string> AuctionType2Name {
-    { AuctionType::NotApplicable, "NotApplicable" },
-    { AuctionType::OpeningAuction, "OpeningAuction" },
-    { AuctionType::ClosingAuction, "ClosingAuction" },
-    { AuctionType::IntradayAuction, "IntradayAuction" },
-    { AuctionType::VolatilityAuctionStatic, "VolatilityAuctionStatic" },
-    { AuctionType::VolatilityAuctionDynamic, "VolatilityAuctionDynamic" },
-    { AuctionType::ExtendedVolatilityAuctionStatic, "ExtendedVolatilityAuctionStatic" },
-    { AuctionType::ExtendedVolatilityAuctionDynamic, "ExtendedVolatilityAuctionDynamic" },
-    { AuctionType::UnsuspensionAuction, "UnsuspensionAuction" }
+static const std::map<InstrumentStatus, std::string> InstrumentStatus2Name {
+    { InstrumentStatus::Active, "Active" },
+    { InstrumentStatus::Inactive, "Inactive" },
+    { InstrumentStatus::MarketOperationsSuspension, "MarketOperationsSuspension" },
+    { InstrumentStatus::OutsideCollarsStatic, "OutsideCollarsStatic" },
+    { InstrumentStatus::OutsideCollarsDynamic, "OutsideCollarsDynamic" },
+    { InstrumentStatus::RegulatorySuspension, "RegulatorySuspension" },
+    { InstrumentStatus::TechnicalHalt, "TechnicalHalt" },
+    { InstrumentStatus::HybridNoQuotes, "HybridNoQuotes" },
+    { InstrumentStatus::HybridPause, "HybridPause" }
 };
 
+
+struct InstrumentStatusChange {
+    Header header;
+    ElementId instrumentId;
+    ElementId tradingPhaseId;
+    TradingPhaseType tradingPhaseType;
+    InstrumentStatus status;
+    bool stressedMarket;
+
+    friend std::ostream &operator << (std::ostream &, const InstrumentStatusChange &);
+};
 
 struct TradingPhaseScheduleEntry {
     Header header;
@@ -483,7 +456,6 @@ struct TradingPhaseScheduleEntry {
     ElementId dynamicCollarVolatilityAuctionId;
     Timestamp tradingPhaseStartTime;
     TradingPhaseType tradingPhaseType;
-    AuctionType auctionType;
     bool uncrossing;
     ElementId extStaticCollarVolatilityAuctionId;
     ElementId extDynamicCollarVolatilityAuctionId;
@@ -1129,21 +1101,24 @@ static const std::map<Currency, std::string> Currency2Name {
 
 
 enum class PriceExpressionType: uint8_t {
+    NotApplicable = 3,
     Price = 1,
     Percentage = 2
 };
 
 static const std::map<std::string, PriceExpressionType> Name2PriceExpressionType {
+    { "NotApplicable", PriceExpressionType::NotApplicable },
     { "Price", PriceExpressionType::Price },
     { "Percentage", PriceExpressionType::Percentage }
 };
 
 static const std::map<PriceExpressionType, std::string> PriceExpressionType2Name {
+    { PriceExpressionType::NotApplicable, "NotApplicable" },
     { PriceExpressionType::Price, "Price" },
     { PriceExpressionType::Percentage, "Percentage" }
 };
 
-using MicCode = AnsiChar[4];
+using PercentageChange = Price;
 
 enum class MmtMarketMechanism: uint8_t {
     CentralLimitOrderBook = 1,
@@ -1219,7 +1194,7 @@ static const std::map<MmtTradingMode, std::string> MmtTradingMode2Name {
 };
 
 
-enum class MmtTransationCategory: uint8_t {
+enum class MmtTransactionCategory: uint8_t {
     DarkTrade = 1,
     TradePriceImprovement  = 2,
     PackageTrade = 3,
@@ -1227,24 +1202,24 @@ enum class MmtTransationCategory: uint8_t {
     None = 5
 };
 
-static const std::map<std::string, MmtTransationCategory> Name2MmtTransationCategory {
-    { "DarkTrade", MmtTransationCategory::DarkTrade },
-    { "TradePriceImprovement ", MmtTransationCategory::TradePriceImprovement  },
-    { "PackageTrade", MmtTransationCategory::PackageTrade },
-    { "ExchangeForPhysicalsTrade", MmtTransationCategory::ExchangeForPhysicalsTrade },
-    { "None", MmtTransationCategory::None }
+static const std::map<std::string, MmtTransactionCategory> Name2MmtTransactionCategory {
+    { "DarkTrade", MmtTransactionCategory::DarkTrade },
+    { "TradePriceImprovement ", MmtTransactionCategory::TradePriceImprovement  },
+    { "PackageTrade", MmtTransactionCategory::PackageTrade },
+    { "ExchangeForPhysicalsTrade", MmtTransactionCategory::ExchangeForPhysicalsTrade },
+    { "None", MmtTransactionCategory::None }
 };
 
-static const std::map<MmtTransationCategory, std::string> MmtTransationCategory2Name {
-    { MmtTransationCategory::DarkTrade, "DarkTrade" },
-    { MmtTransationCategory::TradePriceImprovement , "TradePriceImprovement " },
-    { MmtTransationCategory::PackageTrade, "PackageTrade" },
-    { MmtTransationCategory::ExchangeForPhysicalsTrade, "ExchangeForPhysicalsTrade" },
-    { MmtTransationCategory::None, "None" }
+static const std::map<MmtTransactionCategory, std::string> MmtTransactionCategory2Name {
+    { MmtTransactionCategory::DarkTrade, "DarkTrade" },
+    { MmtTransactionCategory::TradePriceImprovement , "TradePriceImprovement " },
+    { MmtTransactionCategory::PackageTrade, "PackageTrade" },
+    { MmtTransactionCategory::ExchangeForPhysicalsTrade, "ExchangeForPhysicalsTrade" },
+    { MmtTransactionCategory::None, "None" }
 };
 
 
-enum class MmtNegotitationIndicator: uint8_t {
+enum class MmtNegotiationIndicator: uint8_t {
     NegotiatedTrade = 1,
     NegotiatedTradeLiquidFinancialInstruments = 2,
     NegotiatedTradeIlliquidFinancialInstruments = 3,
@@ -1255,26 +1230,26 @@ enum class MmtNegotitationIndicator: uint8_t {
     PreTradeTransparencyWaiversIlqdAndSize = 8
 };
 
-static const std::map<std::string, MmtNegotitationIndicator> Name2MmtNegotitationIndicator {
-    { "NegotiatedTrade", MmtNegotitationIndicator::NegotiatedTrade },
-    { "NegotiatedTradeLiquidFinancialInstruments", MmtNegotitationIndicator::NegotiatedTradeLiquidFinancialInstruments },
-    { "NegotiatedTradeIlliquidFinancialInstruments", MmtNegotitationIndicator::NegotiatedTradeIlliquidFinancialInstruments },
-    { "NegotiatedTradeOther", MmtNegotitationIndicator::NegotiatedTradeOther },
-    { "NoNegotiatedTrade", MmtNegotitationIndicator::NoNegotiatedTrade },
-    { "PreTradeTransparencyWaiverIlliquidInstrument", MmtNegotitationIndicator::PreTradeTransparencyWaiverIlliquidInstrument },
-    { "PreTradeTransparencyWaiverStandardMarketSize", MmtNegotitationIndicator::PreTradeTransparencyWaiverStandardMarketSize },
-    { "PreTradeTransparencyWaiversIlqdAndSize", MmtNegotitationIndicator::PreTradeTransparencyWaiversIlqdAndSize }
+static const std::map<std::string, MmtNegotiationIndicator> Name2MmtNegotiationIndicator {
+    { "NegotiatedTrade", MmtNegotiationIndicator::NegotiatedTrade },
+    { "NegotiatedTradeLiquidFinancialInstruments", MmtNegotiationIndicator::NegotiatedTradeLiquidFinancialInstruments },
+    { "NegotiatedTradeIlliquidFinancialInstruments", MmtNegotiationIndicator::NegotiatedTradeIlliquidFinancialInstruments },
+    { "NegotiatedTradeOther", MmtNegotiationIndicator::NegotiatedTradeOther },
+    { "NoNegotiatedTrade", MmtNegotiationIndicator::NoNegotiatedTrade },
+    { "PreTradeTransparencyWaiverIlliquidInstrument", MmtNegotiationIndicator::PreTradeTransparencyWaiverIlliquidInstrument },
+    { "PreTradeTransparencyWaiverStandardMarketSize", MmtNegotiationIndicator::PreTradeTransparencyWaiverStandardMarketSize },
+    { "PreTradeTransparencyWaiversIlqdAndSize", MmtNegotiationIndicator::PreTradeTransparencyWaiversIlqdAndSize }
 };
 
-static const std::map<MmtNegotitationIndicator, std::string> MmtNegotitationIndicator2Name {
-    { MmtNegotitationIndicator::NegotiatedTrade, "NegotiatedTrade" },
-    { MmtNegotitationIndicator::NegotiatedTradeLiquidFinancialInstruments, "NegotiatedTradeLiquidFinancialInstruments" },
-    { MmtNegotitationIndicator::NegotiatedTradeIlliquidFinancialInstruments, "NegotiatedTradeIlliquidFinancialInstruments" },
-    { MmtNegotitationIndicator::NegotiatedTradeOther, "NegotiatedTradeOther" },
-    { MmtNegotitationIndicator::NoNegotiatedTrade, "NoNegotiatedTrade" },
-    { MmtNegotitationIndicator::PreTradeTransparencyWaiverIlliquidInstrument, "PreTradeTransparencyWaiverIlliquidInstrument" },
-    { MmtNegotitationIndicator::PreTradeTransparencyWaiverStandardMarketSize, "PreTradeTransparencyWaiverStandardMarketSize" },
-    { MmtNegotitationIndicator::PreTradeTransparencyWaiversIlqdAndSize, "PreTradeTransparencyWaiversIlqdAndSize" }
+static const std::map<MmtNegotiationIndicator, std::string> MmtNegotiationIndicator2Name {
+    { MmtNegotiationIndicator::NegotiatedTrade, "NegotiatedTrade" },
+    { MmtNegotiationIndicator::NegotiatedTradeLiquidFinancialInstruments, "NegotiatedTradeLiquidFinancialInstruments" },
+    { MmtNegotiationIndicator::NegotiatedTradeIlliquidFinancialInstruments, "NegotiatedTradeIlliquidFinancialInstruments" },
+    { MmtNegotiationIndicator::NegotiatedTradeOther, "NegotiatedTradeOther" },
+    { MmtNegotiationIndicator::NoNegotiatedTrade, "NoNegotiatedTrade" },
+    { MmtNegotiationIndicator::PreTradeTransparencyWaiverIlliquidInstrument, "PreTradeTransparencyWaiverIlliquidInstrument" },
+    { MmtNegotiationIndicator::PreTradeTransparencyWaiverStandardMarketSize, "PreTradeTransparencyWaiverStandardMarketSize" },
+    { MmtNegotiationIndicator::PreTradeTransparencyWaiversIlqdAndSize, "PreTradeTransparencyWaiversIlqdAndSize" }
 };
 
 
@@ -1484,10 +1459,18 @@ struct Trade {
     Timestamp publicationTimestamp;
     TradeId tradeId;
     bool tradeToBeCleared;
+    PercentageChange pctChange;
+    Price vwap;
+    uint64_t noTrades;
+    Quantity totalVolume;
+    Value totalValue;
+    Price openingPrice;
+    Price maxPrice;
+    Price minPrice;
     MmtMarketMechanism mmtMarketMechanism;
     MmtTradingMode mmtTradingMode;
-    MmtTransationCategory mmtTransationCategory;
-    MmtNegotitationIndicator mmtNegotitationIndicator;
+    MmtTransactionCategory mmtTransactionCategory;
+    MmtNegotiationIndicator mmtNegotiationIndicator;
     MmtAgencyCrossTradeIndicator mmtAgencyCrossTradeIndicator;
     MmtModificationIndicator mmtModificationIndicator;
     MmtBenchmarkReferencePriceIndicator mmtBenchmarkReferencePriceIndicator;
@@ -1577,6 +1560,8 @@ struct PriceLevelSnapshot {
     Header header;
     ElementId instrumentId;
     uint8_t maxDepth;
+    uint8_t mmBuyQuoteLevel;
+    uint8_t mmSellQuoteLevel;
     PriceLevels buy;
     PriceLevels sell;
 
@@ -1598,27 +1583,82 @@ struct AuctionUpdate {
     friend std::ostream &operator << (std::ostream &, const AuctionUpdate &);
 };
 
-enum class PriceType: uint8_t {
+enum class PriceUpdateType: uint8_t {
     ReferencePrice = 1,
-    MidPoint = 2
+    MidPoint = 2,
+    Fixing1Price = 3,
+    Fixing2Price = 4,
+    Fixing1Ytm = 5,
+    Fixing2Ytm = 6
 };
 
-static const std::map<std::string, PriceType> Name2PriceType {
-    { "ReferencePrice", PriceType::ReferencePrice },
-    { "MidPoint", PriceType::MidPoint }
+static const std::map<std::string, PriceUpdateType> Name2PriceUpdateType {
+    { "ReferencePrice", PriceUpdateType::ReferencePrice },
+    { "MidPoint", PriceUpdateType::MidPoint },
+    { "Fixing1Price", PriceUpdateType::Fixing1Price },
+    { "Fixing2Price", PriceUpdateType::Fixing2Price },
+    { "Fixing1Ytm", PriceUpdateType::Fixing1Ytm },
+    { "Fixing2Ytm", PriceUpdateType::Fixing2Ytm }
 };
 
-static const std::map<PriceType, std::string> PriceType2Name {
-    { PriceType::ReferencePrice, "ReferencePrice" },
-    { PriceType::MidPoint, "MidPoint" }
+static const std::map<PriceUpdateType, std::string> PriceUpdateType2Name {
+    { PriceUpdateType::ReferencePrice, "ReferencePrice" },
+    { PriceUpdateType::MidPoint, "MidPoint" },
+    { PriceUpdateType::Fixing1Price, "Fixing1Price" },
+    { PriceUpdateType::Fixing2Price, "Fixing2Price" },
+    { PriceUpdateType::Fixing1Ytm, "Fixing1Ytm" },
+    { PriceUpdateType::Fixing2Ytm, "Fixing2Ytm" }
+};
+
+
+enum class PriceYtmPresence: uint16_t {
+    None = 0,
+    Price = 1,
+    PriceBid = 2,
+    PriceAsk = 4,
+    Ytm = 8,
+    YtmBid = 16,
+    YtmAsk = 32,
+    YtmNoCalc = 64,
+    YtmBidNoCalc = 128,
+    YtmAskNoCalc = 256
+};
+
+static const std::map<std::string, PriceYtmPresence> Name2PriceYtmPresence {
+    { "None", PriceYtmPresence::None },
+    { "Price", PriceYtmPresence::Price },
+    { "PriceBid", PriceYtmPresence::PriceBid },
+    { "PriceAsk", PriceYtmPresence::PriceAsk },
+    { "Ytm", PriceYtmPresence::Ytm },
+    { "YtmBid", PriceYtmPresence::YtmBid },
+    { "YtmAsk", PriceYtmPresence::YtmAsk },
+    { "YtmNoCalc", PriceYtmPresence::YtmNoCalc },
+    { "YtmBidNoCalc", PriceYtmPresence::YtmBidNoCalc },
+    { "YtmAskNoCalc", PriceYtmPresence::YtmAskNoCalc }
+};
+
+static const std::map<PriceYtmPresence, std::string> PriceYtmPresence2Name {
+    { PriceYtmPresence::None, "None" },
+    { PriceYtmPresence::Price, "Price" },
+    { PriceYtmPresence::PriceBid, "PriceBid" },
+    { PriceYtmPresence::PriceAsk, "PriceAsk" },
+    { PriceYtmPresence::Ytm, "Ytm" },
+    { PriceYtmPresence::YtmBid, "YtmBid" },
+    { PriceYtmPresence::YtmAsk, "YtmAsk" },
+    { PriceYtmPresence::YtmNoCalc, "YtmNoCalc" },
+    { PriceYtmPresence::YtmBidNoCalc, "YtmBidNoCalc" },
+    { PriceYtmPresence::YtmAskNoCalc, "YtmAskNoCalc" }
 };
 
 
 struct PriceUpdate {
     Header header;
     ElementId instrumentId;
-    PriceType priceType;
-    Price price;
+    PriceUpdateType priceUpdateType;
+    PriceYtmPresence priceYtmPresence;
+    Price value;
+    Price valueBid;
+    Price valueAsk;
 
     friend std::ostream &operator << (std::ostream &, const PriceUpdate &);
 };
@@ -1663,6 +1703,43 @@ struct OrderCollars {
     friend std::ostream &operator << (std::ostream &, const OrderCollars &);
 };
 
+enum class AuctionType: uint8_t {
+    NotApplicable = 1,
+    OpeningAuction = 2,
+    ClosingAuction = 3,
+    IntradayAuction = 4,
+    VolatilityAuctionStatic = 5,
+    VolatilityAuctionDynamic = 6,
+    ExtendedVolatilityAuctionStatic = 7,
+    ExtendedVolatilityAuctionDynamic = 8,
+    UnsuspensionAuction = 9
+};
+
+static const std::map<std::string, AuctionType> Name2AuctionType {
+    { "NotApplicable", AuctionType::NotApplicable },
+    { "OpeningAuction", AuctionType::OpeningAuction },
+    { "ClosingAuction", AuctionType::ClosingAuction },
+    { "IntradayAuction", AuctionType::IntradayAuction },
+    { "VolatilityAuctionStatic", AuctionType::VolatilityAuctionStatic },
+    { "VolatilityAuctionDynamic", AuctionType::VolatilityAuctionDynamic },
+    { "ExtendedVolatilityAuctionStatic", AuctionType::ExtendedVolatilityAuctionStatic },
+    { "ExtendedVolatilityAuctionDynamic", AuctionType::ExtendedVolatilityAuctionDynamic },
+    { "UnsuspensionAuction", AuctionType::UnsuspensionAuction }
+};
+
+static const std::map<AuctionType, std::string> AuctionType2Name {
+    { AuctionType::NotApplicable, "NotApplicable" },
+    { AuctionType::OpeningAuction, "OpeningAuction" },
+    { AuctionType::ClosingAuction, "ClosingAuction" },
+    { AuctionType::IntradayAuction, "IntradayAuction" },
+    { AuctionType::VolatilityAuctionStatic, "VolatilityAuctionStatic" },
+    { AuctionType::VolatilityAuctionDynamic, "VolatilityAuctionDynamic" },
+    { AuctionType::ExtendedVolatilityAuctionStatic, "ExtendedVolatilityAuctionStatic" },
+    { AuctionType::ExtendedVolatilityAuctionDynamic, "ExtendedVolatilityAuctionDynamic" },
+    { AuctionType::UnsuspensionAuction, "UnsuspensionAuction" }
+};
+
+
 struct AuctionSummary {
     Header header;
     ElementId instrumentId;
@@ -1680,7 +1757,9 @@ enum class MarketModelType: uint8_t {
     BLOCK = 3,
     HYBRID = 4,
     CROSS = 5,
-    IPO = 6
+    IPO = 6,
+    TenderOffer = 7,
+    Redistribution = 8
 };
 
 static const std::map<std::string, MarketModelType> Name2MarketModelType {
@@ -1689,7 +1768,9 @@ static const std::map<std::string, MarketModelType> Name2MarketModelType {
     { "BLOCK", MarketModelType::BLOCK },
     { "HYBRID", MarketModelType::HYBRID },
     { "CROSS", MarketModelType::CROSS },
-    { "IPO", MarketModelType::IPO }
+    { "IPO", MarketModelType::IPO },
+    { "TenderOffer", MarketModelType::TenderOffer },
+    { "Redistribution", MarketModelType::Redistribution }
 };
 
 static const std::map<MarketModelType, std::string> MarketModelType2Name {
@@ -1698,7 +1779,9 @@ static const std::map<MarketModelType, std::string> MarketModelType2Name {
     { MarketModelType::BLOCK, "BLOCK" },
     { MarketModelType::HYBRID, "HYBRID" },
     { MarketModelType::CROSS, "CROSS" },
-    { MarketModelType::IPO, "IPO" }
+    { MarketModelType::IPO, "IPO" },
+    { MarketModelType::TenderOffer, "TenderOffer" },
+    { MarketModelType::Redistribution, "Redistribution" }
 };
 
 
@@ -1714,34 +1797,209 @@ struct MarketStructure {
 };
 
 enum class ProductType: uint8_t {
-    FinancialProductShare = 1,
-    FinancialProductBond = 2,
-    FinancialProductDerivativeFutures = 3,
-    FinancialProductDerivativeOptions = 4,
-    FinancialProductIndex = 5,
-    FinancialProductCurrency = 6
+    Equity = 1,
+    FixedIncome = 2,
+    DerivativeFutures = 3,
+    DerivativeOptions = 4,
+    Index = 5,
+    Currency = 6,
+    StructuredProduct = 7
 };
 
 static const std::map<std::string, ProductType> Name2ProductType {
-    { "FinancialProductShare", ProductType::FinancialProductShare },
-    { "FinancialProductBond", ProductType::FinancialProductBond },
-    { "FinancialProductDerivativeFutures", ProductType::FinancialProductDerivativeFutures },
-    { "FinancialProductDerivativeOptions", ProductType::FinancialProductDerivativeOptions },
-    { "FinancialProductIndex", ProductType::FinancialProductIndex },
-    { "FinancialProductCurrency", ProductType::FinancialProductCurrency }
+    { "Equity", ProductType::Equity },
+    { "FixedIncome", ProductType::FixedIncome },
+    { "DerivativeFutures", ProductType::DerivativeFutures },
+    { "DerivativeOptions", ProductType::DerivativeOptions },
+    { "Index", ProductType::Index },
+    { "Currency", ProductType::Currency },
+    { "StructuredProduct", ProductType::StructuredProduct }
 };
 
 static const std::map<ProductType, std::string> ProductType2Name {
-    { ProductType::FinancialProductShare, "FinancialProductShare" },
-    { ProductType::FinancialProductBond, "FinancialProductBond" },
-    { ProductType::FinancialProductDerivativeFutures, "FinancialProductDerivativeFutures" },
-    { ProductType::FinancialProductDerivativeOptions, "FinancialProductDerivativeOptions" },
-    { ProductType::FinancialProductIndex, "FinancialProductIndex" },
-    { ProductType::FinancialProductCurrency, "FinancialProductCurrency" }
+    { ProductType::Equity, "Equity" },
+    { ProductType::FixedIncome, "FixedIncome" },
+    { ProductType::DerivativeFutures, "DerivativeFutures" },
+    { ProductType::DerivativeOptions, "DerivativeOptions" },
+    { ProductType::Index, "Index" },
+    { ProductType::Currency, "Currency" },
+    { ProductType::StructuredProduct, "StructuredProduct" }
+};
+
+
+enum class ProductSubtype: uint8_t {
+    Share = 1,
+    AllotmentRight = 2,
+    SubscriptionRight = 3,
+    TenderOffer = 4,
+    IssueRight = 5,
+    SubscriptionWarrant = 6,
+    BankSecurities = 7,
+    Bond = 8,
+    TreasuryBond = 9,
+    IssuedBond = 10,
+    MunicipalBond = 11,
+    CorporateBankBond = 12,
+    CorporateFirmBond = 13,
+    ConvertibleBond = 14,
+    MortgageBond = 15,
+    MortgageBackedBond = 16,
+    PublicMortgageBond = 17,
+    Bill = 18,
+    TreasuryBill = 19,
+    CommercialBill = 20,
+    ExchangeTradedFund = 21,
+    ExchangeTradedNote = 22,
+    ExchangeTradedCommodity = 23,
+    InvestmentCertificate = 24,
+    IndexFutures = 25,
+    StockFutures = 26,
+    CurrencyFutures = 27,
+    BondFutures = 28,
+    InterestRateFutures = 29,
+    IndexOptions = 30,
+    StockOptions = 31,
+    OptionWarrants = 32,
+    FactorCertificates = 33,
+    TurboCertificates = 34,
+    CapitalProtectionCertificates = 35,
+    BonusCertificates = 36,
+    ReverseConvertibleCertificates = 37,
+    ExpressCertificates = 38,
+    DiscountCertificates = 39,
+    IndexTrackerCertificates = 40,
+    OtherInvestmentCertificates = 41,
+    StructuredNotes = 42,
+    ReferenceRate = 43,
+    InterestRate = 44,
+    ExchangeRate = 45,
+    PriceIndex = 46,
+    TotalReturnIndex = 47,
+    SectorPriceIndex = 48,
+    SectorTotalReturnIndex = 49,
+    DividendIndex = 50,
+    StrategyPriceIndex = 51,
+    StrategyTotalReturnIndex = 52,
+    CommodityIndex = 53,
+    BondTotalReturnIndex = 54
+};
+
+static const std::map<std::string, ProductSubtype> Name2ProductSubtype {
+    { "Share", ProductSubtype::Share },
+    { "AllotmentRight", ProductSubtype::AllotmentRight },
+    { "SubscriptionRight", ProductSubtype::SubscriptionRight },
+    { "TenderOffer", ProductSubtype::TenderOffer },
+    { "IssueRight", ProductSubtype::IssueRight },
+    { "SubscriptionWarrant", ProductSubtype::SubscriptionWarrant },
+    { "BankSecurities", ProductSubtype::BankSecurities },
+    { "Bond", ProductSubtype::Bond },
+    { "TreasuryBond", ProductSubtype::TreasuryBond },
+    { "IssuedBond", ProductSubtype::IssuedBond },
+    { "MunicipalBond", ProductSubtype::MunicipalBond },
+    { "CorporateBankBond", ProductSubtype::CorporateBankBond },
+    { "CorporateFirmBond", ProductSubtype::CorporateFirmBond },
+    { "ConvertibleBond", ProductSubtype::ConvertibleBond },
+    { "MortgageBond", ProductSubtype::MortgageBond },
+    { "MortgageBackedBond", ProductSubtype::MortgageBackedBond },
+    { "PublicMortgageBond", ProductSubtype::PublicMortgageBond },
+    { "Bill", ProductSubtype::Bill },
+    { "TreasuryBill", ProductSubtype::TreasuryBill },
+    { "CommercialBill", ProductSubtype::CommercialBill },
+    { "ExchangeTradedFund", ProductSubtype::ExchangeTradedFund },
+    { "ExchangeTradedNote", ProductSubtype::ExchangeTradedNote },
+    { "ExchangeTradedCommodity", ProductSubtype::ExchangeTradedCommodity },
+    { "InvestmentCertificate", ProductSubtype::InvestmentCertificate },
+    { "IndexFutures", ProductSubtype::IndexFutures },
+    { "StockFutures", ProductSubtype::StockFutures },
+    { "CurrencyFutures", ProductSubtype::CurrencyFutures },
+    { "BondFutures", ProductSubtype::BondFutures },
+    { "InterestRateFutures", ProductSubtype::InterestRateFutures },
+    { "IndexOptions", ProductSubtype::IndexOptions },
+    { "StockOptions", ProductSubtype::StockOptions },
+    { "OptionWarrants", ProductSubtype::OptionWarrants },
+    { "FactorCertificates", ProductSubtype::FactorCertificates },
+    { "TurboCertificates", ProductSubtype::TurboCertificates },
+    { "CapitalProtectionCertificates", ProductSubtype::CapitalProtectionCertificates },
+    { "BonusCertificates", ProductSubtype::BonusCertificates },
+    { "ReverseConvertibleCertificates", ProductSubtype::ReverseConvertibleCertificates },
+    { "ExpressCertificates", ProductSubtype::ExpressCertificates },
+    { "DiscountCertificates", ProductSubtype::DiscountCertificates },
+    { "IndexTrackerCertificates", ProductSubtype::IndexTrackerCertificates },
+    { "OtherInvestmentCertificates", ProductSubtype::OtherInvestmentCertificates },
+    { "StructuredNotes", ProductSubtype::StructuredNotes },
+    { "ReferenceRate", ProductSubtype::ReferenceRate },
+    { "InterestRate", ProductSubtype::InterestRate },
+    { "ExchangeRate", ProductSubtype::ExchangeRate },
+    { "PriceIndex", ProductSubtype::PriceIndex },
+    { "TotalReturnIndex", ProductSubtype::TotalReturnIndex },
+    { "SectorPriceIndex", ProductSubtype::SectorPriceIndex },
+    { "SectorTotalReturnIndex", ProductSubtype::SectorTotalReturnIndex },
+    { "DividendIndex", ProductSubtype::DividendIndex },
+    { "StrategyPriceIndex", ProductSubtype::StrategyPriceIndex },
+    { "StrategyTotalReturnIndex", ProductSubtype::StrategyTotalReturnIndex },
+    { "CommodityIndex", ProductSubtype::CommodityIndex },
+    { "BondTotalReturnIndex", ProductSubtype::BondTotalReturnIndex }
+};
+
+static const std::map<ProductSubtype, std::string> ProductSubtype2Name {
+    { ProductSubtype::Share, "Share" },
+    { ProductSubtype::AllotmentRight, "AllotmentRight" },
+    { ProductSubtype::SubscriptionRight, "SubscriptionRight" },
+    { ProductSubtype::TenderOffer, "TenderOffer" },
+    { ProductSubtype::IssueRight, "IssueRight" },
+    { ProductSubtype::SubscriptionWarrant, "SubscriptionWarrant" },
+    { ProductSubtype::BankSecurities, "BankSecurities" },
+    { ProductSubtype::Bond, "Bond" },
+    { ProductSubtype::TreasuryBond, "TreasuryBond" },
+    { ProductSubtype::IssuedBond, "IssuedBond" },
+    { ProductSubtype::MunicipalBond, "MunicipalBond" },
+    { ProductSubtype::CorporateBankBond, "CorporateBankBond" },
+    { ProductSubtype::CorporateFirmBond, "CorporateFirmBond" },
+    { ProductSubtype::ConvertibleBond, "ConvertibleBond" },
+    { ProductSubtype::MortgageBond, "MortgageBond" },
+    { ProductSubtype::MortgageBackedBond, "MortgageBackedBond" },
+    { ProductSubtype::PublicMortgageBond, "PublicMortgageBond" },
+    { ProductSubtype::Bill, "Bill" },
+    { ProductSubtype::TreasuryBill, "TreasuryBill" },
+    { ProductSubtype::CommercialBill, "CommercialBill" },
+    { ProductSubtype::ExchangeTradedFund, "ExchangeTradedFund" },
+    { ProductSubtype::ExchangeTradedNote, "ExchangeTradedNote" },
+    { ProductSubtype::ExchangeTradedCommodity, "ExchangeTradedCommodity" },
+    { ProductSubtype::InvestmentCertificate, "InvestmentCertificate" },
+    { ProductSubtype::IndexFutures, "IndexFutures" },
+    { ProductSubtype::StockFutures, "StockFutures" },
+    { ProductSubtype::CurrencyFutures, "CurrencyFutures" },
+    { ProductSubtype::BondFutures, "BondFutures" },
+    { ProductSubtype::InterestRateFutures, "InterestRateFutures" },
+    { ProductSubtype::IndexOptions, "IndexOptions" },
+    { ProductSubtype::StockOptions, "StockOptions" },
+    { ProductSubtype::OptionWarrants, "OptionWarrants" },
+    { ProductSubtype::FactorCertificates, "FactorCertificates" },
+    { ProductSubtype::TurboCertificates, "TurboCertificates" },
+    { ProductSubtype::CapitalProtectionCertificates, "CapitalProtectionCertificates" },
+    { ProductSubtype::BonusCertificates, "BonusCertificates" },
+    { ProductSubtype::ReverseConvertibleCertificates, "ReverseConvertibleCertificates" },
+    { ProductSubtype::ExpressCertificates, "ExpressCertificates" },
+    { ProductSubtype::DiscountCertificates, "DiscountCertificates" },
+    { ProductSubtype::IndexTrackerCertificates, "IndexTrackerCertificates" },
+    { ProductSubtype::OtherInvestmentCertificates, "OtherInvestmentCertificates" },
+    { ProductSubtype::StructuredNotes, "StructuredNotes" },
+    { ProductSubtype::ReferenceRate, "ReferenceRate" },
+    { ProductSubtype::InterestRate, "InterestRate" },
+    { ProductSubtype::ExchangeRate, "ExchangeRate" },
+    { ProductSubtype::PriceIndex, "PriceIndex" },
+    { ProductSubtype::TotalReturnIndex, "TotalReturnIndex" },
+    { ProductSubtype::SectorPriceIndex, "SectorPriceIndex" },
+    { ProductSubtype::SectorTotalReturnIndex, "SectorTotalReturnIndex" },
+    { ProductSubtype::DividendIndex, "DividendIndex" },
+    { ProductSubtype::StrategyPriceIndex, "StrategyPriceIndex" },
+    { ProductSubtype::StrategyTotalReturnIndex, "StrategyTotalReturnIndex" },
+    { ProductSubtype::CommodityIndex, "CommodityIndex" },
+    { ProductSubtype::BondTotalReturnIndex, "BondTotalReturnIndex" }
 };
 
 using LotSize = uint32_t;
-using InstrumentCode = AnsiChar[64];
+using InstrumentDescription = AnsiChar[64];
 
 enum class NominalValueType: uint8_t {
     NotApplicable = 1,
@@ -1787,93 +2045,759 @@ static const std::map<CouponType, std::string> CouponType2Name {
 using Issuer = AnsiChar[150];
 
 enum class Country: uint16_t {
+    AFG = 4,
+    ALB = 8,
+    ATA = 10,
+    DZA = 12,
+    ASM = 16,
+    AND = 20,
+    AGO = 24,
+    ATG = 28,
+    AZE = 31,
+    ARG = 32,
     AUS = 36,
     AUT = 40,
+    BHS = 44,
+    BHR = 48,
+    BGD = 50,
+    ARM = 51,
+    BRB = 52,
     BEL = 56,
+    BMU = 60,
+    BTN = 64,
+    BOL = 68,
+    BIH = 70,
+    BWA = 72,
+    BVT = 74,
+    BRA = 76,
+    BLZ = 84,
+    IOT = 86,
+    SLB = 90,
+    VGB = 92,
+    BRN = 96,
     BGR = 100,
+    MMR = 104,
+    BDI = 108,
+    BLR = 112,
+    KHM = 116,
+    CMR = 120,
     CAN = 124,
+    CPV = 132,
+    CYM = 136,
+    CAF = 140,
+    LKA = 144,
+    TCD = 148,
+    CHL = 152,
+    CHN = 156,
+    TWN = 158,
+    CXR = 162,
+    CCK = 166,
+    COL = 170,
+    COM = 174,
+    MYT = 175,
+    COG = 178,
+    COD = 180,
+    COK = 184,
+    CRI = 188,
+    HRV = 191,
+    CUB = 192,
     CYP = 196,
     CZE = 203,
+    BEN = 204,
+    DNK = 208,
+    DMA = 212,
+    DOM = 214,
+    ECU = 218,
+    SLV = 222,
+    GNQ = 226,
+    ETH = 231,
+    ERI = 232,
     EST = 233,
+    FRO = 234,
+    FLK = 238,
+    SGS = 239,
+    FJI = 242,
+    FIN = 246,
+    ALA = 248,
     FRA = 250,
+    GUF = 254,
+    PYF = 258,
+    ATF = 260,
+    DJI = 262,
+    GAB = 266,
+    GEO = 268,
+    GMB = 270,
+    PSE = 275,
     DEU = 276,
+    GHA = 288,
+    GIB = 292,
+    KIR = 296,
+    GRC = 300,
+    GRL = 304,
+    GRD = 308,
+    GLP = 312,
+    GUM = 316,
+    GTM = 320,
+    GIN = 324,
+    GUY = 328,
+    HTI = 332,
+    HMD = 334,
+    VAT = 336,
+    HND = 340,
+    HKG = 344,
     HUN = 348,
+    ISL = 352,
+    IND = 356,
+    IDN = 360,
+    IRN = 364,
+    IRQ = 368,
     IRL = 372,
     ISR = 376,
     ITA = 380,
+    CIV = 384,
+    JAM = 388,
+    JPN = 392,
+    KAZ = 398,
+    JOR = 400,
+    KEN = 404,
+    PRK = 408,
+    KOR = 410,
+    KWT = 414,
+    KGZ = 417,
+    LAO = 418,
+    LBN = 422,
+    LSO = 426,
+    LVA = 428,
+    LBR = 430,
+    LBY = 434,
+    LIE = 438,
     LTU = 440,
     LUX = 442,
+    MAC = 446,
+    MDG = 450,
+    MWI = 454,
+    MYS = 458,
+    MDV = 462,
+    MLI = 466,
+    MLT = 470,
+    MTQ = 474,
+    MRT = 478,
+    MUS = 480,
+    MEX = 484,
+    MCO = 492,
+    MNG = 496,
+    MDA = 498,
+    MNE = 499,
+    MSR = 500,
+    MAR = 504,
+    MOZ = 508,
+    OMN = 512,
+    NAM = 516,
+    NRU = 520,
+    NPL = 524,
     NLD = 528,
+    CUW = 531,
+    ABW = 533,
+    SXM = 534,
+    BES = 535,
+    NCL = 540,
+    VUT = 548,
+    NZL = 554,
+    NIC = 558,
+    NER = 562,
+    NGA = 566,
+    NIU = 570,
+    NFK = 574,
+    NOR = 578,
+    MNP = 580,
+    UMI = 581,
+    FSM = 583,
+    MHL = 584,
+    PLW = 585,
+    PAK = 586,
+    PAN = 591,
+    PNG = 598,
+    PRY = 600,
+    PER = 604,
+    PHL = 608,
+    PCN = 612,
     POL = 616,
     PRT = 620,
+    GNB = 624,
+    TLS = 626,
+    PRI = 630,
+    QAT = 634,
+    REU = 638,
     ROU = 642,
+    RUS = 643,
+    RWA = 646,
+    BLM = 652,
+    SHN = 654,
+    KNA = 659,
+    AIA = 660,
+    LCA = 662,
+    MAF = 663,
+    SPM = 666,
+    VCT = 670,
+    SMR = 674,
+    STP = 678,
+    SAU = 682,
+    SEN = 686,
+    SRB = 688,
+    SYC = 690,
+    SLE = 694,
+    SGP = 702,
     SVK = 703,
+    VNM = 704,
     SVN = 705,
+    SOM = 706,
+    ZAF = 710,
+    ZWE = 716,
     ESP = 724,
+    SSD = 728,
+    SDN = 729,
+    ESH = 732,
+    SUR = 740,
+    SJM = 744,
+    SWZ = 748,
     SWE = 752,
+    CHE = 756,
+    SYR = 760,
+    TJK = 762,
+    THA = 764,
+    TGO = 768,
+    TKL = 772,
+    TON = 776,
+    TTO = 780,
+    ARE = 784,
+    TUN = 788,
+    TUR = 792,
+    TKM = 795,
+    TCA = 796,
+    TUV = 798,
+    UGA = 800,
     UKR = 804,
+    MKD = 807,
+    EGY = 818,
     GBR = 826,
-    USA = 840
+    GGY = 831,
+    JEY = 832,
+    IMN = 833,
+    TZA = 834,
+    USA = 840,
+    VIR = 850,
+    BFA = 854,
+    URY = 858,
+    UZB = 860,
+    VEN = 862,
+    WLF = 876,
+    WSM = 882,
+    YEM = 887,
+    ZMB = 894
 };
 
 static const std::map<std::string, Country> Name2Country {
+    { "AFG", Country::AFG },
+    { "ALB", Country::ALB },
+    { "ATA", Country::ATA },
+    { "DZA", Country::DZA },
+    { "ASM", Country::ASM },
+    { "AND", Country::AND },
+    { "AGO", Country::AGO },
+    { "ATG", Country::ATG },
+    { "AZE", Country::AZE },
+    { "ARG", Country::ARG },
     { "AUS", Country::AUS },
     { "AUT", Country::AUT },
+    { "BHS", Country::BHS },
+    { "BHR", Country::BHR },
+    { "BGD", Country::BGD },
+    { "ARM", Country::ARM },
+    { "BRB", Country::BRB },
     { "BEL", Country::BEL },
+    { "BMU", Country::BMU },
+    { "BTN", Country::BTN },
+    { "BOL", Country::BOL },
+    { "BIH", Country::BIH },
+    { "BWA", Country::BWA },
+    { "BVT", Country::BVT },
+    { "BRA", Country::BRA },
+    { "BLZ", Country::BLZ },
+    { "IOT", Country::IOT },
+    { "SLB", Country::SLB },
+    { "VGB", Country::VGB },
+    { "BRN", Country::BRN },
     { "BGR", Country::BGR },
+    { "MMR", Country::MMR },
+    { "BDI", Country::BDI },
+    { "BLR", Country::BLR },
+    { "KHM", Country::KHM },
+    { "CMR", Country::CMR },
     { "CAN", Country::CAN },
+    { "CPV", Country::CPV },
+    { "CYM", Country::CYM },
+    { "CAF", Country::CAF },
+    { "LKA", Country::LKA },
+    { "TCD", Country::TCD },
+    { "CHL", Country::CHL },
+    { "CHN", Country::CHN },
+    { "TWN", Country::TWN },
+    { "CXR", Country::CXR },
+    { "CCK", Country::CCK },
+    { "COL", Country::COL },
+    { "COM", Country::COM },
+    { "MYT", Country::MYT },
+    { "COG", Country::COG },
+    { "COD", Country::COD },
+    { "COK", Country::COK },
+    { "CRI", Country::CRI },
+    { "HRV", Country::HRV },
+    { "CUB", Country::CUB },
     { "CYP", Country::CYP },
     { "CZE", Country::CZE },
+    { "BEN", Country::BEN },
+    { "DNK", Country::DNK },
+    { "DMA", Country::DMA },
+    { "DOM", Country::DOM },
+    { "ECU", Country::ECU },
+    { "SLV", Country::SLV },
+    { "GNQ", Country::GNQ },
+    { "ETH", Country::ETH },
+    { "ERI", Country::ERI },
     { "EST", Country::EST },
+    { "FRO", Country::FRO },
+    { "FLK", Country::FLK },
+    { "SGS", Country::SGS },
+    { "FJI", Country::FJI },
+    { "FIN", Country::FIN },
+    { "ALA", Country::ALA },
     { "FRA", Country::FRA },
+    { "GUF", Country::GUF },
+    { "PYF", Country::PYF },
+    { "ATF", Country::ATF },
+    { "DJI", Country::DJI },
+    { "GAB", Country::GAB },
+    { "GEO", Country::GEO },
+    { "GMB", Country::GMB },
+    { "PSE", Country::PSE },
     { "DEU", Country::DEU },
+    { "GHA", Country::GHA },
+    { "GIB", Country::GIB },
+    { "KIR", Country::KIR },
+    { "GRC", Country::GRC },
+    { "GRL", Country::GRL },
+    { "GRD", Country::GRD },
+    { "GLP", Country::GLP },
+    { "GUM", Country::GUM },
+    { "GTM", Country::GTM },
+    { "GIN", Country::GIN },
+    { "GUY", Country::GUY },
+    { "HTI", Country::HTI },
+    { "HMD", Country::HMD },
+    { "VAT", Country::VAT },
+    { "HND", Country::HND },
+    { "HKG", Country::HKG },
     { "HUN", Country::HUN },
+    { "ISL", Country::ISL },
+    { "IND", Country::IND },
+    { "IDN", Country::IDN },
+    { "IRN", Country::IRN },
+    { "IRQ", Country::IRQ },
     { "IRL", Country::IRL },
     { "ISR", Country::ISR },
     { "ITA", Country::ITA },
+    { "CIV", Country::CIV },
+    { "JAM", Country::JAM },
+    { "JPN", Country::JPN },
+    { "KAZ", Country::KAZ },
+    { "JOR", Country::JOR },
+    { "KEN", Country::KEN },
+    { "PRK", Country::PRK },
+    { "KOR", Country::KOR },
+    { "KWT", Country::KWT },
+    { "KGZ", Country::KGZ },
+    { "LAO", Country::LAO },
+    { "LBN", Country::LBN },
+    { "LSO", Country::LSO },
+    { "LVA", Country::LVA },
+    { "LBR", Country::LBR },
+    { "LBY", Country::LBY },
+    { "LIE", Country::LIE },
     { "LTU", Country::LTU },
     { "LUX", Country::LUX },
+    { "MAC", Country::MAC },
+    { "MDG", Country::MDG },
+    { "MWI", Country::MWI },
+    { "MYS", Country::MYS },
+    { "MDV", Country::MDV },
+    { "MLI", Country::MLI },
+    { "MLT", Country::MLT },
+    { "MTQ", Country::MTQ },
+    { "MRT", Country::MRT },
+    { "MUS", Country::MUS },
+    { "MEX", Country::MEX },
+    { "MCO", Country::MCO },
+    { "MNG", Country::MNG },
+    { "MDA", Country::MDA },
+    { "MNE", Country::MNE },
+    { "MSR", Country::MSR },
+    { "MAR", Country::MAR },
+    { "MOZ", Country::MOZ },
+    { "OMN", Country::OMN },
+    { "NAM", Country::NAM },
+    { "NRU", Country::NRU },
+    { "NPL", Country::NPL },
     { "NLD", Country::NLD },
+    { "CUW", Country::CUW },
+    { "ABW", Country::ABW },
+    { "SXM", Country::SXM },
+    { "BES", Country::BES },
+    { "NCL", Country::NCL },
+    { "VUT", Country::VUT },
+    { "NZL", Country::NZL },
+    { "NIC", Country::NIC },
+    { "NER", Country::NER },
+    { "NGA", Country::NGA },
+    { "NIU", Country::NIU },
+    { "NFK", Country::NFK },
+    { "NOR", Country::NOR },
+    { "MNP", Country::MNP },
+    { "UMI", Country::UMI },
+    { "FSM", Country::FSM },
+    { "MHL", Country::MHL },
+    { "PLW", Country::PLW },
+    { "PAK", Country::PAK },
+    { "PAN", Country::PAN },
+    { "PNG", Country::PNG },
+    { "PRY", Country::PRY },
+    { "PER", Country::PER },
+    { "PHL", Country::PHL },
+    { "PCN", Country::PCN },
     { "POL", Country::POL },
     { "PRT", Country::PRT },
+    { "GNB", Country::GNB },
+    { "TLS", Country::TLS },
+    { "PRI", Country::PRI },
+    { "QAT", Country::QAT },
+    { "REU", Country::REU },
     { "ROU", Country::ROU },
+    { "RUS", Country::RUS },
+    { "RWA", Country::RWA },
+    { "BLM", Country::BLM },
+    { "SHN", Country::SHN },
+    { "KNA", Country::KNA },
+    { "AIA", Country::AIA },
+    { "LCA", Country::LCA },
+    { "MAF", Country::MAF },
+    { "SPM", Country::SPM },
+    { "VCT", Country::VCT },
+    { "SMR", Country::SMR },
+    { "STP", Country::STP },
+    { "SAU", Country::SAU },
+    { "SEN", Country::SEN },
+    { "SRB", Country::SRB },
+    { "SYC", Country::SYC },
+    { "SLE", Country::SLE },
+    { "SGP", Country::SGP },
     { "SVK", Country::SVK },
+    { "VNM", Country::VNM },
     { "SVN", Country::SVN },
+    { "SOM", Country::SOM },
+    { "ZAF", Country::ZAF },
+    { "ZWE", Country::ZWE },
     { "ESP", Country::ESP },
+    { "SSD", Country::SSD },
+    { "SDN", Country::SDN },
+    { "ESH", Country::ESH },
+    { "SUR", Country::SUR },
+    { "SJM", Country::SJM },
+    { "SWZ", Country::SWZ },
     { "SWE", Country::SWE },
+    { "CHE", Country::CHE },
+    { "SYR", Country::SYR },
+    { "TJK", Country::TJK },
+    { "THA", Country::THA },
+    { "TGO", Country::TGO },
+    { "TKL", Country::TKL },
+    { "TON", Country::TON },
+    { "TTO", Country::TTO },
+    { "ARE", Country::ARE },
+    { "TUN", Country::TUN },
+    { "TUR", Country::TUR },
+    { "TKM", Country::TKM },
+    { "TCA", Country::TCA },
+    { "TUV", Country::TUV },
+    { "UGA", Country::UGA },
     { "UKR", Country::UKR },
+    { "MKD", Country::MKD },
+    { "EGY", Country::EGY },
     { "GBR", Country::GBR },
-    { "USA", Country::USA }
+    { "GGY", Country::GGY },
+    { "JEY", Country::JEY },
+    { "IMN", Country::IMN },
+    { "TZA", Country::TZA },
+    { "USA", Country::USA },
+    { "VIR", Country::VIR },
+    { "BFA", Country::BFA },
+    { "URY", Country::URY },
+    { "UZB", Country::UZB },
+    { "VEN", Country::VEN },
+    { "WLF", Country::WLF },
+    { "WSM", Country::WSM },
+    { "YEM", Country::YEM },
+    { "ZMB", Country::ZMB }
 };
 
 static const std::map<Country, std::string> Country2Name {
+    { Country::AFG, "AFG" },
+    { Country::ALB, "ALB" },
+    { Country::ATA, "ATA" },
+    { Country::DZA, "DZA" },
+    { Country::ASM, "ASM" },
+    { Country::AND, "AND" },
+    { Country::AGO, "AGO" },
+    { Country::ATG, "ATG" },
+    { Country::AZE, "AZE" },
+    { Country::ARG, "ARG" },
     { Country::AUS, "AUS" },
     { Country::AUT, "AUT" },
+    { Country::BHS, "BHS" },
+    { Country::BHR, "BHR" },
+    { Country::BGD, "BGD" },
+    { Country::ARM, "ARM" },
+    { Country::BRB, "BRB" },
     { Country::BEL, "BEL" },
+    { Country::BMU, "BMU" },
+    { Country::BTN, "BTN" },
+    { Country::BOL, "BOL" },
+    { Country::BIH, "BIH" },
+    { Country::BWA, "BWA" },
+    { Country::BVT, "BVT" },
+    { Country::BRA, "BRA" },
+    { Country::BLZ, "BLZ" },
+    { Country::IOT, "IOT" },
+    { Country::SLB, "SLB" },
+    { Country::VGB, "VGB" },
+    { Country::BRN, "BRN" },
     { Country::BGR, "BGR" },
+    { Country::MMR, "MMR" },
+    { Country::BDI, "BDI" },
+    { Country::BLR, "BLR" },
+    { Country::KHM, "KHM" },
+    { Country::CMR, "CMR" },
     { Country::CAN, "CAN" },
+    { Country::CPV, "CPV" },
+    { Country::CYM, "CYM" },
+    { Country::CAF, "CAF" },
+    { Country::LKA, "LKA" },
+    { Country::TCD, "TCD" },
+    { Country::CHL, "CHL" },
+    { Country::CHN, "CHN" },
+    { Country::TWN, "TWN" },
+    { Country::CXR, "CXR" },
+    { Country::CCK, "CCK" },
+    { Country::COL, "COL" },
+    { Country::COM, "COM" },
+    { Country::MYT, "MYT" },
+    { Country::COG, "COG" },
+    { Country::COD, "COD" },
+    { Country::COK, "COK" },
+    { Country::CRI, "CRI" },
+    { Country::HRV, "HRV" },
+    { Country::CUB, "CUB" },
     { Country::CYP, "CYP" },
     { Country::CZE, "CZE" },
+    { Country::BEN, "BEN" },
+    { Country::DNK, "DNK" },
+    { Country::DMA, "DMA" },
+    { Country::DOM, "DOM" },
+    { Country::ECU, "ECU" },
+    { Country::SLV, "SLV" },
+    { Country::GNQ, "GNQ" },
+    { Country::ETH, "ETH" },
+    { Country::ERI, "ERI" },
     { Country::EST, "EST" },
+    { Country::FRO, "FRO" },
+    { Country::FLK, "FLK" },
+    { Country::SGS, "SGS" },
+    { Country::FJI, "FJI" },
+    { Country::FIN, "FIN" },
+    { Country::ALA, "ALA" },
     { Country::FRA, "FRA" },
+    { Country::GUF, "GUF" },
+    { Country::PYF, "PYF" },
+    { Country::ATF, "ATF" },
+    { Country::DJI, "DJI" },
+    { Country::GAB, "GAB" },
+    { Country::GEO, "GEO" },
+    { Country::GMB, "GMB" },
+    { Country::PSE, "PSE" },
     { Country::DEU, "DEU" },
+    { Country::GHA, "GHA" },
+    { Country::GIB, "GIB" },
+    { Country::KIR, "KIR" },
+    { Country::GRC, "GRC" },
+    { Country::GRL, "GRL" },
+    { Country::GRD, "GRD" },
+    { Country::GLP, "GLP" },
+    { Country::GUM, "GUM" },
+    { Country::GTM, "GTM" },
+    { Country::GIN, "GIN" },
+    { Country::GUY, "GUY" },
+    { Country::HTI, "HTI" },
+    { Country::HMD, "HMD" },
+    { Country::VAT, "VAT" },
+    { Country::HND, "HND" },
+    { Country::HKG, "HKG" },
     { Country::HUN, "HUN" },
+    { Country::ISL, "ISL" },
+    { Country::IND, "IND" },
+    { Country::IDN, "IDN" },
+    { Country::IRN, "IRN" },
+    { Country::IRQ, "IRQ" },
     { Country::IRL, "IRL" },
     { Country::ISR, "ISR" },
     { Country::ITA, "ITA" },
+    { Country::CIV, "CIV" },
+    { Country::JAM, "JAM" },
+    { Country::JPN, "JPN" },
+    { Country::KAZ, "KAZ" },
+    { Country::JOR, "JOR" },
+    { Country::KEN, "KEN" },
+    { Country::PRK, "PRK" },
+    { Country::KOR, "KOR" },
+    { Country::KWT, "KWT" },
+    { Country::KGZ, "KGZ" },
+    { Country::LAO, "LAO" },
+    { Country::LBN, "LBN" },
+    { Country::LSO, "LSO" },
+    { Country::LVA, "LVA" },
+    { Country::LBR, "LBR" },
+    { Country::LBY, "LBY" },
+    { Country::LIE, "LIE" },
     { Country::LTU, "LTU" },
     { Country::LUX, "LUX" },
+    { Country::MAC, "MAC" },
+    { Country::MDG, "MDG" },
+    { Country::MWI, "MWI" },
+    { Country::MYS, "MYS" },
+    { Country::MDV, "MDV" },
+    { Country::MLI, "MLI" },
+    { Country::MLT, "MLT" },
+    { Country::MTQ, "MTQ" },
+    { Country::MRT, "MRT" },
+    { Country::MUS, "MUS" },
+    { Country::MEX, "MEX" },
+    { Country::MCO, "MCO" },
+    { Country::MNG, "MNG" },
+    { Country::MDA, "MDA" },
+    { Country::MNE, "MNE" },
+    { Country::MSR, "MSR" },
+    { Country::MAR, "MAR" },
+    { Country::MOZ, "MOZ" },
+    { Country::OMN, "OMN" },
+    { Country::NAM, "NAM" },
+    { Country::NRU, "NRU" },
+    { Country::NPL, "NPL" },
     { Country::NLD, "NLD" },
+    { Country::CUW, "CUW" },
+    { Country::ABW, "ABW" },
+    { Country::SXM, "SXM" },
+    { Country::BES, "BES" },
+    { Country::NCL, "NCL" },
+    { Country::VUT, "VUT" },
+    { Country::NZL, "NZL" },
+    { Country::NIC, "NIC" },
+    { Country::NER, "NER" },
+    { Country::NGA, "NGA" },
+    { Country::NIU, "NIU" },
+    { Country::NFK, "NFK" },
+    { Country::NOR, "NOR" },
+    { Country::MNP, "MNP" },
+    { Country::UMI, "UMI" },
+    { Country::FSM, "FSM" },
+    { Country::MHL, "MHL" },
+    { Country::PLW, "PLW" },
+    { Country::PAK, "PAK" },
+    { Country::PAN, "PAN" },
+    { Country::PNG, "PNG" },
+    { Country::PRY, "PRY" },
+    { Country::PER, "PER" },
+    { Country::PHL, "PHL" },
+    { Country::PCN, "PCN" },
     { Country::POL, "POL" },
     { Country::PRT, "PRT" },
+    { Country::GNB, "GNB" },
+    { Country::TLS, "TLS" },
+    { Country::PRI, "PRI" },
+    { Country::QAT, "QAT" },
+    { Country::REU, "REU" },
     { Country::ROU, "ROU" },
+    { Country::RUS, "RUS" },
+    { Country::RWA, "RWA" },
+    { Country::BLM, "BLM" },
+    { Country::SHN, "SHN" },
+    { Country::KNA, "KNA" },
+    { Country::AIA, "AIA" },
+    { Country::LCA, "LCA" },
+    { Country::MAF, "MAF" },
+    { Country::SPM, "SPM" },
+    { Country::VCT, "VCT" },
+    { Country::SMR, "SMR" },
+    { Country::STP, "STP" },
+    { Country::SAU, "SAU" },
+    { Country::SEN, "SEN" },
+    { Country::SRB, "SRB" },
+    { Country::SYC, "SYC" },
+    { Country::SLE, "SLE" },
+    { Country::SGP, "SGP" },
     { Country::SVK, "SVK" },
+    { Country::VNM, "VNM" },
     { Country::SVN, "SVN" },
+    { Country::SOM, "SOM" },
+    { Country::ZAF, "ZAF" },
+    { Country::ZWE, "ZWE" },
     { Country::ESP, "ESP" },
+    { Country::SSD, "SSD" },
+    { Country::SDN, "SDN" },
+    { Country::ESH, "ESH" },
+    { Country::SUR, "SUR" },
+    { Country::SJM, "SJM" },
+    { Country::SWZ, "SWZ" },
     { Country::SWE, "SWE" },
+    { Country::CHE, "CHE" },
+    { Country::SYR, "SYR" },
+    { Country::TJK, "TJK" },
+    { Country::THA, "THA" },
+    { Country::TGO, "TGO" },
+    { Country::TKL, "TKL" },
+    { Country::TON, "TON" },
+    { Country::TTO, "TTO" },
+    { Country::ARE, "ARE" },
+    { Country::TUN, "TUN" },
+    { Country::TUR, "TUR" },
+    { Country::TKM, "TKM" },
+    { Country::TCA, "TCA" },
+    { Country::TUV, "TUV" },
+    { Country::UGA, "UGA" },
     { Country::UKR, "UKR" },
+    { Country::MKD, "MKD" },
+    { Country::EGY, "EGY" },
     { Country::GBR, "GBR" },
-    { Country::USA, "USA" }
+    { Country::GGY, "GGY" },
+    { Country::JEY, "JEY" },
+    { Country::IMN, "IMN" },
+    { Country::TZA, "TZA" },
+    { Country::USA, "USA" },
+    { Country::VIR, "VIR" },
+    { Country::BFA, "BFA" },
+    { Country::URY, "URY" },
+    { Country::UZB, "UZB" },
+    { Country::VEN, "VEN" },
+    { Country::WLF, "WLF" },
+    { Country::WSM, "WSM" },
+    { Country::YEM, "YEM" },
+    { Country::ZMB, "ZMB" }
 };
 
 using Code = AnsiChar[16];
@@ -1937,22 +2861,41 @@ static const std::map<OptionType, std::string> OptionType2Name {
 };
 
 
-enum class ExcerciseType: uint8_t {
+enum class ExerciseType: uint8_t {
     AMER = 1,
     EURO = 2,
     NA = 3
 };
 
-static const std::map<std::string, ExcerciseType> Name2ExcerciseType {
-    { "AMER", ExcerciseType::AMER },
-    { "EURO", ExcerciseType::EURO },
-    { "NA", ExcerciseType::NA }
+static const std::map<std::string, ExerciseType> Name2ExerciseType {
+    { "AMER", ExerciseType::AMER },
+    { "EURO", ExerciseType::EURO },
+    { "NA", ExerciseType::NA }
 };
 
-static const std::map<ExcerciseType, std::string> ExcerciseType2Name {
-    { ExcerciseType::AMER, "AMER" },
-    { ExcerciseType::EURO, "EURO" },
-    { ExcerciseType::NA, "NA" }
+static const std::map<ExerciseType, std::string> ExerciseType2Name {
+    { ExerciseType::AMER, "AMER" },
+    { ExerciseType::EURO, "EURO" },
+    { ExerciseType::NA, "NA" }
+};
+
+
+enum class LeverageFlag: uint8_t {
+    NotApplicable = 1,
+    Yes = 2,
+    No = 3
+};
+
+static const std::map<std::string, LeverageFlag> Name2LeverageFlag {
+    { "NotApplicable", LeverageFlag::NotApplicable },
+    { "Yes", LeverageFlag::Yes },
+    { "No", LeverageFlag::No }
+};
+
+static const std::map<LeverageFlag, std::string> LeverageFlag2Name {
+    { LeverageFlag::NotApplicable, "NotApplicable" },
+    { LeverageFlag::Yes, "Yes" },
+    { LeverageFlag::No, "No" }
 };
 
 
@@ -1960,10 +2903,12 @@ struct Instrument {
     Header header;
     ElementId instrumentId;
     ProductType productType;
+    ProductSubtype productSubtype;
     Date firstTradingDate;
     Date lastTradingDate;
     ElementId productId;
     Currency currency;
+    Value icebergMinValue;
     LotSize lotSize;
     PriceExpressionType priceExpressionType;
     ElementId calendarId;
@@ -1971,12 +2916,13 @@ struct Instrument {
     ElementId tickTableId;
     ElementId collarGroupId;
     ElementId tradingScheduleId;
-    InstrumentCode code;
+    InstrumentDescription description;
     MicCode mic;
     Price nominalValue;
     NominalValueType nominalValueType;
     Multiplier multiplier;
     Price strikePrice;
+    Currency strikePriceCurrency;
     ProductIdentification productIdentification;
     ProductIdentificationType productIdentificationType;
     ElementId settlementCalendarId;
@@ -2002,11 +2948,14 @@ struct Instrument {
     uint8_t versionNumber;
     SettlementType settlementType;
     OptionType optionType;
-    ExcerciseType excerciseType;
+    ExerciseType exerciseType;
     Name productName;
     Price referencePrice;
     InstrumentStatus status;
     ElementId initialPhaseId;
+    Price thresholdMax;
+    Price thresholdMin;
+    LeverageFlag isLeverage;
 
     friend std::ostream &operator << (std::ostream &, const Instrument &);
 };
@@ -2035,19 +2984,25 @@ struct Login {
 enum class LoginResult: uint8_t {
     Ok = 1,
     InvalidToken = 2,
-    AlreadyLoggedIn = 3
+    AlreadyLoggedIn = 3,
+    LoginNotAllowed = 4,
+    Other = 5
 };
 
 static const std::map<std::string, LoginResult> Name2LoginResult {
     { "Ok", LoginResult::Ok },
     { "InvalidToken", LoginResult::InvalidToken },
-    { "AlreadyLoggedIn", LoginResult::AlreadyLoggedIn }
+    { "AlreadyLoggedIn", LoginResult::AlreadyLoggedIn },
+    { "LoginNotAllowed", LoginResult::LoginNotAllowed },
+    { "Other", LoginResult::Other }
 };
 
 static const std::map<LoginResult, std::string> LoginResult2Name {
     { LoginResult::Ok, "Ok" },
     { LoginResult::InvalidToken, "InvalidToken" },
-    { LoginResult::AlreadyLoggedIn, "AlreadyLoggedIn" }
+    { LoginResult::AlreadyLoggedIn, "AlreadyLoggedIn" },
+    { LoginResult::LoginNotAllowed, "LoginNotAllowed" },
+    { LoginResult::Other, "Other" }
 };
 
 
@@ -2131,7 +3086,6 @@ static const std::map<IndexLevelCode, std::string> IndexLevelCode2Name {
     { IndexLevelCode::ValueWithoutOpening, "ValueWithoutOpening" }
 };
 
-using PercentageChange = Price;
 using IndexValue = Price;
 
 struct RealTimeIndex {
@@ -2250,14 +3204,16 @@ struct IndexParams {
 };
 
 enum class ClosingPriceType: uint8_t {
-    LTP = 1,
-    LastACP = 2,
-    FairValue = 3,
-    DailySettlementPrice = 4,
-    FinalSettlementPrice = 5
+    InitialPrice = 1,
+    LTP = 2,
+    LastACP = 3,
+    FairValue = 4,
+    DailySettlementPrice = 5,
+    FinalSettlementPrice = 6
 };
 
 static const std::map<std::string, ClosingPriceType> Name2ClosingPriceType {
+    { "InitialPrice", ClosingPriceType::InitialPrice },
     { "LTP", ClosingPriceType::LTP },
     { "LastACP", ClosingPriceType::LastACP },
     { "FairValue", ClosingPriceType::FairValue },
@@ -2266,6 +3222,7 @@ static const std::map<std::string, ClosingPriceType> Name2ClosingPriceType {
 };
 
 static const std::map<ClosingPriceType, std::string> ClosingPriceType2Name {
+    { ClosingPriceType::InitialPrice, "InitialPrice" },
     { ClosingPriceType::LTP, "LTP" },
     { ClosingPriceType::LastACP, "LastACP" },
     { ClosingPriceType::FairValue, "FairValue" },
@@ -2275,16 +3232,18 @@ static const std::map<ClosingPriceType, std::string> ClosingPriceType2Name {
 
 
 enum class AdjustedClosingPriceReason: uint8_t {
-    Regular = 1,
-    Dividend = 2,
-    IssueRight = 3,
-    Split = 4,
-    ReverseSplit = 5,
-    Bonus = 6,
-    SpinOff = 7
+    NotApplicable = 1,
+    Regular = 2,
+    Dividend = 3,
+    IssueRight = 4,
+    Split = 5,
+    ReverseSplit = 6,
+    Bonus = 7,
+    SpinOff = 8
 };
 
 static const std::map<std::string, AdjustedClosingPriceReason> Name2AdjustedClosingPriceReason {
+    { "NotApplicable", AdjustedClosingPriceReason::NotApplicable },
     { "Regular", AdjustedClosingPriceReason::Regular },
     { "Dividend", AdjustedClosingPriceReason::Dividend },
     { "IssueRight", AdjustedClosingPriceReason::IssueRight },
@@ -2295,6 +3254,7 @@ static const std::map<std::string, AdjustedClosingPriceReason> Name2AdjustedClos
 };
 
 static const std::map<AdjustedClosingPriceReason, std::string> AdjustedClosingPriceReason2Name {
+    { AdjustedClosingPriceReason::NotApplicable, "NotApplicable" },
     { AdjustedClosingPriceReason::Regular, "Regular" },
     { AdjustedClosingPriceReason::Dividend, "Dividend" },
     { AdjustedClosingPriceReason::IssueRight, "IssueRight" },
@@ -2314,15 +3274,40 @@ struct InstrumentSummary {
     Price adjustedClosingPrice;
     AdjustedClosingPriceReason adjustedClosingPriceReason;
     PercentageChange pctChange;
-    Price VWAP;
+    Price vwap;
     uint64_t noTrades;
     Quantity totalVolume;
     Value totalValue;
     Price openingPrice;
     Price maxPrice;
     Price minPrice;
+    bool isCorrection;
 
     friend std::ostream &operator << (std::ostream &, const InstrumentSummary &);
+};
+
+struct SingleInstrumentSummary {
+    ElementId instrumentId;
+    MarketModelType marketModelType;
+    Price lastTradedPrice;
+    Price closingPrice;
+    ClosingPriceType closingPriceType;
+    Price adjustedClosingPrice;
+    AdjustedClosingPriceReason adjustedClosingPriceReason;
+    PercentageChange pctChange;
+    Price vwap;
+    uint64_t noTrades;
+    Quantity totalVolume;
+    Value totalValue;
+    Price openingPrice;
+    Price maxPrice;
+    Price minPrice;
+    Price settlementPrice;
+    Price settlementValue;
+    Date endTradingDate;
+    Date lastTradeDate;
+
+    friend std::ostream &operator << (std::ostream &, const SingleInstrumentSummary &);
 };
 
 enum class Market: uint8_t {
@@ -2397,45 +3382,25 @@ static const std::map<QuotationSystem, std::string> QuotationSystem2Name {
 };
 
 
-struct SessionSummary {
+struct ProductSummary {
     Header header;
-    ElementId instrumentId;
-    Price lastTradedPrice;
-    Price closingPrice;
-    ClosingPriceType closingPriceType;
-    PercentageChange pctChange;
-    Price vwap;
-    uint64_t noTrades;
-    Quantity totalVolume;
-    Value totalValue;
-    Price openingPrice;
-    Price maxPrice;
-    Price minPrice;
+    SingleInstrumentSummary clobInstrument;
+    SingleInstrumentSummary crossInstrument;
+    SingleInstrumentSummary blockInstrument;
+    SingleInstrumentSummary hybridInstrument;
     ProductIdentificationType productIdentificationType;
     ProductIdentification productIdentification;
+    ElementId productId;
+    MicCode mic;
     Number AccumulatedInterest;
     Number interestRate;
-    Price referencePrice;
-    Price settlementPrice;
-    Price settlementValue;
     Currency currency;
-    uint32_t openPositions;
     Date sessionDate;
-    Date endTradingDate;
-    Date lastTradeDate;
-    uint64_t numberOfInstruments;
     Value tradingValueCurrency;
-    uint64_t blockNoTrades;
-    Quantity blockVolume;
-    Value blockValue;
-    Price blockMinPrice;
-    Price blockMaxPrice;
-    Price vwapBlockTrade;
     InstrumentStatus status;
     uint16_t sector;
     Market market;
     ChangeIndicator markerPriceChange;
-    ElementId marketStructureId;
     bool lowerLiquidity;
     Number multiplier;
     Number impliedVolatility;
@@ -2454,16 +3419,18 @@ struct SessionSummary {
     QuotationSystem quotationSystem;
     bool liquiditySupportPge;
 
-    friend std::ostream &operator << (std::ostream &, const SessionSummary &);
+    friend std::ostream &operator << (std::ostream &, const ProductSummary &);
 };
+using NewsTitle = AnsiChar[80];
+using NewsText = AnsiChar[800];
 
 struct News {
     Header header;
     ElementId marketStructureId;
-    AnsiChar title[80];
+    NewsTitle title;
     uint8_t entryNumber;
     uint8_t total;
-    AnsiChar text[800];
+    NewsText text;
 
     friend std::ostream &operator << (std::ostream &, const News &);
 };
@@ -2496,18 +3463,42 @@ struct TestEvent {
     friend std::ostream &operator << (std::ostream &, const TestEvent &);
 };
 
+enum class PosType: uint8_t {
+    SOD = 1,
+    ITD = 2,
+    FIN = 3
+};
+
+static const std::map<std::string, PosType> Name2PosType {
+    { "SOD", PosType::SOD },
+    { "ITD", PosType::ITD },
+    { "FIN", PosType::FIN }
+};
+
+static const std::map<PosType, std::string> PosType2Name {
+    { PosType::SOD, "SOD" },
+    { PosType::ITD, "ITD" },
+    { PosType::FIN, "FIN" }
+};
+
+
+struct PositionReport {
+    Header header;
+    PublicProductIdentification publicProductIdentification;
+    PosType posType;
+    uint32_t openPositions;
+    TradeId tradeID;
+
+    friend std::ostream &operator << (std::ostream &, const PositionReport &);
+};
+
 union Message {
     Heartbeat uHeartbeat;
-    Text uText;
-    Test uTest;
     OrderAdd uOrderAdd;
     OrderModify uOrderModify;
     OrderDelete uOrderDelete;
     OrderExecute uOrderExecute;
-    StartOfTechnicalSession uStartOfTechnicalSession;
-    EndOfTechnicalSession uEndOfTechnicalSession;
-    ReferenceDataStart uReferenceDataStart;
-    ReferenceDataEnd uReferenceDataEnd;
+    TradingSessionStatus uTradingSessionStatus;
     EncryptionKey uEncryptionKey;
     InstrumentStatusChange uInstrumentStatusChange;
     TradingPhaseScheduleEntry uTradingPhaseScheduleEntry;
@@ -2538,9 +3529,10 @@ union Message {
     IndexPortfolioEntry uIndexPortfolioEntry;
     IndexParams uIndexParams;
     InstrumentSummary uInstrumentSummary;
-    SessionSummary uSessionSummary;
+    ProductSummary uProductSummary;
     News uNews;
     TestEvent uTestEvent;
+    PositionReport uPositionReport;
 };
   
   #pragma pack(pop)

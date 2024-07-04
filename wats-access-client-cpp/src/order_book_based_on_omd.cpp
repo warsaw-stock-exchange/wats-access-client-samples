@@ -13,26 +13,6 @@
 namespace btp = wats::trading_port;
 namespace omd = wats::online_market_data;
 
-inline btp::messages::OrderModify simple_order_modify(
-    btp::messages::OrderId order_id,
-    btp::messages::Price price,
-    btp::messages::Quantity quantity) {
-
-    return btp::messages::OrderModify {
-        .orderId = order_id,
-        .price = price,
-        .quantity = quantity,
-    };
-}
-
-inline btp::messages::OrderCancel simple_order_cancel(
-    btp::messages::OrderId order_id) {
-
-    return btp::messages::OrderCancel {
-        .orderId = order_id,
-    };
-}
-
 int main() {
 
     boost::asio::io_context io_context;
@@ -125,7 +105,7 @@ int main() {
     trading_port_0.handle([&](btp::messages::OrderAddResponse message) {
 
         if (message.orderId == orderId_0) {
-            if (message.status != btp::messages::OrderStatus::Ack) {
+            if (message.status != btp::messages::OrderStatus::New) {
                 test_result = EXIT_FAILURE;
             }
 
@@ -142,7 +122,7 @@ int main() {
     trading_port_0.handle([&](btp::messages::OrderModifyResponse message) {
 
         if (message.orderId == orderId_0) {
-            if (message.status != btp::messages::OrderStatus::Modified) {
+            if (message.status != btp::messages::OrderStatus::New) {
                 test_result = EXIT_FAILURE;
             }
 

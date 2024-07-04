@@ -11,6 +11,7 @@
 
 use crate::utils::{init_tracing, simple_order_add, simple_trade_capture_report_dual};
 use chrono::{DateTime, Datelike, Local};
+use utils::simple_order_modify;
 use std::collections::HashMap;
 use std::time::Duration;
 use tokio::time::sleep;
@@ -75,7 +76,8 @@ async fn limit_order() {
         .submit_order(simple_order_add(
             wats_config.limit_order_instrument_id(),
             tp::OrderSide::Buy,
-            100 * 100_000_000, // Mind that WATS uses integer value with eight decimal places for price
+             // WATS uses integer value with eight decimal places for price
+            100 * 100_000_000,
             1000,
         ))
         .await
@@ -83,14 +85,14 @@ async fn limit_order() {
 
     // Get OrderAddResponse and skip any heartbeat
     let buy_resp = client_a.get_order_add_resp().await.unwrap();
-    assert_eq!(buy_resp.status, tp::OrderStatus::Ack);
+    assert_eq!(buy_resp.status, tp::OrderStatus::New);
 
     // Send Sell order to WATS
     client_b
         .submit_order(simple_order_add(
             wats_config.limit_order_instrument_id(),
             tp::OrderSide::Sell,
-            100 * 100_000_000, // Mind that WATS uses integer value with eight decimal places for price
+            100 * 100_000_000,
             1000,
         ))
         .await
@@ -158,30 +160,113 @@ async fn modify_in_fly() {
         .submit_order(simple_order_add(
             wats_config.modify_in_fly_instrument_id(),
             tp::OrderSide::Buy,
-            100 * 100_000_000, // Mind that WATS uses integer value with eight decimal places for price
+            100 * 100_000_000,
             1000,
         ))
         .await
         .unwrap();
 
-    let mod_buy_order = tp::OrderModify {
-        header: tp::Header::new(tp::MsgType::OrderModify),
-        price: 100 * 100_000_000, // Mind that WATS uses integer value with eight decimal places for price
-        quantity: 2000,
-        ..Default::default()
-    };
-    client.mod_last_order(mod_buy_order).await.unwrap();
-
     // First, get OrderAddResponse and skip any heartbeat
     let buy_resp = client.get_order_add_resp().await.unwrap();
-    assert_eq!(buy_resp.status, tp::OrderStatus::Ack);
+    assert_eq!(buy_resp.status, tp::OrderStatus::New);
+
+    // ModifyOrder #1
+    let mod_buy_order = simple_order_modify(
+        buy_resp.order_id,
+        100 * 100_000_000,
+        2000);
+    client.modify_order(mod_buy_order, buy_resp.order_id).await.unwrap();
 
     // Then, get OrderModifyResponse and skip any heartbeat
     let mod_resp = client.get_order_mod_resp().await.unwrap();
-    assert_eq!(mod_resp.status, tp::OrderStatus::Modified);
-
+    assert_eq!(mod_resp.status, tp::OrderStatus::New);
     // Assert that OrderModify was sent for right OrderAdd
     assert_eq!({ mod_resp.order_id }, { buy_resp.order_id });
+
+    // ModifyOrder #2
+    let mod_buy_order = simple_order_modify(
+      buy_resp.order_id,
+      101 * 100_000_000,
+      2000);
+    client.modify_order(mod_buy_order, buy_resp.order_id).await.unwrap();
+
+    // Then, get OrderModifyResponse and skip any heartbeat
+    let mod_resp = client.get_order_mod_resp().await.unwrap();
+    assert_eq!(mod_resp.status, tp::OrderStatus::New);
+    // Assert that OrderModify was sent for right OrderAdd
+    assert_eq!({ mod_resp.order_id }, { buy_resp.order_id });
+
+    // ModifyOrder #3
+    let mod_buy_order = simple_order_modify(
+      buy_resp.order_id,
+      10001 * 100_000_000,
+      2000000000);
+    client.modify_order(mod_buy_order, buy_resp.order_id).await.unwrap();
+
+    // Then, get OrderModifyResponse and skip any heartbeat
+    let mod_resp = client.get_order_mod_resp().await.unwrap();
+    assert_eq!(mod_resp.status, tp::OrderStatus::Rejected);
+    // Assert that OrderModify was sent for right OrderAdd
+    assert_eq!({ mod_resp.order_id }, { buy_resp.order_id });
+
+    // ModifyOrder #4
+    let mod_buy_order = simple_order_modify(
+      buy_resp.order_id,
+      100 * 100_000_000,
+      1500);
+    client.modify_order(mod_buy_order, buy_resp.order_id).await.unwrap();
+
+    // Then, get OrderModifyResponse and skip any heartbeat
+    let mod_resp = client.get_order_mod_resp().await.unwrap();
+    assert_eq!(mod_resp.status, tp::OrderStatus::New);
+    // Assert that OrderModify was sent for right OrderAdd
+    assert_eq!({ mod_resp.order_id }, { buy_resp.order_id });
+
+    // ModifyOrder #5
+    let mut mod_buy_order = simple_order_modify(
+      buy_resp.order_id,
+      100 * 100_000_000,
+      1500);
+    mod_buy_order.expire = 9999999999000000000.into();
+    client.modify_order(mod_buy_order, buy_resp.order_id).await.unwrap();
+
+    // Then, get OrderModifyResponse and skip any heartbeat
+    let mod_resp = client.get_order_mod_resp().await.unwrap();
+    assert_eq!(mod_resp.status, tp::OrderStatus::Rejected);
+    // Assert that OrderModify was sent for right OrderAdd
+    assert_eq!({ mod_resp.order_id }, { buy_resp.order_id });
+
+    // ModifyOrder #6
+    let mod_buy_order = simple_order_modify(
+      buy_resp.order_id,
+      100 * 100_000_000,
+      3000);
+    client.modify_order(mod_buy_order, buy_resp.order_id).await.unwrap();
+
+    // Then, get OrderModifyResponse and skip any heartbeat
+    let mod_resp = client.get_order_mod_resp().await.unwrap();
+    assert_eq!(mod_resp.status, tp::OrderStatus::New);
+    // Assert that OrderModify was sent for right OrderAdd
+    assert_eq!({ mod_resp.order_id }, { buy_resp.order_id });
+
+    // Submit complimentary Sell order
+    client
+        .submit_order(simple_order_add(
+            wats_config.modify_in_fly_instrument_id(),
+            tp::OrderSide::Sell,
+            100 * 100_000_000,
+            3000,
+        ))
+        .await
+        .unwrap();
+
+    // Pull OrderAddResponse and skip any heartbeat
+    let sell_resp = client.get_order_add_resp().await.unwrap();
+    assert_eq!(sell_resp.status, tp::OrderStatus::Filled);
+
+    // Grab resulting trades
+    let _trade = client.get_trade().await.unwrap();
+    let _trade = client.get_trade().await.unwrap();
 
     client.logout().await.unwrap();
 }
@@ -210,7 +295,7 @@ async fn bad_instrument_id() {
         .submit_order(simple_order_add(
             wats_config.bad_instrument_id(),
             tp::OrderSide::Buy,
-            100 * 100_000_000, // Mind that WATS uses integer value with eight decimal places for price
+            100 * 100_000_000,
             1000,
         ))
         .await
@@ -221,7 +306,7 @@ async fn bad_instrument_id() {
     assert_eq!(buy_resp.status, tp::OrderStatus::Rejected);
     assert_eq!(
         { buy_resp.reason },
-        tp::OrderRejectionReason::UnknownInstrumentId
+        tp::OrderRejectionReason::UnknownInstrument
     );
 
     client.logout().await.unwrap();
@@ -251,7 +336,7 @@ async fn bad_price() {
         .submit_order(simple_order_add(
             wats_config.bad_price_instrument_id(),
             tp::OrderSide::Buy,
-            100 * 100_000_001, // Mind that WATS uses integer value with eight decimal places for price
+            100 * 100_000_001,
             1000,
         ))
         .await
@@ -293,7 +378,7 @@ async fn order_cancel_ok() {
         .submit_order(simple_order_add(
             wats_config.order_cancel_ok_instrument_id(),
             tp::OrderSide::Buy,
-            100 * 100_000_000, // Mind that WATS uses integer value with eight decimal places for price
+            100 * 100_000_000,
             1000,
         ))
         .await
@@ -301,11 +386,26 @@ async fn order_cancel_ok() {
 
     // First, get OrderAddResponse and skip any heartbeat
     let buy_resp = client.get_order_add_resp().await.unwrap();
-    assert_eq!(buy_resp.status, tp::OrderStatus::Ack);
+    assert_eq!(buy_resp.status, tp::OrderStatus::New);
 
     let cancel_buy_order = tp::OrderCancel {
         header: tp::Header::new(tp::MsgType::OrderCancel),
         order_id: buy_resp.order_id,
+        mifid_fields: tp::MifidFields {
+          flags: tp::MifidFlags::NONE,
+          client: tp::MifidField {
+              short_code: 1,
+              qualifier: tp::PartyRoleQualifier::NA,
+          },
+          executing_trader: tp::MifidField {
+              short_code: 4,
+              qualifier: tp::PartyRoleQualifier::Algorithm,
+          },
+          investment_decision_maker: tp::MifidField {
+              short_code: 17,
+              qualifier: tp::PartyRoleQualifier::NaturalPerson,
+          },
+        }
     };
     client.cancel_order(cancel_buy_order).await.unwrap();
 
@@ -342,7 +442,7 @@ async fn order_cancel_bad_order_id() {
         .submit_order(simple_order_add(
             wats_config.order_cancel_bad_instrument_id(),
             tp::OrderSide::Buy,
-            100 * 100_000_000, // Mind that WATS uses integer value with eight decimal places for price
+            100 * 100_000_000,
             1000,
         ))
         .await
@@ -350,11 +450,26 @@ async fn order_cancel_bad_order_id() {
 
     // First, get OrderAddResponse and skip any heartbeat
     let buy_resp = client.get_order_add_resp().await.unwrap();
-    assert_eq!(buy_resp.status, tp::OrderStatus::Ack);
+    assert_eq!(buy_resp.status, tp::OrderStatus::New);
 
     let cancel_buy_order = tp::OrderCancel {
         header: tp::Header::new(tp::MsgType::OrderCancel),
         order_id: tp::OrderId::new(0, 0, 0, 0).unwrap(),
+        mifid_fields: tp::MifidFields {
+          flags: tp::MifidFlags::NONE,
+          client: tp::MifidField {
+              short_code: 1,
+              qualifier: tp::PartyRoleQualifier::NA,
+          },
+          executing_trader: tp::MifidField {
+              short_code: 4,
+              qualifier: tp::PartyRoleQualifier::Algorithm,
+          },
+          investment_decision_maker: tp::MifidField {
+              short_code: 17,
+              qualifier: tp::PartyRoleQualifier::NaturalPerson,
+          },
+        }
     };
     client.cancel_order(cancel_buy_order).await.unwrap();
 
@@ -390,7 +505,7 @@ async fn price_violates_tick_table() {
         .submit_order_checked(simple_order_add(
             wats_config.violates_tick_table_instrument_id(),
             tp::OrderSide::Buy,
-            100 * 100_000_001, // Mind that WATS uses integer value with eight decimal places for price
+            100 * 100_000_001,
             1000,
         ))
         .await
@@ -405,7 +520,7 @@ async fn price_violates_tick_table() {
         .submit_order_checked(simple_order_add(
             wats_config.violates_tick_table_instrument_id(),
             tp::OrderSide::Buy,
-            100 * 100_000_000, // Mind that WATS uses integer value with eight decimal places for price
+            100 * 100_000_000,
             1000,
         ))
         .await
@@ -413,7 +528,7 @@ async fn price_violates_tick_table() {
 
     // Get OrderAddResponse and skip any heartbeat
     let buy_resp = client.get_order_add_resp().await.unwrap();
-    assert_eq!(buy_resp.status, tp::OrderStatus::Ack);
+    assert_eq!(buy_resp.status, tp::OrderStatus::New);
 
     client.logout().await.unwrap();
 }
@@ -442,7 +557,7 @@ async fn no_gap_in_omd_msg() {
         .submit_order_checked(simple_order_add(
             wats_config.gap_in_omd_instrument_id(),
             tp::OrderSide::Buy,
-            100 * 100_000_000, // Mind that WATS uses integer value with eight decimal places for price
+            100 * 100_000_000,
             1000,
         ))
         .await
@@ -450,7 +565,7 @@ async fn no_gap_in_omd_msg() {
 
     // Get OrderAddResponse and skip any heartbeat
     let buy_resp = client.get_order_add_resp().await.unwrap();
-    assert_eq!(buy_resp.status, tp::OrderStatus::Ack);
+    assert_eq!(buy_resp.status, tp::OrderStatus::New);
 
     // There is no gap in the OMD
     let gap = client.pull_msg_from_omd().await.unwrap();
@@ -558,7 +673,7 @@ async fn bbo_price_level() {
         .submit_order(simple_order_add(
             wats_config.bbo_instrument_id(),
             tp::OrderSide::Buy,
-            99 * 100_000_000, // Mind that WATS uses integer value with eight decimal places for price
+            99 * 100_000_000,
             1000,
         ))
         .await
@@ -566,14 +681,14 @@ async fn bbo_price_level() {
 
     // Get OrderAddResponse and skip any heartbeat
     let resp = client.get_order_add_resp().await.unwrap();
-    assert_eq!(resp.status, tp::OrderStatus::Ack);
+    assert_eq!(resp.status, tp::OrderStatus::New);
 
     // Send Buy order to WATS with price=98
     client
         .submit_order(simple_order_add(
             wats_config.bbo_instrument_id(),
             tp::OrderSide::Buy,
-            98 * 100_000_000, // Mind that WATS uses integer value with eight decimal places for price
+            98 * 100_000_000,
             1000,
         ))
         .await
@@ -581,14 +696,14 @@ async fn bbo_price_level() {
 
     // Get OrderAddResponse and skip any heartbeat
     let resp = client.get_order_add_resp().await.unwrap();
-    assert_eq!(resp.status, tp::OrderStatus::Ack);
+    assert_eq!(resp.status, tp::OrderStatus::New);
 
     // Send Sell order to WATS with price=101
     client
         .submit_order(simple_order_add(
             wats_config.bbo_instrument_id(),
             tp::OrderSide::Sell,
-            101 * 100_000_000, // Mind that WATS uses integer value with eight decimal places for price
+            101 * 100_000_000,
             1000,
         ))
         .await
@@ -596,14 +711,14 @@ async fn bbo_price_level() {
 
     // Get OrderAddResponse and skip any heartbeat
     let resp = client.get_order_add_resp().await.unwrap();
-    assert_eq!(resp.status, tp::OrderStatus::Ack);
+    assert_eq!(resp.status, tp::OrderStatus::New);
 
     // Send Sell order to WATS with price=102
     client
         .submit_order(simple_order_add(
             wats_config.bbo_instrument_id(),
             tp::OrderSide::Sell,
-            102 * 100_000_000, // Mind that WATS uses integer value with eight decimal places for price
+            102 * 100_000_000,
             1000,
         ))
         .await
@@ -611,7 +726,7 @@ async fn bbo_price_level() {
 
     // Get OrderAddResponse and skip any heartbeat
     let resp = client.get_order_add_resp().await.unwrap();
-    assert_eq!(resp.status, tp::OrderStatus::Ack);
+    assert_eq!(resp.status, tp::OrderStatus::New);
 
     client.logout().await.unwrap();
 
@@ -761,7 +876,7 @@ async fn ptc() {
 
     assert_eq!(
         product_type,
-        market_data::ProductType::FinancialProductShare
+        market_data::ProductType::Equity
     );
 
     let price = 100 * 100_000_000;
@@ -785,7 +900,7 @@ async fn ptc() {
 
     // Get OrderAddResponse and skip any heartbeat
     let buy_resp = client.get_order_add_resp().await.unwrap();
-    assert_eq!(buy_resp.status, tp::OrderStatus::Ack);
+    assert_eq!(buy_resp.status, tp::OrderStatus::New);
 
     // *****************************************************************
     //           OrderAdd violates PTC (volume out of bounds)
@@ -886,7 +1001,7 @@ async fn order_book_based_on_market_data() {
         .submit_order(simple_order_add(
             wats_config.order_book_based_on_market_data_instrument_id(),
             tp::OrderSide::Buy,
-            100 * 100_000_000, // Mind that WATS uses integer value with eight decimal places for price
+            100 * 100_000_000,
             5000,
         ))
         .await
@@ -894,7 +1009,7 @@ async fn order_book_based_on_market_data() {
 
     // Get OrderAddResponse and skip any heartbeat
     let buy_resp = client_a.get_order_add_resp().await.unwrap();
-    assert_eq!(buy_resp.status, tp::OrderStatus::Ack);
+    assert_eq!(buy_resp.status, tp::OrderStatus::New);
 
     // Pull last OrderAdd message from Online Market Data
     if let Some(gap) = client_a.pull_msg_from_omd().await.unwrap() {
@@ -926,19 +1041,15 @@ async fn order_book_based_on_market_data() {
     assert_eq!(5000, { last_md_order_add.quantity });
 
     // Submit OrderModify for previous OrderAdd
-    client_a
-        .mod_last_order(tp::OrderModify {
-            header: tp::Header::new(tp::MsgType::OrderModify),
-            price: 100 * 100_000_000, // Mind that WATS uses integer value with eight decimal places for price
-            quantity: 13000,
-            ..Default::default()
-        })
-        .await
-        .unwrap();
+    let mod_buy_order = simple_order_modify(
+      buy_resp.order_id,
+      100 * 100_000_000,
+      13000);
+    client_a.modify_order(mod_buy_order, buy_resp.order_id).await.unwrap();
 
     // Get OrderModifyResponse and skip any heartbeat
     let mod_resp = client_a.get_order_mod_resp().await.unwrap();
-    assert_eq!(mod_resp.status, tp::OrderStatus::Modified);
+    assert_eq!(mod_resp.status, tp::OrderStatus::New);
     // Assert that OrderModify was sent for right OrderAdd
     assert_eq!({ mod_resp.order_id }, { buy_resp.order_id });
 
@@ -968,7 +1079,7 @@ async fn order_book_based_on_market_data() {
         .submit_order(simple_order_add(
             wats_config.order_book_based_on_market_data_instrument_id(),
             tp::OrderSide::Sell,
-            100 * 100_000_000, // Mind that WATS uses integer value with eight decimal places for price
+            100 * 100_000_000,
             5000,
         ))
         .await
@@ -1049,6 +1160,21 @@ async fn order_book_based_on_market_data() {
         .cancel_order(tp::OrderCancel {
             header: tp::Header::new(tp::MsgType::OrderCancel),
             order_id: buy_resp.order_id,
+            mifid_fields: tp::MifidFields {
+              flags: tp::MifidFlags::NONE,
+              client: tp::MifidField {
+                  short_code: 1,
+                  qualifier: tp::PartyRoleQualifier::NA,
+              },
+              executing_trader: tp::MifidField {
+                  short_code: 4,
+                  qualifier: tp::PartyRoleQualifier::Algorithm,
+              },
+              investment_decision_maker: tp::MifidField {
+                  short_code: 17,
+                  qualifier: tp::PartyRoleQualifier::NaturalPerson,
+              },
+            }
         })
         .await
         .unwrap();
@@ -1112,11 +1238,42 @@ async fn block_dual() {
 
     utils::fetch_messages(&mut client).await;
 
+    // There has to be an underlying transaction of reference instrument
+    // for the request for Trade Report to work
+    client
+        .submit_order(simple_order_add(
+            wats_config.block_dual_reference(),
+            tp::OrderSide::Buy,
+            100 * 100_000_000,
+            1000,
+        ))
+        .await
+        .unwrap();
+
+    // Get OrderAddResponse and skip any heartbeat
+    let buy_resp = client.get_order_add_resp().await.unwrap();
+    assert_eq!(buy_resp.status, tp::OrderStatus::New);
+
+    client
+        .submit_order(simple_order_add(
+            wats_config.block_dual_reference(),
+            tp::OrderSide::Sell,
+            100 * 100_000_000,
+            1000,
+        ))
+        .await
+        .unwrap();
+
+    // Get OrderAddResponse and skip any heartbeat
+    let sell_resp = client.get_order_add_resp().await.unwrap();
+    assert_eq!(sell_resp.status, tp::OrderStatus::Filled);
+
+    // Now request Trade Capture Report
     client
         .submit_trade_capture_report_dual(simple_trade_capture_report_dual(
             wats_config.block_dual(),
             trade_report_id_from_str("ID0000"),
-            tp::ExecType::New,
+            tp::ExecType::NA,
             100 * 100_000_000,
             10,
             settlement_date(Local::now() + chrono::Duration::try_days(1).unwrap()),
@@ -1148,7 +1305,7 @@ async fn block_dual() {
         .submit_trade_capture_report_dual(simple_trade_capture_report_dual(
             wats_config.block_dual(),
             trade_report_id_from_str("ID0002"),
-            tp::ExecType::New,
+            tp::ExecType::NA,
             100 * 100_000_000,
             10,
             settlement_date(Local::now() + chrono::Duration::try_days(1).unwrap()),
@@ -1164,7 +1321,7 @@ async fn block_dual() {
         .submit_trade_capture_report_dual(simple_trade_capture_report_dual(
             wats_config.block_dual(),
             trade_report_id_from_str("ID0002"),
-            tp::ExecType::New,
+            tp::ExecType::NA,
             100 * 100_000_000,
             10,
             settlement_date(Local::now() + chrono::Duration::try_days(1).unwrap()),
@@ -1180,7 +1337,7 @@ async fn block_dual() {
     //     .submit_trade_capture_report_dual(simple_trade_capture_report_dual(
     //         wats_config.block_dual(),
     //         trade_report_id_from_str("ID0003"),
-    //         tp::ExecType::New,
+    //         tp::ExecType::NA,
     //         100 * 100_000_000,
     //         1,
     //         settlement_date(Local::now() + chrono::Duration::try_days(1).unwrap()),
@@ -1196,7 +1353,7 @@ async fn block_dual() {
         .submit_trade_capture_report_dual(simple_trade_capture_report_dual(
             wats_config.block_dual(),
             trade_report_id_from_str("ID0004"),
-            tp::ExecType::New,
+            tp::ExecType::NA,
             100 * 100_000_000,
             1,
             settlement_date(Local::now() - chrono::Duration::try_days(1).unwrap()),

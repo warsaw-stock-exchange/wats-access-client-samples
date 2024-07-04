@@ -1,10 +1,7 @@
 package pl.gpw.wats.client.md.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.nio.ByteBuffer;
 
 /**
@@ -39,60 +36,55 @@ public enum Market {
     /**
      * Other market.
      */
-    OTHER(7),
-    UNKNOWN(99999);
-
+    OTHER(7);
+    
     private final int value;
-
     private final int byteLength = 1;
-
-
+    
     private static final Map<Integer, Market> TYPES = new HashMap<>();
     static {
         for (Market type : Market.values()) {
             TYPES.put(type.value, type);
         }
     }
-
-
+    
     Market(int newValue) {
         value = newValue;
     }
-
+    
     /**
-     Get Market from java input
-     * @param newValue
-     * @return Market enum
+     * Get Market by attribute
+     * @param val
+     * @return Market enum or null if variant is undefined
      */
-    public static Market getMarket(int newValue) {
-        Market val = TYPES.get(newValue);
-        return val == null ? Market.UNKNOWN : val;
+    public static Market getMarket(int val) {
+        return TYPES.get(val);
     }
-
+    
     /**
      * Get Market int value
      * @return int value
      */
-    public int getMarketValue() { return value; }
-
-
+    public int getMarketValue() {
+        return value; 
+    }
+    
     /**
-     Get Market from bytes
+     * Get Market from bytes
      * @param bytes byte[]
      * @param offset - int
      */
     public static Market getMarket(byte[] bytes, int offset) {
         return getMarket(BendecUtils.uInt8FromByteArray(bytes, offset));
     }
-
+    
     byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
         return buffer.array();
     }
-
+    
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
     }
-
 }

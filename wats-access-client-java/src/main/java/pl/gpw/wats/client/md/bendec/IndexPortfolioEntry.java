@@ -1,28 +1,22 @@
 package pl.gpw.wats.client.md.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.nio.ByteBuffer;
-
 
 /**
  * <h2>IndexPortfolioEntry</h2>
  * <p>The message contains information about a product providing the index portfolio. The entire index portfolio is sent as successive IndexPortfolioEntry messages.</p>
- * <p>Byte length: 92</p>
- * <p>Header header - Message header. | size 39</p>
+ * <p>Byte length: 95</p>
+ * <p>Header header - Message header. | size 42</p>
  * <p>ElementId > long (u32) id - The identifier of the entry within the given index. | size 4</p>
  * <p>ElementId > long (u32) instrumentId - ID of the instrument. | size 4</p>
  * <p>PublicProductIdentification publicProductIdentification - Product identification type and code. | size 31</p>
  * <p>MicCode > String (u8[]) mic - Market structure's Market Identifier Code (MIC) as specified in ISO 10383. | size 4</p>
  * <p>Currency currency - Currency (e.g. USD). | size 2</p>
  * <p>u64 > BigInteger instrumentPacket - Instrument packet in index portfolio / of information product. Number of units (usually stocks/shares) of a given instrument in the index portfolio or in the information product. | size 8</p>
- * */
-
+ */
 public class IndexPortfolioEntry implements ByteSerializable, Message {
-
     private Header header;
     private long id;
     private long instrumentId;
@@ -30,8 +24,8 @@ public class IndexPortfolioEntry implements ByteSerializable, Message {
     private String mic;
     private Currency currency;
     private BigInteger instrumentPacket;
-    public static final int byteLength = 92;
-
+    public static final int byteLength = 95;
+    
     public IndexPortfolioEntry(Header header, long id, long instrumentId, PublicProductIdentification publicProductIdentification, String mic, Currency currency, BigInteger instrumentPacket) {
         this.header = header;
         this.id = id;
@@ -40,119 +34,124 @@ public class IndexPortfolioEntry implements ByteSerializable, Message {
         this.mic = mic;
         this.currency = currency;
         this.instrumentPacket = instrumentPacket;
-        this.header.setLength(this.byteLength);
-        this.header.setMsgType(MsgType.INDEXPORTFOLIOENTRY);
     }
-
+    
     public IndexPortfolioEntry(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
-        this.id = BendecUtils.uInt32FromByteArray(bytes, offset + 39);
-        this.instrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 43);
-        this.publicProductIdentification = new PublicProductIdentification(bytes, offset + 47);
-        this.mic = BendecUtils.stringFromByteArray(bytes, offset + 78, 4);
-        this.currency = Currency.getCurrency(bytes, offset + 82);
-        this.instrumentPacket = BendecUtils.uInt64FromByteArray(bytes, offset + 84);
-        this.header.setLength(this.byteLength);
-        this.header.setMsgType(MsgType.INDEXPORTFOLIOENTRY);
+        this.id = BendecUtils.uInt32FromByteArray(bytes, offset + 42);
+        this.instrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 46);
+        this.publicProductIdentification = new PublicProductIdentification(bytes, offset + 50);
+        this.mic = BendecUtils.stringFromByteArray(bytes, offset + 81, 4);
+        this.currency = Currency.getCurrency(bytes, offset + 85);
+        this.instrumentPacket = BendecUtils.uInt64FromByteArray(bytes, offset + 87);
     }
-
+    
     public IndexPortfolioEntry(byte[] bytes) {
         this(bytes, 0);
     }
-
+    
     public IndexPortfolioEntry() {
     }
-
-
-
+    
     /**
      * @return Message header.
      */
     public Header getHeader() {
         return this.header;
-    };
+    }
+    
     /**
      * @return The identifier of the entry within the given index.
      */
     public long getId() {
         return this.id;
-    };
+    }
+    
     /**
      * @return ID of the instrument.
      */
     public long getInstrumentId() {
         return this.instrumentId;
-    };
+    }
+    
     /**
      * @return Product identification type and code.
      */
     public PublicProductIdentification getPublicProductIdentification() {
         return this.publicProductIdentification;
-    };
+    }
+    
     /**
      * @return Market structure's Market Identifier Code (MIC) as specified in ISO 10383.
      */
     public String getMic() {
         return this.mic;
-    };
+    }
+    
     /**
      * @return Currency (e.g. USD).
      */
     public Currency getCurrency() {
         return this.currency;
-    };
+    }
+    
     /**
      * @return Instrument packet in index portfolio / of information product. Number of units (usually stocks/shares) of a given instrument in the index portfolio or in the information product.
      */
     public BigInteger getInstrumentPacket() {
         return this.instrumentPacket;
-    };
-
+    }
+    
     /**
      * @param header Message header.
      */
     public void setHeader(Header header) {
         this.header = header;
-    };
+    }
+    
     /**
      * @param id The identifier of the entry within the given index.
      */
     public void setId(long id) {
         this.id = id;
-    };
+    }
+    
     /**
      * @param instrumentId ID of the instrument.
      */
     public void setInstrumentId(long instrumentId) {
         this.instrumentId = instrumentId;
-    };
+    }
+    
     /**
      * @param publicProductIdentification Product identification type and code.
      */
     public void setPublicProductIdentification(PublicProductIdentification publicProductIdentification) {
         this.publicProductIdentification = publicProductIdentification;
-    };
+    }
+    
     /**
      * @param mic Market structure's Market Identifier Code (MIC) as specified in ISO 10383.
      */
     public void setMic(String mic) {
         this.mic = mic;
-    };
+    }
+    
     /**
      * @param currency Currency (e.g. USD).
      */
     public void setCurrency(Currency currency) {
         this.currency = currency;
-    };
+    }
+    
     /**
      * @param instrumentPacket Instrument packet in index portfolio / of information product. Number of units (usually stocks/shares) of a given instrument in the index portfolio or in the information product.
      */
     public void setInstrumentPacket(BigInteger instrumentPacket) {
         this.instrumentPacket = instrumentPacket;
-    };
-
-
-    @Override  
+    }
+    
+    @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         header.toBytes(buffer);
@@ -164,7 +163,7 @@ public class IndexPortfolioEntry implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt64ToByteArray(this.instrumentPacket));
         return buffer.array();
     }
-
+    
     @Override  
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
@@ -175,15 +174,21 @@ public class IndexPortfolioEntry implements ByteSerializable, Message {
         currency.toBytes(buffer);
         buffer.put(BendecUtils.uInt64ToByteArray(this.instrumentPacket));
     }
-
+    
     @Override
     public int hashCode() {
-        return Objects.hash(header, id, instrumentId, publicProductIdentification, mic, currency, instrumentPacket);
+        return Objects.hash(header,
+        id,
+        instrumentId,
+        publicProductIdentification,
+        mic,
+        currency,
+        instrumentPacket);
     }
-
+    
     @Override
     public String toString() {
-        return "IndexPortfolioEntry{" +
+        return "IndexPortfolioEntry {" +
             "header=" + header +
             ", id=" + id +
             ", instrumentId=" + instrumentId +
@@ -191,6 +196,6 @@ public class IndexPortfolioEntry implements ByteSerializable, Message {
             ", mic=" + mic +
             ", currency=" + currency +
             ", instrumentPacket=" + instrumentPacket +
-            '}';
-        }
+            "}";
+    }
 }

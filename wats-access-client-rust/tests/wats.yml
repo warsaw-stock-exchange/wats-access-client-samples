@@ -45,7 +45,7 @@ dmd_replay:
   host: 127.0.0.1
   port: 10034
 
-multicast_interface: 172.20.100.65
+multicast_interface: 127.0.0.1
 
 connection_01:
   id: 581
@@ -67,8 +67,9 @@ product_bucket:
   order_cancel_ok_instrument_id: 4669
   order_cancel_bad_instrument_id: 4669
   violates_tick_table_instrument_id: 4669
-  bbo_instrument_id: 4679
+  bbo_instrument_id: 4688
   gap_in_omd_instrument_id: 4700
   ptc_instrument_id: 4697
   order_book_based_on_market_data_instrument_id: 4685
   block_dual: 4701
+  block_dual_reference: 4700

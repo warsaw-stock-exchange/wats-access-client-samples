@@ -1,10 +1,7 @@
 package pl.gpw.wats.client.tp.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.nio.ByteBuffer;
 
 /**
@@ -17,66 +14,81 @@ public enum MassCancelRejectionReason {
      */
     NA(101),
     /**
-     * Unknown instrument ID.
+     * Unknown instrument.
      */
-    UNKNOWNINSTRUMENTID(100),
+    UNKNOWNINSTRUMENT(1001),
+    /**
+     * Missing Executing Trader repeating group
+     */
+    INVALIDEXECUTIONTRADER(1005),
     /**
      * Unknown market segment ID.
      */
     UNKNOWNMARKETSEGMENTID(1016),
-    UNKNOWN(99999);
-
+    /**
+     * Unknown connection ID.
+     */
+    UNKNOWNCONNECTIONID(1017),
+    /**
+     * Instrument forbidden.
+     */
+    INSTRUMENTFORBIDDEN(1053),
+    /**
+     * Market segment ID forbidden.
+     */
+    MARKETSEGMENTIDFORBIDDEN(1054),
+    /**
+     * Operation on redistributed instruments forbidden.
+     */
+    OPERATIONONREDISTRIBUTEDINSTRUMENTSFORBIDDEN(1056);
+    
     private final int value;
-
     private final int byteLength = 2;
-
-
+    
     private static final Map<Integer, MassCancelRejectionReason> TYPES = new HashMap<>();
     static {
         for (MassCancelRejectionReason type : MassCancelRejectionReason.values()) {
             TYPES.put(type.value, type);
         }
     }
-
-
+    
     MassCancelRejectionReason(int newValue) {
         value = newValue;
     }
-
+    
     /**
-     Get MassCancelRejectionReason from java input
-     * @param newValue
-     * @return MassCancelRejectionReason enum
+     * Get MassCancelRejectionReason by attribute
+     * @param val
+     * @return MassCancelRejectionReason enum or null if variant is undefined
      */
-    public static MassCancelRejectionReason getMassCancelRejectionReason(int newValue) {
-        MassCancelRejectionReason val = TYPES.get(newValue);
-        return val == null ? MassCancelRejectionReason.UNKNOWN : val;
+    public static MassCancelRejectionReason getMassCancelRejectionReason(int val) {
+        return TYPES.get(val);
     }
-
+    
     /**
      * Get MassCancelRejectionReason int value
      * @return int value
      */
-    public int getMassCancelRejectionReasonValue() { return value; }
-
-
+    public int getMassCancelRejectionReasonValue() {
+        return value; 
+    }
+    
     /**
-     Get MassCancelRejectionReason from bytes
+     * Get MassCancelRejectionReason from bytes
      * @param bytes byte[]
      * @param offset - int
      */
     public static MassCancelRejectionReason getMassCancelRejectionReason(byte[] bytes, int offset) {
         return getMassCancelRejectionReason(BendecUtils.uInt16FromByteArray(bytes, offset));
     }
-
+    
     byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         buffer.put(BendecUtils.uInt16ToByteArray(this.value));
         return buffer.array();
     }
-
+    
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt16ToByteArray(this.value));
     }
-
 }

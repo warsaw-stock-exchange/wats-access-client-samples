@@ -34,7 +34,10 @@ int main() {
     btp::TradingPort trading_port(io_context);
     omd::MarketData market_data(io_context);
 
-    btp::messages::OrderId orderRespId;
+    btp::messages::OrderId orderId_0;
+    btp::messages::OrderId orderId_1;
+
+    bool create_tcrs {false};
 
     int clients_active(0);
     int tcr_count(0);
@@ -49,6 +52,8 @@ int main() {
 
     btp::messages::ElementId instrumentId =
         config["product"].as<btp::messages::ElementId>();
+    omd::messages::ElementId instrumentReferenceId =
+        config["product_clob_reference"].as<omd::messages::ElementId>();
 
     market_data.handle([&](omd::messages::EndOfSnapshot message, wats::EventSource source) {
 
@@ -70,78 +75,106 @@ int main() {
 
         clients_active++;
 
-        // Accepted
-        btp::messages::TradeCaptureReportDual tcrd1 = simple_trade_capture_report_dual(
-            instrumentId,
-            "ID0000",
-            btp::messages::ExecType::New,
+        btp::messages::OrderAdd buyOrder = simple_order_add(
+            instrumentReferenceId,
+            btp::messages::OrderSide::Sell,
             100 * 100'000'000ll,
-            10,
-            to_date(system_clock::now() + days{1})
-        );
+            1000);
 
-        trading_port.send_sequenced(tcrd1);
+        trading_port.orderAdd(buyOrder, orderId_0);
+    });
 
-        // Bad exec type
-        btp::messages::TradeCaptureReportDual tcrd2 = simple_trade_capture_report_dual(
-            instrumentId,
-            "ID0001",
-            btp::messages::ExecType::Trade,
-            100 * 100'000'000ll,
-            10,
-            to_date(system_clock::now() + days{1})
-        );
+    trading_port.handle([&](btp::messages::OrderAddResponse message) {
 
-        trading_port.send_sequenced(tcrd2);
+        if (message.orderId == orderId_0) {
+            btp::messages::OrderAdd buyOrder = simple_order_add(
+                instrumentReferenceId,
+                btp::messages::OrderSide::Buy,
+                100 * 100'000'000ll,
+                1000);
 
-        // Ducplcated TCR ID
-        btp::messages::TradeCaptureReportDual tcrd3 = simple_trade_capture_report_dual(
-            instrumentId,
-            "ID0002",
-            btp::messages::ExecType::New,
-            100 * 100'000'000ll,
-            10,
-            to_date(system_clock::now() + days{1})
-        );
+            trading_port.orderAdd(buyOrder, orderId_1);
+        }
+    });
 
-        trading_port.send_sequenced(tcrd3);
+    trading_port.handle([&](omd::messages::Trade message) {
 
-        btp::messages::TradeCaptureReportDual tcrd4 = simple_trade_capture_report_dual(
-            instrumentId,
-            "ID0002",
-            btp::messages::ExecType::New,
-            100 * 100'000'000ll,
-            10,
-            to_date(system_clock::now() + days{1})
-        );
+        if (!create_tcrs) {
+            // Accepted
+            btp::messages::TradeCaptureReportDual tcrd1 = simple_trade_capture_report_dual(
+                instrumentId,
+                "ID0000",
+                btp::messages::ExecType::NA,
+                100 * 100'000'000ll,
+                10,
+                to_date(system_clock::now() + days{1})
+            );
 
-        trading_port.send_sequenced(tcrd4);
+            trading_port.send_sequenced(tcrd1);
 
-        // Disabled temporarily
-        //
-        // Capture quantity below minimum
-        // btp::messages::TradeCaptureReportDual tcrd5 = simple_trade_capture_report_dual(
-        //     instrumentId,
-        //     "ID0003",
-        //     btp::messages::ExecType::New,
-        //     100 * 100'000'000ll,
-        //     1,
-        //     to_date(system_clock::now() + days{1})
-        // );
+            // Bad exec type
+            btp::messages::TradeCaptureReportDual tcrd2 = simple_trade_capture_report_dual(
+                instrumentId,
+                "ID0001",
+                btp::messages::ExecType::Trade,
+                100 * 100'000'000ll,
+                10,
+                to_date(system_clock::now() + days{1})
+            );
 
-        trading_port.send_sequenced(tcrd4);
+            trading_port.send_sequenced(tcrd2);
 
-        // Settlement date yesterday
-        btp::messages::TradeCaptureReportDual tcrd6 = simple_trade_capture_report_dual(
-            instrumentId,
-            "ID0004",
-            btp::messages::ExecType::New,
-            100 * 100'000'000ll,
-            10,
-            to_date(system_clock::now() - days{1})
-        );
+            // Ducplcated TCR ID
+            btp::messages::TradeCaptureReportDual tcrd3 = simple_trade_capture_report_dual(
+                instrumentId,
+                "ID0002",
+                btp::messages::ExecType::NA,
+                100 * 100'000'000ll,
+                10,
+                to_date(system_clock::now() + days{1})
+            );
 
-        trading_port.send_sequenced(tcrd6);
+            trading_port.send_sequenced(tcrd3);
+
+            btp::messages::TradeCaptureReportDual tcrd4 = simple_trade_capture_report_dual(
+                instrumentId,
+                "ID0002",
+                btp::messages::ExecType::NA,
+                100 * 100'000'000ll,
+                10,
+                to_date(system_clock::now() + days{1})
+            );
+
+            trading_port.send_sequenced(tcrd4);
+
+            // Disabled temporarily
+            //
+            // Capture quantity below minimum
+            // btp::messages::TradeCaptureReportDual tcrd5 = simple_trade_capture_report_dual(
+            //     instrumentId,
+            //     "ID0003",
+            //     btp::messages::ExecType::New,
+            //     100 * 100'000'000ll,
+            //     1,
+            //     to_date(system_clock::now() + days{1})
+            // );
+
+            trading_port.send_sequenced(tcrd4);
+
+            // Settlement date yesterday
+            btp::messages::TradeCaptureReportDual tcrd6 = simple_trade_capture_report_dual(
+                instrumentId,
+                "ID0004",
+                btp::messages::ExecType::NA,
+                100 * 100'000'000ll,
+                10,
+                to_date(system_clock::now() - days{1})
+            );
+
+            trading_port.send_sequenced(tcrd6);
+
+            create_tcrs = true;
+        }
     });
 
     trading_port.handle([&](btp::messages::TradeCaptureReportResponse message) {

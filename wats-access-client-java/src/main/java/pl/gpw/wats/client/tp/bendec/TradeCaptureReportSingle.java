@@ -1,17 +1,13 @@
 package pl.gpw.wats.client.tp.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.nio.ByteBuffer;
-
 
 /**
  * <h2>TradeCaptureReportSingle</h2>
  * <p>Trade Capture Report - single side.</p>
- * <p>Byte length: 175</p>
+ * <p>Byte length: 196</p>
  * <p>Header header - Header. | size 16</p>
  * <p>ElementId > long (u32) instrumentId - ID of the instrument included in the order. | size 4</p>
  * <p>TradeReportId > String (u8[]) tradeReportId - Unique identifier of the trade capture report. | size 20</p>
@@ -26,14 +22,11 @@ import java.nio.ByteBuffer;
  * <p>Quantity > BigInteger (u64) lastQty - Quantity (e.g. shares) bought/sold on this (last) fill. | size 8</p>
  * <p>Price > long (i64) lastPx - Price of this (last) fill. | size 8</p>
  * <p>Date > long (u32) settlementDate - Settlement date of the trade is equal to current date plus actual settlement offset calendar days. | size 4</p>
- * <p>MatchStatus matchStatus - The status of this trade with respect to matching or comparison. | size 1</p>
  * <p>OrderSide side - Side of order. | size 1</p>
  * <p>CcpCode > String (u8[]) counterpartyCode - CCP code of the counterparty. | size 16</p>
- * <p>TcrParty tcrParty - TCR party. | size 60</p>
- * */
-
+ * <p>TcrParty tcrParty - TCR party. | size 82</p>
+ */
 public class TradeCaptureReportSingle implements ByteSerializable, Message {
-
     private Header header;
     private long instrumentId;
     private String tradeReportId;
@@ -48,13 +41,12 @@ public class TradeCaptureReportSingle implements ByteSerializable, Message {
     private BigInteger lastQty;
     private long lastPx;
     private long settlementDate;
-    private MatchStatus matchStatus;
     private OrderSide side;
     private String counterpartyCode;
     private TcrParty tcrParty;
-    public static final int byteLength = 175;
-
-    public TradeCaptureReportSingle(Header header, long instrumentId, String tradeReportId, BigInteger secondaryTradeReportId, long tradeId, TradeReportTransType tradeReportTransType, TradeReportType tradeReportType, TradeType tradeType, AlgorithmicTradeIndicator algorithmicTradeIndicator, ExecType execType, String tradeReportRefId, BigInteger lastQty, long lastPx, long settlementDate, MatchStatus matchStatus, OrderSide side, String counterpartyCode, TcrParty tcrParty) {
+    public static final int byteLength = 196;
+    
+    public TradeCaptureReportSingle(Header header, long instrumentId, String tradeReportId, BigInteger secondaryTradeReportId, long tradeId, TradeReportTransType tradeReportTransType, TradeReportType tradeReportType, TradeType tradeType, AlgorithmicTradeIndicator algorithmicTradeIndicator, ExecType execType, String tradeReportRefId, BigInteger lastQty, long lastPx, long settlementDate, OrderSide side, String counterpartyCode, TcrParty tcrParty) {
         this.header = header;
         this.instrumentId = instrumentId;
         this.tradeReportId = tradeReportId;
@@ -69,14 +61,11 @@ public class TradeCaptureReportSingle implements ByteSerializable, Message {
         this.lastQty = lastQty;
         this.lastPx = lastPx;
         this.settlementDate = settlementDate;
-        this.matchStatus = matchStatus;
         this.side = side;
         this.counterpartyCode = counterpartyCode;
         this.tcrParty = tcrParty;
-        this.header.setLength(this.byteLength);
-        this.header.setMsgType(MsgType.TRADECAPTUREREPORTSINGLE);
     }
-
+    
     public TradeCaptureReportSingle(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
         this.instrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 16);
@@ -92,243 +81,257 @@ public class TradeCaptureReportSingle implements ByteSerializable, Message {
         this.lastQty = BendecUtils.uInt64FromByteArray(bytes, offset + 77);
         this.lastPx = BendecUtils.int64FromByteArray(bytes, offset + 85);
         this.settlementDate = BendecUtils.uInt32FromByteArray(bytes, offset + 93);
-        this.matchStatus = MatchStatus.getMatchStatus(bytes, offset + 97);
-        this.side = OrderSide.getOrderSide(bytes, offset + 98);
-        this.counterpartyCode = BendecUtils.stringFromByteArray(bytes, offset + 99, 16);
-        this.tcrParty = new TcrParty(bytes, offset + 115);
-        this.header.setLength(this.byteLength);
-        this.header.setMsgType(MsgType.TRADECAPTUREREPORTSINGLE);
+        this.side = OrderSide.getOrderSide(bytes, offset + 97);
+        this.counterpartyCode = BendecUtils.stringFromByteArray(bytes, offset + 98, 16);
+        this.tcrParty = new TcrParty(bytes, offset + 114);
     }
-
+    
     public TradeCaptureReportSingle(byte[] bytes) {
         this(bytes, 0);
     }
-
+    
     public TradeCaptureReportSingle() {
     }
-
-
-
+    
     /**
      * @return Header.
      */
     public Header getHeader() {
         return this.header;
-    };
+    }
+    
     /**
      * @return ID of the instrument included in the order.
      */
     public long getInstrumentId() {
         return this.instrumentId;
-    };
+    }
+    
     /**
      * @return Unique identifier of the trade capture report.
      */
     public String getTradeReportId() {
         return this.tradeReportId;
-    };
+    }
+    
     /**
      * @return ID of the trade capture report.
      */
     public BigInteger getSecondaryTradeReportId() {
         return this.secondaryTradeReportId;
-    };
+    }
+    
     /**
      * @return The unique ID assigned to the trade entity once it is received or matched by the exchange or central counterparty.
      */
     public long getTradeId() {
         return this.tradeId;
-    };
+    }
+    
     /**
      * @return Identifies Trade Report message transaction type.
      */
     public TradeReportTransType getTradeReportTransType() {
         return this.tradeReportTransType;
-    };
+    }
+    
     /**
      * @return Type of Trade Report.
      */
     public TradeReportType getTradeReportType() {
         return this.tradeReportType;
-    };
+    }
+    
     /**
      * @return Type of trade.
      */
     public TradeType getTradeType() {
         return this.tradeType;
-    };
+    }
+    
     /**
      * @return Indicates algorithmic trader.
      */
     public AlgorithmicTradeIndicator getAlgorithmicTradeIndicator() {
         return this.algorithmicTradeIndicator;
-    };
+    }
+    
     /**
      * @return Type of execution being reported. Uses subset of ExecType for trade capture reports.
      */
     public ExecType getExecType() {
         return this.execType;
-    };
+    }
+    
     /**
      * @return Reference identifier used with Cancel and Replace transaction types. The TradeReportID that is being referenced for trade correction or cancelation.
      */
     public String getTradeReportRefId() {
         return this.tradeReportRefId;
-    };
+    }
+    
     /**
      * @return Quantity (e.g. shares) bought/sold on this (last) fill.
      */
     public BigInteger getLastQty() {
         return this.lastQty;
-    };
+    }
+    
     /**
      * @return Price of this (last) fill.
      */
     public long getLastPx() {
         return this.lastPx;
-    };
+    }
+    
     /**
      * @return Settlement date of the trade is equal to current date plus actual settlement offset calendar days.
      */
     public long getSettlementDate() {
         return this.settlementDate;
-    };
-    /**
-     * @return The status of this trade with respect to matching or comparison.
-     */
-    public MatchStatus getMatchStatus() {
-        return this.matchStatus;
-    };
+    }
+    
     /**
      * @return Side of order.
      */
     public OrderSide getSide() {
         return this.side;
-    };
+    }
+    
     /**
      * @return CCP code of the counterparty.
      */
     public String getCounterpartyCode() {
         return this.counterpartyCode;
-    };
+    }
+    
     /**
      * @return TCR party.
      */
     public TcrParty getTcrParty() {
         return this.tcrParty;
-    };
-
+    }
+    
     /**
      * @param header Header.
      */
     public void setHeader(Header header) {
         this.header = header;
-    };
+    }
+    
     /**
      * @param instrumentId ID of the instrument included in the order.
      */
     public void setInstrumentId(long instrumentId) {
         this.instrumentId = instrumentId;
-    };
+    }
+    
     /**
      * @param tradeReportId Unique identifier of the trade capture report.
      */
     public void setTradeReportId(String tradeReportId) {
         this.tradeReportId = tradeReportId;
-    };
+    }
+    
     /**
      * @param secondaryTradeReportId ID of the trade capture report.
      */
     public void setSecondaryTradeReportId(BigInteger secondaryTradeReportId) {
         this.secondaryTradeReportId = secondaryTradeReportId;
-    };
+    }
+    
     /**
      * @param tradeId The unique ID assigned to the trade entity once it is received or matched by the exchange or central counterparty.
      */
     public void setTradeId(long tradeId) {
         this.tradeId = tradeId;
-    };
+    }
+    
     /**
      * @param tradeReportTransType Identifies Trade Report message transaction type.
      */
     public void setTradeReportTransType(TradeReportTransType tradeReportTransType) {
         this.tradeReportTransType = tradeReportTransType;
-    };
+    }
+    
     /**
      * @param tradeReportType Type of Trade Report.
      */
     public void setTradeReportType(TradeReportType tradeReportType) {
         this.tradeReportType = tradeReportType;
-    };
+    }
+    
     /**
      * @param tradeType Type of trade.
      */
     public void setTradeType(TradeType tradeType) {
         this.tradeType = tradeType;
-    };
+    }
+    
     /**
      * @param algorithmicTradeIndicator Indicates algorithmic trader.
      */
     public void setAlgorithmicTradeIndicator(AlgorithmicTradeIndicator algorithmicTradeIndicator) {
         this.algorithmicTradeIndicator = algorithmicTradeIndicator;
-    };
+    }
+    
     /**
      * @param execType Type of execution being reported. Uses subset of ExecType for trade capture reports.
      */
     public void setExecType(ExecType execType) {
         this.execType = execType;
-    };
+    }
+    
     /**
      * @param tradeReportRefId Reference identifier used with Cancel and Replace transaction types. The TradeReportID that is being referenced for trade correction or cancelation.
      */
     public void setTradeReportRefId(String tradeReportRefId) {
         this.tradeReportRefId = tradeReportRefId;
-    };
+    }
+    
     /**
      * @param lastQty Quantity (e.g. shares) bought/sold on this (last) fill.
      */
     public void setLastQty(BigInteger lastQty) {
         this.lastQty = lastQty;
-    };
+    }
+    
     /**
      * @param lastPx Price of this (last) fill.
      */
     public void setLastPx(long lastPx) {
         this.lastPx = lastPx;
-    };
+    }
+    
     /**
      * @param settlementDate Settlement date of the trade is equal to current date plus actual settlement offset calendar days.
      */
     public void setSettlementDate(long settlementDate) {
         this.settlementDate = settlementDate;
-    };
-    /**
-     * @param matchStatus The status of this trade with respect to matching or comparison.
-     */
-    public void setMatchStatus(MatchStatus matchStatus) {
-        this.matchStatus = matchStatus;
-    };
+    }
+    
     /**
      * @param side Side of order.
      */
     public void setSide(OrderSide side) {
         this.side = side;
-    };
+    }
+    
     /**
      * @param counterpartyCode CCP code of the counterparty.
      */
     public void setCounterpartyCode(String counterpartyCode) {
         this.counterpartyCode = counterpartyCode;
-    };
+    }
+    
     /**
      * @param tcrParty TCR party.
      */
     public void setTcrParty(TcrParty tcrParty) {
         this.tcrParty = tcrParty;
-    };
-
-
-    @Override  
+    }
+    
+    @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         header.toBytes(buffer);
@@ -345,13 +348,12 @@ public class TradeCaptureReportSingle implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt64ToByteArray(this.lastQty));
         buffer.put(BendecUtils.int64ToByteArray(this.lastPx));
         buffer.put(BendecUtils.uInt32ToByteArray(this.settlementDate));
-        matchStatus.toBytes(buffer);
         side.toBytes(buffer);
         buffer.put(BendecUtils.stringToByteArray(this.counterpartyCode, 16));
         tcrParty.toBytes(buffer);
         return buffer.array();
     }
-
+    
     @Override  
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
@@ -368,20 +370,35 @@ public class TradeCaptureReportSingle implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt64ToByteArray(this.lastQty));
         buffer.put(BendecUtils.int64ToByteArray(this.lastPx));
         buffer.put(BendecUtils.uInt32ToByteArray(this.settlementDate));
-        matchStatus.toBytes(buffer);
         side.toBytes(buffer);
         buffer.put(BendecUtils.stringToByteArray(this.counterpartyCode, 16));
         tcrParty.toBytes(buffer);
     }
-
+    
     @Override
     public int hashCode() {
-        return Objects.hash(header, instrumentId, tradeReportId, secondaryTradeReportId, tradeId, tradeReportTransType, tradeReportType, tradeType, algorithmicTradeIndicator, execType, tradeReportRefId, lastQty, lastPx, settlementDate, matchStatus, side, counterpartyCode, tcrParty);
+        return Objects.hash(header,
+        instrumentId,
+        tradeReportId,
+        secondaryTradeReportId,
+        tradeId,
+        tradeReportTransType,
+        tradeReportType,
+        tradeType,
+        algorithmicTradeIndicator,
+        execType,
+        tradeReportRefId,
+        lastQty,
+        lastPx,
+        settlementDate,
+        side,
+        counterpartyCode,
+        tcrParty);
     }
-
+    
     @Override
     public String toString() {
-        return "TradeCaptureReportSingle{" +
+        return "TradeCaptureReportSingle {" +
             "header=" + header +
             ", instrumentId=" + instrumentId +
             ", tradeReportId=" + tradeReportId +
@@ -396,10 +413,9 @@ public class TradeCaptureReportSingle implements ByteSerializable, Message {
             ", lastQty=" + lastQty +
             ", lastPx=" + lastPx +
             ", settlementDate=" + settlementDate +
-            ", matchStatus=" + matchStatus +
             ", side=" + side +
             ", counterpartyCode=" + counterpartyCode +
             ", tcrParty=" + tcrParty +
-            '}';
-        }
+            "}";
+    }
 }

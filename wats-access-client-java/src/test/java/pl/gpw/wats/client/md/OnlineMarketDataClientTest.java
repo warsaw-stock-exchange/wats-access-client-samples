@@ -114,7 +114,7 @@ public class OnlineMarketDataClientTest {
         while (tpA_buyOrderResponse.get() == null) {
             tpcA.read();
         }
-        assertEquals(OrderStatus.ACK, tpA_buyOrderResponse.get().getStatus(),
+        assertEquals(OrderStatus.NEW, tpA_buyOrderResponse.get().getStatus(),
                 "Test failed: " + tpA_buyOrderResponse.get().getReason());
 
         md_buyOrder.set(null);

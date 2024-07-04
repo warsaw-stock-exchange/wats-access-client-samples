@@ -1,12 +1,8 @@
 package pl.gpw.wats.client.tp.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.nio.ByteBuffer;
-
 
 /**
  * <h2>MassQuote</h2>
@@ -23,10 +19,8 @@ import java.nio.ByteBuffer;
  * <p>ClearingCode > String (u8[]) clearingMemberCode - Clearing member code. | size 20</p>
  * <p>ClearingIdentifier clearingMemberClearingIdentifier - Clearing member's clearing identifier. | size 1</p>
  * <p>Quotes quotes - The array of quotes. | size 1081</p>
- * */
-
+ */
 public class MassQuote implements ByteSerializable, Message {
-
     private Header header;
     private int onBehalfOf;
     private int stpId;
@@ -39,7 +33,7 @@ public class MassQuote implements ByteSerializable, Message {
     private ClearingIdentifier clearingMemberClearingIdentifier;
     private Quotes quotes;
     public static final int byteLength = 1173;
-
+    
     public MassQuote(Header header, int onBehalfOf, int stpId, Capacity capacity, String account, AccountType accountType, MifidFields mifidFields, String memo, String clearingMemberCode, ClearingIdentifier clearingMemberClearingIdentifier, Quotes quotes) {
         this.header = header;
         this.onBehalfOf = onBehalfOf;
@@ -52,10 +46,8 @@ public class MassQuote implements ByteSerializable, Message {
         this.clearingMemberCode = clearingMemberCode;
         this.clearingMemberClearingIdentifier = clearingMemberClearingIdentifier;
         this.quotes = quotes;
-        this.header.setLength(this.byteLength);
-        this.header.setMsgType(MsgType.MASSQUOTE);
     }
-
+    
     public MassQuote(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
         this.onBehalfOf = BendecUtils.uInt16FromByteArray(bytes, offset + 16);
@@ -68,137 +60,152 @@ public class MassQuote implements ByteSerializable, Message {
         this.clearingMemberCode = BendecUtils.stringFromByteArray(bytes, offset + 71, 20);
         this.clearingMemberClearingIdentifier = ClearingIdentifier.getClearingIdentifier(bytes, offset + 91);
         this.quotes = new Quotes(bytes, offset + 92);
-        this.header.setLength(this.byteLength);
-        this.header.setMsgType(MsgType.MASSQUOTE);
     }
-
+    
     public MassQuote(byte[] bytes) {
         this(bytes, 0);
     }
-
+    
     public MassQuote() {
     }
-
-
-
+    
     /**
      * @return Message header.
      */
     public Header getHeader() {
         return this.header;
-    };
+    }
+    
     public int getOnBehalfOf() {
         return this.onBehalfOf;
-    };
+    }
+    
     /**
      * @return An ID assigned by the client used in Self Match Prevention mechanism.
      */
     public int getStpId() {
         return this.stpId;
-    };
+    }
+    
     /**
      * @return Capacity of the party making the order (either principal or agency).
      */
     public Capacity getCapacity() {
         return this.capacity;
-    };
+    }
+    
     /**
      * @return Account mnemonic as agreed between buy and sell sides.
      */
     public String getAccount() {
         return this.account;
-    };
+    }
+    
     /**
      * @return Type of account associated with the order.
      */
     public AccountType getAccountType() {
         return this.accountType;
-    };
+    }
+    
     public MifidFields getMifidFields() {
         return this.mifidFields;
-    };
+    }
+    
     public String getMemo() {
         return this.memo;
-    };
+    }
+    
     /**
      * @return Clearing member code.
      */
     public String getClearingMemberCode() {
         return this.clearingMemberCode;
-    };
+    }
+    
     /**
      * @return Clearing member's clearing identifier.
      */
     public ClearingIdentifier getClearingMemberClearingIdentifier() {
         return this.clearingMemberClearingIdentifier;
-    };
+    }
+    
     /**
      * @return The array of quotes.
      */
     public Quotes getQuotes() {
         return this.quotes;
-    };
-
+    }
+    
     /**
      * @param header Message header.
      */
     public void setHeader(Header header) {
         this.header = header;
-    };
+    }
+    
     public void setOnBehalfOf(int onBehalfOf) {
         this.onBehalfOf = onBehalfOf;
-    };
+    }
+    
     /**
      * @param stpId An ID assigned by the client used in Self Match Prevention mechanism.
      */
     public void setStpId(int stpId) {
         this.stpId = stpId;
-    };
+    }
+    
     /**
      * @param capacity Capacity of the party making the order (either principal or agency).
      */
     public void setCapacity(Capacity capacity) {
         this.capacity = capacity;
-    };
+    }
+    
     /**
      * @param account Account mnemonic as agreed between buy and sell sides.
      */
     public void setAccount(String account) {
         this.account = account;
-    };
+    }
+    
     /**
      * @param accountType Type of account associated with the order.
      */
     public void setAccountType(AccountType accountType) {
         this.accountType = accountType;
-    };
+    }
+    
     public void setMifidFields(MifidFields mifidFields) {
         this.mifidFields = mifidFields;
-    };
+    }
+    
     public void setMemo(String memo) {
         this.memo = memo;
-    };
+    }
+    
     /**
      * @param clearingMemberCode Clearing member code.
      */
     public void setClearingMemberCode(String clearingMemberCode) {
         this.clearingMemberCode = clearingMemberCode;
-    };
+    }
+    
     /**
      * @param clearingMemberClearingIdentifier Clearing member's clearing identifier.
      */
     public void setClearingMemberClearingIdentifier(ClearingIdentifier clearingMemberClearingIdentifier) {
         this.clearingMemberClearingIdentifier = clearingMemberClearingIdentifier;
-    };
+    }
+    
     /**
      * @param quotes The array of quotes.
      */
     public void setQuotes(Quotes quotes) {
         this.quotes = quotes;
-    };
-
-
-    @Override  
+    }
+    
+    @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         header.toBytes(buffer);
@@ -214,7 +221,7 @@ public class MassQuote implements ByteSerializable, Message {
         quotes.toBytes(buffer);
         return buffer.array();
     }
-
+    
     @Override  
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
@@ -229,15 +236,25 @@ public class MassQuote implements ByteSerializable, Message {
         clearingMemberClearingIdentifier.toBytes(buffer);
         quotes.toBytes(buffer);
     }
-
+    
     @Override
     public int hashCode() {
-        return Objects.hash(header, onBehalfOf, stpId, capacity, account, accountType, mifidFields, memo, clearingMemberCode, clearingMemberClearingIdentifier, quotes);
+        return Objects.hash(header,
+        onBehalfOf,
+        stpId,
+        capacity,
+        account,
+        accountType,
+        mifidFields,
+        memo,
+        clearingMemberCode,
+        clearingMemberClearingIdentifier,
+        quotes);
     }
-
+    
     @Override
     public String toString() {
-        return "MassQuote{" +
+        return "MassQuote {" +
             "header=" + header +
             ", onBehalfOf=" + onBehalfOf +
             ", stpId=" + stpId +
@@ -249,6 +266,6 @@ public class MassQuote implements ByteSerializable, Message {
             ", clearingMemberCode=" + clearingMemberCode +
             ", clearingMemberClearingIdentifier=" + clearingMemberClearingIdentifier +
             ", quotes=" + quotes +
-            '}';
-        }
+            "}";
+    }
 }

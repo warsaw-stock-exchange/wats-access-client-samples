@@ -1,6 +1,6 @@
 {
   "$schema": "./schema.json",
-  "version": 2024,
+  "version": 2051,
   "typeDefinitions": {
     "marketData": [
       {
@@ -68,6 +68,12 @@
         "name": "SessionId",
         "alias": "u16",
         "description": "ID of the session. Must fit into 14 bits, see OrderId for details."
+      },
+      {
+        "kind": "Alias",
+        "name": "StreamId",
+        "alias": "u8",
+        "description": "ID of the md stream."
       },
       {
         "kind": "Alias",
@@ -216,17 +222,10 @@
       },
       {
         "kind": "Array",
-        "name": "TextMessage",
-        "type": "AnsiChar",
-        "length": 50,
-        "description": "A text message."
-      },
-      {
-        "kind": "Array",
-        "name": "InstrumentCode",
+        "name": "InstrumentDescription",
         "type": "AnsiChar",
         "length": 64,
-        "description": "Type for long, 64-character long code for market structure messages."
+        "description": "Type for long, 64-character long description for market structure messages."
       },
       {
         "kind": "Alias",
@@ -408,7 +407,7 @@
       {
         "kind": "Enum",
         "name": "Currency",
-        "description": "Currency - ISO 4217 (2022/04/01) code (e.g. PLN)",
+        "description": "Currency - ISO 4217 code (e.g. PLN)",
         "underlying": "u16",
         "variants": [
           [
@@ -1094,7 +1093,7 @@
           [
             "UYI",
             940,
-            "[object Object]"
+            "Uruguay Peso en Unidades Indexadas (URUIURUI)"
           ],
           [
             "RSD",
@@ -1119,12 +1118,12 @@
           [
             "CHE",
             947,
-            "[object Object]"
+            "WIR Euro"
           ],
           [
             "CHW",
             948,
-            "[object Object]"
+            "WIR Franc"
           ],
           [
             "TRY",
@@ -1224,7 +1223,7 @@
           [
             "COU",
             970,
-            "[object Object]"
+            "Unidad de Valor Real"
           ],
           [
             "AFN",
@@ -1264,7 +1263,7 @@
           [
             "MXV",
             979,
-            "[object Object]"
+            "Unidad de inversion (UDI)"
           ],
           [
             "UAH",
@@ -1279,7 +1278,7 @@
           [
             "BOV",
             984,
-            "[object Object]"
+            "Mvdol"
           ],
           [
             "PLN",
@@ -1294,7 +1293,7 @@
           [
             "CLF",
             990,
-            "[object Object]"
+            "Unidad de Fomento"
           ],
           [
             "XSU",
@@ -1304,7 +1303,7 @@
           [
             "USN",
             997,
-            "[object Object]"
+            "US Dollar (next day)"
           ],
           [
             "XXX",
@@ -1356,6 +1355,11 @@
         "underlying": "u8",
         "variants": [
           [
+            "NotApplicable",
+            3,
+            "Not applicable."
+          ],
+          [
             "Price",
             1,
             "Price expressed as absolute value."
@@ -1404,34 +1408,317 @@
         "underlying": "u8",
         "variants": [
           [
-            "FinancialProductShare",
+            "Equity",
             1,
             "Equity"
           ],
           [
-            "FinancialProductBond",
+            "FixedIncome",
             2,
             "Fixed income"
           ],
           [
-            "FinancialProductDerivativeFutures",
+            "DerivativeFutures",
             3,
-            "Futures"
+            "Derivative Futures"
           ],
           [
-            "FinancialProductDerivativeOptions",
+            "DerivativeOptions",
             4,
-            "Options"
+            "Derivative Options"
           ],
           [
-            "FinancialProductIndex",
+            "Index",
             5,
             "Index"
           ],
           [
-            "FinancialProductCurrency",
+            "Currency",
             6,
             "Currency"
+          ],
+          [
+            "StructuredProduct",
+            7,
+            "Structured Product"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "ProductSubtype",
+        "description": "Product Subtype.",
+        "underlying": "u8",
+        "variants": [
+          [
+            "Share",
+            1,
+            "Share"
+          ],
+          [
+            "AllotmentRight",
+            2,
+            "Allotment Right"
+          ],
+          [
+            "SubscriptionRight",
+            3,
+            "Subscription Right"
+          ],
+          [
+            "TenderOffer",
+            4,
+            "Tender Offer"
+          ],
+          [
+            "IssueRight",
+            5,
+            "Issue Right"
+          ],
+          [
+            "SubscriptionWarrant",
+            6,
+            "Subscription Warrant"
+          ],
+          [
+            "BankSecurities",
+            7,
+            "Bank Securities"
+          ],
+          [
+            "Bond",
+            8,
+            "Bond"
+          ],
+          [
+            "TreasuryBond",
+            9,
+            "Treasury Bond"
+          ],
+          [
+            "IssuedBond",
+            10,
+            "Bond issued by a government institution"
+          ],
+          [
+            "MunicipalBond",
+            11,
+            "Municipal Bond"
+          ],
+          [
+            "CorporateBankBond",
+            12,
+            "Corporate Bond - bank"
+          ],
+          [
+            "CorporateFirmBond",
+            13,
+            "Corporate Bond - firm"
+          ],
+          [
+            "ConvertibleBond",
+            14,
+            "Convertible Bond"
+          ],
+          [
+            "MortgageBond",
+            15,
+            "Mortgage Bond"
+          ],
+          [
+            "MortgageBackedBond",
+            16,
+            "Mortgage Backed Bond"
+          ],
+          [
+            "PublicMortgageBond",
+            17,
+            "Public Mortgage Bond"
+          ],
+          [
+            "Bill",
+            18,
+            "Bill"
+          ],
+          [
+            "TreasuryBill",
+            19,
+            "Treasury Bill"
+          ],
+          [
+            "CommercialBill",
+            20,
+            "Commercial Bill"
+          ],
+          [
+            "ExchangeTradedFund",
+            21,
+            "ETF - Exchange Traded Fund"
+          ],
+          [
+            "ExchangeTradedNote",
+            22,
+            "ETN - Exchange Traded Note"
+          ],
+          [
+            "ExchangeTradedCommodity",
+            23,
+            "ETC - Exchange Traded Commodity"
+          ],
+          [
+            "InvestmentCertificate",
+            24,
+            "Investment Certificate"
+          ],
+          [
+            "IndexFutures",
+            25,
+            "Index Futures"
+          ],
+          [
+            "StockFutures",
+            26,
+            "Stock Futures"
+          ],
+          [
+            "CurrencyFutures",
+            27,
+            "Currency Futures"
+          ],
+          [
+            "BondFutures",
+            28,
+            "Bond Futures"
+          ],
+          [
+            "InterestRateFutures",
+            29,
+            "Interest Rate Futures"
+          ],
+          [
+            "IndexOptions",
+            30,
+            "Index Options"
+          ],
+          [
+            "StockOptions",
+            31,
+            "Stock Options"
+          ],
+          [
+            "OptionWarrants",
+            32,
+            "Option warrants"
+          ],
+          [
+            "FactorCertificates",
+            33,
+            "Factor certificates"
+          ],
+          [
+            "TurboCertificates",
+            34,
+            "Turbo certificates"
+          ],
+          [
+            "CapitalProtectionCertificates",
+            35,
+            "Capital protection certificates"
+          ],
+          [
+            "BonusCertificates",
+            36,
+            "Bonus certificates"
+          ],
+          [
+            "ReverseConvertibleCertificates",
+            37,
+            "Reverse convertible certificates"
+          ],
+          [
+            "ExpressCertificates",
+            38,
+            "Express certificates"
+          ],
+          [
+            "DiscountCertificates",
+            39,
+            "Discount certificates"
+          ],
+          [
+            "IndexTrackerCertificates",
+            40,
+            "Index/tracker certificates"
+          ],
+          [
+            "OtherInvestmentCertificates",
+            41,
+            "Other investment certificates (non leveraged)"
+          ],
+          [
+            "StructuredNotes",
+            42,
+            "Structured notes"
+          ],
+          [
+            "ReferenceRate",
+            43,
+            "Reference rate"
+          ],
+          [
+            "InterestRate",
+            44,
+            "Interest rate"
+          ],
+          [
+            "ExchangeRate",
+            45,
+            "Exchange rate"
+          ],
+          [
+            "PriceIndex",
+            46,
+            "Price index"
+          ],
+          [
+            "TotalReturnIndex",
+            47,
+            "Total return index"
+          ],
+          [
+            "SectorPriceIndex",
+            48,
+            "Sector price index"
+          ],
+          [
+            "SectorTotalReturnIndex",
+            49,
+            "Sector total return index"
+          ],
+          [
+            "DividendIndex",
+            50,
+            "Dividend index"
+          ],
+          [
+            "StrategyPriceIndex",
+            51,
+            "Strategy price index"
+          ],
+          [
+            "StrategyTotalReturnIndex",
+            52,
+            "Strategy total return index"
+          ],
+          [
+            "CommodityIndex",
+            53,
+            "Commodity index"
+          ],
+          [
+            "BondTotalReturnIndex",
+            54,
+            "Bond total return index"
           ]
         ]
       },
@@ -1717,29 +2004,34 @@
         "underlying": "u8",
         "variants": [
           [
-            "LTP",
+            "InitialPrice",
             1,
-            "0 = LTP"
+            "Initial price of the instrument"
+          ],
+          [
+            "LTP",
+            2,
+            "Last traded price"
           ],
           [
             "LastACP",
-            2,
-            "1 = Last ACP"
+            3,
+            "Last adjusted closing price"
           ],
           [
             "FairValue",
-            3,
-            "2 = Fair Value"
+            4,
+            "Fair value"
           ],
           [
             "DailySettlementPrice",
-            4,
-            "3 = Daily Settlement Price"
+            5,
+            "Daily Settlement Price"
           ],
           [
             "FinalSettlementPrice",
-            5,
-            "4 = Final Settlement Price"
+            6,
+            "Final Settlement Price"
           ]
         ]
       },
@@ -1750,39 +2042,44 @@
         "underlying": "u8",
         "variants": [
           [
-            "Regular",
+            "NotApplicable",
             1,
-            "0 = Regular"
+            "Not applicable."
+          ],
+          [
+            "Regular",
+            2,
+            "Regular"
           ],
           [
             "Dividend",
-            2,
-            "1 = Dividend"
+            3,
+            "Dividend"
           ],
           [
             "IssueRight",
-            3,
-            "2 = Issue Right"
+            4,
+            "Issue Right"
           ],
           [
             "Split",
-            4,
-            "3 = Split"
+            5,
+            "Split"
           ],
           [
             "ReverseSplit",
-            5,
-            "4 = Reverse Split"
+            6,
+            "Reverse Split"
           ],
           [
             "Bonus",
-            6,
-            "5 = Bonus"
+            7,
+            "Bonus"
           ],
           [
             "SpinOff",
-            7,
-            "6 = Spin-Off"
+            8,
+            "Spin-Off"
           ]
         ]
       },
@@ -1832,7 +2129,7 @@
       {
         "kind": "Enum",
         "name": "ChangeIndicator",
-        "description": "Defines a vaule change indicator (e.g. market price).",
+        "description": "Defines a value change indicator (e.g. market price).",
         "underlying": "u8",
         "variants": [
           [
@@ -1882,7 +2179,7 @@
       },
       {
         "kind": "Enum",
-        "name": "ExcerciseType",
+        "name": "ExerciseType",
         "description": "Dictionary with option exercise styles",
         "underlying": "u8",
         "variants": [
@@ -1910,6 +2207,56 @@
         "underlying": "u16",
         "variants": [
           [
+            "AFG",
+            4,
+            "Afghanistan"
+          ],
+          [
+            "ALB",
+            8,
+            "Albania"
+          ],
+          [
+            "ATA",
+            10,
+            "Antarctica"
+          ],
+          [
+            "DZA",
+            12,
+            "Algeria"
+          ],
+          [
+            "ASM",
+            16,
+            "American Samoa"
+          ],
+          [
+            "AND",
+            20,
+            "Andorra"
+          ],
+          [
+            "AGO",
+            24,
+            "Angola"
+          ],
+          [
+            "ATG",
+            28,
+            "Antigua and Barbuda"
+          ],
+          [
+            "AZE",
+            31,
+            "Azerbaijan"
+          ],
+          [
+            "ARG",
+            32,
+            "Argentina"
+          ],
+          [
             "AUS",
             36,
             "Australia"
@@ -1920,9 +2267,94 @@
             "Austria"
           ],
           [
+            "BHS",
+            44,
+            "Bahamas"
+          ],
+          [
+            "BHR",
+            48,
+            "Bahrain"
+          ],
+          [
+            "BGD",
+            50,
+            "Bangladesh"
+          ],
+          [
+            "ARM",
+            51,
+            "Armenia"
+          ],
+          [
+            "BRB",
+            52,
+            "Barbados"
+          ],
+          [
             "BEL",
             56,
             "Belgium"
+          ],
+          [
+            "BMU",
+            60,
+            "Bermuda"
+          ],
+          [
+            "BTN",
+            64,
+            "Bhutan"
+          ],
+          [
+            "BOL",
+            68,
+            "Bolivia"
+          ],
+          [
+            "BIH",
+            70,
+            "Bosnia and Herzegovina"
+          ],
+          [
+            "BWA",
+            72,
+            "Botswana"
+          ],
+          [
+            "BVT",
+            74,
+            "Bouvet Island"
+          ],
+          [
+            "BRA",
+            76,
+            "Brazil"
+          ],
+          [
+            "BLZ",
+            84,
+            "Belize"
+          ],
+          [
+            "IOT",
+            86,
+            "British Indian Ocean Territory"
+          ],
+          [
+            "SLB",
+            90,
+            "Solomon Islands"
+          ],
+          [
+            "VGB",
+            92,
+            "Virgin Islands (British)"
+          ],
+          [
+            "BRN",
+            96,
+            "Brunei Darussalam"
           ],
           [
             "BGR",
@@ -1930,9 +2362,129 @@
             "Bulgaria"
           ],
           [
+            "MMR",
+            104,
+            "Myanmar"
+          ],
+          [
+            "BDI",
+            108,
+            "Burundi"
+          ],
+          [
+            "BLR",
+            112,
+            "Belarus"
+          ],
+          [
+            "KHM",
+            116,
+            "Cambodia"
+          ],
+          [
+            "CMR",
+            120,
+            "Cameroon"
+          ],
+          [
             "CAN",
             124,
             "Canada"
+          ],
+          [
+            "CPV",
+            132,
+            "Cabo Verde"
+          ],
+          [
+            "CYM",
+            136,
+            "Cayman Islands"
+          ],
+          [
+            "CAF",
+            140,
+            "Central African Republic"
+          ],
+          [
+            "LKA",
+            144,
+            "Sri Lanka"
+          ],
+          [
+            "TCD",
+            148,
+            "Chad"
+          ],
+          [
+            "CHL",
+            152,
+            "Chile"
+          ],
+          [
+            "CHN",
+            156,
+            "China"
+          ],
+          [
+            "TWN",
+            158,
+            "Taiwan"
+          ],
+          [
+            "CXR",
+            162,
+            "Christmas Island"
+          ],
+          [
+            "CCK",
+            166,
+            "Cocos (Keeling) Islands"
+          ],
+          [
+            "COL",
+            170,
+            "Colombia"
+          ],
+          [
+            "COM",
+            174,
+            "Comoros"
+          ],
+          [
+            "MYT",
+            175,
+            "Mayotte"
+          ],
+          [
+            "COG",
+            178,
+            "Congo"
+          ],
+          [
+            "COD",
+            180,
+            "Democratic Republic of the Congo"
+          ],
+          [
+            "COK",
+            184,
+            "Cook Islands"
+          ],
+          [
+            "CRI",
+            188,
+            "Costa Rica"
+          ],
+          [
+            "HRV",
+            191,
+            "Croatia"
+          ],
+          [
+            "CUB",
+            192,
+            "Cuba"
           ],
           [
             "CYP",
@@ -1945,9 +2497,84 @@
             "Czechia"
           ],
           [
+            "BEN",
+            204,
+            "Benin"
+          ],
+          [
+            "DNK",
+            208,
+            "Denmark"
+          ],
+          [
+            "DMA",
+            212,
+            "Dominica"
+          ],
+          [
+            "DOM",
+            214,
+            "Dominican Republic"
+          ],
+          [
+            "ECU",
+            218,
+            "Ecuador"
+          ],
+          [
+            "SLV",
+            222,
+            "El Salvador"
+          ],
+          [
+            "GNQ",
+            226,
+            "Equatorial Guinea"
+          ],
+          [
+            "ETH",
+            231,
+            "Ethiopia"
+          ],
+          [
+            "ERI",
+            232,
+            "Eritrea"
+          ],
+          [
             "EST",
             233,
             "Estonia"
+          ],
+          [
+            "FRO",
+            234,
+            "Faroe Islands"
+          ],
+          [
+            "FLK",
+            238,
+            "Falkland Islands (Malvinas)"
+          ],
+          [
+            "SGS",
+            239,
+            "South Georgia and the South Sandwich Islands"
+          ],
+          [
+            "FJI",
+            242,
+            "Fiji"
+          ],
+          [
+            "FIN",
+            246,
+            "Finland"
+          ],
+          [
+            "ALA",
+            248,
+            "AlandIslands"
           ],
           [
             "FRA",
@@ -1955,14 +2582,159 @@
             "France"
           ],
           [
+            "GUF",
+            254,
+            "French Guiana"
+          ],
+          [
+            "PYF",
+            258,
+            "French Polynesia"
+          ],
+          [
+            "ATF",
+            260,
+            "French Southern Territories"
+          ],
+          [
+            "DJI",
+            262,
+            "Djibouti"
+          ],
+          [
+            "GAB",
+            266,
+            "Gabon"
+          ],
+          [
+            "GEO",
+            268,
+            "Georgia"
+          ],
+          [
+            "GMB",
+            270,
+            "Gambia"
+          ],
+          [
+            "PSE",
+            275,
+            "Palestine"
+          ],
+          [
             "DEU",
             276,
             "Germany"
           ],
           [
+            "GHA",
+            288,
+            "Ghana"
+          ],
+          [
+            "GIB",
+            292,
+            "Gibraltar"
+          ],
+          [
+            "KIR",
+            296,
+            "Kiribati"
+          ],
+          [
+            "GRC",
+            300,
+            "Greece"
+          ],
+          [
+            "GRL",
+            304,
+            "Greenland"
+          ],
+          [
+            "GRD",
+            308,
+            "Grenada"
+          ],
+          [
+            "GLP",
+            312,
+            "Guadeloupe"
+          ],
+          [
+            "GUM",
+            316,
+            "Guam"
+          ],
+          [
+            "GTM",
+            320,
+            "Guatemala"
+          ],
+          [
+            "GIN",
+            324,
+            "Guinea"
+          ],
+          [
+            "GUY",
+            328,
+            "Guyana"
+          ],
+          [
+            "HTI",
+            332,
+            "Haiti"
+          ],
+          [
+            "HMD",
+            334,
+            "Heard Island and McDonald Islands"
+          ],
+          [
+            "VAT",
+            336,
+            "Holy See"
+          ],
+          [
+            "HND",
+            340,
+            "Honduras"
+          ],
+          [
+            "HKG",
+            344,
+            "Hong Kong"
+          ],
+          [
             "HUN",
             348,
             "Hungary"
+          ],
+          [
+            "ISL",
+            352,
+            "Iceland"
+          ],
+          [
+            "IND",
+            356,
+            "India"
+          ],
+          [
+            "IDN",
+            360,
+            "Indonesia"
+          ],
+          [
+            "IRN",
+            364,
+            "Iran"
+          ],
+          [
+            "IRQ",
+            368,
+            "Iraq"
           ],
           [
             "IRL",
@@ -1980,6 +2752,91 @@
             "Italy"
           ],
           [
+            "CIV",
+            384,
+            "Cote d'Ivoire"
+          ],
+          [
+            "JAM",
+            388,
+            "Jamaica"
+          ],
+          [
+            "JPN",
+            392,
+            "Japan"
+          ],
+          [
+            "KAZ",
+            398,
+            "Kazakhstan"
+          ],
+          [
+            "JOR",
+            400,
+            "Jordan"
+          ],
+          [
+            "KEN",
+            404,
+            "Kenya"
+          ],
+          [
+            "PRK",
+            408,
+            "Democratic People's Republic of Korea"
+          ],
+          [
+            "KOR",
+            410,
+            "Republic of Korea"
+          ],
+          [
+            "KWT",
+            414,
+            "Kuwait"
+          ],
+          [
+            "KGZ",
+            417,
+            "Kyrgyzstan"
+          ],
+          [
+            "LAO",
+            418,
+            "Lao People's Democratic Republic"
+          ],
+          [
+            "LBN",
+            422,
+            "Lebanon"
+          ],
+          [
+            "LSO",
+            426,
+            "Lesotho"
+          ],
+          [
+            "LVA",
+            428,
+            "Latvia"
+          ],
+          [
+            "LBR",
+            430,
+            "Liberia"
+          ],
+          [
+            "LBY",
+            434,
+            "Libya"
+          ],
+          [
+            "LIE",
+            438,
+            "Liechtenstein"
+          ],
+          [
             "LTU",
             440,
             "Lithuania"
@@ -1990,9 +2847,244 @@
             "Luxembourg"
           ],
           [
+            "MAC",
+            446,
+            "Macao"
+          ],
+          [
+            "MDG",
+            450,
+            "Madagascar"
+          ],
+          [
+            "MWI",
+            454,
+            "Malawi"
+          ],
+          [
+            "MYS",
+            458,
+            "Malaysia"
+          ],
+          [
+            "MDV",
+            462,
+            "Maldives"
+          ],
+          [
+            "MLI",
+            466,
+            "Mali"
+          ],
+          [
+            "MLT",
+            470,
+            "Malta"
+          ],
+          [
+            "MTQ",
+            474,
+            "Martinique"
+          ],
+          [
+            "MRT",
+            478,
+            "Mauritania"
+          ],
+          [
+            "MUS",
+            480,
+            "Mauritius"
+          ],
+          [
+            "MEX",
+            484,
+            "Mexico"
+          ],
+          [
+            "MCO",
+            492,
+            "Monaco"
+          ],
+          [
+            "MNG",
+            496,
+            "Mongolia"
+          ],
+          [
+            "MDA",
+            498,
+            "Republic of Moldova"
+          ],
+          [
+            "MNE",
+            499,
+            "Montenegro"
+          ],
+          [
+            "MSR",
+            500,
+            "Montserrat"
+          ],
+          [
+            "MAR",
+            504,
+            "Morocco"
+          ],
+          [
+            "MOZ",
+            508,
+            "Mozambique"
+          ],
+          [
+            "OMN",
+            512,
+            "Oman"
+          ],
+          [
+            "NAM",
+            516,
+            "Namibia"
+          ],
+          [
+            "NRU",
+            520,
+            "Nauru"
+          ],
+          [
+            "NPL",
+            524,
+            "Nepal"
+          ],
+          [
             "NLD",
             528,
             "Netherlands (the)"
+          ],
+          [
+            "CUW",
+            531,
+            "Curacao"
+          ],
+          [
+            "ABW",
+            533,
+            "Aruba"
+          ],
+          [
+            "SXM",
+            534,
+            "Sint Maarten (Dutch part)"
+          ],
+          [
+            "BES",
+            535,
+            "Bonaire, Sint Eustatius and Saba"
+          ],
+          [
+            "NCL",
+            540,
+            "New Caledonia"
+          ],
+          [
+            "VUT",
+            548,
+            "Vanuatu"
+          ],
+          [
+            "NZL",
+            554,
+            "New Zealand"
+          ],
+          [
+            "NIC",
+            558,
+            "Nicaragua"
+          ],
+          [
+            "NER",
+            562,
+            "Niger"
+          ],
+          [
+            "NGA",
+            566,
+            "Nigeria"
+          ],
+          [
+            "NIU",
+            570,
+            "Niue"
+          ],
+          [
+            "NFK",
+            574,
+            "Norfolk Island"
+          ],
+          [
+            "NOR",
+            578,
+            "Norway"
+          ],
+          [
+            "MNP",
+            580,
+            "Northern Mariana Islands"
+          ],
+          [
+            "UMI",
+            581,
+            "United States Minor Outlying Islands"
+          ],
+          [
+            "FSM",
+            583,
+            "Micronesia, Federated States of"
+          ],
+          [
+            "MHL",
+            584,
+            "Marshall Islands"
+          ],
+          [
+            "PLW",
+            585,
+            "Palau"
+          ],
+          [
+            "PAK",
+            586,
+            "Pakistan"
+          ],
+          [
+            "PAN",
+            591,
+            "Panama"
+          ],
+          [
+            "PNG",
+            598,
+            "Papua New Guinea"
+          ],
+          [
+            "PRY",
+            600,
+            "Paraguay"
+          ],
+          [
+            "PER",
+            604,
+            "Peru"
+          ],
+          [
+            "PHL",
+            608,
+            "Philippines"
+          ],
+          [
+            "PCN",
+            612,
+            "Pitcairn"
           ],
           [
             "POL",
@@ -2005,9 +3097,124 @@
             "Portugal"
           ],
           [
+            "GNB",
+            624,
+            "Guinea-Bissau"
+          ],
+          [
+            "TLS",
+            626,
+            "Timor-Leste"
+          ],
+          [
+            "PRI",
+            630,
+            "Puerto Rico"
+          ],
+          [
+            "QAT",
+            634,
+            "Qatar"
+          ],
+          [
+            "REU",
+            638,
+            "Réunion"
+          ],
+          [
             "ROU",
             642,
             "Romania"
+          ],
+          [
+            "RUS",
+            643,
+            "Russian Federation"
+          ],
+          [
+            "RWA",
+            646,
+            "Rwanda"
+          ],
+          [
+            "BLM",
+            652,
+            "Saint Barthélemy"
+          ],
+          [
+            "SHN",
+            654,
+            "Saint Helena, Ascension and Tristan da Cunha"
+          ],
+          [
+            "KNA",
+            659,
+            "Saint Kitts and Nevis"
+          ],
+          [
+            "AIA",
+            660,
+            "Anguilla"
+          ],
+          [
+            "LCA",
+            662,
+            "Saint Lucia"
+          ],
+          [
+            "MAF",
+            663,
+            "Saint Martin (French part)"
+          ],
+          [
+            "SPM",
+            666,
+            "Saint Pierre and Miquelon"
+          ],
+          [
+            "VCT",
+            670,
+            "Saint Vincent and the Grenadines"
+          ],
+          [
+            "SMR",
+            674,
+            "San Marino"
+          ],
+          [
+            "STP",
+            678,
+            "Sao Tome and Principe"
+          ],
+          [
+            "SAU",
+            682,
+            "Saudi Arabia"
+          ],
+          [
+            "SEN",
+            686,
+            "Senegal"
+          ],
+          [
+            "SRB",
+            688,
+            "Serbia"
+          ],
+          [
+            "SYC",
+            690,
+            "Seychelles"
+          ],
+          [
+            "SLE",
+            694,
+            "Sierra Leone"
+          ],
+          [
+            "SGP",
+            702,
+            "Singapore"
           ],
           [
             "SVK",
@@ -2015,9 +3222,29 @@
             "Slovakia"
           ],
           [
+            "VNM",
+            704,
+            "Viet Nam"
+          ],
+          [
             "SVN",
             705,
             "Slovenia"
+          ],
+          [
+            "SOM",
+            706,
+            "Somalia"
+          ],
+          [
+            "ZAF",
+            710,
+            "South Africa"
+          ],
+          [
+            "ZWE",
+            716,
+            "Zimbabwe"
           ],
           [
             "ESP",
@@ -2025,9 +3252,114 @@
             "Spain"
           ],
           [
+            "SSD",
+            728,
+            "South Sudan"
+          ],
+          [
+            "SDN",
+            729,
+            "Sudan"
+          ],
+          [
+            "ESH",
+            732,
+            "Western Sahara"
+          ],
+          [
+            "SUR",
+            740,
+            "Suriname"
+          ],
+          [
+            "SJM",
+            744,
+            "Svalbard and Jan Mayen"
+          ],
+          [
+            "SWZ",
+            748,
+            "Eswatini"
+          ],
+          [
             "SWE",
             752,
             "Sweden"
+          ],
+          [
+            "CHE",
+            756,
+            "Switzerland"
+          ],
+          [
+            "SYR",
+            760,
+            "Syrian Arab Republic"
+          ],
+          [
+            "TJK",
+            762,
+            "Tajikistan"
+          ],
+          [
+            "THA",
+            764,
+            "Thailand"
+          ],
+          [
+            "TGO",
+            768,
+            "Togo"
+          ],
+          [
+            "TKL",
+            772,
+            "Tokelau"
+          ],
+          [
+            "TON",
+            776,
+            "Tonga"
+          ],
+          [
+            "TTO",
+            780,
+            "Trinidad and Tobago"
+          ],
+          [
+            "ARE",
+            784,
+            "United Arab Emirates"
+          ],
+          [
+            "TUN",
+            788,
+            "Tunisia"
+          ],
+          [
+            "TUR",
+            792,
+            "Türkiye"
+          ],
+          [
+            "TKM",
+            795,
+            "Turkmenistan"
+          ],
+          [
+            "TCA",
+            796,
+            "Turks and Caicos Islands"
+          ],
+          [
+            "TUV",
+            798,
+            "Tuvalu"
+          ],
+          [
+            "UGA",
+            800,
+            "Uganda"
           ],
           [
             "UKR",
@@ -2035,14 +3367,89 @@
             "Ukraine"
           ],
           [
+            "MKD",
+            807,
+            "North Macedonia"
+          ],
+          [
+            "EGY",
+            818,
+            "Egypt"
+          ],
+          [
             "GBR",
             826,
             "United Kingdom of Great Britain and Northern Ireland (the)"
           ],
           [
+            "GGY",
+            831,
+            "Guernsey"
+          ],
+          [
+            "JEY",
+            832,
+            "Jersey"
+          ],
+          [
+            "IMN",
+            833,
+            "Isle of Man"
+          ],
+          [
+            "TZA",
+            834,
+            "Tanzania, United Republic of"
+          ],
+          [
             "USA",
             840,
             "United States of America (the)"
+          ],
+          [
+            "VIR",
+            850,
+            "Virgin Islands (U.S.)"
+          ],
+          [
+            "BFA",
+            854,
+            "Burkina Faso"
+          ],
+          [
+            "URY",
+            858,
+            "Uruguay"
+          ],
+          [
+            "UZB",
+            860,
+            "Uzbekistan"
+          ],
+          [
+            "VEN",
+            862,
+            "Venezuela"
+          ],
+          [
+            "WLF",
+            876,
+            "Wallis and Futuna"
+          ],
+          [
+            "WSM",
+            882,
+            "Samoa"
+          ],
+          [
+            "YEM",
+            887,
+            "Yemen"
+          ],
+          [
+            "ZMB",
+            894,
+            "Zambia"
           ]
         ]
       },
@@ -2181,6 +3588,16 @@
             "name": "encryptionKeyId",
             "type": "ElementId",
             "description": "Reference to an EncryptionKey message."
+          },
+          {
+            "name": "sessionId",
+            "type": "SessionId",
+            "description": "ID of the session."
+          },
+          {
+            "name": "streamId",
+            "type": "StreamId",
+            "description": "ID of the md stream."
           }
         ]
       },
@@ -2412,23 +3829,6 @@
       },
       {
         "kind": "Struct",
-        "name": "EndOfTechnicalSession",
-        "description": "End of a technical session.",
-        "fields": [
-          {
-            "name": "header",
-            "type": "Header",
-            "description": "Message header."
-          },
-          {
-            "name": "sessionId",
-            "type": "SessionId",
-            "description": "ID of the session."
-          }
-        ]
-      },
-      {
-        "kind": "Struct",
         "name": "Heartbeat",
         "description": "A message type used to check connectivity.",
         "fields": [
@@ -2537,6 +3937,11 @@
             "name": "quantity",
             "type": "Quantity",
             "description": "Order quantity."
+          },
+          {
+            "name": "mmQuote",
+            "type": "bool",
+            "description": "Market maker quote flag."
           }
         ]
       },
@@ -2699,6 +4104,16 @@
             "description": "The number of BBO levels contained in the message."
           },
           {
+            "name": "mmBuyQuoteLevel",
+            "type": "u8",
+            "description": "Id of an level on which mm quote rests (0 means no mm)."
+          },
+          {
+            "name": "mmSellQuoteLevel",
+            "type": "u8",
+            "description": "Id of an level on which mm quote rests (0 means no mm)."
+          },
+          {
             "name": "buy",
             "type": "PriceLevels",
             "description": "Price levels for buy side."
@@ -2756,44 +4171,140 @@
       },
       {
         "kind": "Enum",
-        "name": "PriceType",
+        "name": "PriceUpdateType",
         "underlying": "u8",
-        "description": "Price type.",
+        "description": "Price update message variant.",
         "variants": [
           [
             "ReferencePrice",
-            1
+            1,
+            "Reference price placed in the vale field"
           ],
           [
             "MidPoint",
-            2
+            2,
+            "MidPoint price placed in the vale field"
+          ],
+          [
+            "Fixing1Price",
+            3,
+            "The first fixing prices fixing prices appropriately placed in the value field as the average price, valueBid as the bid price, and valueAsk as the ask price."
+          ],
+          [
+            "Fixing2Price",
+            4,
+            "The second fixing prices fixing prices appropriately placed in the value field as the average price, valueBid as the bid price, and valueAsk as the ask price."
+          ],
+          [
+            "Fixing1Ytm",
+            5,
+            "The first fixing YTM (e.i. yield to maturity)  appropriately placed in the value field as the average YTM, valueBid as the bid YTM, and valueAsk as the ask YTM."
+          ],
+          [
+            "Fixing2Ytm",
+            6,
+            "The second fixing YTM (e.i. yield to maturity)  appropriately placed in the value field as the average YTM, valueBid as the bid YTM, and valueAsk as the ask YTM."
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "PriceYtmPresence",
+        "underlying": "u16",
+        "description": "Bit flags indicating the filling of 'value', 'valueAsk', 'valueBid' attributes in the price update message.",
+        "bitflags": true,
+        "variants": [
+          [
+            "None",
+            "0b000000000",
+            "No values provided."
+          ],
+          [
+            "Price",
+            "0b000000001",
+            "A price was provided."
+          ],
+          [
+            "PriceBid",
+            "0b000000010",
+            "A bid price was provided."
+          ],
+          [
+            "PriceAsk",
+            "0b000000100",
+            "A ask price was provided."
+          ],
+          [
+            "Ytm",
+            "0b000001000",
+            "YTM was provided."
+          ],
+          [
+            "YtmBid",
+            "0b000010000",
+            "Bid YTM was provided."
+          ],
+          [
+            "YtmAsk",
+            "0b000100000",
+            "Ask YTM was provided."
+          ],
+          [
+            "YtmNoCalc",
+            "0b001000000",
+            "YTM was not provided due to the absence of its calculation."
+          ],
+          [
+            "YtmBidNoCalc",
+            "0b010000000",
+            "Bid YTM was not provided due to the absence of its calculation."
+          ],
+          [
+            "YtmAskNoCalc",
+            "0b100000000",
+            "Ask YTM was not provided due to the absence of its calculation."
           ]
         ]
       },
       {
         "kind": "Struct",
         "name": "PriceUpdate",
-        "description": "Message indicating a price update",
+        "description": "Message indicating a price or YTM update",
         "fields": [
           {
             "name": "header",
             "type": "Header",
-            "description": "Message header."
+            "description": "Message Header."
           },
           {
             "name": "instrumentId",
             "type": "ElementId",
-            "description": "Instrument to which the price update refers."
+            "description": "Instrument to which the update refers."
           },
           {
-            "name": "priceType",
-            "type": "PriceType",
-            "description": "Price type."
+            "name": "priceUpdateType",
+            "type": "PriceUpdateType",
+            "description": "Indicates price update message variant."
           },
           {
-            "name": "price",
+            "name": "priceYtmPresence",
+            "type": "PriceYtmPresence",
+            "description": "Indicates the filling of fields: value, valueBid, valueAsk."
+          },
+          {
+            "name": "value",
             "type": "Price",
-            "description": "Indicates the updated price."
+            "description": "Indicates the updated price or YTM."
+          },
+          {
+            "name": "valueBid",
+            "type": "Price",
+            "description": "Indicates the updated bid price or bid YTM."
+          },
+          {
+            "name": "valueAsk",
+            "type": "Price",
+            "description": "Indicates the updated ask price or ask YTM."
           }
         ]
       },
@@ -2898,33 +4409,75 @@
         ]
       },
       {
-        "kind": "Struct",
-        "name": "ReferenceDataEnd",
-        "description": "Marks the end of the reference data.",
-        "fields": [
-          {
-            "name": "header",
-            "type": "Header",
-            "description": "Message header."
-          }
+        "kind": "Enum",
+        "name": "TradingSessionState",
+        "description": "State of the trading session.",
+        "underlying": "u8",
+        "variants": [
+          [
+            "Unknown",
+            1,
+            "Unknown (off)."
+          ],
+          [
+            "Open",
+            2,
+            "Open."
+          ],
+          [
+            "Close",
+            3,
+            "Close."
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "TradingSessionEvent",
+        "description": "Identifies an event related to the trading status of a trading session.",
+        "underlying": "u8",
+        "variants": [
+          [
+            "NA",
+            1,
+            "Not applicable."
+          ],
+          [
+            "StartOfTechnicalSession",
+            2,
+            "Start of technical session."
+          ],
+          [
+            "EndOfTechnicalSession",
+            3,
+            "End of technical session."
+          ],
+          [
+            "InitialReferenceDataStart",
+            4,
+            "Initial reference data start."
+          ],
+          [
+            "InitialReferenceDataEnd",
+            5,
+            "Initial reference data end."
+          ],
+          [
+            "PreviousDayRestateStart",
+            6,
+            "Previous day restate start."
+          ],
+          [
+            "PreviousDayRestateEnd",
+            7,
+            "Previous day restate end."
+          ]
         ]
       },
       {
         "kind": "Struct",
-        "name": "ReferenceDataStart",
-        "description": "Marks the start of the reference data.",
-        "fields": [
-          {
-            "name": "header",
-            "type": "Header",
-            "description": "Message header."
-          }
-        ]
-      },
-      {
-        "kind": "Struct",
-        "name": "StartOfTechnicalSession",
-        "description": "Start of a technical session.",
+        "name": "TradingSessionStatus",
+        "description": "The Trading Session Status provides information on the status of a market and on a trading day events.",
         "fields": [
           {
             "name": "header",
@@ -2932,58 +4485,24 @@
             "description": "Message header."
           },
           {
-            "name": "sessionId",
-            "type": "SessionId",
-            "description": "ID of the session."
-          }
-        ]
-      },
-      {
-        "kind": "Struct",
-        "name": "Test",
-        "description": "A message used to test system operation.",
-        "fields": [
-          {
-            "name": "header",
-            "type": "Header",
-            "description": "Message header."
+            "name": "marketId",
+            "type": "MicCode",
+            "description": "Market structure's Market Identifier Code (MIC) as specified in ISO 10383."
           },
           {
-            "name": "timestampA",
-            "type": "Timestamp",
-            "description": "First Core Bus timestamp."
+            "name": "marketStructureId",
+            "type": "ElementId",
+            "description": "ID of the financial instrument's market segment."
           },
           {
-            "name": "timestampB",
-            "type": "Timestamp",
-            "description": "Sequencer timestamp."
+            "name": "tradingSessionState",
+            "type": "TradingSessionState",
+            "description": "State of the trading session."
           },
           {
-            "name": "timestampC",
-            "type": "Timestamp",
-            "description": "Market Data timestamp."
-          },
-          {
-            "name": "timestampD",
-            "type": "Timestamp",
-            "description": "Consumer timestamp."
-          }
-        ]
-      },
-      {
-        "kind": "Struct",
-        "name": "Text",
-        "description": "A text message.",
-        "fields": [
-          {
-            "name": "header",
-            "type": "Header",
-            "description": "Message header."
-          },
-          {
-            "name": "text",
-            "type": "TextMessage",
-            "description": "Arbitrary text."
+            "name": "tradingSessionEvent",
+            "type": "TradingSessionEvent",
+            "description": "Identifies an event related to the trading status of a trading session."
           }
         ]
       },
@@ -3015,6 +4534,29 @@
         ]
       },
       {
+        "kind": "Enum",
+        "name": "LeverageFlag",
+        "underlying": "u8",
+        "description": "Identifier of leverage instruments",
+        "variants": [
+          [
+            "NotApplicable",
+            1,
+            "Not applicable"
+          ],
+          [
+            "Yes",
+            2,
+            "Leveraged"
+          ],
+          [
+            "No",
+            3,
+            "Not leveraged"
+          ]
+        ]
+      },
+      {
         "kind": "Struct",
         "name": "Instrument",
         "description": "Definition of a financial instrument.",
@@ -3035,6 +4577,11 @@
             "description": "Type of the product."
           },
           {
+            "name": "productSubtype",
+            "type": "ProductSubtype",
+            "description": "Subtype of the product."
+          },
+          {
             "name": "firstTradingDate",
             "type": "Date",
             "description": "First trading day of the financial instrument."
@@ -3053,6 +4600,11 @@
             "name": "currency",
             "type": "Currency",
             "description": "Trading currency (e.g. USD)."
+          },
+          {
+            "name": "icebergMinValue",
+            "type": "Value",
+            "description": "Minimum iceberg order value."
           },
           {
             "name": "lotSize",
@@ -3090,8 +4642,8 @@
             "description": "Trading schedule ID."
           },
           {
-            "name": "code",
-            "type": "InstrumentCode",
+            "name": "description",
+            "type": "InstrumentDescription",
             "description": "Financial instrument code."
           },
           {
@@ -3118,6 +4670,11 @@
             "name": "strikePrice",
             "type": "Price",
             "description": "Product strike price."
+          },
+          {
+            "name": "strikePriceCurrency",
+            "type": "Currency",
+            "description": "Strike Price Currency"
           },
           {
             "name": "productIdentification",
@@ -3245,8 +4802,8 @@
             "description": "Identifier of option type."
           },
           {
-            "name": "excerciseType",
-            "type": "ExcerciseType",
+            "name": "exerciseType",
+            "type": "ExerciseType",
             "description": "Identifier of exercise style."
           },
           {
@@ -3268,6 +4825,21 @@
             "name": "initialPhaseId",
             "type": "ElementId",
             "description": "Id of starting phase for the instrument"
+          },
+          {
+            "name": "thresholdMax",
+            "type": "Price",
+            "description": "upper threshold for leveraged instruments"
+          },
+          {
+            "name": "thresholdMin",
+            "type": "Price",
+            "description": "lower threshold for leveraged instruments"
+          },
+          {
+            "name": "isLeverage",
+            "type": "LeverageFlag",
+            "description": "Identifier of leverage instruments"
           }
         ]
       },
@@ -3290,6 +4862,11 @@
             "name": "tradingPhaseId",
             "type": "ElementId",
             "description": "Trading phase ID."
+          },
+          {
+            "name": "tradingPhaseType",
+            "type": "TradingPhaseType",
+            "description": "Type of matching algorithm."
           },
           {
             "name": "status",
@@ -3389,6 +4966,46 @@
             "description": "Code to identify whether the transaction will be cleared."
           },
           {
+            "name": "pctChange",
+            "type": "PercentageChange",
+            "description": "Percentage change."
+          },
+          {
+            "name": "vwap",
+            "type": "Price",
+            "description": "Volume-weighted average price."
+          },
+          {
+            "name": "noTrades",
+            "type": "u64",
+            "description": "Total number of transactions."
+          },
+          {
+            "name": "totalVolume",
+            "type": "Quantity",
+            "description": "Total transaction volume."
+          },
+          {
+            "name": "totalValue",
+            "type": "Value",
+            "description": "Total transaction value."
+          },
+          {
+            "name": "openingPrice",
+            "type": "Price",
+            "description": "The price of the first trade on the current trading day."
+          },
+          {
+            "name": "maxPrice",
+            "type": "Price",
+            "description": "Highest price of the instrument on the current trading day."
+          },
+          {
+            "name": "minPrice",
+            "type": "Price",
+            "description": "Lowest price of the instrument on the current trading day."
+          },
+          {
             "name": "mmtMarketMechanism",
             "type": "MmtMarketMechanism",
             "description": "MMT Market Mechanism"
@@ -3399,14 +5016,14 @@
             "description": "MMT Trading Mode"
           },
           {
-            "name": "mmtTransationCategory",
-            "type": "MmtTransationCategory",
+            "name": "mmtTransactionCategory",
+            "type": "MmtTransactionCategory",
             "description": "MMT Transaction Category"
           },
           {
-            "name": "mmtNegotitationIndicator",
-            "type": "MmtNegotitationIndicator",
-            "description": "MMT Negotitation Indicator"
+            "name": "mmtNegotiationIndicator",
+            "type": "MmtNegotiationIndicator",
+            "description": "MMT Negotiation Indicator"
           },
           {
             "name": "mmtAgencyCrossTradeIndicator",
@@ -3504,11 +5121,6 @@
             "name": "tradingPhaseType",
             "type": "TradingPhaseType",
             "description": "Type of matching algorithm."
-          },
-          {
-            "name": "auctionType",
-            "type": "AuctionType",
-            "description": "Type of auction."
           },
           {
             "name": "uncrossing",
@@ -3613,6 +5225,16 @@
             "AlreadyLoggedIn",
             3,
             "Already logged in."
+          ],
+          [
+            "LoginNotAllowed",
+            4,
+            "Login is currently unavailable due to reasons such as service unavailability."
+          ],
+          [
+            "Other",
+            5,
+            "Other errors."
           ]
         ]
       },
@@ -3981,7 +5603,7 @@
           {
             "name": "dateValidity",
             "type": "Date",
-            "description": "Date of validity of index."
+            "description": "Date of validity of index portfolio."
           }
         ]
       },
@@ -3998,7 +5620,94 @@
           {
             "name": "instrumentId",
             "type": "ElementId",
-            "description": "Identifier of the CLOB instrument."
+            "description": "Identifier of the instrument."
+          },
+          {
+            "name": "lastTradedPrice",
+            "type": "Price",
+            "description": "Last Traded Price (LTP)."
+          },
+          {
+            "name": "closingPrice",
+            "type": "Price",
+            "description": "Closing Price (CP)."
+          },
+          {
+            "name": "closingPriceType",
+            "type": "ClosingPriceType",
+            "description": "Closing Price Type. For OffBook means last transaction price."
+          },
+          {
+            "name": "adjustedClosingPrice",
+            "type": "Price",
+            "description": "Adjusted Closing Price (ACP)."
+          },
+          {
+            "name": "adjustedClosingPriceReason",
+            "type": "AdjustedClosingPriceReason",
+            "description": "Reason for adjusting the Closing Price."
+          },
+          {
+            "name": "pctChange",
+            "type": "PercentageChange",
+            "description": "Percentage change from last session closing price."
+          },
+          {
+            "name": "vwap",
+            "type": "Price",
+            "description": "Volume-weighted average price for the market model in which there is an instrument."
+          },
+          {
+            "name": "noTrades",
+            "type": "u64",
+            "description": "Total number of transactions on the current trading day."
+          },
+          {
+            "name": "totalVolume",
+            "type": "Quantity",
+            "description": "Total transaction volume."
+          },
+          {
+            "name": "totalValue",
+            "type": "Value",
+            "description": "Total transaction value."
+          },
+          {
+            "name": "openingPrice",
+            "type": "Price",
+            "description": "The price of the first trade on the current trading day."
+          },
+          {
+            "name": "maxPrice",
+            "type": "Price",
+            "description": "Highest price of the instrument on the current trading day."
+          },
+          {
+            "name": "minPrice",
+            "type": "Price",
+            "description": "Lowest price of the instrument on the current trading day."
+          },
+          {
+            "name": "isCorrection",
+            "type": "bool",
+            "description": "Previous message correction flag."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "SingleInstrumentSummary",
+        "description": "Provides brief instrument summary.",
+        "fields": [
+          {
+            "name": "instrumentId",
+            "type": "ElementId",
+            "description": "Identifier of the instrument."
+          },
+          {
+            "name": "marketModelType",
+            "type": "MarketModelType",
+            "description": "Market model type."
           },
           {
             "name": "lastTradedPrice",
@@ -4023,94 +5732,22 @@
           {
             "name": "adjustedClosingPriceReason",
             "type": "AdjustedClosingPriceReason",
-            "description": "Adjusted Closing Price Reason."
+            "description": "Reason for adjusting the Closing Price."
           },
           {
             "name": "pctChange",
             "type": "PercentageChange",
-            "description": "Percentage change."
-          },
-          {
-            "name": "VWAP",
-            "type": "Price",
-            "description": "Volume-weighted average price."
-          },
-          {
-            "name": "noTrades",
-            "type": "u64",
-            "description": "Total number of transations on the current trading day."
-          },
-          {
-            "name": "totalVolume",
-            "type": "Quantity",
-            "description": "Total transaction volume."
-          },
-          {
-            "name": "totalValue",
-            "type": "Value",
-            "description": "Total transaction value."
-          },
-          {
-            "name": "openingPrice",
-            "type": "Price",
-            "description": "The price of the first trade on the current trading day."
-          },
-          {
-            "name": "maxPrice",
-            "type": "Price",
-            "description": "Highest price of the instrument on the current trading day"
-          },
-          {
-            "name": "minPrice",
-            "type": "Price",
-            "description": "Lowest price of the instrument on the current trading day"
-          }
-        ]
-      },
-      {
-        "kind": "Struct",
-        "name": "SessionSummary",
-        "description": "Session day instrument summary.",
-        "fields": [
-          {
-            "name": "header",
-            "type": "Header",
-            "description": "Message header."
-          },
-          {
-            "name": "instrumentId",
-            "type": "ElementId",
-            "description": "Identifier of the CLOB instrument."
-          },
-          {
-            "name": "lastTradedPrice",
-            "type": "Price",
-            "description": "Last Traded Price (LTP)."
-          },
-          {
-            "name": "closingPrice",
-            "type": "Price",
-            "description": "Closing Price (CP)."
-          },
-          {
-            "name": "closingPriceType",
-            "type": "ClosingPriceType",
-            "description": "Closing Price Type."
-          },
-          {
-            "name": "pctChange",
-            "type": "PercentageChange",
-            "description": "Percentage change."
+            "description": "Percentage change from last session closing price."
           },
           {
             "name": "vwap",
             "type": "Price",
-            "description": "Volume-weighted average price."
+            "description": "Volume-weighted average price for the market model in which there is an instrument."
           },
           {
             "name": "noTrades",
             "type": "u64",
-            "description": "Total number of transations on the current trading day."
+            "description": "Total number of transactions on the current trading day."
           },
           {
             "name": "totalVolume",
@@ -4130,37 +5767,12 @@
           {
             "name": "maxPrice",
             "type": "Price",
-            "description": "Highest price of the instrument on the current trading day"
+            "description": "Highest price of the instrument on the current trading day."
           },
           {
             "name": "minPrice",
             "type": "Price",
-            "description": "Lowest price of the instrument on the current trading day"
-          },
-          {
-            "name": "productIdentificationType",
-            "type": "ProductIdentificationType",
-            "description": "Type of product identification."
-          },
-          {
-            "name": "productIdentification",
-            "type": "ProductIdentification",
-            "description": "Product identification, e.g. ISIN number."
-          },
-          {
-            "name": "AccumulatedInterest",
-            "type": "Number",
-            "description": "Accumulated interest on the bonds or for mortgage-backed bonds on the day of settling the transaction."
-          },
-          {
-            "name": "interestRate",
-            "type": "Number",
-            "description": "Interest rate is determined on the basis of WIBOR/WIBID/WIRON rates for each expiration date of options and futures."
-          },
-          {
-            "name": "referencePrice",
-            "type": "Price",
-            "description": "Initial reference price (at the start of session day)."
+            "description": "Lowest price of the instrument on the current trading day."
           },
           {
             "name": "settlementPrice",
@@ -4173,21 +5785,6 @@
             "description": "Settlement value."
           },
           {
-            "name": "currency",
-            "type": "Currency",
-            "description": "Price currency (e.g. USD)."
-          },
-          {
-            "name": "openPositions",
-            "type": "u32",
-            "description": "Number of open positions after the end of the session."
-          },
-          {
-            "name": "sessionDate",
-            "type": "Date",
-            "description": "Stock Exchange session date."
-          },
-          {
             "name": "endTradingDate",
             "type": "Date",
             "description": "End of trading date."
@@ -4196,46 +5793,83 @@
             "name": "lastTradeDate",
             "type": "Date",
             "description": "The date of execution of the last trade for the given instrument."
+          }
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "ProductSummary",
+        "description": "Session day product summary.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
           },
           {
-            "name": "numberOfInstruments",
-            "type": "u64",
-            "description": "Number of instruments admitted to trading."
+            "name": "clobInstrument",
+            "type": "SingleInstrumentSummary",
+            "description": "Provides brief CLOB instrument summary."
+          },
+          {
+            "name": "crossInstrument",
+            "type": "SingleInstrumentSummary",
+            "description": "Provides brief CROSS instrument summary."
+          },
+          {
+            "name": "blockInstrument",
+            "type": "SingleInstrumentSummary",
+            "description": "Provides brief BLOCK instrument summary."
+          },
+          {
+            "name": "hybridInstrument",
+            "type": "SingleInstrumentSummary",
+            "description": "Provides brief HYBRID instrument summary."
+          },
+          {
+            "name": "productIdentificationType",
+            "type": "ProductIdentificationType",
+            "description": "Type of product identification."
+          },
+          {
+            "name": "productIdentification",
+            "type": "ProductIdentification",
+            "description": "Product identification, e.g. ISIN number."
+          },
+          {
+            "name": "productId",
+            "type": "ElementId",
+            "description": "ID of the product."
+          },
+          {
+            "name": "mic",
+            "type": "MicCode",
+            "description": "Market structure's Market Identifier Code (MIC) as specified in ISO 10383."
+          },
+          {
+            "name": "AccumulatedInterest",
+            "type": "Number",
+            "description": "Accumulated interest on the bonds or for mortgage-backed bonds on the day of settling the transaction."
+          },
+          {
+            "name": "interestRate",
+            "type": "Number",
+            "description": "Interest rate is determined on the basis of WIBOR/WIBID/WIRON rates for each expiration date of options and futures."
+          },
+          {
+            "name": "currency",
+            "type": "Currency",
+            "description": "Price currency (e.g. USD)."
+          },
+          {
+            "name": "sessionDate",
+            "type": "Date",
+            "description": "Stock Exchange session date."
           },
           {
             "name": "tradingValueCurrency",
             "type": "Value",
             "description": "The field comprises the trading value expressed in trading currency."
-          },
-          {
-            "name": "blockNoTrades",
-            "type": "u64",
-            "description": "The total number of block trades concluded on a particular instrument during the current trading session."
-          },
-          {
-            "name": "blockVolume",
-            "type": "Quantity",
-            "description": "The total turnover volume of block trades concluded on a particular instrument during the current trading session."
-          },
-          {
-            "name": "blockValue",
-            "type": "Value",
-            "description": "The total turnover value of block trades concluded on a particular instrument during the current trading session."
-          },
-          {
-            "name": "blockMinPrice",
-            "type": "Price",
-            "description": "Minimum price of block trades in the instrument during the current trading session. If no block trades were concluded during the trading session, the field is completed with zeros."
-          },
-          {
-            "name": "blockMaxPrice",
-            "type": "Price",
-            "description": "Maximum price of block trades in the instrument during the current trading session. If no block trades were concluded during the trading session, the field is completed with zeros."
-          },
-          {
-            "name": "vwapBlockTrade",
-            "type": "Price",
-            "description": "Volume weighted average price of block trades for a particular instrument during a particular trading session."
           },
           {
             "name": "status",
@@ -4245,7 +5879,7 @@
           {
             "name": "sector",
             "type": "u16",
-            "description": "Defines the sector of the economy that the company belongs to. Possible values for shares, the field assumes were described in the WATS Market Data documetation."
+            "description": "Defines the sector of the economy that the company belongs to. Possible values for shares, the field assumes were described in the WATS Market Data documentation."
           },
           {
             "name": "market",
@@ -4256,11 +5890,6 @@
             "name": "markerPriceChange",
             "type": "ChangeIndicator",
             "description": "The field contains the market of the percentage change of the instrument closing price from the current session in relation to the reference price."
-          },
-          {
-            "name": "marketStructureId",
-            "type": "ElementId",
-            "description": "ID of the financial instrument’s market segment."
           },
           {
             "name": "lowerLiquidity",
@@ -4350,6 +5979,20 @@
         ]
       },
       {
+        "kind": "Array",
+        "name": "NewsTitle",
+        "type": "AnsiChar",
+        "length": 80,
+        "description": "News title."
+      },
+      {
+        "kind": "Array",
+        "name": "NewsText",
+        "type": "AnsiChar",
+        "length": 800,
+        "description": "News text."
+      },
+      {
         "kind": "Struct",
         "name": "News",
         "description": "News message.",
@@ -4366,8 +6009,7 @@
           },
           {
             "name": "title",
-            "type": "AnsiChar",
-            "length": 80,
+            "type": "NewsTitle",
             "description": "News title, unique per message."
           },
           {
@@ -4382,8 +6024,7 @@
           },
           {
             "name": "text",
-            "type": "AnsiChar",
-            "length": 800,
+            "type": "NewsText",
             "description": "News text."
           }
         ]
@@ -4496,7 +6137,7 @@
       },
       {
         "kind": "Enum",
-        "name": "MmtTransationCategory",
+        "name": "MmtTransactionCategory",
         "description": "MMT Transaction Category",
         "underlying": "u8",
         "variants": [
@@ -4529,8 +6170,8 @@
       },
       {
         "kind": "Enum",
-        "name": "MmtNegotitationIndicator",
-        "description": "MMT Negotitation Indicator",
+        "name": "MmtNegotiationIndicator",
+        "description": "MMT Negotiation Indicator",
         "underlying": "u8",
         "variants": [
           [
@@ -4823,16 +6464,6 @@
             "A message type used to check connectivity."
           ],
           [
-            "Text",
-            2,
-            "A text message."
-          ],
-          [
-            "Test",
-            3,
-            "A message used to test system operation."
-          ],
-          [
             "OrderAdd",
             9,
             "New (limit) order added to order book."
@@ -4853,24 +6484,9 @@
             "Execution report."
           ],
           [
-            "StartOfTechnicalSession",
-            20,
-            "Start of a technical session."
-          ],
-          [
-            "EndOfTechnicalSession",
-            21,
-            "End of a technical session."
-          ],
-          [
-            "ReferenceDataStart",
-            22,
-            "Marks the start of the reference data."
-          ],
-          [
-            "ReferenceDataEnd",
+            "TradingSessionStatus",
             23,
-            "Marks the end of the reference data."
+            "The Trading Session Status provides information on the status of a market and on a trading day events."
           ],
           [
             "EncryptionKey",
@@ -5028,9 +6644,14 @@
             "Instrument summary."
           ],
           [
-            "SessionSummary",
+            "ProductSummary",
             672,
-            "Session summary."
+            "Product summary."
+          ],
+          [
+            "PositionReport",
+            801,
+            "Report of open positions."
           ],
           [
             "TestEvent",
@@ -5074,6 +6695,16 @@
             "IPO",
             6,
             "Initial public offering"
+          ],
+          [
+            "TenderOffer",
+            7,
+            "Tender offer"
+          ],
+          [
+            "Redistribution",
+            8,
+            "Redistribution"
           ]
         ]
       },
@@ -5130,20 +6761,70 @@
         ]
       },
       {
+        "kind": "Enum",
+        "name": "PosType",
+        "description": "Identifies type of quantity returned.",
+        "underlying": "u8",
+        "variants": [
+          [
+            "SOD",
+            1,
+            "Start-of-Day Qty."
+          ],
+          [
+            "ITD",
+            2,
+            "Intraday Qty."
+          ],
+          [
+            "FIN",
+            3,
+            "End-of-Day Qty."
+          ]
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "PositionReport",
+        "description": "Report of open positions.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message Header."
+          },
+          {
+            "name": "publicProductIdentification",
+            "type": "PublicProductIdentification",
+            "description": "Product identification, for example its ISIN number."
+          },
+          {
+            "name": "posType",
+            "type": "PosType",
+            "description": "Type of quantity returned."
+          },
+          {
+            "name": "openPositions",
+            "type": "u32",
+            "description": "Number of open positions."
+          },
+          {
+            "name": "tradeID",
+            "type": "TradeId",
+            "description": "Trade ID."
+          }
+        ]
+      },
+      {
         "kind": "Union",
         "name": "Message",
         "members": [
           "Heartbeat",
-          "Text",
-          "Test",
           "OrderAdd",
           "OrderModify",
           "OrderDelete",
           "OrderExecute",
-          "StartOfTechnicalSession",
-          "EndOfTechnicalSession",
-          "ReferenceDataStart",
-          "ReferenceDataEnd",
+          "TradingSessionStatus",
           "EncryptionKey",
           "InstrumentStatusChange",
           "TradingPhaseScheduleEntry",
@@ -5174,9 +6855,10 @@
           "IndexPortfolioEntry",
           "IndexParams",
           "InstrumentSummary",
-          "SessionSummary",
+          "ProductSummary",
           "News",
-          "TestEvent"
+          "TestEvent",
+          "PositionReport"
         ],
         "discriminator": [
           "header",
@@ -5208,6 +6890,12 @@
         "name": "SeqNum",
         "alias": "u32",
         "description": "Sequence number of the message. Must fit into 28 bits, see OrderId for details."
+      },
+      {
+        "kind": "Alias",
+        "name": "StreamId",
+        "alias": "u8",
+        "description": "ID of the md stream."
       },
       {
         "kind": "Alias",
@@ -5251,6 +6939,11 @@
             "name": "endSeqNum",
             "type": "SeqNum",
             "description": "Final sequence number for the requested range."
+          },
+          {
+            "name": "streamId",
+            "type": "StreamId",
+            "description": "ID of the md stream."
           }
         ]
       },

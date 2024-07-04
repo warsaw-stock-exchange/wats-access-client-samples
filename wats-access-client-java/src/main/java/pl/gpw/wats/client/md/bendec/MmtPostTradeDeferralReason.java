@@ -1,10 +1,7 @@
 package pl.gpw.wats.client.md.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.nio.ByteBuffer;
 
 /**
@@ -39,60 +36,55 @@ public enum MmtPostTradeDeferralReason {
     /**
      * 6 = Non-Immediate Publication : Deferrals of ILQD and LRGS (for RTS 2 use only)
      */
-    NONIMMEDIATEPUBLICATIONILQDANDLRGS(7),
-    UNKNOWN(99999);
-
+    NONIMMEDIATEPUBLICATIONILQDANDLRGS(7);
+    
     private final int value;
-
     private final int byteLength = 1;
-
-
+    
     private static final Map<Integer, MmtPostTradeDeferralReason> TYPES = new HashMap<>();
     static {
         for (MmtPostTradeDeferralReason type : MmtPostTradeDeferralReason.values()) {
             TYPES.put(type.value, type);
         }
     }
-
-
+    
     MmtPostTradeDeferralReason(int newValue) {
         value = newValue;
     }
-
+    
     /**
-     Get MmtPostTradeDeferralReason from java input
-     * @param newValue
-     * @return MmtPostTradeDeferralReason enum
+     * Get MmtPostTradeDeferralReason by attribute
+     * @param val
+     * @return MmtPostTradeDeferralReason enum or null if variant is undefined
      */
-    public static MmtPostTradeDeferralReason getMmtPostTradeDeferralReason(int newValue) {
-        MmtPostTradeDeferralReason val = TYPES.get(newValue);
-        return val == null ? MmtPostTradeDeferralReason.UNKNOWN : val;
+    public static MmtPostTradeDeferralReason getMmtPostTradeDeferralReason(int val) {
+        return TYPES.get(val);
     }
-
+    
     /**
      * Get MmtPostTradeDeferralReason int value
      * @return int value
      */
-    public int getMmtPostTradeDeferralReasonValue() { return value; }
-
-
+    public int getMmtPostTradeDeferralReasonValue() {
+        return value; 
+    }
+    
     /**
-     Get MmtPostTradeDeferralReason from bytes
+     * Get MmtPostTradeDeferralReason from bytes
      * @param bytes byte[]
      * @param offset - int
      */
     public static MmtPostTradeDeferralReason getMmtPostTradeDeferralReason(byte[] bytes, int offset) {
         return getMmtPostTradeDeferralReason(BendecUtils.uInt8FromByteArray(bytes, offset));
     }
-
+    
     byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
         return buffer.array();
     }
-
+    
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
     }
-
 }

@@ -27,7 +27,7 @@ public class OnlineMarketDataReplayClientTest {
         omdrc.addGeneralHandler(x -> {
             waitForMessages.incrementAndGet();
             System.out.println("Replay connector received: " + Message.getMsgType((byte[]) x)
-                    + " " + Message.createObject(Message.getMsgType((byte[]) x), (byte[]) x).get());
+                    + " " + Message.createObject((byte[]) x).get());
         });
 
         ReplayRequest request = new ReplayRequest();

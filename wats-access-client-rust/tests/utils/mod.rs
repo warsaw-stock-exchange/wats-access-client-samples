@@ -82,20 +82,49 @@ pub(super) fn simple_order_add(
         mifid_fields: MifidFields {
             flags: MifidFlags::NONE,
             client: MifidField {
-                short_code: 1234567,
-                qualifier: PartyRoleQualifier::FirmOrLegalEntity,
+                short_code: 1,
+                qualifier: PartyRoleQualifier::NA,
             },
             executing_trader: MifidField {
-                short_code: 1234567,
+                short_code: 4,
                 qualifier: PartyRoleQualifier::Algorithm,
             },
             investment_decision_maker: MifidField {
-                short_code: 1234567,
+                short_code: 17,
                 qualifier: PartyRoleQualifier::NaturalPerson,
             },
         },
         ..Default::default()
     }
+}
+
+pub(super) fn simple_order_modify(
+  order_id: tp::OrderId,
+  price: i64,
+  quantity: u64,
+) -> tp::OrderModify {
+  tp::OrderModify {
+    header: tp::Header::new(tp::MsgType::OrderModify),
+    order_id,
+    price,
+    quantity,
+    mifid_fields: MifidFields {
+      flags: MifidFlags::NONE,
+      client: MifidField {
+          short_code: 1,
+          qualifier: PartyRoleQualifier::NA,
+      },
+      executing_trader: MifidField {
+          short_code: 4,
+          qualifier: PartyRoleQualifier::Algorithm,
+      },
+      investment_decision_maker: MifidField {
+          short_code: 17,
+          qualifier: PartyRoleQualifier::NaturalPerson,
+      },
+    },
+    ..Default::default()
+  }
 }
 
 pub(super) fn simple_trade_capture_report_dual(
@@ -110,7 +139,7 @@ pub(super) fn simple_trade_capture_report_dual(
         header: tp::Header::new(tp::MsgType::TradeCaptureReportDual),
         instrument_id,
         trade_type: tp::TradeType::BlockTrade,
-        algorithmic_trade_indicator: tp::AlgorithmicTradeIndicator::NonAlgorithmicTrade,
+        algorithmic_trade_indicator: tp::AlgorithmicTradeIndicator::NA,
         trade_report_id,
         exec_type,
         last_qty,

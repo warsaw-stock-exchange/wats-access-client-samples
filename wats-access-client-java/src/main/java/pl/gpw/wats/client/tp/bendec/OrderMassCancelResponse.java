@@ -1,12 +1,8 @@
 package pl.gpw.wats.client.tp.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.nio.ByteBuffer;
-
 
 /**
  * <h2>OrderMassCancelResponse</h2>
@@ -20,10 +16,8 @@ import java.nio.ByteBuffer;
  * <p>u32 > long targetPartyId - Used to identify the party targeted for the action specified in the message. | size 4</p>
  * <p>ElementId > long (u32) marketSegmentId - Identifies the market segment for request type CancelOrdersForMarketSegment. | size 4</p>
  * <p>MassCancelRejectionReason reason - Reason for rejecting the given mass order cancel request. | size 2</p>
- * */
-
+ */
 public class OrderMassCancelResponse implements ByteSerializable, Message {
-
     private Header header;
     private BigInteger totalAffectedOrders;
     private MassCancelRequestType massCancelRequestType;
@@ -33,7 +27,7 @@ public class OrderMassCancelResponse implements ByteSerializable, Message {
     private long marketSegmentId;
     private MassCancelRejectionReason reason;
     public static final int byteLength = 44;
-
+    
     public OrderMassCancelResponse(Header header, BigInteger totalAffectedOrders, MassCancelRequestType massCancelRequestType, BigInteger massCancelId, TargetPartyRole targetPartyRole, long targetPartyId, long marketSegmentId, MassCancelRejectionReason reason) {
         this.header = header;
         this.totalAffectedOrders = totalAffectedOrders;
@@ -43,10 +37,8 @@ public class OrderMassCancelResponse implements ByteSerializable, Message {
         this.targetPartyId = targetPartyId;
         this.marketSegmentId = marketSegmentId;
         this.reason = reason;
-        this.header.setLength(this.byteLength);
-        this.header.setMsgType(MsgType.ORDERMASSCANCELRESPONSE);
     }
-
+    
     public OrderMassCancelResponse(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
         this.totalAffectedOrders = BendecUtils.uInt64FromByteArray(bytes, offset + 16);
@@ -56,119 +48,128 @@ public class OrderMassCancelResponse implements ByteSerializable, Message {
         this.targetPartyId = BendecUtils.uInt32FromByteArray(bytes, offset + 34);
         this.marketSegmentId = BendecUtils.uInt32FromByteArray(bytes, offset + 38);
         this.reason = MassCancelRejectionReason.getMassCancelRejectionReason(bytes, offset + 42);
-        this.header.setLength(this.byteLength);
-        this.header.setMsgType(MsgType.ORDERMASSCANCELRESPONSE);
     }
-
+    
     public OrderMassCancelResponse(byte[] bytes) {
         this(bytes, 0);
     }
-
+    
     public OrderMassCancelResponse() {
     }
-
-
-
+    
     /**
      * @return Header.
      */
     public Header getHeader() {
         return this.header;
-    };
+    }
+    
     /**
      * @return Total number of orders affected by the mass cancel request.
      */
     public BigInteger getTotalAffectedOrders() {
         return this.totalAffectedOrders;
-    };
+    }
+    
     /**
      * @return Mass cancel request type.
      */
     public MassCancelRequestType getMassCancelRequestType() {
         return this.massCancelRequestType;
-    };
+    }
+    
     /**
      * @return Mass cancel request ID.
      */
     public BigInteger getMassCancelId() {
         return this.massCancelId;
-    };
+    }
+    
     /**
      * @return Target party role filter selection field.
      */
     public TargetPartyRole getTargetPartyRole() {
         return this.targetPartyRole;
-    };
+    }
+    
     /**
      * @return Used to identify the party targeted for the action specified in the message.
      */
     public long getTargetPartyId() {
         return this.targetPartyId;
-    };
+    }
+    
     /**
      * @return Identifies the market segment for request type CancelOrdersForMarketSegment.
      */
     public long getMarketSegmentId() {
         return this.marketSegmentId;
-    };
+    }
+    
     /**
      * @return Reason for rejecting the given mass order cancel request.
      */
     public MassCancelRejectionReason getReason() {
         return this.reason;
-    };
-
+    }
+    
     /**
      * @param header Header.
      */
     public void setHeader(Header header) {
         this.header = header;
-    };
+    }
+    
     /**
      * @param totalAffectedOrders Total number of orders affected by the mass cancel request.
      */
     public void setTotalAffectedOrders(BigInteger totalAffectedOrders) {
         this.totalAffectedOrders = totalAffectedOrders;
-    };
+    }
+    
     /**
      * @param massCancelRequestType Mass cancel request type.
      */
     public void setMassCancelRequestType(MassCancelRequestType massCancelRequestType) {
         this.massCancelRequestType = massCancelRequestType;
-    };
+    }
+    
     /**
      * @param massCancelId Mass cancel request ID.
      */
     public void setMassCancelId(BigInteger massCancelId) {
         this.massCancelId = massCancelId;
-    };
+    }
+    
     /**
      * @param targetPartyRole Target party role filter selection field.
      */
     public void setTargetPartyRole(TargetPartyRole targetPartyRole) {
         this.targetPartyRole = targetPartyRole;
-    };
+    }
+    
     /**
      * @param targetPartyId Used to identify the party targeted for the action specified in the message.
      */
     public void setTargetPartyId(long targetPartyId) {
         this.targetPartyId = targetPartyId;
-    };
+    }
+    
     /**
      * @param marketSegmentId Identifies the market segment for request type CancelOrdersForMarketSegment.
      */
     public void setMarketSegmentId(long marketSegmentId) {
         this.marketSegmentId = marketSegmentId;
-    };
+    }
+    
     /**
      * @param reason Reason for rejecting the given mass order cancel request.
      */
     public void setReason(MassCancelRejectionReason reason) {
         this.reason = reason;
-    };
-
-
-    @Override  
+    }
+    
+    @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         header.toBytes(buffer);
@@ -181,7 +182,7 @@ public class OrderMassCancelResponse implements ByteSerializable, Message {
         reason.toBytes(buffer);
         return buffer.array();
     }
-
+    
     @Override  
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
@@ -193,15 +194,22 @@ public class OrderMassCancelResponse implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt32ToByteArray(this.marketSegmentId));
         reason.toBytes(buffer);
     }
-
+    
     @Override
     public int hashCode() {
-        return Objects.hash(header, totalAffectedOrders, massCancelRequestType, massCancelId, targetPartyRole, targetPartyId, marketSegmentId, reason);
+        return Objects.hash(header,
+        totalAffectedOrders,
+        massCancelRequestType,
+        massCancelId,
+        targetPartyRole,
+        targetPartyId,
+        marketSegmentId,
+        reason);
     }
-
+    
     @Override
     public String toString() {
-        return "OrderMassCancelResponse{" +
+        return "OrderMassCancelResponse {" +
             "header=" + header +
             ", totalAffectedOrders=" + totalAffectedOrders +
             ", massCancelRequestType=" + massCancelRequestType +
@@ -210,6 +218,6 @@ public class OrderMassCancelResponse implements ByteSerializable, Message {
             ", targetPartyId=" + targetPartyId +
             ", marketSegmentId=" + marketSegmentId +
             ", reason=" + reason +
-            '}';
-        }
+            "}";
+    }
 }

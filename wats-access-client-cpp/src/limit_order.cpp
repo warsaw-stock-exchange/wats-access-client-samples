@@ -49,7 +49,7 @@ int main() {
     trading_port_0.handle([&](btp::messages::OrderAddResponse message) {
 
         if (message.orderId == orderId_0) {
-            if (message.status != btp::messages::OrderStatus::Ack) {
+            if (message.status != btp::messages::OrderStatus::New) {
                 test_result = EXIT_FAILURE;
             }
 

@@ -109,7 +109,7 @@ public class OnlineMarketDataSnapshotClient {
 
     private Login loginMessage() {
         pl.gpw.wats.client.md.bendec.Header header = new pl.gpw.wats.client.md.bendec.Header(
-                Login.byteLength, MsgType.LOGIN, config.version(), 0, BigInteger.ZERO, BigInteger.ZERO, false, BigInteger.ONE, 0L);
+                Login.byteLength, MsgType.LOGIN, config.version(), 0, BigInteger.ZERO, BigInteger.ZERO, false, BigInteger.ONE, 0L, 0, 0);
         return new Login(header, config.connectionId(), config.token());
     }
 

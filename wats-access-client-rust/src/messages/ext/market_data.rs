@@ -127,6 +127,8 @@ impl market_data::Header {
       is_encrypted: false,
       encryption_key_id: 0,
       encryption_offset: 0,
+      session_id: 0,
+      stream_id: 0
     }
   }
 }
@@ -134,13 +136,12 @@ impl market_data::Header {
 impl Default for market_data::Message {
   fn default() -> Self {
     Self {
-      test: market_data::Test {
+      heartbeat: market_data::Heartbeat {
         header: market_data::Header {
-          msg_type: market_data::MsgType::Test,
-          length: std::mem::size_of::<market_data::Test>() as u16,
+          msg_type: market_data::MsgType::Heartbeat,
+          length: std::mem::size_of::<market_data::Heartbeat>() as u16,
           ..Default::default()
-        },
-        ..Default::default()
+        }
       },
     }
   }

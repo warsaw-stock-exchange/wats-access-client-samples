@@ -1,10 +1,7 @@
 package pl.gpw.wats.client.tp.bendec;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.nio.ByteBuffer;
 
 /**
@@ -35,60 +32,55 @@ public enum OrderType {
     /**
      * Stop loss order type.
      */
-    STOPLOSS(6),
-    UNKNOWN(99999);
-
+    STOPLOSS(6);
+    
     private final int value;
-
     private final int byteLength = 1;
-
-
+    
     private static final Map<Integer, OrderType> TYPES = new HashMap<>();
     static {
         for (OrderType type : OrderType.values()) {
             TYPES.put(type.value, type);
         }
     }
-
-
+    
     OrderType(int newValue) {
         value = newValue;
     }
-
+    
     /**
-     Get OrderType from java input
-     * @param newValue
-     * @return OrderType enum
+     * Get OrderType by attribute
+     * @param val
+     * @return OrderType enum or null if variant is undefined
      */
-    public static OrderType getOrderType(int newValue) {
-        OrderType val = TYPES.get(newValue);
-        return val == null ? OrderType.UNKNOWN : val;
+    public static OrderType getOrderType(int val) {
+        return TYPES.get(val);
     }
-
+    
     /**
      * Get OrderType int value
      * @return int value
      */
-    public int getOrderTypeValue() { return value; }
-
-
+    public int getOrderTypeValue() {
+        return value; 
+    }
+    
     /**
-     Get OrderType from bytes
+     * Get OrderType from bytes
      * @param bytes byte[]
      * @param offset - int
      */
     public static OrderType getOrderType(byte[] bytes, int offset) {
         return getOrderType(BendecUtils.uInt8FromByteArray(bytes, offset));
     }
-
+    
     byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
         return buffer.array();
     }
-
+    
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
     }
-
 }
