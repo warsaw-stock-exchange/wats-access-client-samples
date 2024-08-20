@@ -527,14 +527,29 @@ enum class OrderRejectionReason: uint16_t {
     MassQuoteNotAllowedForSelectedMarketModel = 1201,
     InstrumentClosed = 1203,
     InvalidBidAskSpread = 1208,
+    NotAuthorizedToQuoteInstrument = 1209,
     BuyOrderNotAllowed = 1301,
+    StopOrdersNotAllowed = 1307,
+    TriggerPriceMustBeHigherThanLpSellQuote = 1308,
+    TriggerPriceMustBeLowerThanLpBuyQuote = 1309,
     OnlyOneSellOrderIsAllowedForIpo = 1401,
     RequestNotAllowedForBlockInstrument = 2026,
     RequestNotAllowedForCrossInstrument = 2028,
     RiskLimitNotDefined = 7000,
     RiskMaximumOrderVolumeExceeded = 7001,
     RiskMaximumOrderValueExceeded = 7002,
-    RiskOrderPriceCollarExceeded = 7003
+    RiskOrderPriceCollarExceeded = 7003,
+    TotalTradedValueExceeded = 7011,
+    TotalTradedBuyValueExceeded = 7012,
+    TotalTradedSellValueExceeded = 7013,
+    TotalOpenValueExceeded = 7014,
+    TotalOpenBuyValueExceeded = 7015,
+    TotalOpenSellValueExceeded = 7016,
+    TotalRiskValueExceeded = 7017,
+    TotalBuyRiskValueExceeded = 7018,
+    TotalSellRiskValueExceeded = 7019,
+    TotalNetRiskValueExceeded = 7020,
+    MaxOrderCountExceeded = 7021
 };
 
 static const std::map<std::string, OrderRejectionReason> Name2OrderRejectionReason {
@@ -595,14 +610,29 @@ static const std::map<std::string, OrderRejectionReason> Name2OrderRejectionReas
     { "MassQuoteNotAllowedForSelectedMarketModel", OrderRejectionReason::MassQuoteNotAllowedForSelectedMarketModel },
     { "InstrumentClosed", OrderRejectionReason::InstrumentClosed },
     { "InvalidBidAskSpread", OrderRejectionReason::InvalidBidAskSpread },
+    { "NotAuthorizedToQuoteInstrument", OrderRejectionReason::NotAuthorizedToQuoteInstrument },
     { "BuyOrderNotAllowed", OrderRejectionReason::BuyOrderNotAllowed },
+    { "StopOrdersNotAllowed", OrderRejectionReason::StopOrdersNotAllowed },
+    { "TriggerPriceMustBeHigherThanLpSellQuote", OrderRejectionReason::TriggerPriceMustBeHigherThanLpSellQuote },
+    { "TriggerPriceMustBeLowerThanLpBuyQuote", OrderRejectionReason::TriggerPriceMustBeLowerThanLpBuyQuote },
     { "OnlyOneSellOrderIsAllowedForIpo", OrderRejectionReason::OnlyOneSellOrderIsAllowedForIpo },
     { "RequestNotAllowedForBlockInstrument", OrderRejectionReason::RequestNotAllowedForBlockInstrument },
     { "RequestNotAllowedForCrossInstrument", OrderRejectionReason::RequestNotAllowedForCrossInstrument },
     { "RiskLimitNotDefined", OrderRejectionReason::RiskLimitNotDefined },
     { "RiskMaximumOrderVolumeExceeded", OrderRejectionReason::RiskMaximumOrderVolumeExceeded },
     { "RiskMaximumOrderValueExceeded", OrderRejectionReason::RiskMaximumOrderValueExceeded },
-    { "RiskOrderPriceCollarExceeded", OrderRejectionReason::RiskOrderPriceCollarExceeded }
+    { "RiskOrderPriceCollarExceeded", OrderRejectionReason::RiskOrderPriceCollarExceeded },
+    { "TotalTradedValueExceeded", OrderRejectionReason::TotalTradedValueExceeded },
+    { "TotalTradedBuyValueExceeded", OrderRejectionReason::TotalTradedBuyValueExceeded },
+    { "TotalTradedSellValueExceeded", OrderRejectionReason::TotalTradedSellValueExceeded },
+    { "TotalOpenValueExceeded", OrderRejectionReason::TotalOpenValueExceeded },
+    { "TotalOpenBuyValueExceeded", OrderRejectionReason::TotalOpenBuyValueExceeded },
+    { "TotalOpenSellValueExceeded", OrderRejectionReason::TotalOpenSellValueExceeded },
+    { "TotalRiskValueExceeded", OrderRejectionReason::TotalRiskValueExceeded },
+    { "TotalBuyRiskValueExceeded", OrderRejectionReason::TotalBuyRiskValueExceeded },
+    { "TotalSellRiskValueExceeded", OrderRejectionReason::TotalSellRiskValueExceeded },
+    { "TotalNetRiskValueExceeded", OrderRejectionReason::TotalNetRiskValueExceeded },
+    { "MaxOrderCountExceeded", OrderRejectionReason::MaxOrderCountExceeded }
 };
 
 static const std::map<OrderRejectionReason, std::string> OrderRejectionReason2Name {
@@ -663,14 +693,29 @@ static const std::map<OrderRejectionReason, std::string> OrderRejectionReason2Na
     { OrderRejectionReason::MassQuoteNotAllowedForSelectedMarketModel, "MassQuoteNotAllowedForSelectedMarketModel" },
     { OrderRejectionReason::InstrumentClosed, "InstrumentClosed" },
     { OrderRejectionReason::InvalidBidAskSpread, "InvalidBidAskSpread" },
+    { OrderRejectionReason::NotAuthorizedToQuoteInstrument, "NotAuthorizedToQuoteInstrument" },
     { OrderRejectionReason::BuyOrderNotAllowed, "BuyOrderNotAllowed" },
+    { OrderRejectionReason::StopOrdersNotAllowed, "StopOrdersNotAllowed" },
+    { OrderRejectionReason::TriggerPriceMustBeHigherThanLpSellQuote, "TriggerPriceMustBeHigherThanLpSellQuote" },
+    { OrderRejectionReason::TriggerPriceMustBeLowerThanLpBuyQuote, "TriggerPriceMustBeLowerThanLpBuyQuote" },
     { OrderRejectionReason::OnlyOneSellOrderIsAllowedForIpo, "OnlyOneSellOrderIsAllowedForIpo" },
     { OrderRejectionReason::RequestNotAllowedForBlockInstrument, "RequestNotAllowedForBlockInstrument" },
     { OrderRejectionReason::RequestNotAllowedForCrossInstrument, "RequestNotAllowedForCrossInstrument" },
     { OrderRejectionReason::RiskLimitNotDefined, "RiskLimitNotDefined" },
     { OrderRejectionReason::RiskMaximumOrderVolumeExceeded, "RiskMaximumOrderVolumeExceeded" },
     { OrderRejectionReason::RiskMaximumOrderValueExceeded, "RiskMaximumOrderValueExceeded" },
-    { OrderRejectionReason::RiskOrderPriceCollarExceeded, "RiskOrderPriceCollarExceeded" }
+    { OrderRejectionReason::RiskOrderPriceCollarExceeded, "RiskOrderPriceCollarExceeded" },
+    { OrderRejectionReason::TotalTradedValueExceeded, "TotalTradedValueExceeded" },
+    { OrderRejectionReason::TotalTradedBuyValueExceeded, "TotalTradedBuyValueExceeded" },
+    { OrderRejectionReason::TotalTradedSellValueExceeded, "TotalTradedSellValueExceeded" },
+    { OrderRejectionReason::TotalOpenValueExceeded, "TotalOpenValueExceeded" },
+    { OrderRejectionReason::TotalOpenBuyValueExceeded, "TotalOpenBuyValueExceeded" },
+    { OrderRejectionReason::TotalOpenSellValueExceeded, "TotalOpenSellValueExceeded" },
+    { OrderRejectionReason::TotalRiskValueExceeded, "TotalRiskValueExceeded" },
+    { OrderRejectionReason::TotalBuyRiskValueExceeded, "TotalBuyRiskValueExceeded" },
+    { OrderRejectionReason::TotalSellRiskValueExceeded, "TotalSellRiskValueExceeded" },
+    { OrderRejectionReason::TotalNetRiskValueExceeded, "TotalNetRiskValueExceeded" },
+    { OrderRejectionReason::MaxOrderCountExceeded, "MaxOrderCountExceeded" }
 };
 
 
@@ -941,7 +986,8 @@ enum class TradeReportType: uint8_t {
     Alleged = 2,
     Accept = 3,
     Decline = 4,
-    TradeReportCancel = 7
+    TradeReportCancel = 7,
+    TradeBreak = 8
 };
 
 static const std::map<std::string, TradeReportType> Name2TradeReportType {
@@ -949,7 +995,8 @@ static const std::map<std::string, TradeReportType> Name2TradeReportType {
     { "Alleged", TradeReportType::Alleged },
     { "Accept", TradeReportType::Accept },
     { "Decline", TradeReportType::Decline },
-    { "TradeReportCancel", TradeReportType::TradeReportCancel }
+    { "TradeReportCancel", TradeReportType::TradeReportCancel },
+    { "TradeBreak", TradeReportType::TradeBreak }
 };
 
 static const std::map<TradeReportType, std::string> TradeReportType2Name {
@@ -957,7 +1004,8 @@ static const std::map<TradeReportType, std::string> TradeReportType2Name {
     { TradeReportType::Alleged, "Alleged" },
     { TradeReportType::Accept, "Accept" },
     { TradeReportType::Decline, "Decline" },
-    { TradeReportType::TradeReportCancel, "TradeReportCancel" }
+    { TradeReportType::TradeReportCancel, "TradeReportCancel" },
+    { TradeReportType::TradeBreak, "TradeBreak" }
 };
 
 
@@ -997,7 +1045,7 @@ static const std::map<AlgorithmicTradeIndicator, std::string> AlgorithmicTradeIn
 
 
 enum class ExecType: uint8_t {
-    NA = 0,
+    NA = 1,
     Rejected = 8,
     Expired = 12,
     Trade = 15,

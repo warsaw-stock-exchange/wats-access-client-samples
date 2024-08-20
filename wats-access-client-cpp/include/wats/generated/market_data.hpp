@@ -407,7 +407,8 @@ enum class InstrumentStatus: uint8_t {
     RegulatorySuspension = 6,
     TechnicalHalt = 7,
     HybridNoQuotes = 8,
-    HybridPause = 9
+    HybridKnockout = 9,
+    HybridPause = 10
 };
 
 static const std::map<std::string, InstrumentStatus> Name2InstrumentStatus {
@@ -419,6 +420,7 @@ static const std::map<std::string, InstrumentStatus> Name2InstrumentStatus {
     { "RegulatorySuspension", InstrumentStatus::RegulatorySuspension },
     { "TechnicalHalt", InstrumentStatus::TechnicalHalt },
     { "HybridNoQuotes", InstrumentStatus::HybridNoQuotes },
+    { "HybridKnockout", InstrumentStatus::HybridKnockout },
     { "HybridPause", InstrumentStatus::HybridPause }
 };
 
@@ -431,6 +433,7 @@ static const std::map<InstrumentStatus, std::string> InstrumentStatus2Name {
     { InstrumentStatus::RegulatorySuspension, "RegulatorySuspension" },
     { InstrumentStatus::TechnicalHalt, "TechnicalHalt" },
     { InstrumentStatus::HybridNoQuotes, "HybridNoQuotes" },
+    { InstrumentStatus::HybridKnockout, "HybridKnockout" },
     { InstrumentStatus::HybridPause, "HybridPause" }
 };
 
@@ -1585,53 +1588,47 @@ struct AuctionUpdate {
 
 enum class PriceUpdateType: uint8_t {
     ReferencePrice = 1,
-    MidPoint = 2,
-    Fixing1Price = 3,
-    Fixing2Price = 4,
-    Fixing1Ytm = 5,
-    Fixing2Ytm = 6
+    ReferenceIndexPrice = 2,
+    ReferenceFixingIndexPrice = 3,
+    MidPrice = 4,
+    FixingPrice = 5,
+    FixingYtm = 6
 };
 
 static const std::map<std::string, PriceUpdateType> Name2PriceUpdateType {
     { "ReferencePrice", PriceUpdateType::ReferencePrice },
-    { "MidPoint", PriceUpdateType::MidPoint },
-    { "Fixing1Price", PriceUpdateType::Fixing1Price },
-    { "Fixing2Price", PriceUpdateType::Fixing2Price },
-    { "Fixing1Ytm", PriceUpdateType::Fixing1Ytm },
-    { "Fixing2Ytm", PriceUpdateType::Fixing2Ytm }
+    { "ReferenceIndexPrice", PriceUpdateType::ReferenceIndexPrice },
+    { "ReferenceFixingIndexPrice", PriceUpdateType::ReferenceFixingIndexPrice },
+    { "MidPrice", PriceUpdateType::MidPrice },
+    { "FixingPrice", PriceUpdateType::FixingPrice },
+    { "FixingYtm", PriceUpdateType::FixingYtm }
 };
 
 static const std::map<PriceUpdateType, std::string> PriceUpdateType2Name {
     { PriceUpdateType::ReferencePrice, "ReferencePrice" },
-    { PriceUpdateType::MidPoint, "MidPoint" },
-    { PriceUpdateType::Fixing1Price, "Fixing1Price" },
-    { PriceUpdateType::Fixing2Price, "Fixing2Price" },
-    { PriceUpdateType::Fixing1Ytm, "Fixing1Ytm" },
-    { PriceUpdateType::Fixing2Ytm, "Fixing2Ytm" }
+    { PriceUpdateType::ReferenceIndexPrice, "ReferenceIndexPrice" },
+    { PriceUpdateType::ReferenceFixingIndexPrice, "ReferenceFixingIndexPrice" },
+    { PriceUpdateType::MidPrice, "MidPrice" },
+    { PriceUpdateType::FixingPrice, "FixingPrice" },
+    { PriceUpdateType::FixingYtm, "FixingYtm" }
 };
 
 
 enum class PriceYtmPresence: uint16_t {
     None = 0,
-    Price = 1,
-    PriceBid = 2,
-    PriceAsk = 4,
-    Ytm = 8,
-    YtmBid = 16,
-    YtmAsk = 32,
-    YtmNoCalc = 64,
-    YtmBidNoCalc = 128,
-    YtmAskNoCalc = 256
+    value = 1,
+    valueBid = 2,
+    valueAsk = 4,
+    YtmNoCalc = 8,
+    YtmBidNoCalc = 16,
+    YtmAskNoCalc = 32
 };
 
 static const std::map<std::string, PriceYtmPresence> Name2PriceYtmPresence {
     { "None", PriceYtmPresence::None },
-    { "Price", PriceYtmPresence::Price },
-    { "PriceBid", PriceYtmPresence::PriceBid },
-    { "PriceAsk", PriceYtmPresence::PriceAsk },
-    { "Ytm", PriceYtmPresence::Ytm },
-    { "YtmBid", PriceYtmPresence::YtmBid },
-    { "YtmAsk", PriceYtmPresence::YtmAsk },
+    { "value", PriceYtmPresence::value },
+    { "valueBid", PriceYtmPresence::valueBid },
+    { "valueAsk", PriceYtmPresence::valueAsk },
     { "YtmNoCalc", PriceYtmPresence::YtmNoCalc },
     { "YtmBidNoCalc", PriceYtmPresence::YtmBidNoCalc },
     { "YtmAskNoCalc", PriceYtmPresence::YtmAskNoCalc }
@@ -1639,12 +1636,9 @@ static const std::map<std::string, PriceYtmPresence> Name2PriceYtmPresence {
 
 static const std::map<PriceYtmPresence, std::string> PriceYtmPresence2Name {
     { PriceYtmPresence::None, "None" },
-    { PriceYtmPresence::Price, "Price" },
-    { PriceYtmPresence::PriceBid, "PriceBid" },
-    { PriceYtmPresence::PriceAsk, "PriceAsk" },
-    { PriceYtmPresence::Ytm, "Ytm" },
-    { PriceYtmPresence::YtmBid, "YtmBid" },
-    { PriceYtmPresence::YtmAsk, "YtmAsk" },
+    { PriceYtmPresence::value, "value" },
+    { PriceYtmPresence::valueBid, "valueBid" },
+    { PriceYtmPresence::valueAsk, "valueAsk" },
     { PriceYtmPresence::YtmNoCalc, "YtmNoCalc" },
     { PriceYtmPresence::YtmBidNoCalc, "YtmBidNoCalc" },
     { PriceYtmPresence::YtmAskNoCalc, "YtmAskNoCalc" }
@@ -2898,6 +2892,7 @@ static const std::map<LeverageFlag, std::string> LeverageFlag2Name {
     { LeverageFlag::No, "No" }
 };
 
+using Kid = AnsiChar[128];
 
 struct Instrument {
     Header header;
@@ -2956,6 +2951,10 @@ struct Instrument {
     Price thresholdMax;
     Price thresholdMin;
     LeverageFlag isLeverage;
+    Number accruedInterestValue;
+    Kid kid;
+    Date kidIssueDate;
+    uint8_t valueAtRisk;
 
     friend std::ostream &operator << (std::ostream &, const Instrument &);
 };
@@ -3181,7 +3180,37 @@ static const std::map<IndexType, std::string> IndexType2Name {
     { IndexType::L, "L" }
 };
 
-using IndexUnderlying = PublicProductIdentification[3];
+
+enum class IndexUnderlyingType: uint8_t {
+    Index = 1,
+    ReferenceRate = 2
+};
+
+static const std::map<std::string, IndexUnderlyingType> Name2IndexUnderlyingType {
+    { "Index", IndexUnderlyingType::Index },
+    { "ReferenceRate", IndexUnderlyingType::ReferenceRate }
+};
+
+static const std::map<IndexUnderlyingType, std::string> IndexUnderlyingType2Name {
+    { IndexUnderlyingType::Index, "Index" },
+    { IndexUnderlyingType::ReferenceRate, "ReferenceRate" }
+};
+
+
+struct IndexUnderlying {
+    PublicProductIdentification productIdentification;
+    IndexUnderlyingType indexUnderlyingType;
+
+    friend std::ostream &operator << (std::ostream &, const IndexUnderlying &);
+};
+using IndexUnderlyingArray = IndexUnderlying[3];
+
+struct IndexUnderlyings {
+    uint8_t count;
+    IndexUnderlyingArray items;
+
+    friend std::ostream &operator << (std::ostream &, const IndexUnderlyings &);
+};
 
 struct IndexParams {
     Header header;
@@ -3195,7 +3224,7 @@ struct IndexParams {
     IndexType indexType;
     uint8_t daysSinceLastPublication;
     uint16_t numberOfDividends;
-    IndexUnderlying indexUnderlying;
+    IndexUnderlyings indexUnderlyings;
     uint16_t publicationOrder;
     Currency currency;
     Date dateValidity;

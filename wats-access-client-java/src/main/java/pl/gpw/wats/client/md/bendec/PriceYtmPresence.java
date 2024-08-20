@@ -65,39 +65,27 @@ public class PriceYtmPresence {
         /**
          * A price was provided.
          */
-        PRICE(1),
+        VALUE(1),
         /**
          * A bid price was provided.
          */
-        PRICEBID(2),
+        VALUEBID(2),
         /**
-         * A ask price was provided.
+         * An ask price was provided.
          */
-        PRICEASK(4),
-        /**
-         * YTM was provided.
-         */
-        YTM(8),
-        /**
-         * Bid YTM was provided.
-         */
-        YTMBID(16),
-        /**
-         * Ask YTM was provided.
-         */
-        YTMASK(32),
+        VALUEASK(4),
         /**
          * YTM was not provided due to the absence of its calculation.
          */
-        YTMNOCALC(64),
+        YTMNOCALC(8),
         /**
          * Bid YTM was not provided due to the absence of its calculation.
          */
-        YTMBIDNOCALC(128),
+        YTMBIDNOCALC(16),
         /**
          * Ask YTM was not provided due to the absence of its calculation.
          */
-        YTMASKNOCALC(256);
+        YTMASKNOCALC(32);
         
         private final int optionValue;
         private static final Map<Integer, PriceYtmPresenceOptions> TYPES = new HashMap<>();

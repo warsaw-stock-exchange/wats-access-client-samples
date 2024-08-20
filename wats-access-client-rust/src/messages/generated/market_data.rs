@@ -186,10 +186,6 @@ pub type PercentageChange = Price;
 /// Value of an index.
 pub type IndexValue = Price;
 
-/// List of underlying instruments for index.
-pub type IndexUnderlying = [PublicProductIdentification; 3];
-
-
 /// Name of the issuer.
 #[derive(Clone, Copy)]
 pub struct Issuer(pub(crate) [AnsiChar; 150]);
@@ -236,6 +232,22 @@ impl FisnCode {
   }
 }
 crate::char_array!(35, FisnCode);
+
+
+/// KID text.
+#[derive(Clone, Copy)]
+pub struct Kid(pub(crate) [AnsiChar; 128]);
+impl Kid {
+  pub fn new(v: [AnsiChar; 128]) -> Self {
+    Self(v)
+  }
+}
+impl Kid {
+  pub fn as_inner(&self) -> [AnsiChar; 128] {
+    self.0
+  }
+}
+crate::char_array!(128, Kid);
 
 
 /// Type of auction.
@@ -1314,8 +1326,10 @@ pub enum InstrumentStatus {
   TechnicalHalt = 0x0007,
   /// Hybrid no valid quotes.
   HybridNoQuotes = 0x0008,
+  /// Hybrid knockout.
+  HybridKnockout = 0x0009,
   /// Hybrid pause.
-  HybridPause = 0x0009,
+  HybridPause = 0x000a,
 }
 impl Default for InstrumentStatus {
   fn default() -> Self {
@@ -1334,7 +1348,8 @@ impl std::convert::TryFrom<u8> for InstrumentStatus {
       0x0006 => Ok(Self::RegulatorySuspension),
       0x0007 => Ok(Self::TechnicalHalt),
       0x0008 => Ok(Self::HybridNoQuotes),
-      0x0009 => Ok(Self::HybridPause),
+      0x0009 => Ok(Self::HybridKnockout),
+      0x000a => Ok(Self::HybridPause),
       other => Err(InvalidVariant::new(other as u32, "InstrumentStatus")),
     }
   }
@@ -2599,6 +2614,59 @@ pub struct PublicProductIdentification {
   pub product_identification_type: ProductIdentificationType,
 }
 
+/// Underlying type of index.
+#[repr(u8)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum IndexUnderlyingType {
+  /// Index.
+  Index = 0x0001,
+  /// Reference Rate.
+  ReferenceRate = 0x0002,
+}
+impl Default for IndexUnderlyingType {
+  fn default() -> Self {
+    Self::Index
+  }
+}
+impl std::convert::TryFrom<u8> for IndexUnderlyingType {
+  type Error = InvalidVariant;
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      0x0001 => Ok(Self::Index),
+      0x0002 => Ok(Self::ReferenceRate),
+      other => Err(InvalidVariant::new(other as u32, "IndexUnderlyingType")),
+    }
+  }
+}
+
+/// Underlying instruments for index.
+#[repr(C, packed)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
+#[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
+pub struct IndexUnderlying {
+  /// Product Identification.
+  pub product_identification: PublicProductIdentification,
+  /// Underlying type of index.
+  pub index_underlying_type: IndexUnderlyingType,
+}
+
+/// IndexUnderlying Array.
+pub type IndexUnderlyingArray = [IndexUnderlying; 3];
+
+
+/// Array of IndexUnderlying with their count.
+#[repr(C, packed)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
+#[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
+pub struct IndexUnderlyings {
+  /// How many elements does IndexUnderlyings contain.
+  pub count: u8,
+  /// IndexUnderlying Array.
+  pub items: IndexUnderlyingArray,
+}
+
 /// Market Data message header.
 #[repr(C, packed)]
 #[derive(Serialize, Deserialize, Clone, Copy, Default)]
@@ -2951,18 +3019,18 @@ pub struct PriceLevel {
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum PriceUpdateType {
-  /// Reference price placed in the vale field
+  /// Reference price placed in the value field
   ReferencePrice = 0x0001,
-  /// MidPoint price placed in the vale field
-  MidPoint = 0x0002,
-  /// The first fixing prices fixing prices appropriately placed in the value field as the average price, valueBid as the bid price, and valueAsk as the ask price.
-  Fixing1Price = 0x0003,
-  /// The second fixing prices fixing prices appropriately placed in the value field as the average price, valueBid as the bid price, and valueAsk as the ask price.
-  Fixing2Price = 0x0004,
-  /// The first fixing YTM (e.i. yield to maturity)  appropriately placed in the value field as the average YTM, valueBid as the bid YTM, and valueAsk as the ask YTM.
-  Fixing1Ytm = 0x0005,
-  /// The second fixing YTM (e.i. yield to maturity)  appropriately placed in the value field as the average YTM, valueBid as the bid YTM, and valueAsk as the ask YTM.
-  Fixing2Ytm = 0x0006,
+  /// TBSP.Price price placed in the value field
+  ReferenceIndexPrice = 0x0002,
+  /// TBSP.FixPrice price placed in the value field
+  ReferenceFixingIndexPrice = 0x0003,
+  /// MidPrice price placed in the value field
+  MidPrice = 0x0004,
+  /// The fixing prices placed appropriately in the value field as the average price, valueBid as the bid price, and valueAsk as the ask price.
+  FixingPrice = 0x0005,
+  /// The fixing YTM (i.e. yield to maturity) appropriately placed in the value field as the average YTM, valueBid as the bid YTM, and valueAsk as the ask YTM.
+  FixingYtm = 0x0006,
 }
 impl Default for PriceUpdateType {
   fn default() -> Self {
@@ -2974,11 +3042,11 @@ impl std::convert::TryFrom<u8> for PriceUpdateType {
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
       0x0001 => Ok(Self::ReferencePrice),
-      0x0002 => Ok(Self::MidPoint),
-      0x0003 => Ok(Self::Fixing1Price),
-      0x0004 => Ok(Self::Fixing2Price),
-      0x0005 => Ok(Self::Fixing1Ytm),
-      0x0006 => Ok(Self::Fixing2Ytm),
+      0x0002 => Ok(Self::ReferenceIndexPrice),
+      0x0003 => Ok(Self::ReferenceFixingIndexPrice),
+      0x0004 => Ok(Self::MidPrice),
+      0x0005 => Ok(Self::FixingPrice),
+      0x0006 => Ok(Self::FixingYtm),
       other => Err(InvalidVariant::new(other as u32, "PriceUpdateType")),
     }
   }
@@ -2993,23 +3061,17 @@ bitflags::bitflags! {
 /// No values provided.
     const NONE            = 0b0000000000000000;
 /// A price was provided.
-    const PRICE           = 0b0000000000000001;
+    const VALUE           = 0b0000000000000001;
 /// A bid price was provided.
-    const PRICE_BID       = 0b0000000000000010;
-/// A ask price was provided.
-    const PRICE_ASK       = 0b0000000000000100;
-/// YTM was provided.
-    const YTM             = 0b0000000000001000;
-/// Bid YTM was provided.
-    const YTM_BID         = 0b0000000000010000;
-/// Ask YTM was provided.
-    const YTM_ASK         = 0b0000000000100000;
+    const VALUE_BID       = 0b0000000000000010;
+/// An ask price was provided.
+    const VALUE_ASK       = 0b0000000000000100;
 /// YTM was not provided due to the absence of its calculation.
-    const YTM_NO_CALC     = 0b0000000001000000;
+    const YTM_NO_CALC     = 0b0000000000001000;
 /// Bid YTM was not provided due to the absence of its calculation.
-    const YTM_BID_NO_CALC = 0b0000000010000000;
+    const YTM_BID_NO_CALC = 0b0000000000010000;
 /// Ask YTM was not provided due to the absence of its calculation.
-    const YTM_ASK_NO_CALC = 0b0000000100000000;
+    const YTM_ASK_NO_CALC = 0b0000000000100000;
   }
 }
 
@@ -3350,6 +3412,14 @@ pub struct Instrument {
   pub threshold_min: Price,
   /// Identifier of leverage instruments
   pub is_leverage: LeverageFlag,
+  /// Accrued iterest value of the instrument
+  pub accrued_interest_value: Number,
+  /// KID.
+  pub kid: Kid,
+  /// KID issue date.
+  pub kid_issue_date: Date,
+  /// Value at risk.
+  pub value_at_risk: u8,
 }
 
 /// Start of a new trading phase.
@@ -3768,7 +3838,7 @@ pub struct IndexParams {
   /// Number of dividends included in the index calculation.
   pub number_of_dividends: u16,
   /// List of underlying instruments for index.
-  pub index_underlying: IndexUnderlying,
+  pub index_underlyings: IndexUnderlyings,
   /// Index publication presentation order.
   pub publication_order: u16,
   /// Currency (e.g. USD).

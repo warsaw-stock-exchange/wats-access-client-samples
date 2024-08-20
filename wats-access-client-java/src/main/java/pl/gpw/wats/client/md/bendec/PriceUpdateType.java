@@ -10,29 +10,29 @@ import java.nio.ByteBuffer;
  */
 public enum PriceUpdateType {
     /**
-     * Reference price placed in the vale field
+     * Reference price placed in the value field
      */
     REFERENCEPRICE(1),
     /**
-     * MidPoint price placed in the vale field
+     * TBSP.Price price placed in the value field
      */
-    MIDPOINT(2),
+    REFERENCEINDEXPRICE(2),
     /**
-     * The first fixing prices fixing prices appropriately placed in the value field as the average price, valueBid as the bid price, and valueAsk as the ask price.
+     * TBSP.FixPrice price placed in the value field
      */
-    FIXING1PRICE(3),
+    REFERENCEFIXINGINDEXPRICE(3),
     /**
-     * The second fixing prices fixing prices appropriately placed in the value field as the average price, valueBid as the bid price, and valueAsk as the ask price.
+     * MidPrice price placed in the value field
      */
-    FIXING2PRICE(4),
+    MIDPRICE(4),
     /**
-     * The first fixing YTM (e.i. yield to maturity)  appropriately placed in the value field as the average YTM, valueBid as the bid YTM, and valueAsk as the ask YTM.
+     * The fixing prices placed appropriately in the value field as the average price, valueBid as the bid price, and valueAsk as the ask price.
      */
-    FIXING1YTM(5),
+    FIXINGPRICE(5),
     /**
-     * The second fixing YTM (e.i. yield to maturity)  appropriately placed in the value field as the average YTM, valueBid as the bid YTM, and valueAsk as the ask YTM.
+     * The fixing YTM (i.e. yield to maturity) appropriately placed in the value field as the average YTM, valueBid as the bid YTM, and valueAsk as the ask YTM.
      */
-    FIXING2YTM(6);
+    FIXINGYTM(6);
     
     private final int value;
     private final int byteLength = 1;

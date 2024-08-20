@@ -238,9 +238,25 @@ public enum OrderRejectionReason {
      */
     INVALIDBIDASKSPREAD(1208),
     /**
+     * Firm is not a Market Maker for this SecurityID (48).
+     */
+    NOTAUTHORIZEDTOQUOTEINSTRUMENT(1209),
+    /**
      * Buy orders from participants are not allowed in BuyOnly phase.
      */
     BUYORDERNOTALLOWED(1301),
+    /**
+     * Stop Orders not allowed when no opposite LP quote available
+     */
+    STOPORDERSNOTALLOWED(1307),
+    /**
+     * TriggerPrice (1102) must be higher than LP sell quote for buy Stop Order
+     */
+    TRIGGERPRICEMUSTBEHIGHERTHANLPSELLQUOTE(1308),
+    /**
+     * TriggerPrice (1102) must be lower than LP buy quote for sell Stop Order
+     */
+    TRIGGERPRICEMUSTBELOWERTHANLPBUYQUOTE(1309),
     /**
      * Only one sell order is allowed for IPO instrument
      */
@@ -268,7 +284,51 @@ public enum OrderRejectionReason {
     /**
      * The order price has exceeded the risk limit.
      */
-    RISKORDERPRICECOLLAREXCEEDED(7003);
+    RISKORDERPRICECOLLAREXCEEDED(7003),
+    /**
+     * Total traded value has exceeded the risk limit.
+     */
+    TOTALTRADEDVALUEEXCEEDED(7011),
+    /**
+     * Total traded buy value has exceeded the risk limit.
+     */
+    TOTALTRADEDBUYVALUEEXCEEDED(7012),
+    /**
+     * Total traded sell value has exceeded the risk limit.
+     */
+    TOTALTRADEDSELLVALUEEXCEEDED(7013),
+    /**
+     * Total open value has exceeded the risk limit.
+     */
+    TOTALOPENVALUEEXCEEDED(7014),
+    /**
+     * Total open buy value has exceeded the risk limit.
+     */
+    TOTALOPENBUYVALUEEXCEEDED(7015),
+    /**
+     * Total open sell value has exceeded the risk limit.
+     */
+    TOTALOPENSELLVALUEEXCEEDED(7016),
+    /**
+     * Total risk value has exceeded the risk limit.
+     */
+    TOTALRISKVALUEEXCEEDED(7017),
+    /**
+     * Total buy risk value has exceeded the risk limit.
+     */
+    TOTALBUYRISKVALUEEXCEEDED(7018),
+    /**
+     * Total sell risk value has exceeded the risk limit.
+     */
+    TOTALSELLRISKVALUEEXCEEDED(7019),
+    /**
+     * Total net risk value has exceeded the risk limit.
+     */
+    TOTALNETRISKVALUEEXCEEDED(7020),
+    /**
+     * Maximum order count has exceeded the risk limit.
+     */
+    MAXORDERCOUNTEXCEEDED(7021);
     
     private final int value;
     private final int byteLength = 2;

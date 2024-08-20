@@ -42,6 +42,7 @@ const marketDataTypes = {
       'OrderExecute': ['Default'],
       'OrderModify': ['Default'],
       'ScenarioName': ['Clone', 'Copy'],
+      'Kid': ['Clone', 'Copy'],
     },
     meta: {
       'MsgType': {
@@ -87,7 +88,8 @@ const marketDataTypes = {
         'Issuer',
         'FisnCode',
         'CfiCode',
-        'Code'
+        'Code',
+        'Kid'
       ].map((name) => [name, crateNewtype]))
     },
     enumConversionError,

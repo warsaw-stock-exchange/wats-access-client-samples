@@ -42,9 +42,13 @@ public enum InstrumentStatus {
      */
     HYBRIDNOQUOTES(8),
     /**
+     * Hybrid knockout.
+     */
+    HYBRIDKNOCKOUT(9),
+    /**
      * Hybrid pause.
      */
-    HYBRIDPAUSE(9);
+    HYBRIDPAUSE(10);
     
     private final int value;
     private final int byteLength = 1;

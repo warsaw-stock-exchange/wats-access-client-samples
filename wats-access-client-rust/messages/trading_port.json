@@ -1,5 +1,5 @@
 {
-  "version": 1076,
+  "version": 1081,
   "typeDefinitions": [
     {
       "kind": "Primitive",
@@ -744,9 +744,29 @@
           "OfferPx (133) must be greater than BidPx (132)."
         ],
         [
+          "NotAuthorizedToQuoteInstrument",
+          1209,
+          "Firm is not a Market Maker for this SecurityID (48)."
+        ],
+        [
           "BuyOrderNotAllowed",
           1301,
           "Buy orders from participants are not allowed in BuyOnly phase."
+        ],
+        [
+          "StopOrdersNotAllowed",
+          1307,
+          "Stop Orders not allowed when no opposite LP quote available"
+        ],
+        [
+          "TriggerPriceMustBeHigherThanLpSellQuote",
+          1308,
+          "TriggerPrice (1102) must be higher than LP sell quote for buy Stop Order"
+        ],
+        [
+          "TriggerPriceMustBeLowerThanLpBuyQuote",
+          1309,
+          "TriggerPrice (1102) must be lower than LP buy quote for sell Stop Order"
         ],
         [
           "OnlyOneSellOrderIsAllowedForIpo",
@@ -782,6 +802,61 @@
           "RiskOrderPriceCollarExceeded",
           7003,
           "The order price has exceeded the risk limit."
+        ],
+        [
+          "TotalTradedValueExceeded",
+          7011,
+          "Total traded value has exceeded the risk limit."
+        ],
+        [
+          "TotalTradedBuyValueExceeded",
+          7012,
+          "Total traded buy value has exceeded the risk limit."
+        ],
+        [
+          "TotalTradedSellValueExceeded",
+          7013,
+          "Total traded sell value has exceeded the risk limit."
+        ],
+        [
+          "TotalOpenValueExceeded",
+          7014,
+          "Total open value has exceeded the risk limit."
+        ],
+        [
+          "TotalOpenBuyValueExceeded",
+          7015,
+          "Total open buy value has exceeded the risk limit."
+        ],
+        [
+          "TotalOpenSellValueExceeded",
+          7016,
+          "Total open sell value has exceeded the risk limit."
+        ],
+        [
+          "TotalRiskValueExceeded",
+          7017,
+          "Total risk value has exceeded the risk limit."
+        ],
+        [
+          "TotalBuyRiskValueExceeded",
+          7018,
+          "Total buy risk value has exceeded the risk limit."
+        ],
+        [
+          "TotalSellRiskValueExceeded",
+          7019,
+          "Total sell risk value has exceeded the risk limit."
+        ],
+        [
+          "TotalNetRiskValueExceeded",
+          7020,
+          "Total net risk value has exceeded the risk limit."
+        ],
+        [
+          "MaxOrderCountExceeded",
+          7021,
+          "Maximum order count has exceeded the risk limit."
         ]
       ]
     },
@@ -1695,6 +1770,11 @@
           "TradeReportCancel",
           7,
           "Trade Report Cancel"
+        ],
+        [
+          "TradeBreak",
+          8,
+          "Trade Break"
         ]
       ]
     },
@@ -2118,7 +2198,7 @@
       "variants": [
         [
           "NA",
-          0,
+          1,
           "Not applicable"
         ],
         [
@@ -2151,7 +2231,7 @@
     {
       "kind": "Struct",
       "name": "TradeBust",
-      "description": "Message used to cancel previously accepted Trade Capture Report.",
+      "description": "Message used to inform about cancellation of previously accepted Trade.",
       "fields": [
         {
           "name": "header",

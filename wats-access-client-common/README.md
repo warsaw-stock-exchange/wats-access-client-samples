@@ -10,35 +10,6 @@ Outline of the services and they data streams:
 
 ![services](media/services.png)
 
-## Functionality
-System's Trading Services enable following types of order:
-
-* Limit (TIF: DAY, IOC, FOK)
-* Market (IOC/FOK)
-* Market to limit (IOC/FOK)
-
-Placing, modifying and canceling of orders through Trading Services:
-
-### FIX Order Gateway
-
-* New Order Single (D)
-* Order Cancel Replace (G)
-* Order Cancel Request (F)
-* Execution Report (8)
-* Order Cancel Reject (9)
-
-### Native Order Gateway
-
-* OrderAdd / OrderAddResponse
-* OrderModify / OrderModifyResponse
-* OrderCancel / OrderCancelResponse
-* Trade
-
-### Market Data
-
-* Reference Data
-* Market State
-
 ## Environment
 
 ### Access
@@ -79,7 +50,7 @@ To check the status of the services running you can invoke:
 Each time the services are restarted the Reference Data database is populated with new data and state files are reset so no trace of previously submitted orders is kept.
 
 ## Connectivity Data
-Below table summarizes the connectivity data for core services on the ISV development machine. Other environments may require other connectivity data.
+Below table summarizes the connectivity data for core services on the ISV development virtual machine. Other environments may require other connectivity data.
 
 | Port                                         | Connectivity data                                                                                                                                                                           |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

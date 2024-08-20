@@ -698,8 +698,16 @@ pub enum OrderRejectionReason {
   InstrumentClosed = 0x04b3,
   /// OfferPx (133) must be greater than BidPx (132).
   InvalidBidAskSpread = 0x04b8,
+  /// Firm is not a Market Maker for this SecurityID (48).
+  NotAuthorizedToQuoteInstrument = 0x04b9,
   /// Buy orders from participants are not allowed in BuyOnly phase.
   BuyOrderNotAllowed = 0x0515,
+  /// Stop Orders not allowed when no opposite LP quote available
+  StopOrdersNotAllowed = 0x051b,
+  /// TriggerPrice (1102) must be higher than LP sell quote for buy Stop Order
+  TriggerPriceMustBeHigherThanLpSellQuote = 0x051c,
+  /// TriggerPrice (1102) must be lower than LP buy quote for sell Stop Order
+  TriggerPriceMustBeLowerThanLpBuyQuote = 0x051d,
   /// Only one sell order is allowed for IPO instrument
   OnlyOneSellOrderIsAllowedForIpo = 0x0579,
   /// Request not allowed for BLOCK instrument
@@ -714,6 +722,28 @@ pub enum OrderRejectionReason {
   RiskMaximumOrderValueExceeded = 0x1b5a,
   /// The order price has exceeded the risk limit.
   RiskOrderPriceCollarExceeded = 0x1b5b,
+  /// Total traded value has exceeded the risk limit.
+  TotalTradedValueExceeded = 0x1b63,
+  /// Total traded buy value has exceeded the risk limit.
+  TotalTradedBuyValueExceeded = 0x1b64,
+  /// Total traded sell value has exceeded the risk limit.
+  TotalTradedSellValueExceeded = 0x1b65,
+  /// Total open value has exceeded the risk limit.
+  TotalOpenValueExceeded = 0x1b66,
+  /// Total open buy value has exceeded the risk limit.
+  TotalOpenBuyValueExceeded = 0x1b67,
+  /// Total open sell value has exceeded the risk limit.
+  TotalOpenSellValueExceeded = 0x1b68,
+  /// Total risk value has exceeded the risk limit.
+  TotalRiskValueExceeded = 0x1b69,
+  /// Total buy risk value has exceeded the risk limit.
+  TotalBuyRiskValueExceeded = 0x1b6a,
+  /// Total sell risk value has exceeded the risk limit.
+  TotalSellRiskValueExceeded = 0x1b6b,
+  /// Total net risk value has exceeded the risk limit.
+  TotalNetRiskValueExceeded = 0x1b6c,
+  /// Maximum order count has exceeded the risk limit.
+  MaxOrderCountExceeded = 0x1b6d,
 }
 impl Default for OrderRejectionReason {
   fn default() -> Self {
@@ -781,7 +811,11 @@ impl std::convert::TryFrom<u16> for OrderRejectionReason {
       0x04b1 => Ok(Self::MassQuoteNotAllowedForSelectedMarketModel),
       0x04b3 => Ok(Self::InstrumentClosed),
       0x04b8 => Ok(Self::InvalidBidAskSpread),
+      0x04b9 => Ok(Self::NotAuthorizedToQuoteInstrument),
       0x0515 => Ok(Self::BuyOrderNotAllowed),
+      0x051b => Ok(Self::StopOrdersNotAllowed),
+      0x051c => Ok(Self::TriggerPriceMustBeHigherThanLpSellQuote),
+      0x051d => Ok(Self::TriggerPriceMustBeLowerThanLpBuyQuote),
       0x0579 => Ok(Self::OnlyOneSellOrderIsAllowedForIpo),
       0x07ea => Ok(Self::RequestNotAllowedForBlockInstrument),
       0x07ec => Ok(Self::RequestNotAllowedForCrossInstrument),
@@ -789,6 +823,17 @@ impl std::convert::TryFrom<u16> for OrderRejectionReason {
       0x1b59 => Ok(Self::RiskMaximumOrderVolumeExceeded),
       0x1b5a => Ok(Self::RiskMaximumOrderValueExceeded),
       0x1b5b => Ok(Self::RiskOrderPriceCollarExceeded),
+      0x1b63 => Ok(Self::TotalTradedValueExceeded),
+      0x1b64 => Ok(Self::TotalTradedBuyValueExceeded),
+      0x1b65 => Ok(Self::TotalTradedSellValueExceeded),
+      0x1b66 => Ok(Self::TotalOpenValueExceeded),
+      0x1b67 => Ok(Self::TotalOpenBuyValueExceeded),
+      0x1b68 => Ok(Self::TotalOpenSellValueExceeded),
+      0x1b69 => Ok(Self::TotalRiskValueExceeded),
+      0x1b6a => Ok(Self::TotalBuyRiskValueExceeded),
+      0x1b6b => Ok(Self::TotalSellRiskValueExceeded),
+      0x1b6c => Ok(Self::TotalNetRiskValueExceeded),
+      0x1b6d => Ok(Self::MaxOrderCountExceeded),
       other => Err(InvalidVariant::new(other as u32, "OrderRejectionReason")),
     }
   }
@@ -853,7 +898,11 @@ impl OrderRejectionReasonInt {
   pub const MassQuoteNotAllowedForSelectedMarketModel: u16 = 0x04b1;
   pub const InstrumentClosed: u16 = 0x04b3;
   pub const InvalidBidAskSpread: u16 = 0x04b8;
+  pub const NotAuthorizedToQuoteInstrument: u16 = 0x04b9;
   pub const BuyOrderNotAllowed: u16 = 0x0515;
+  pub const StopOrdersNotAllowed: u16 = 0x051b;
+  pub const TriggerPriceMustBeHigherThanLpSellQuote: u16 = 0x051c;
+  pub const TriggerPriceMustBeLowerThanLpBuyQuote: u16 = 0x051d;
   pub const OnlyOneSellOrderIsAllowedForIpo: u16 = 0x0579;
   pub const RequestNotAllowedForBlockInstrument: u16 = 0x07ea;
   pub const RequestNotAllowedForCrossInstrument: u16 = 0x07ec;
@@ -861,6 +910,17 @@ impl OrderRejectionReasonInt {
   pub const RiskMaximumOrderVolumeExceeded: u16 = 0x1b59;
   pub const RiskMaximumOrderValueExceeded: u16 = 0x1b5a;
   pub const RiskOrderPriceCollarExceeded: u16 = 0x1b5b;
+  pub const TotalTradedValueExceeded: u16 = 0x1b63;
+  pub const TotalTradedBuyValueExceeded: u16 = 0x1b64;
+  pub const TotalTradedSellValueExceeded: u16 = 0x1b65;
+  pub const TotalOpenValueExceeded: u16 = 0x1b66;
+  pub const TotalOpenBuyValueExceeded: u16 = 0x1b67;
+  pub const TotalOpenSellValueExceeded: u16 = 0x1b68;
+  pub const TotalRiskValueExceeded: u16 = 0x1b69;
+  pub const TotalBuyRiskValueExceeded: u16 = 0x1b6a;
+  pub const TotalSellRiskValueExceeded: u16 = 0x1b6b;
+  pub const TotalNetRiskValueExceeded: u16 = 0x1b6c;
+  pub const MaxOrderCountExceeded: u16 = 0x1b6d;
 }
 
 #[allow(dead_code)]
@@ -871,7 +931,7 @@ impl BytesValidator for OrderRejectionReason {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u16::from_le_bytes).unwrap_unchecked();
-  matches!(disc, OrderRejectionReasonInt::NA | OrderRejectionReasonInt::UnknownOrder | OrderRejectionReasonInt::ExchangeClosed | OrderRejectionReasonInt::InvalidPriceIncrement | OrderRejectionReasonInt::Other | OrderRejectionReasonInt::InstrumentPhaseNoTrading | OrderRejectionReasonInt::UnknownInstrument | OrderRejectionReasonInt::InvalidExecutionTrader | OrderRejectionReasonInt::InvalidDecisionMaker | OrderRejectionReasonInt::InvalidClientId | OrderRejectionReasonInt::InvalidPartyRoleQualifierForClientId | OrderRejectionReasonInt::InvalidPartyRoleQualifierForExecutingTrader | OrderRejectionReasonInt::InvalidPartyRoleQualifierForInvestmentDecisionMaker | OrderRejectionReasonInt::CannotModifyMifidFlags | OrderRejectionReasonInt::WrongDisplayQtyValue | OrderRejectionReasonInt::InvalidDisplayQty | OrderRejectionReasonInt::IcebergOrderValueLessThanRequired | OrderRejectionReasonInt::OrderQuantityMustBeGreaterThanMinimumQuantity | OrderRejectionReasonInt::OrderQuantityMustBeLowerThanMaximumQuantity | OrderRejectionReasonInt::OrderPriceMustBeGreaterThanMinimumPrice | OrderRejectionReasonInt::OrderPriceMustBeLowerThanMaximumPrice | OrderRejectionReasonInt::OrderPriceMustBeNonzero | OrderRejectionReasonInt::OrderValueMustBeGreaterThanMinimumValue | OrderRejectionReasonInt::OrderValueMustBeLowerThanMaximumValue | OrderRejectionReasonInt::InvalidOrdTypeForSelectedMarketModel | OrderRejectionReasonInt::LeavesQuantityMustBeGreaterThanZeroAfterModification | OrderRejectionReasonInt::PriceNotAllowed | OrderRejectionReasonInt::InvalidTimeInForceForOrderType | OrderRejectionReasonInt::InvalidTimeInForceForCurrentMarketPhase | OrderRejectionReasonInt::InvalidTimeInForceForSelectedMarketModel | OrderRejectionReasonInt::ExpireTimeCannotBeModified | OrderRejectionReasonInt::ObsoleteExpireDate | OrderRejectionReasonInt::ExpireDateInPast | OrderRejectionReasonInt::ObsoleteExpireTime | OrderRejectionReasonInt::ExpireTimeInPast | OrderRejectionReasonInt::AmbigousExpire | OrderRejectionReasonInt::ExpireDateExceedsLimit | OrderRejectionReasonInt::PriceBelowLowCollar | OrderRejectionReasonInt::PriceAboveHighCollar | OrderRejectionReasonInt::OperationOnRedistributedInstrumentsForbidden | OrderRejectionReasonInt::FirmNotAuthorizedToBuyAndSellTheInstrument | OrderRejectionReasonInt::FirmNotAuthorizedToBuyTheInstrument | OrderRejectionReasonInt::FirmNotAuthorizedToSellTheInstrument | OrderRejectionReasonInt::TriggerPriceNotAllowed | OrderRejectionReasonInt::TriggerPriceNotHigherThanLTP | OrderRejectionReasonInt::TriggerPriceNotLowerThanLTP | OrderRejectionReasonInt::TriggerPriceLowerThanPrice | OrderRejectionReasonInt::TriggerPriceHigherThanPrice | OrderRejectionReasonInt::TriggerPriceModifiedForActivatedOrder | OrderRejectionReasonInt::TriggerPriceMustBeGreaterThanZero | OrderRejectionReasonInt::InvalidPartyIdForClientId | OrderRejectionReasonInt::InvalidPartyIdForExecutingTrader | OrderRejectionReasonInt::InvalidPartyIdForInvestmentDecisionMaker | OrderRejectionReasonInt::InvalidPartyRoleQualifierForPartyId | OrderRejectionReasonInt::MassQuoteNotAllowedForSelectedMarketModel | OrderRejectionReasonInt::InstrumentClosed | OrderRejectionReasonInt::InvalidBidAskSpread | OrderRejectionReasonInt::BuyOrderNotAllowed | OrderRejectionReasonInt::OnlyOneSellOrderIsAllowedForIpo | OrderRejectionReasonInt::RequestNotAllowedForBlockInstrument | OrderRejectionReasonInt::RequestNotAllowedForCrossInstrument | OrderRejectionReasonInt::RiskLimitNotDefined | OrderRejectionReasonInt::RiskMaximumOrderVolumeExceeded | OrderRejectionReasonInt::RiskMaximumOrderValueExceeded | OrderRejectionReasonInt::RiskOrderPriceCollarExceeded)
+  matches!(disc, OrderRejectionReasonInt::NA | OrderRejectionReasonInt::UnknownOrder | OrderRejectionReasonInt::ExchangeClosed | OrderRejectionReasonInt::InvalidPriceIncrement | OrderRejectionReasonInt::Other | OrderRejectionReasonInt::InstrumentPhaseNoTrading | OrderRejectionReasonInt::UnknownInstrument | OrderRejectionReasonInt::InvalidExecutionTrader | OrderRejectionReasonInt::InvalidDecisionMaker | OrderRejectionReasonInt::InvalidClientId | OrderRejectionReasonInt::InvalidPartyRoleQualifierForClientId | OrderRejectionReasonInt::InvalidPartyRoleQualifierForExecutingTrader | OrderRejectionReasonInt::InvalidPartyRoleQualifierForInvestmentDecisionMaker | OrderRejectionReasonInt::CannotModifyMifidFlags | OrderRejectionReasonInt::WrongDisplayQtyValue | OrderRejectionReasonInt::InvalidDisplayQty | OrderRejectionReasonInt::IcebergOrderValueLessThanRequired | OrderRejectionReasonInt::OrderQuantityMustBeGreaterThanMinimumQuantity | OrderRejectionReasonInt::OrderQuantityMustBeLowerThanMaximumQuantity | OrderRejectionReasonInt::OrderPriceMustBeGreaterThanMinimumPrice | OrderRejectionReasonInt::OrderPriceMustBeLowerThanMaximumPrice | OrderRejectionReasonInt::OrderPriceMustBeNonzero | OrderRejectionReasonInt::OrderValueMustBeGreaterThanMinimumValue | OrderRejectionReasonInt::OrderValueMustBeLowerThanMaximumValue | OrderRejectionReasonInt::InvalidOrdTypeForSelectedMarketModel | OrderRejectionReasonInt::LeavesQuantityMustBeGreaterThanZeroAfterModification | OrderRejectionReasonInt::PriceNotAllowed | OrderRejectionReasonInt::InvalidTimeInForceForOrderType | OrderRejectionReasonInt::InvalidTimeInForceForCurrentMarketPhase | OrderRejectionReasonInt::InvalidTimeInForceForSelectedMarketModel | OrderRejectionReasonInt::ExpireTimeCannotBeModified | OrderRejectionReasonInt::ObsoleteExpireDate | OrderRejectionReasonInt::ExpireDateInPast | OrderRejectionReasonInt::ObsoleteExpireTime | OrderRejectionReasonInt::ExpireTimeInPast | OrderRejectionReasonInt::AmbigousExpire | OrderRejectionReasonInt::ExpireDateExceedsLimit | OrderRejectionReasonInt::PriceBelowLowCollar | OrderRejectionReasonInt::PriceAboveHighCollar | OrderRejectionReasonInt::OperationOnRedistributedInstrumentsForbidden | OrderRejectionReasonInt::FirmNotAuthorizedToBuyAndSellTheInstrument | OrderRejectionReasonInt::FirmNotAuthorizedToBuyTheInstrument | OrderRejectionReasonInt::FirmNotAuthorizedToSellTheInstrument | OrderRejectionReasonInt::TriggerPriceNotAllowed | OrderRejectionReasonInt::TriggerPriceNotHigherThanLTP | OrderRejectionReasonInt::TriggerPriceNotLowerThanLTP | OrderRejectionReasonInt::TriggerPriceLowerThanPrice | OrderRejectionReasonInt::TriggerPriceHigherThanPrice | OrderRejectionReasonInt::TriggerPriceModifiedForActivatedOrder | OrderRejectionReasonInt::TriggerPriceMustBeGreaterThanZero | OrderRejectionReasonInt::InvalidPartyIdForClientId | OrderRejectionReasonInt::InvalidPartyIdForExecutingTrader | OrderRejectionReasonInt::InvalidPartyIdForInvestmentDecisionMaker | OrderRejectionReasonInt::InvalidPartyRoleQualifierForPartyId | OrderRejectionReasonInt::MassQuoteNotAllowedForSelectedMarketModel | OrderRejectionReasonInt::InstrumentClosed | OrderRejectionReasonInt::InvalidBidAskSpread | OrderRejectionReasonInt::NotAuthorizedToQuoteInstrument | OrderRejectionReasonInt::BuyOrderNotAllowed | OrderRejectionReasonInt::StopOrdersNotAllowed | OrderRejectionReasonInt::TriggerPriceMustBeHigherThanLpSellQuote | OrderRejectionReasonInt::TriggerPriceMustBeLowerThanLpBuyQuote | OrderRejectionReasonInt::OnlyOneSellOrderIsAllowedForIpo | OrderRejectionReasonInt::RequestNotAllowedForBlockInstrument | OrderRejectionReasonInt::RequestNotAllowedForCrossInstrument | OrderRejectionReasonInt::RiskLimitNotDefined | OrderRejectionReasonInt::RiskMaximumOrderVolumeExceeded | OrderRejectionReasonInt::RiskMaximumOrderValueExceeded | OrderRejectionReasonInt::RiskOrderPriceCollarExceeded | OrderRejectionReasonInt::TotalTradedValueExceeded | OrderRejectionReasonInt::TotalTradedBuyValueExceeded | OrderRejectionReasonInt::TotalTradedSellValueExceeded | OrderRejectionReasonInt::TotalOpenValueExceeded | OrderRejectionReasonInt::TotalOpenBuyValueExceeded | OrderRejectionReasonInt::TotalOpenSellValueExceeded | OrderRejectionReasonInt::TotalRiskValueExceeded | OrderRejectionReasonInt::TotalBuyRiskValueExceeded | OrderRejectionReasonInt::TotalSellRiskValueExceeded | OrderRejectionReasonInt::TotalNetRiskValueExceeded | OrderRejectionReasonInt::MaxOrderCountExceeded)
     }
   }
 
@@ -1721,6 +1781,8 @@ pub enum TradeReportType {
   Decline = 0x0004,
   /// Trade Report Cancel
   TradeReportCancel = 0x0007,
+  /// Trade Break
+  TradeBreak = 0x0008,
 }
 impl Default for TradeReportType {
   fn default() -> Self {
@@ -1736,6 +1798,7 @@ impl std::convert::TryFrom<u8> for TradeReportType {
       0x0003 => Ok(Self::Accept),
       0x0004 => Ok(Self::Decline),
       0x0007 => Ok(Self::TradeReportCancel),
+      0x0008 => Ok(Self::TradeBreak),
       other => Err(InvalidVariant::new(other as u32, "TradeReportType")),
     }
   }
@@ -1748,6 +1811,7 @@ impl TradeReportTypeInt {
   pub const Accept: u8 = 0x0003;
   pub const Decline: u8 = 0x0004;
   pub const TradeReportCancel: u8 = 0x0007;
+  pub const TradeBreak: u8 = 0x0008;
 }
 
 #[allow(dead_code)]
@@ -1758,7 +1822,7 @@ impl BytesValidator for TradeReportType {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u8::from_le_bytes).unwrap_unchecked();
-  matches!(disc, TradeReportTypeInt::Submit | TradeReportTypeInt::Alleged | TradeReportTypeInt::Accept | TradeReportTypeInt::Decline | TradeReportTypeInt::TradeReportCancel)
+  matches!(disc, TradeReportTypeInt::Submit | TradeReportTypeInt::Alleged | TradeReportTypeInt::Accept | TradeReportTypeInt::Decline | TradeReportTypeInt::TradeReportCancel | TradeReportTypeInt::TradeBreak)
     }
   }
 
@@ -2227,7 +2291,7 @@ pub type TradeReportRefID = [AnsiChar; 20];
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum ExecType {
   /// Not applicable
-  NA = 0x0000,
+  NA = 0x0001,
   /// Rejected.
   Rejected = 0x0008,
   /// Expired
@@ -2248,7 +2312,7 @@ impl std::convert::TryFrom<u8> for ExecType {
   type Error = InvalidVariant;
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
-      0x0000 => Ok(Self::NA),
+      0x0001 => Ok(Self::NA),
       0x0008 => Ok(Self::Rejected),
       0x000c => Ok(Self::Expired),
       0x000f => Ok(Self::Trade),
@@ -2261,7 +2325,7 @@ impl std::convert::TryFrom<u8> for ExecType {
 pub struct ExecTypeInt;
 #[allow(non_upper_case_globals, dead_code)]
 impl ExecTypeInt {
-  pub const NA: u8 = 0x0000;
+  pub const NA: u8 = 0x0001;
   pub const Rejected: u8 = 0x0008;
   pub const Expired: u8 = 0x000c;
   pub const Trade: u8 = 0x000f;
@@ -2281,7 +2345,7 @@ impl BytesValidator for ExecType {
     }
   }
 
-/// Message used to cancel previously accepted Trade Capture Report.
+/// Message used to inform about cancellation of previously accepted Trade.
 #[repr(C, packed)]
 #[derive(Serialize, Deserialize, Clone, Copy)]
 #[serde(deny_unknown_fields)]

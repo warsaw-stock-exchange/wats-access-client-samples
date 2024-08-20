@@ -1,6 +1,6 @@
 {
   "$schema": "./schema.json",
-  "version": 2051,
+  "version": 2054,
   "typeDefinitions": {
     "marketData": [
       {
@@ -241,13 +241,6 @@
       },
       {
         "kind": "Array",
-        "name": "IndexUnderlying",
-        "type": "PublicProductIdentification",
-        "length": 3,
-        "description": "List of underlying instruments for index."
-      },
-      {
-        "kind": "Array",
         "name": "Issuer",
         "type": "AnsiChar",
         "length": 150,
@@ -266,6 +259,13 @@
         "type": "AnsiChar",
         "length": 35,
         "description": "Financial Instrument Short Name as specified in ISO 10962."
+      },
+      {
+        "kind": "Array",
+        "name": "Kid",
+        "type": "AnsiChar",
+        "length": 128,
+        "description": "KID text."
       },
       {
         "kind": "Enum",
@@ -1769,8 +1769,13 @@
             "Hybrid no valid quotes."
           ],
           [
-            "HybridPause",
+            "HybridKnockout",
             9,
+            "Hybrid knockout."
+          ],
+          [
+            "HybridPause",
+            10,
             "Hybrid pause."
           ]
         ]
@@ -3540,6 +3545,65 @@
         ]
       },
       {
+        "kind": "Enum",
+        "name": "IndexUnderlyingType",
+        "description": "Underlying type of index.",
+        "underlying": "u8",
+        "variants": [
+          [
+            "Index",
+            1,
+            "Index."
+          ],
+          [
+            "ReferenceRate",
+            2,
+            "Reference Rate."
+          ]
+        ]
+      },
+      {
+        "kind": "Struct",
+        "name": "IndexUnderlying",
+        "description": "Underlying instruments for index.",
+        "fields": [
+          {
+            "name": "productIdentification",
+            "type": "PublicProductIdentification",
+            "description": "Product Identification."
+          },
+          {
+            "name": "indexUnderlyingType",
+            "type": "IndexUnderlyingType",
+            "description": "Underlying type of index."
+          }
+        ]
+      },
+      {
+        "kind": "Array",
+        "name": "IndexUnderlyingArray",
+        "description": "IndexUnderlying Array.",
+        "type": "IndexUnderlying",
+        "length": 3
+      },
+      {
+        "kind": "Struct",
+        "name": "IndexUnderlyings",
+        "description": "Array of IndexUnderlying with their count.",
+        "fields": [
+          {
+            "name": "count",
+            "type": "u8",
+            "description": "How many elements does IndexUnderlyings contain."
+          },
+          {
+            "name": "items",
+            "type": "IndexUnderlyingArray",
+            "description": "IndexUnderlying Array."
+          }
+        ]
+      },
+      {
         "kind": "Struct",
         "name": "Header",
         "description": "Market Data message header.",
@@ -4178,32 +4242,32 @@
           [
             "ReferencePrice",
             1,
-            "Reference price placed in the vale field"
+            "Reference price placed in the value field"
           ],
           [
-            "MidPoint",
+            "ReferenceIndexPrice",
             2,
-            "MidPoint price placed in the vale field"
+            "TBSP.Price price placed in the value field"
           ],
           [
-            "Fixing1Price",
+            "ReferenceFixingIndexPrice",
             3,
-            "The first fixing prices fixing prices appropriately placed in the value field as the average price, valueBid as the bid price, and valueAsk as the ask price."
+            "TBSP.FixPrice price placed in the value field"
           ],
           [
-            "Fixing2Price",
+            "MidPrice",
             4,
-            "The second fixing prices fixing prices appropriately placed in the value field as the average price, valueBid as the bid price, and valueAsk as the ask price."
+            "MidPrice price placed in the value field"
           ],
           [
-            "Fixing1Ytm",
+            "FixingPrice",
             5,
-            "The first fixing YTM (e.i. yield to maturity)  appropriately placed in the value field as the average YTM, valueBid as the bid YTM, and valueAsk as the ask YTM."
+            "The fixing prices placed appropriately in the value field as the average price, valueBid as the bid price, and valueAsk as the ask price."
           ],
           [
-            "Fixing2Ytm",
+            "FixingYtm",
             6,
-            "The second fixing YTM (e.i. yield to maturity)  appropriately placed in the value field as the average YTM, valueBid as the bid YTM, and valueAsk as the ask YTM."
+            "The fixing YTM (i.e. yield to maturity) appropriately placed in the value field as the average YTM, valueBid as the bid YTM, and valueAsk as the ask YTM."
           ]
         ]
       },
@@ -4220,48 +4284,33 @@
             "No values provided."
           ],
           [
-            "Price",
+            "value",
             "0b000000001",
             "A price was provided."
           ],
           [
-            "PriceBid",
+            "valueBid",
             "0b000000010",
             "A bid price was provided."
           ],
           [
-            "PriceAsk",
+            "valueAsk",
             "0b000000100",
-            "A ask price was provided."
-          ],
-          [
-            "Ytm",
-            "0b000001000",
-            "YTM was provided."
-          ],
-          [
-            "YtmBid",
-            "0b000010000",
-            "Bid YTM was provided."
-          ],
-          [
-            "YtmAsk",
-            "0b000100000",
-            "Ask YTM was provided."
+            "An ask price was provided."
           ],
           [
             "YtmNoCalc",
-            "0b001000000",
+            "0b000001000",
             "YTM was not provided due to the absence of its calculation."
           ],
           [
             "YtmBidNoCalc",
-            "0b010000000",
+            "0b000010000",
             "Bid YTM was not provided due to the absence of its calculation."
           ],
           [
             "YtmAskNoCalc",
-            "0b100000000",
+            "0b000100000",
             "Ask YTM was not provided due to the absence of its calculation."
           ]
         ]
@@ -4840,6 +4889,26 @@
             "name": "isLeverage",
             "type": "LeverageFlag",
             "description": "Identifier of leverage instruments"
+          },
+          {
+            "name": "accruedInterestValue",
+            "type": "Number",
+            "description": "Accrued iterest value of the instrument"
+          },
+          {
+            "name": "kid",
+            "type": "Kid",
+            "description": "KID."
+          },
+          {
+            "name": "kidIssueDate",
+            "type": "Date",
+            "description": "KID issue date."
+          },
+          {
+            "name": "valueAtRisk",
+            "type": "u8",
+            "description": "Value at risk."
           }
         ]
       },
@@ -5586,8 +5655,8 @@
             "description": "Number of dividends included in the index calculation."
           },
           {
-            "name": "indexUnderlying",
-            "type": "IndexUnderlying",
+            "name": "indexUnderlyings",
+            "type": "IndexUnderlyings",
             "description": "List of underlying instruments for index."
           },
           {

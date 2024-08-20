@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 /**
  * <h2>Instrument</h2>
  * <p>Definition of a financial instrument.</p>
- * <p>Byte length: 588</p>
+ * <p>Byte length: 729</p>
  * <p>Header header - Message header. | size 42</p>
  * <p>ElementId > long (u32) instrumentId - ID of financial instrument. | size 4</p>
  * <p>ProductType productType - Type of the product. | size 1</p>
@@ -64,6 +64,10 @@ import java.nio.ByteBuffer;
  * <p>Price > long (i64) thresholdMax - upper threshold for leveraged instruments | size 8</p>
  * <p>Price > long (i64) thresholdMin - lower threshold for leveraged instruments | size 8</p>
  * <p>LeverageFlag isLeverage - Identifier of leverage instruments | size 1</p>
+ * <p>Number > long (i64) accruedInterestValue - Accrued iterest value of the instrument | size 8</p>
+ * <p>Kid > String (u8[]) kid - KID. | size 128</p>
+ * <p>Date > long (u32) kidIssueDate - KID issue date. | size 4</p>
+ * <p>u8 > int valueAtRisk - Value at risk. | size 1</p>
  */
 public class Instrument implements ByteSerializable, Message {
     private Header header;
@@ -122,9 +126,13 @@ public class Instrument implements ByteSerializable, Message {
     private long thresholdMax;
     private long thresholdMin;
     private LeverageFlag isLeverage;
-    public static final int byteLength = 588;
+    private long accruedInterestValue;
+    private String kid;
+    private long kidIssueDate;
+    private int valueAtRisk;
+    public static final int byteLength = 729;
     
-    public Instrument(Header header, long instrumentId, ProductType productType, ProductSubtype productSubtype, long firstTradingDate, long lastTradingDate, long productId, Currency currency, long icebergMinValue, long lotSize, PriceExpressionType priceExpressionType, long calendarId, long marketStructureId, long tickTableId, long collarGroupId, long tradingScheduleId, String description, String mic, long nominalValue, NominalValueType nominalValueType, long multiplier, long strikePrice, Currency strikePriceCurrency, String productIdentification, ProductIdentificationType productIdentificationType, long settlementCalendarId, CouponType bondCouponType, long preTradeCheckMinPrice, long preTradeCheckMaxPrice, BigInteger preTradeCheckMinQuantity, BigInteger preTradeCheckMaxQuantity, long preTradeCheckMaxValue, long preTradeCheckMinValue, boolean liquidity, MarketModelType marketModelType, String issuer, Country issuerRegCountry, long underlyingInstrumentId, String productCode, String cfi, String fisn, BigInteger issueSize, Currency nominalCurrency, UsIndicator usIndicator, long expiryDate, int versionNumber, SettlementType settlementType, OptionType optionType, ExerciseType exerciseType, String productName, long referencePrice, InstrumentStatus status, long initialPhaseId, long thresholdMax, long thresholdMin, LeverageFlag isLeverage) {
+    public Instrument(Header header, long instrumentId, ProductType productType, ProductSubtype productSubtype, long firstTradingDate, long lastTradingDate, long productId, Currency currency, long icebergMinValue, long lotSize, PriceExpressionType priceExpressionType, long calendarId, long marketStructureId, long tickTableId, long collarGroupId, long tradingScheduleId, String description, String mic, long nominalValue, NominalValueType nominalValueType, long multiplier, long strikePrice, Currency strikePriceCurrency, String productIdentification, ProductIdentificationType productIdentificationType, long settlementCalendarId, CouponType bondCouponType, long preTradeCheckMinPrice, long preTradeCheckMaxPrice, BigInteger preTradeCheckMinQuantity, BigInteger preTradeCheckMaxQuantity, long preTradeCheckMaxValue, long preTradeCheckMinValue, boolean liquidity, MarketModelType marketModelType, String issuer, Country issuerRegCountry, long underlyingInstrumentId, String productCode, String cfi, String fisn, BigInteger issueSize, Currency nominalCurrency, UsIndicator usIndicator, long expiryDate, int versionNumber, SettlementType settlementType, OptionType optionType, ExerciseType exerciseType, String productName, long referencePrice, InstrumentStatus status, long initialPhaseId, long thresholdMax, long thresholdMin, LeverageFlag isLeverage, long accruedInterestValue, String kid, long kidIssueDate, int valueAtRisk) {
         this.header = header;
         this.instrumentId = instrumentId;
         this.productType = productType;
@@ -181,6 +189,10 @@ public class Instrument implements ByteSerializable, Message {
         this.thresholdMax = thresholdMax;
         this.thresholdMin = thresholdMin;
         this.isLeverage = isLeverage;
+        this.accruedInterestValue = accruedInterestValue;
+        this.kid = kid;
+        this.kidIssueDate = kidIssueDate;
+        this.valueAtRisk = valueAtRisk;
     }
     
     public Instrument(byte[] bytes, int offset) {
@@ -240,6 +252,10 @@ public class Instrument implements ByteSerializable, Message {
         this.thresholdMax = BendecUtils.int64FromByteArray(bytes, offset + 571);
         this.thresholdMin = BendecUtils.int64FromByteArray(bytes, offset + 579);
         this.isLeverage = LeverageFlag.getLeverageFlag(bytes, offset + 587);
+        this.accruedInterestValue = BendecUtils.int64FromByteArray(bytes, offset + 588);
+        this.kid = BendecUtils.stringFromByteArray(bytes, offset + 596, 128);
+        this.kidIssueDate = BendecUtils.uInt32FromByteArray(bytes, offset + 724);
+        this.valueAtRisk = BendecUtils.uInt8FromByteArray(bytes, offset + 728);
     }
     
     public Instrument(byte[] bytes) {
@@ -642,6 +658,34 @@ public class Instrument implements ByteSerializable, Message {
     }
     
     /**
+     * @return Accrued iterest value of the instrument
+     */
+    public long getAccruedInterestValue() {
+        return this.accruedInterestValue;
+    }
+    
+    /**
+     * @return KID.
+     */
+    public String getKid() {
+        return this.kid;
+    }
+    
+    /**
+     * @return KID issue date.
+     */
+    public long getKidIssueDate() {
+        return this.kidIssueDate;
+    }
+    
+    /**
+     * @return Value at risk.
+     */
+    public int getValueAtRisk() {
+        return this.valueAtRisk;
+    }
+    
+    /**
      * @param header Message header.
      */
     public void setHeader(Header header) {
@@ -1033,6 +1077,34 @@ public class Instrument implements ByteSerializable, Message {
         this.isLeverage = isLeverage;
     }
     
+    /**
+     * @param accruedInterestValue Accrued iterest value of the instrument
+     */
+    public void setAccruedInterestValue(long accruedInterestValue) {
+        this.accruedInterestValue = accruedInterestValue;
+    }
+    
+    /**
+     * @param kid KID.
+     */
+    public void setKid(String kid) {
+        this.kid = kid;
+    }
+    
+    /**
+     * @param kidIssueDate KID issue date.
+     */
+    public void setKidIssueDate(long kidIssueDate) {
+        this.kidIssueDate = kidIssueDate;
+    }
+    
+    /**
+     * @param valueAtRisk Value at risk.
+     */
+    public void setValueAtRisk(int valueAtRisk) {
+        this.valueAtRisk = valueAtRisk;
+    }
+    
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -1092,6 +1164,10 @@ public class Instrument implements ByteSerializable, Message {
         buffer.put(BendecUtils.int64ToByteArray(this.thresholdMax));
         buffer.put(BendecUtils.int64ToByteArray(this.thresholdMin));
         isLeverage.toBytes(buffer);
+        buffer.put(BendecUtils.int64ToByteArray(this.accruedInterestValue));
+        buffer.put(BendecUtils.stringToByteArray(this.kid, 128));
+        buffer.put(BendecUtils.uInt32ToByteArray(this.kidIssueDate));
+        buffer.put(BendecUtils.uInt8ToByteArray(this.valueAtRisk));
         return buffer.array();
     }
     
@@ -1153,6 +1229,10 @@ public class Instrument implements ByteSerializable, Message {
         buffer.put(BendecUtils.int64ToByteArray(this.thresholdMax));
         buffer.put(BendecUtils.int64ToByteArray(this.thresholdMin));
         isLeverage.toBytes(buffer);
+        buffer.put(BendecUtils.int64ToByteArray(this.accruedInterestValue));
+        buffer.put(BendecUtils.stringToByteArray(this.kid, 128));
+        buffer.put(BendecUtils.uInt32ToByteArray(this.kidIssueDate));
+        buffer.put(BendecUtils.uInt8ToByteArray(this.valueAtRisk));
     }
     
     @Override
@@ -1212,7 +1292,11 @@ public class Instrument implements ByteSerializable, Message {
         initialPhaseId,
         thresholdMax,
         thresholdMin,
-        isLeverage);
+        isLeverage,
+        accruedInterestValue,
+        kid,
+        kidIssueDate,
+        valueAtRisk);
     }
     
     @Override
@@ -1274,6 +1358,10 @@ public class Instrument implements ByteSerializable, Message {
             ", thresholdMax=" + thresholdMax +
             ", thresholdMin=" + thresholdMin +
             ", isLeverage=" + isLeverage +
+            ", accruedInterestValue=" + accruedInterestValue +
+            ", kid=" + kid +
+            ", kidIssueDate=" + kidIssueDate +
+            ", valueAtRisk=" + valueAtRisk +
             "}";
     }
 }

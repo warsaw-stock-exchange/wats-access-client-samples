@@ -28,7 +28,11 @@ public enum TradeReportType {
     /**
      * Trade Report Cancel
      */
-    TRADEREPORTCANCEL(7);
+    TRADEREPORTCANCEL(7),
+    /**
+     * Trade Break
+     */
+    TRADEBREAK(8);
     
     private final int value;
     private final int byteLength = 1;

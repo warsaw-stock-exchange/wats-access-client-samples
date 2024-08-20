@@ -12,7 +12,7 @@ public enum ExecType {
     /**
      * Not applicable
      */
-    NA(0),
+    NA(1),
     /**
      * Rejected.
      */

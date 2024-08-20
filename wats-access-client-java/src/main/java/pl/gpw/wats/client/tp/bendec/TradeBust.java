@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 
 /**
  * <h2>TradeBust</h2>
- * <p>Message used to cancel previously accepted Trade Capture Report.</p>
+ * <p>Message used to inform about cancellation of previously accepted Trade.</p>
  * <p>Byte length: 20</p>
  * <p>Header header - Header. | size 16</p>
  * <p>TradeId > long (u32) tradeId - The unique ID assigned to the trade entity once it is received or matched by the exchange or central counterparty. | size 4</p>
