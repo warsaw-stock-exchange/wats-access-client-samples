@@ -40,7 +40,7 @@ public class TestUtils {
                     new MifidField(4, PartyRoleQualifier.ALGORITHM),
                     new MifidField(17, PartyRoleQualifier.NATURALPERSON)
                 ),
-                BigInteger.TEN,
+                BigInteger.ZERO,
                 "",
                 "",
                 ClearingIdentifier.NOTAPPLICABLE,

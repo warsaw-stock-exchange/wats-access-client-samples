@@ -118,6 +118,10 @@ public enum MsgType {
      */
     MARKETMAKERCOMMANDRESPONSE(33),
     /**
+     * Create a SeqNum gap bettwen current SeqNum and header::seqNum
+     */
+    GAPFILL(34),
+    /**
      * A message to relay test scenario information
      */
     TESTEVENT(255);

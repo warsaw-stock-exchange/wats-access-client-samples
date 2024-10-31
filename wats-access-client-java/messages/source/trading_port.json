@@ -1,5 +1,5 @@
 {
-  "version": 1081,
+  "version": 1093,
   "typeDefinitions": [
     {
       "kind": "Primitive",
@@ -729,6 +729,16 @@
           "Invalid PartyRoleQualifier (2376) for PartyID (448)"
         ],
         [
+          "MissingClearingMemberCode",
+          1076,
+          "Missing ClearingMemberCode"
+        ],
+        [
+          "ForbiddenClearingMemberCode",
+          1077,
+          "Forbidden ClearingMemberCode"
+        ],
+        [
           "MassQuoteNotAllowedForSelectedMarketModel",
           1201,
           "Mass Quote not allowed for selected Market Model."
@@ -767,6 +777,16 @@
           "TriggerPriceMustBeLowerThanLpBuyQuote",
           1309,
           "TriggerPrice (1102) must be lower than LP buy quote for sell Stop Order"
+        ],
+        [
+          "MarketMakingViaMassQuoteOnlyOnHybridMarket",
+          1310,
+          "Market Making in Hybrid market model is only possible using Mass Quote message."
+        ],
+        [
+          "SellQuotesNotAllowedDuringBuyOnlyState",
+          1311,
+          "During BuyOnly  state in Hybrid market model sell quotes are not accepted"
         ],
         [
           "OnlyOneSellOrderIsAllowedForIpo",
@@ -857,6 +877,11 @@
           "MaxOrderCountExceeded",
           7021,
           "Maximum order count has exceeded the risk limit."
+        ],
+        [
+          "KillSwitch",
+          7022,
+          "Rejected due to kill switch."
         ]
       ]
     },
@@ -963,6 +988,16 @@
           "InvalidAlgorithmicTradeIndicator",
           9,
           "Invalid algorithmic trade indicator."
+        ],
+        [
+          "InvalidTradeReportId",
+          10,
+          "Invalid Trade report ID."
+        ],
+        [
+          "InvalidGapFillSeqNum",
+          11,
+          "GapFill seqNum should be higher than current seqNum"
         ]
       ]
     },
@@ -1572,6 +1607,11 @@
           "OperationOnRedistributedInstrumentsForbidden",
           1056,
           "Operation on redistributed instruments forbidden."
+        ],
+        [
+          "RequestNotAllowedOnSponsoredConnection",
+          2025,
+          "Request not allowed on sponsored connection."
         ]
       ]
     },
@@ -2005,6 +2045,21 @@
           "Invalid PartyRoleQualifier (2376) for PartyID (448)"
         ],
         [
+          "MissingClearingMemberCode",
+          1076,
+          "Missing ClearingMemberCode"
+        ],
+        [
+          "ForbiddenClearingMemberCode",
+          1077,
+          "Forbidden ClearingMemberCode"
+        ],
+        [
+          "NotAuthorizedToQuoteInstrument",
+          1209,
+          "Firm is not a Market Maker for this SecurityID (48)."
+        ],
+        [
           "UnknownTradeReport",
           2001,
           "Unknown trade report"
@@ -2180,14 +2235,14 @@
       "kind": "Array",
       "name": "TradeReportId",
       "type": "AnsiChar",
-      "length": 20,
-      "description": "Unique identifier of trade capture report."
+      "length": 21,
+      "description": "Unique identifier of trade capture report. 21st character is reserved for exchange-assigned identifiers."
     },
     {
       "kind": "Array",
       "name": "TradeReportRefID",
       "type": "AnsiChar",
-      "length": 20,
+      "length": 21,
       "description": "Reference identifier used with Cancel and Replace transaction types. The TradeReportID that is being referenced for trade correction or cancelation."
     },
     {
@@ -2668,6 +2723,11 @@
           "The response to the Market Maker command."
         ],
         [
+          "GapFill",
+          34,
+          "Create a SeqNum gap bettwen current SeqNum and header::seqNum"
+        ],
+        [
           "TestEvent",
           255,
           "A message to relay test scenario information"
@@ -2702,6 +2762,18 @@
           3,
           "End of test scenario"
         ]
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "GapFill",
+      "description": "Create a SeqNum gap bettwen current SeqNum and header::seqNum",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Message header."
+        }
       ]
     },
     {
@@ -2757,6 +2829,7 @@
         "OrderMassCancel",
         "OrderMassCancelResponse",
         "BidOfferUpdate",
+        "GapFill",
         "TestEvent"
       ],
       "discriminator": [
@@ -2844,6 +2917,21 @@
           "Rejected",
           15,
           "Order rejected."
+        ],
+        [
+          "CancelonBuyOnlyStateEntry",
+          16,
+          "Cancel on BuyOnly state entry"
+        ],
+        [
+          "CancelonKnockedOutStateEntry",
+          17,
+          "Cancel on KnockedOut state entry"
+        ],
+        [
+          "CancelByRiskManagement",
+          18,
+          "Order cancelled due to exceeding RMA post trade limit."
         ]
       ]
     },
@@ -3089,6 +3177,16 @@
           "InvalidPartyRoleQualifierForPartyId",
           1075,
           "Invalid PartyRoleQualifier (2376) for PartyID (448)"
+        ],
+        [
+          "MissingClearingMemberCode",
+          1076,
+          "Missing ClearingMemberCode"
+        ],
+        [
+          "ForbiddenClearingMemberCode",
+          1077,
+          "Forbidden ClearingMemberCode"
         ],
         [
           "DuplicateInstrument",

@@ -6,6 +6,6 @@
     "gen-cpp": "node ./messages/generator/generateCPP"
   },
   "dependencies": {
-    "bendec": "0.49.0"
+    "bendec": "0.50.0"
   }
 }

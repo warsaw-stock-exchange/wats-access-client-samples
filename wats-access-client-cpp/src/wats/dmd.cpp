@@ -159,6 +159,8 @@ void DelayedMarketData::read_replay() {
 
     do {
         boost::asio::read(socket_replay_, buffer(&message_replay_, sizeof(Header)), ec);
+        // Replay stream is finished with two bytes zero pair which is
+        // immediately followed by disconnect. Here we react on the disconnect.
         if (!ec) {
             auto payload = buffer(header + sizeof(Header),
                 pheader->length - sizeof(Header));

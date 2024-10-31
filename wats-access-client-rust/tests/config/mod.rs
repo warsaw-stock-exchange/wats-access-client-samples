@@ -80,12 +80,6 @@ pub(super) struct Config {
     /// Online Market Data replay endpoint
     omd_replay: Endpoint,
 
-    /// Delayed Market Data multicast group address
-    dmd_stream: Endpoint,
-
-    /// Delayed Market Data replay endpoint
-    dmd_replay: Endpoint,
-
     /// Best Bid Offer replay endpoint
     bbo_snapshot: Endpoint,
 
@@ -100,6 +94,8 @@ pub(super) struct Config {
     connection_01: Connection,
 
     connection_02: Connection,
+
+    connection_03: Connection,
 
     connection_04: Connection,
 
@@ -190,16 +186,6 @@ impl Config {
         (self.omd_replay.host.as_str(), self.omd_replay.port)
     }
 
-    /// Delayed Market Data multicast group address
-    pub(super) fn dmd_addr(&self) -> impl tokio::net::ToSocketAddrs + '_ {
-        (self.dmd_stream.host.as_str(), self.dmd_stream.port)
-    }
-
-    /// Delayed Market Data replay endpoint
-    pub(super) fn dmd_replay_addr(&self) -> impl tokio::net::ToSocketAddrs + '_ {
-        (self.dmd_replay.host.as_str(), self.dmd_replay.port)
-    }
-
     /// Snapshot peer socket address
     pub(super) fn bbo_snap_addr(&self) -> impl tokio::net::ToSocketAddrs + '_ {
         (self.bbo_snapshot.host.as_str(), self.bbo_snapshot.port)
@@ -247,11 +233,24 @@ impl Config {
     }
 
     /// Connection 3 id
+    pub(super) fn connection_03_id(&self) -> u16 {
+      self.connection_03.id
+  }
+
+  /// Connection 3 token
+  pub(super) fn connection_03_token(&self) -> [u8; 8] {
+      let mut token_arr = [0u8; 8];
+      token_arr[..self.connection_03.token.len()]
+          .copy_from_slice(self.connection_03.token.as_bytes());
+      token_arr
+  }
+
+    /// Connection 4 id
     pub(super) fn connection_04_id(&self) -> u16 {
       self.connection_04.id
   }
 
-  /// Connection 3 token
+  /// Connection 4 token
   pub(super) fn connection_04_token(&self) -> [u8; 8] {
       let mut token_arr = [0u8; 8];
       token_arr[..self.connection_04.token.len()]

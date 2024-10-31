@@ -126,6 +126,18 @@ public enum TcrRejectionReason {
      */
     INVALIDPARTYROLEQUALIFIERFORPARTYID(1075),
     /**
+     * Missing ClearingMemberCode
+     */
+    MISSINGCLEARINGMEMBERCODE(1076),
+    /**
+     * Forbidden ClearingMemberCode
+     */
+    FORBIDDENCLEARINGMEMBERCODE(1077),
+    /**
+     * Firm is not a Market Maker for this SecurityID (48).
+     */
+    NOTAUTHORIZEDTOQUOTEINSTRUMENT(1209),
+    /**
      * Unknown trade report
      */
     UNKNOWNTRADEREPORT(2001),

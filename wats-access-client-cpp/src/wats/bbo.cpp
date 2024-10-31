@@ -13,6 +13,35 @@ BestBidOffer::BestBidOffer(boost::asio::io_context& io_context) :
     state_(SessionState::disconnected),
     expectedSeqNum_{1} {
 
+    handle([this](LoginResponse message, EventSource source) {
+        if (message.result == LoginResult::Ok) {
+            this->state_ = SessionState::connected;
+        } else {
+            throw best_bid_offer_exception("Invalid login data");
+        }
+    });
+
+    handle([this](EncryptionKey message, EventSource source) {
+
+        spdlog::info("EncryptionKey received with {{ id: {} }}",
+            (uint32_t)message.id);
+
+        DecryptionProcessor processor_;
+
+        SecByteBlock encryptionKey(32);
+        SecByteBlock encryptionNonce(12);
+
+        const uint8_t nonce[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+        encryptionKey.Assign(message.secretKey, sizeof(EncryptionGroupKey));
+        encryptionNonce.Assign(nonce, sizeof(nonce));
+
+        processor_.SetKeyWithIV(encryptionKey, encryptionKey.size(),
+            encryptionNonce, encryptionNonce.size());
+
+        decryption_.streams.emplace(+message.id, processor_);
+    });
+
     handle([this](EndOfSnapshot message, EventSource source) {
         spdlog::info("finished reading from best-bid-offer/snapshot");
         spdlog::debug("EndOfSnapshot received with {{ lastSeqNum: {} }}",
@@ -73,8 +102,9 @@ void BestBidOffer::start(const std::string snapshotHost, const uint16_t snapshot
         if (!ec) {
             spdlog::info("connected to best-bid-offer/snapshot");
 
-            spdlog::info("start reading from best-bid-offer/snapshot");
             login(token_, connectionId_);
+
+            spdlog::info("start reading from best-bid-offer/snapshot");
 
             read_snapshot();
         } else {
@@ -141,6 +171,41 @@ void BestBidOffer::dispatch(Message &message, EventSource source) {
         throw best_bid_offer_exception("unexpected message sequence number");
     }
 
+    if (pheader->isEncrypted) {
+        switch (pheader->msgType) {
+            case MsgType::OrderAdd: {
+                decryption_.decrypt(buffer_cast<OrderAdd*>(header));
+                spdlog::debug("OrderAdd decrypted");
+                break;
+            }
+            case MsgType::OrderModify: {
+                decryption_.decrypt(buffer_cast<OrderModify*>(header));
+                spdlog::debug("OrderModify decrypted");
+                break;
+            }
+            case MsgType::OrderExecute: {
+                decryption_.decrypt(buffer_cast<OrderExecute*>(header));
+                spdlog::debug("OrderExecute decrypted");
+                break;
+            }
+            case MsgType::TopPriceLevelUpdate: {
+                decryption_.decrypt(buffer_cast<TopPriceLevelUpdate*>(header));
+                spdlog::debug("TopPriceLevelUpdate decrypted");
+                break;
+            }
+            case MsgType::PriceLevelSnapshot: {
+                decryption_.decrypt(buffer_cast<PriceLevelSnapshot*>(header));
+                spdlog::debug("PriceLevelSnapshot decrypted");
+                break;
+            }
+            case MsgType::ProductSummary: {
+                decryption_.decrypt(buffer_cast<ProductSummary*>(header));
+                spdlog::debug("ProductSummary decrypted");
+                break;
+            }
+        }
+    }
+
     if (dispatch_table_.find(pheader->msgType) != dispatch_table_.end()) {
         std::any msg = dispatch_table_[pheader->msgType](message);
         for (CallbackWrapper& callbackWrapper: callback_wrappers_) {
@@ -194,26 +259,6 @@ void BestBidOffer::read_stream() {
                     MsgType2Name.find(pheader->msgType)->second, +pheader->seqNum,
                     (unsigned int)pheader->msgType, +pheader->length);
 
-                if (pheader->isEncrypted) {
-                    switch (pheader->msgType) {
-                        case MsgType::OrderAdd: {
-                            decryption_.decrypt(buffer_cast<OrderAdd*>(header));
-                            spdlog::debug("OrderAdd decrypted");
-                            break;
-                        }
-                        case MsgType::OrderModify: {
-                            decryption_.decrypt(buffer_cast<OrderModify*>(header));
-                            spdlog::debug("OrderModify decrypted");
-                            break;
-                        }
-                        case MsgType::OrderExecute: {
-                            decryption_.decrypt(buffer_cast<OrderExecute*>(header));
-                            spdlog::debug("OrderExecute decrypted");
-                            break;
-                        }
-                    }
-                }
-
                 dispatch(message_stream_, EventSource::stream);
 
                 read_stream();
@@ -241,26 +286,6 @@ void BestBidOffer::read_replay() {
                 "{{ seqNum: {}, msgType: {}, length: {} }}",
                 MsgType2Name.find(pheader->msgType)->second, +pheader->seqNum,
                 (unsigned int)pheader->msgType, +pheader->length);
-
-            if (pheader->isEncrypted) {
-                switch (pheader->msgType) {
-                    case MsgType::OrderAdd: {
-                        decryption_.decrypt(buffer_cast<OrderAdd*>(header));
-                        spdlog::debug("OrderAdd decrypted");
-                        break;
-                    }
-                    case MsgType::OrderModify: {
-                        decryption_.decrypt(buffer_cast<OrderModify*>(header));
-                        spdlog::debug("OrderModify decrypted");
-                        break;
-                    }
-                    case MsgType::OrderExecute: {
-                        decryption_.decrypt(buffer_cast<OrderExecute*>(header));
-                        spdlog::debug("OrderExecute decrypted");
-                        break;
-                    }
-                }
-            }
 
             dispatch(message_replay_, EventSource::replay);
         } else {

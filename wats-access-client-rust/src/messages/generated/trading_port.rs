@@ -692,6 +692,10 @@ pub enum OrderRejectionReason {
   InvalidPartyIdForInvestmentDecisionMaker = 0x0430,
   /// Invalid PartyRoleQualifier (2376) for PartyID (448)
   InvalidPartyRoleQualifierForPartyId = 0x0433,
+  /// Missing ClearingMemberCode
+  MissingClearingMemberCode = 0x0434,
+  /// Forbidden ClearingMemberCode
+  ForbiddenClearingMemberCode = 0x0435,
   /// Mass Quote not allowed for selected Market Model.
   MassQuoteNotAllowedForSelectedMarketModel = 0x04b1,
   /// Instrument closed for trading.
@@ -708,6 +712,10 @@ pub enum OrderRejectionReason {
   TriggerPriceMustBeHigherThanLpSellQuote = 0x051c,
   /// TriggerPrice (1102) must be lower than LP buy quote for sell Stop Order
   TriggerPriceMustBeLowerThanLpBuyQuote = 0x051d,
+  /// Market Making in Hybrid market model is only possible using Mass Quote message.
+  MarketMakingViaMassQuoteOnlyOnHybridMarket = 0x051e,
+  /// During BuyOnly  state in Hybrid market model sell quotes are not accepted
+  SellQuotesNotAllowedDuringBuyOnlyState = 0x051f,
   /// Only one sell order is allowed for IPO instrument
   OnlyOneSellOrderIsAllowedForIpo = 0x0579,
   /// Request not allowed for BLOCK instrument
@@ -744,6 +752,8 @@ pub enum OrderRejectionReason {
   TotalNetRiskValueExceeded = 0x1b6c,
   /// Maximum order count has exceeded the risk limit.
   MaxOrderCountExceeded = 0x1b6d,
+  /// Rejected due to kill switch.
+  KillSwitch = 0x1b6e,
 }
 impl Default for OrderRejectionReason {
   fn default() -> Self {
@@ -808,6 +818,8 @@ impl std::convert::TryFrom<u16> for OrderRejectionReason {
       0x042f => Ok(Self::InvalidPartyIdForExecutingTrader),
       0x0430 => Ok(Self::InvalidPartyIdForInvestmentDecisionMaker),
       0x0433 => Ok(Self::InvalidPartyRoleQualifierForPartyId),
+      0x0434 => Ok(Self::MissingClearingMemberCode),
+      0x0435 => Ok(Self::ForbiddenClearingMemberCode),
       0x04b1 => Ok(Self::MassQuoteNotAllowedForSelectedMarketModel),
       0x04b3 => Ok(Self::InstrumentClosed),
       0x04b8 => Ok(Self::InvalidBidAskSpread),
@@ -816,6 +828,8 @@ impl std::convert::TryFrom<u16> for OrderRejectionReason {
       0x051b => Ok(Self::StopOrdersNotAllowed),
       0x051c => Ok(Self::TriggerPriceMustBeHigherThanLpSellQuote),
       0x051d => Ok(Self::TriggerPriceMustBeLowerThanLpBuyQuote),
+      0x051e => Ok(Self::MarketMakingViaMassQuoteOnlyOnHybridMarket),
+      0x051f => Ok(Self::SellQuotesNotAllowedDuringBuyOnlyState),
       0x0579 => Ok(Self::OnlyOneSellOrderIsAllowedForIpo),
       0x07ea => Ok(Self::RequestNotAllowedForBlockInstrument),
       0x07ec => Ok(Self::RequestNotAllowedForCrossInstrument),
@@ -834,6 +848,7 @@ impl std::convert::TryFrom<u16> for OrderRejectionReason {
       0x1b6b => Ok(Self::TotalSellRiskValueExceeded),
       0x1b6c => Ok(Self::TotalNetRiskValueExceeded),
       0x1b6d => Ok(Self::MaxOrderCountExceeded),
+      0x1b6e => Ok(Self::KillSwitch),
       other => Err(InvalidVariant::new(other as u32, "OrderRejectionReason")),
     }
   }
@@ -895,6 +910,8 @@ impl OrderRejectionReasonInt {
   pub const InvalidPartyIdForExecutingTrader: u16 = 0x042f;
   pub const InvalidPartyIdForInvestmentDecisionMaker: u16 = 0x0430;
   pub const InvalidPartyRoleQualifierForPartyId: u16 = 0x0433;
+  pub const MissingClearingMemberCode: u16 = 0x0434;
+  pub const ForbiddenClearingMemberCode: u16 = 0x0435;
   pub const MassQuoteNotAllowedForSelectedMarketModel: u16 = 0x04b1;
   pub const InstrumentClosed: u16 = 0x04b3;
   pub const InvalidBidAskSpread: u16 = 0x04b8;
@@ -903,6 +920,8 @@ impl OrderRejectionReasonInt {
   pub const StopOrdersNotAllowed: u16 = 0x051b;
   pub const TriggerPriceMustBeHigherThanLpSellQuote: u16 = 0x051c;
   pub const TriggerPriceMustBeLowerThanLpBuyQuote: u16 = 0x051d;
+  pub const MarketMakingViaMassQuoteOnlyOnHybridMarket: u16 = 0x051e;
+  pub const SellQuotesNotAllowedDuringBuyOnlyState: u16 = 0x051f;
   pub const OnlyOneSellOrderIsAllowedForIpo: u16 = 0x0579;
   pub const RequestNotAllowedForBlockInstrument: u16 = 0x07ea;
   pub const RequestNotAllowedForCrossInstrument: u16 = 0x07ec;
@@ -921,6 +940,7 @@ impl OrderRejectionReasonInt {
   pub const TotalSellRiskValueExceeded: u16 = 0x1b6b;
   pub const TotalNetRiskValueExceeded: u16 = 0x1b6c;
   pub const MaxOrderCountExceeded: u16 = 0x1b6d;
+  pub const KillSwitch: u16 = 0x1b6e;
 }
 
 #[allow(dead_code)]
@@ -931,7 +951,7 @@ impl BytesValidator for OrderRejectionReason {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u16::from_le_bytes).unwrap_unchecked();
-  matches!(disc, OrderRejectionReasonInt::NA | OrderRejectionReasonInt::UnknownOrder | OrderRejectionReasonInt::ExchangeClosed | OrderRejectionReasonInt::InvalidPriceIncrement | OrderRejectionReasonInt::Other | OrderRejectionReasonInt::InstrumentPhaseNoTrading | OrderRejectionReasonInt::UnknownInstrument | OrderRejectionReasonInt::InvalidExecutionTrader | OrderRejectionReasonInt::InvalidDecisionMaker | OrderRejectionReasonInt::InvalidClientId | OrderRejectionReasonInt::InvalidPartyRoleQualifierForClientId | OrderRejectionReasonInt::InvalidPartyRoleQualifierForExecutingTrader | OrderRejectionReasonInt::InvalidPartyRoleQualifierForInvestmentDecisionMaker | OrderRejectionReasonInt::CannotModifyMifidFlags | OrderRejectionReasonInt::WrongDisplayQtyValue | OrderRejectionReasonInt::InvalidDisplayQty | OrderRejectionReasonInt::IcebergOrderValueLessThanRequired | OrderRejectionReasonInt::OrderQuantityMustBeGreaterThanMinimumQuantity | OrderRejectionReasonInt::OrderQuantityMustBeLowerThanMaximumQuantity | OrderRejectionReasonInt::OrderPriceMustBeGreaterThanMinimumPrice | OrderRejectionReasonInt::OrderPriceMustBeLowerThanMaximumPrice | OrderRejectionReasonInt::OrderPriceMustBeNonzero | OrderRejectionReasonInt::OrderValueMustBeGreaterThanMinimumValue | OrderRejectionReasonInt::OrderValueMustBeLowerThanMaximumValue | OrderRejectionReasonInt::InvalidOrdTypeForSelectedMarketModel | OrderRejectionReasonInt::LeavesQuantityMustBeGreaterThanZeroAfterModification | OrderRejectionReasonInt::PriceNotAllowed | OrderRejectionReasonInt::InvalidTimeInForceForOrderType | OrderRejectionReasonInt::InvalidTimeInForceForCurrentMarketPhase | OrderRejectionReasonInt::InvalidTimeInForceForSelectedMarketModel | OrderRejectionReasonInt::ExpireTimeCannotBeModified | OrderRejectionReasonInt::ObsoleteExpireDate | OrderRejectionReasonInt::ExpireDateInPast | OrderRejectionReasonInt::ObsoleteExpireTime | OrderRejectionReasonInt::ExpireTimeInPast | OrderRejectionReasonInt::AmbigousExpire | OrderRejectionReasonInt::ExpireDateExceedsLimit | OrderRejectionReasonInt::PriceBelowLowCollar | OrderRejectionReasonInt::PriceAboveHighCollar | OrderRejectionReasonInt::OperationOnRedistributedInstrumentsForbidden | OrderRejectionReasonInt::FirmNotAuthorizedToBuyAndSellTheInstrument | OrderRejectionReasonInt::FirmNotAuthorizedToBuyTheInstrument | OrderRejectionReasonInt::FirmNotAuthorizedToSellTheInstrument | OrderRejectionReasonInt::TriggerPriceNotAllowed | OrderRejectionReasonInt::TriggerPriceNotHigherThanLTP | OrderRejectionReasonInt::TriggerPriceNotLowerThanLTP | OrderRejectionReasonInt::TriggerPriceLowerThanPrice | OrderRejectionReasonInt::TriggerPriceHigherThanPrice | OrderRejectionReasonInt::TriggerPriceModifiedForActivatedOrder | OrderRejectionReasonInt::TriggerPriceMustBeGreaterThanZero | OrderRejectionReasonInt::InvalidPartyIdForClientId | OrderRejectionReasonInt::InvalidPartyIdForExecutingTrader | OrderRejectionReasonInt::InvalidPartyIdForInvestmentDecisionMaker | OrderRejectionReasonInt::InvalidPartyRoleQualifierForPartyId | OrderRejectionReasonInt::MassQuoteNotAllowedForSelectedMarketModel | OrderRejectionReasonInt::InstrumentClosed | OrderRejectionReasonInt::InvalidBidAskSpread | OrderRejectionReasonInt::NotAuthorizedToQuoteInstrument | OrderRejectionReasonInt::BuyOrderNotAllowed | OrderRejectionReasonInt::StopOrdersNotAllowed | OrderRejectionReasonInt::TriggerPriceMustBeHigherThanLpSellQuote | OrderRejectionReasonInt::TriggerPriceMustBeLowerThanLpBuyQuote | OrderRejectionReasonInt::OnlyOneSellOrderIsAllowedForIpo | OrderRejectionReasonInt::RequestNotAllowedForBlockInstrument | OrderRejectionReasonInt::RequestNotAllowedForCrossInstrument | OrderRejectionReasonInt::RiskLimitNotDefined | OrderRejectionReasonInt::RiskMaximumOrderVolumeExceeded | OrderRejectionReasonInt::RiskMaximumOrderValueExceeded | OrderRejectionReasonInt::RiskOrderPriceCollarExceeded | OrderRejectionReasonInt::TotalTradedValueExceeded | OrderRejectionReasonInt::TotalTradedBuyValueExceeded | OrderRejectionReasonInt::TotalTradedSellValueExceeded | OrderRejectionReasonInt::TotalOpenValueExceeded | OrderRejectionReasonInt::TotalOpenBuyValueExceeded | OrderRejectionReasonInt::TotalOpenSellValueExceeded | OrderRejectionReasonInt::TotalRiskValueExceeded | OrderRejectionReasonInt::TotalBuyRiskValueExceeded | OrderRejectionReasonInt::TotalSellRiskValueExceeded | OrderRejectionReasonInt::TotalNetRiskValueExceeded | OrderRejectionReasonInt::MaxOrderCountExceeded)
+  matches!(disc, OrderRejectionReasonInt::NA | OrderRejectionReasonInt::UnknownOrder | OrderRejectionReasonInt::ExchangeClosed | OrderRejectionReasonInt::InvalidPriceIncrement | OrderRejectionReasonInt::Other | OrderRejectionReasonInt::InstrumentPhaseNoTrading | OrderRejectionReasonInt::UnknownInstrument | OrderRejectionReasonInt::InvalidExecutionTrader | OrderRejectionReasonInt::InvalidDecisionMaker | OrderRejectionReasonInt::InvalidClientId | OrderRejectionReasonInt::InvalidPartyRoleQualifierForClientId | OrderRejectionReasonInt::InvalidPartyRoleQualifierForExecutingTrader | OrderRejectionReasonInt::InvalidPartyRoleQualifierForInvestmentDecisionMaker | OrderRejectionReasonInt::CannotModifyMifidFlags | OrderRejectionReasonInt::WrongDisplayQtyValue | OrderRejectionReasonInt::InvalidDisplayQty | OrderRejectionReasonInt::IcebergOrderValueLessThanRequired | OrderRejectionReasonInt::OrderQuantityMustBeGreaterThanMinimumQuantity | OrderRejectionReasonInt::OrderQuantityMustBeLowerThanMaximumQuantity | OrderRejectionReasonInt::OrderPriceMustBeGreaterThanMinimumPrice | OrderRejectionReasonInt::OrderPriceMustBeLowerThanMaximumPrice | OrderRejectionReasonInt::OrderPriceMustBeNonzero | OrderRejectionReasonInt::OrderValueMustBeGreaterThanMinimumValue | OrderRejectionReasonInt::OrderValueMustBeLowerThanMaximumValue | OrderRejectionReasonInt::InvalidOrdTypeForSelectedMarketModel | OrderRejectionReasonInt::LeavesQuantityMustBeGreaterThanZeroAfterModification | OrderRejectionReasonInt::PriceNotAllowed | OrderRejectionReasonInt::InvalidTimeInForceForOrderType | OrderRejectionReasonInt::InvalidTimeInForceForCurrentMarketPhase | OrderRejectionReasonInt::InvalidTimeInForceForSelectedMarketModel | OrderRejectionReasonInt::ExpireTimeCannotBeModified | OrderRejectionReasonInt::ObsoleteExpireDate | OrderRejectionReasonInt::ExpireDateInPast | OrderRejectionReasonInt::ObsoleteExpireTime | OrderRejectionReasonInt::ExpireTimeInPast | OrderRejectionReasonInt::AmbigousExpire | OrderRejectionReasonInt::ExpireDateExceedsLimit | OrderRejectionReasonInt::PriceBelowLowCollar | OrderRejectionReasonInt::PriceAboveHighCollar | OrderRejectionReasonInt::OperationOnRedistributedInstrumentsForbidden | OrderRejectionReasonInt::FirmNotAuthorizedToBuyAndSellTheInstrument | OrderRejectionReasonInt::FirmNotAuthorizedToBuyTheInstrument | OrderRejectionReasonInt::FirmNotAuthorizedToSellTheInstrument | OrderRejectionReasonInt::TriggerPriceNotAllowed | OrderRejectionReasonInt::TriggerPriceNotHigherThanLTP | OrderRejectionReasonInt::TriggerPriceNotLowerThanLTP | OrderRejectionReasonInt::TriggerPriceLowerThanPrice | OrderRejectionReasonInt::TriggerPriceHigherThanPrice | OrderRejectionReasonInt::TriggerPriceModifiedForActivatedOrder | OrderRejectionReasonInt::TriggerPriceMustBeGreaterThanZero | OrderRejectionReasonInt::InvalidPartyIdForClientId | OrderRejectionReasonInt::InvalidPartyIdForExecutingTrader | OrderRejectionReasonInt::InvalidPartyIdForInvestmentDecisionMaker | OrderRejectionReasonInt::InvalidPartyRoleQualifierForPartyId | OrderRejectionReasonInt::MissingClearingMemberCode | OrderRejectionReasonInt::ForbiddenClearingMemberCode | OrderRejectionReasonInt::MassQuoteNotAllowedForSelectedMarketModel | OrderRejectionReasonInt::InstrumentClosed | OrderRejectionReasonInt::InvalidBidAskSpread | OrderRejectionReasonInt::NotAuthorizedToQuoteInstrument | OrderRejectionReasonInt::BuyOrderNotAllowed | OrderRejectionReasonInt::StopOrdersNotAllowed | OrderRejectionReasonInt::TriggerPriceMustBeHigherThanLpSellQuote | OrderRejectionReasonInt::TriggerPriceMustBeLowerThanLpBuyQuote | OrderRejectionReasonInt::MarketMakingViaMassQuoteOnlyOnHybridMarket | OrderRejectionReasonInt::SellQuotesNotAllowedDuringBuyOnlyState | OrderRejectionReasonInt::OnlyOneSellOrderIsAllowedForIpo | OrderRejectionReasonInt::RequestNotAllowedForBlockInstrument | OrderRejectionReasonInt::RequestNotAllowedForCrossInstrument | OrderRejectionReasonInt::RiskLimitNotDefined | OrderRejectionReasonInt::RiskMaximumOrderVolumeExceeded | OrderRejectionReasonInt::RiskMaximumOrderValueExceeded | OrderRejectionReasonInt::RiskOrderPriceCollarExceeded | OrderRejectionReasonInt::TotalTradedValueExceeded | OrderRejectionReasonInt::TotalTradedBuyValueExceeded | OrderRejectionReasonInt::TotalTradedSellValueExceeded | OrderRejectionReasonInt::TotalOpenValueExceeded | OrderRejectionReasonInt::TotalOpenBuyValueExceeded | OrderRejectionReasonInt::TotalOpenSellValueExceeded | OrderRejectionReasonInt::TotalRiskValueExceeded | OrderRejectionReasonInt::TotalBuyRiskValueExceeded | OrderRejectionReasonInt::TotalSellRiskValueExceeded | OrderRejectionReasonInt::TotalNetRiskValueExceeded | OrderRejectionReasonInt::MaxOrderCountExceeded | OrderRejectionReasonInt::KillSwitch)
     }
   }
 
@@ -1026,6 +1046,10 @@ pub enum RejectReason {
   InvalidTradeId = 0x0008,
   /// Invalid algorithmic trade indicator.
   InvalidAlgorithmicTradeIndicator = 0x0009,
+  /// Invalid Trade report ID.
+  InvalidTradeReportId = 0x000a,
+  /// GapFill seqNum should be higher than current seqNum
+  InvalidGapFillSeqNum = 0x000b,
 }
 impl Default for RejectReason {
   fn default() -> Self {
@@ -1046,6 +1070,8 @@ impl std::convert::TryFrom<u8> for RejectReason {
       0x0007 => Ok(Self::MissingReportIdSecondaryTradeReportIdOrTradeReportRefId),
       0x0008 => Ok(Self::InvalidTradeId),
       0x0009 => Ok(Self::InvalidAlgorithmicTradeIndicator),
+      0x000a => Ok(Self::InvalidTradeReportId),
+      0x000b => Ok(Self::InvalidGapFillSeqNum),
       other => Err(InvalidVariant::new(other as u32, "RejectReason")),
     }
   }
@@ -1063,6 +1089,8 @@ impl RejectReasonInt {
   pub const MissingReportIdSecondaryTradeReportIdOrTradeReportRefId: u8 = 0x0007;
   pub const InvalidTradeId: u8 = 0x0008;
   pub const InvalidAlgorithmicTradeIndicator: u8 = 0x0009;
+  pub const InvalidTradeReportId: u8 = 0x000a;
+  pub const InvalidGapFillSeqNum: u8 = 0x000b;
 }
 
 #[allow(dead_code)]
@@ -1073,7 +1101,7 @@ impl BytesValidator for RejectReason {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u8::from_le_bytes).unwrap_unchecked();
-  matches!(disc, RejectReasonInt::NA | RejectReasonInt::MaxThroughputExceeded | RejectReasonInt::InvalidMsgType | RejectReasonInt::InvalidExpireTimePrecision | RejectReasonInt::InvalidSettlementDate | RejectReasonInt::SettlementDateRequired | RejectReasonInt::TradeReportIdRequired | RejectReasonInt::MissingReportIdSecondaryTradeReportIdOrTradeReportRefId | RejectReasonInt::InvalidTradeId | RejectReasonInt::InvalidAlgorithmicTradeIndicator)
+  matches!(disc, RejectReasonInt::NA | RejectReasonInt::MaxThroughputExceeded | RejectReasonInt::InvalidMsgType | RejectReasonInt::InvalidExpireTimePrecision | RejectReasonInt::InvalidSettlementDate | RejectReasonInt::SettlementDateRequired | RejectReasonInt::TradeReportIdRequired | RejectReasonInt::MissingReportIdSecondaryTradeReportIdOrTradeReportRefId | RejectReasonInt::InvalidTradeId | RejectReasonInt::InvalidAlgorithmicTradeIndicator | RejectReasonInt::InvalidTradeReportId | RejectReasonInt::InvalidGapFillSeqNum)
     }
   }
 
@@ -1594,6 +1622,8 @@ pub enum MassCancelRejectionReason {
   MarketSegmentIdForbidden = 0x041e,
   /// Operation on redistributed instruments forbidden.
   OperationOnRedistributedInstrumentsForbidden = 0x0420,
+  /// Request not allowed on sponsored connection.
+  RequestNotAllowedOnSponsoredConnection = 0x07e9,
 }
 impl Default for MassCancelRejectionReason {
   fn default() -> Self {
@@ -1612,6 +1642,7 @@ impl std::convert::TryFrom<u16> for MassCancelRejectionReason {
       0x041d => Ok(Self::InstrumentForbidden),
       0x041e => Ok(Self::MarketSegmentIdForbidden),
       0x0420 => Ok(Self::OperationOnRedistributedInstrumentsForbidden),
+      0x07e9 => Ok(Self::RequestNotAllowedOnSponsoredConnection),
       other => Err(InvalidVariant::new(other as u32, "MassCancelRejectionReason")),
     }
   }
@@ -1627,6 +1658,7 @@ impl MassCancelRejectionReasonInt {
   pub const InstrumentForbidden: u16 = 0x041d;
   pub const MarketSegmentIdForbidden: u16 = 0x041e;
   pub const OperationOnRedistributedInstrumentsForbidden: u16 = 0x0420;
+  pub const RequestNotAllowedOnSponsoredConnection: u16 = 0x07e9;
 }
 
 #[allow(dead_code)]
@@ -1637,7 +1669,7 @@ impl BytesValidator for MassCancelRejectionReason {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u16::from_le_bytes).unwrap_unchecked();
-  matches!(disc, MassCancelRejectionReasonInt::NA | MassCancelRejectionReasonInt::UnknownInstrument | MassCancelRejectionReasonInt::InvalidExecutionTrader | MassCancelRejectionReasonInt::UnknownMarketSegmentId | MassCancelRejectionReasonInt::UnknownConnectionId | MassCancelRejectionReasonInt::InstrumentForbidden | MassCancelRejectionReasonInt::MarketSegmentIdForbidden | MassCancelRejectionReasonInt::OperationOnRedistributedInstrumentsForbidden)
+  matches!(disc, MassCancelRejectionReasonInt::NA | MassCancelRejectionReasonInt::UnknownInstrument | MassCancelRejectionReasonInt::InvalidExecutionTrader | MassCancelRejectionReasonInt::UnknownMarketSegmentId | MassCancelRejectionReasonInt::UnknownConnectionId | MassCancelRejectionReasonInt::InstrumentForbidden | MassCancelRejectionReasonInt::MarketSegmentIdForbidden | MassCancelRejectionReasonInt::OperationOnRedistributedInstrumentsForbidden | MassCancelRejectionReasonInt::RequestNotAllowedOnSponsoredConnection)
     }
   }
 
@@ -2033,6 +2065,12 @@ pub enum TcrRejectionReason {
   InvalidPartyIdForInvestmentDecisionMaker = 0x0430,
   /// Invalid PartyRoleQualifier (2376) for PartyID (448)
   InvalidPartyRoleQualifierForPartyId = 0x0433,
+  /// Missing ClearingMemberCode
+  MissingClearingMemberCode = 0x0434,
+  /// Forbidden ClearingMemberCode
+  ForbiddenClearingMemberCode = 0x0435,
+  /// Firm is not a Market Maker for this SecurityID (48).
+  NotAuthorizedToQuoteInstrument = 0x04b9,
   /// Unknown trade report
   UnknownTradeReport = 0x07d1,
   /// Duplicate TradeReportId
@@ -2108,6 +2146,9 @@ impl std::convert::TryFrom<u16> for TcrRejectionReason {
       0x042f => Ok(Self::InvalidPartyIdForExecutingTrader),
       0x0430 => Ok(Self::InvalidPartyIdForInvestmentDecisionMaker),
       0x0433 => Ok(Self::InvalidPartyRoleQualifierForPartyId),
+      0x0434 => Ok(Self::MissingClearingMemberCode),
+      0x0435 => Ok(Self::ForbiddenClearingMemberCode),
+      0x04b9 => Ok(Self::NotAuthorizedToQuoteInstrument),
       0x07d1 => Ok(Self::UnknownTradeReport),
       0x07d2 => Ok(Self::DuplicateTradeReportId),
       0x07d5 => Ok(Self::TradeReportTypeNotCompatibleWithTradeReportTransType),
@@ -2162,6 +2203,9 @@ impl TcrRejectionReasonInt {
   pub const InvalidPartyIdForExecutingTrader: u16 = 0x042f;
   pub const InvalidPartyIdForInvestmentDecisionMaker: u16 = 0x0430;
   pub const InvalidPartyRoleQualifierForPartyId: u16 = 0x0433;
+  pub const MissingClearingMemberCode: u16 = 0x0434;
+  pub const ForbiddenClearingMemberCode: u16 = 0x0435;
+  pub const NotAuthorizedToQuoteInstrument: u16 = 0x04b9;
   pub const UnknownTradeReport: u16 = 0x07d1;
   pub const DuplicateTradeReportId: u16 = 0x07d2;
   pub const TradeReportTypeNotCompatibleWithTradeReportTransType: u16 = 0x07d5;
@@ -2190,7 +2234,7 @@ impl BytesValidator for TcrRejectionReason {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u16::from_le_bytes).unwrap_unchecked();
-  matches!(disc, TcrRejectionReasonInt::NA | TcrRejectionReasonInt::ExchangeClosed | TcrRejectionReasonInt::InvalidPriceIncrement | TcrRejectionReasonInt::Other | TcrRejectionReasonInt::InstrumentPhaseNoTrading | TcrRejectionReasonInt::UnknownInstrument | TcrRejectionReasonInt::InvalidExecutionTrader | TcrRejectionReasonInt::InvalidDecisionMaker | TcrRejectionReasonInt::InvalidClientId | TcrRejectionReasonInt::InvalidPartyRoleQualifierForClientId | TcrRejectionReasonInt::InvalidPartyRoleQualifierForExecutingTrader | TcrRejectionReasonInt::InvalidPartyRoleQualifierForInvestmentDecisionMaker | TcrRejectionReasonInt::OrderQuantityMustBeGreaterThanMinimumQuantity | TcrRejectionReasonInt::OrderQuantityMustBeLowerThanMaximumQuantity | TcrRejectionReasonInt::OrderPriceMustBeGreaterThanMinimumPrice | TcrRejectionReasonInt::OrderPriceMustBeLowerThanMaximumPrice | TcrRejectionReasonInt::OrderPriceMustBeNonzero | TcrRejectionReasonInt::OrderValueMustBeGreaterThanMinimumValue | TcrRejectionReasonInt::OrderValueMustBeLowerThanMaximumValue | TcrRejectionReasonInt::PriceBelowLowCollar | TcrRejectionReasonInt::PriceAboveHighCollar | TcrRejectionReasonInt::OperationOnRedistributedInstrumentsForbidden | TcrRejectionReasonInt::FirmNotAuthorizedToBuyAndSellTheInstrument | TcrRejectionReasonInt::FirmNotAuthorizedToBuyTheInstrument | TcrRejectionReasonInt::FirmNotAuthorizedToSellTheInstrument | TcrRejectionReasonInt::InvalidPartyIdForClientId | TcrRejectionReasonInt::InvalidPartyIdForExecutingTrader | TcrRejectionReasonInt::InvalidPartyIdForInvestmentDecisionMaker | TcrRejectionReasonInt::InvalidPartyRoleQualifierForPartyId | TcrRejectionReasonInt::UnknownTradeReport | TcrRejectionReasonInt::DuplicateTradeReportId | TcrRejectionReasonInt::TradeReportTypeNotCompatibleWithTradeReportTransType | TcrRejectionReasonInt::InvalidExecType | TcrRejectionReasonInt::TradeReportRefIdNotAllowed | TcrRejectionReasonInt::SettlementDateCannotBeEarlierThanMinimumSettlementDate | TcrRejectionReasonInt::SettlementDateCannotBeLaterThanMaximumSettlementDate | TcrRejectionReasonInt::UnknownContraFirm | TcrRejectionReasonInt::SentAttributeDoesNotMatchOriginalValue | TcrRejectionReasonInt::RequestNotAllowedForBlockInstrument | TcrRejectionReasonInt::RequestNotAllowedForClobInstrument | TcrRejectionReasonInt::RequestNotAllowedForCrossInstrument | TcrRejectionReasonInt::CrossNotAllowedOutsideOfClobInstrumentSpread | TcrRejectionReasonInt::CrossPriceNotEqualToTheReferencePrice | TcrRejectionReasonInt::CrossNotAllowedDuringClobInstrumentAuctionOrSuspension | TcrRejectionReasonInt::ForbiddenSecondaryTradereportId | TcrRejectionReasonInt::UnknownSecondaryTradereportId | TcrRejectionReasonInt::NoTradeForClobReferenceInstrument)
+  matches!(disc, TcrRejectionReasonInt::NA | TcrRejectionReasonInt::ExchangeClosed | TcrRejectionReasonInt::InvalidPriceIncrement | TcrRejectionReasonInt::Other | TcrRejectionReasonInt::InstrumentPhaseNoTrading | TcrRejectionReasonInt::UnknownInstrument | TcrRejectionReasonInt::InvalidExecutionTrader | TcrRejectionReasonInt::InvalidDecisionMaker | TcrRejectionReasonInt::InvalidClientId | TcrRejectionReasonInt::InvalidPartyRoleQualifierForClientId | TcrRejectionReasonInt::InvalidPartyRoleQualifierForExecutingTrader | TcrRejectionReasonInt::InvalidPartyRoleQualifierForInvestmentDecisionMaker | TcrRejectionReasonInt::OrderQuantityMustBeGreaterThanMinimumQuantity | TcrRejectionReasonInt::OrderQuantityMustBeLowerThanMaximumQuantity | TcrRejectionReasonInt::OrderPriceMustBeGreaterThanMinimumPrice | TcrRejectionReasonInt::OrderPriceMustBeLowerThanMaximumPrice | TcrRejectionReasonInt::OrderPriceMustBeNonzero | TcrRejectionReasonInt::OrderValueMustBeGreaterThanMinimumValue | TcrRejectionReasonInt::OrderValueMustBeLowerThanMaximumValue | TcrRejectionReasonInt::PriceBelowLowCollar | TcrRejectionReasonInt::PriceAboveHighCollar | TcrRejectionReasonInt::OperationOnRedistributedInstrumentsForbidden | TcrRejectionReasonInt::FirmNotAuthorizedToBuyAndSellTheInstrument | TcrRejectionReasonInt::FirmNotAuthorizedToBuyTheInstrument | TcrRejectionReasonInt::FirmNotAuthorizedToSellTheInstrument | TcrRejectionReasonInt::InvalidPartyIdForClientId | TcrRejectionReasonInt::InvalidPartyIdForExecutingTrader | TcrRejectionReasonInt::InvalidPartyIdForInvestmentDecisionMaker | TcrRejectionReasonInt::InvalidPartyRoleQualifierForPartyId | TcrRejectionReasonInt::MissingClearingMemberCode | TcrRejectionReasonInt::ForbiddenClearingMemberCode | TcrRejectionReasonInt::NotAuthorizedToQuoteInstrument | TcrRejectionReasonInt::UnknownTradeReport | TcrRejectionReasonInt::DuplicateTradeReportId | TcrRejectionReasonInt::TradeReportTypeNotCompatibleWithTradeReportTransType | TcrRejectionReasonInt::InvalidExecType | TcrRejectionReasonInt::TradeReportRefIdNotAllowed | TcrRejectionReasonInt::SettlementDateCannotBeEarlierThanMinimumSettlementDate | TcrRejectionReasonInt::SettlementDateCannotBeLaterThanMaximumSettlementDate | TcrRejectionReasonInt::UnknownContraFirm | TcrRejectionReasonInt::SentAttributeDoesNotMatchOriginalValue | TcrRejectionReasonInt::RequestNotAllowedForBlockInstrument | TcrRejectionReasonInt::RequestNotAllowedForClobInstrument | TcrRejectionReasonInt::RequestNotAllowedForCrossInstrument | TcrRejectionReasonInt::CrossNotAllowedOutsideOfClobInstrumentSpread | TcrRejectionReasonInt::CrossPriceNotEqualToTheReferencePrice | TcrRejectionReasonInt::CrossNotAllowedDuringClobInstrumentAuctionOrSuspension | TcrRejectionReasonInt::ForbiddenSecondaryTradereportId | TcrRejectionReasonInt::UnknownSecondaryTradereportId | TcrRejectionReasonInt::NoTradeForClobReferenceInstrument)
     }
   }
 
@@ -2276,13 +2320,13 @@ impl BytesValidator for AlgorithmicTradeIndicator {
     }
   }
 
-/// Unique identifier of trade capture report.
-pub type TradeReportId = [AnsiChar; 20];
+/// Unique identifier of trade capture report. 21st character is reserved for exchange-assigned identifiers.
+pub type TradeReportId = [AnsiChar; 21];
 
 
 
 /// Reference identifier used with Cancel and Replace transaction types. The TradeReportID that is being referenced for trade correction or cancelation.
-pub type TradeReportRefID = [AnsiChar; 20];
+pub type TradeReportRefID = [AnsiChar; 21];
 
 
 
@@ -2654,6 +2698,8 @@ pub enum MsgType {
   MarketMakerCommand = 0x0020,
   /// The response to the Market Maker command.
   MarketMakerCommandResponse = 0x0021,
+  /// Create a SeqNum gap bettwen current SeqNum and header::seqNum
+  GapFill = 0x0022,
   /// A message to relay test scenario information
   TestEvent = 0x00ff,
 }
@@ -2693,6 +2739,7 @@ impl std::convert::TryFrom<u16> for MsgType {
       0x001f => Ok(Self::BidOfferUpdate),
       0x0020 => Ok(Self::MarketMakerCommand),
       0x0021 => Ok(Self::MarketMakerCommandResponse),
+      0x0022 => Ok(Self::GapFill),
       0x00ff => Ok(Self::TestEvent),
       other => Err(InvalidVariant::new(other as u32, "MsgType")),
     }
@@ -2728,6 +2775,7 @@ impl MsgTypeInt {
   pub const BidOfferUpdate: u16 = 0x001f;
   pub const MarketMakerCommand: u16 = 0x0020;
   pub const MarketMakerCommandResponse: u16 = 0x0021;
+  pub const GapFill: u16 = 0x0022;
   pub const TestEvent: u16 = 0x00ff;
 }
 
@@ -2739,7 +2787,7 @@ impl BytesValidator for MsgType {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u16::from_le_bytes).unwrap_unchecked();
-  matches!(disc, MsgTypeInt::Test | MsgTypeInt::Login | MsgTypeInt::LoginResponse | MsgTypeInt::OrderAdd | MsgTypeInt::OrderAddResponse | MsgTypeInt::OrderCancel | MsgTypeInt::OrderCancelResponse | MsgTypeInt::OrderModify | MsgTypeInt::OrderModifyResponse | MsgTypeInt::Trade | MsgTypeInt::Logout | MsgTypeInt::ConnectionClose | MsgTypeInt::Heartbeat | MsgTypeInt::LogoutResponse | MsgTypeInt::Reject | MsgTypeInt::TradeCaptureReportSingle | MsgTypeInt::TradeCaptureReportDual | MsgTypeInt::TradeCaptureReportResponse | MsgTypeInt::TradeBust | MsgTypeInt::MassQuote | MsgTypeInt::MassQuoteResponse | MsgTypeInt::RequestForExecution | MsgTypeInt::OrderMassCancel | MsgTypeInt::OrderMassCancelResponse | MsgTypeInt::BidOfferUpdate | MsgTypeInt::MarketMakerCommand | MsgTypeInt::MarketMakerCommandResponse | MsgTypeInt::TestEvent)
+  matches!(disc, MsgTypeInt::Test | MsgTypeInt::Login | MsgTypeInt::LoginResponse | MsgTypeInt::OrderAdd | MsgTypeInt::OrderAddResponse | MsgTypeInt::OrderCancel | MsgTypeInt::OrderCancelResponse | MsgTypeInt::OrderModify | MsgTypeInt::OrderModifyResponse | MsgTypeInt::Trade | MsgTypeInt::Logout | MsgTypeInt::ConnectionClose | MsgTypeInt::Heartbeat | MsgTypeInt::LogoutResponse | MsgTypeInt::Reject | MsgTypeInt::TradeCaptureReportSingle | MsgTypeInt::TradeCaptureReportDual | MsgTypeInt::TradeCaptureReportResponse | MsgTypeInt::TradeBust | MsgTypeInt::MassQuote | MsgTypeInt::MassQuoteResponse | MsgTypeInt::RequestForExecution | MsgTypeInt::OrderMassCancel | MsgTypeInt::OrderMassCancelResponse | MsgTypeInt::BidOfferUpdate | MsgTypeInt::MarketMakerCommand | MsgTypeInt::MarketMakerCommandResponse | MsgTypeInt::GapFill | MsgTypeInt::TestEvent)
     }
   }
 
@@ -2795,6 +2843,23 @@ impl BytesValidator for EventType {
     }
   }
 
+/// Create a SeqNum gap bettwen current SeqNum and header::seqNum
+#[repr(C, packed)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
+#[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
+pub struct GapFill {
+  /// Message header.
+  pub header: Header,
+}
+impl BytesValidator for GapFill {
+    #[inline]
+    unsafe fn is_valid(bytes: &[u8]) -> bool {
+      debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
+      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(GapFill, header)))
+    }
+  }
+
 /// Test event
 #[repr(C, packed)]
 #[derive(Serialize, Deserialize, Clone, Copy)]
@@ -2846,6 +2911,7 @@ pub union Message {
   pub order_mass_cancel: OrderMassCancel,
   pub order_mass_cancel_response: OrderMassCancelResponse,
   pub bid_offer_update: BidOfferUpdate,
+  pub gap_fill: GapFill,
   pub test_event: TestEvent,
 }
 
@@ -2883,6 +2949,7 @@ impl Serialize for Message {
         MsgType::OrderMassCancel => self.order_mass_cancel.serialize(serializer),
         MsgType::OrderMassCancelResponse => self.order_mass_cancel_response.serialize(serializer),
         MsgType::BidOfferUpdate => self.bid_offer_update.serialize(serializer),
+        MsgType::GapFill => self.gap_fill.serialize(serializer),
         MsgType::TestEvent => self.test_event.serialize(serializer), 
       }
     }
@@ -2922,6 +2989,7 @@ impl Message {
       MsgType::OrderMassCancel => OrderMassCancel::deserialize(de).map(|v| Message { order_mass_cancel: v }),
       MsgType::OrderMassCancelResponse => OrderMassCancelResponse::deserialize(de).map(|v| Message { order_mass_cancel_response: v }),
       MsgType::BidOfferUpdate => BidOfferUpdate::deserialize(de).map(|v| Message { bid_offer_update: v }),
+      MsgType::GapFill => GapFill::deserialize(de).map(|v| Message { gap_fill: v }),
       MsgType::TestEvent => TestEvent::deserialize(de).map(|v| Message { test_event: v }),
     }
   }
@@ -2957,6 +3025,7 @@ impl Message {
       MsgType::OrderMassCancel => std::mem::size_of::<OrderMassCancel>(),
       MsgType::OrderMassCancelResponse => std::mem::size_of::<OrderMassCancelResponse>(),
       MsgType::BidOfferUpdate => std::mem::size_of::<BidOfferUpdate>(),
+      MsgType::GapFill => std::mem::size_of::<GapFill>(),
       MsgType::TestEvent => std::mem::size_of::<TestEvent>(),
     }
   }
@@ -2992,6 +3061,7 @@ MsgTypeInt::RequestForExecution => std::mem::size_of::<RequestForExecution>() ==
 MsgTypeInt::OrderMassCancel => std::mem::size_of::<OrderMassCancel>() == length && unsafe { OrderMassCancel::is_valid(bytes) },
 MsgTypeInt::OrderMassCancelResponse => std::mem::size_of::<OrderMassCancelResponse>() == length && unsafe { OrderMassCancelResponse::is_valid(bytes) },
 MsgTypeInt::BidOfferUpdate => std::mem::size_of::<BidOfferUpdate>() == length && unsafe { BidOfferUpdate::is_valid(bytes) },
+MsgTypeInt::GapFill => std::mem::size_of::<GapFill>() == length && unsafe { GapFill::is_valid(bytes) },
 MsgTypeInt::TestEvent => std::mem::size_of::<TestEvent>() == length && unsafe { TestEvent::is_valid(bytes) },
         _ => false,
       }
@@ -3032,6 +3102,12 @@ pub enum ExecTypeReason {
   FirstTradeOnAggressiveOrder = 0x000e,
   /// Order rejected.
   Rejected = 0x000f,
+  /// Cancel on BuyOnly state entry
+  CancelonBuyOnlyStateEntry = 0x0010,
+  /// Cancel on KnockedOut state entry
+  CancelonKnockedOutStateEntry = 0x0011,
+  /// Order cancelled due to exceeding RMA post trade limit.
+  CancelByRiskManagement = 0x0012,
 }
 impl Default for ExecTypeReason {
   fn default() -> Self {
@@ -3057,6 +3133,9 @@ impl std::convert::TryFrom<u8> for ExecTypeReason {
       0x000d => Ok(Self::Replaced),
       0x000e => Ok(Self::FirstTradeOnAggressiveOrder),
       0x000f => Ok(Self::Rejected),
+      0x0010 => Ok(Self::CancelonBuyOnlyStateEntry),
+      0x0011 => Ok(Self::CancelonKnockedOutStateEntry),
+      0x0012 => Ok(Self::CancelByRiskManagement),
       other => Err(InvalidVariant::new(other as u32, "ExecTypeReason")),
     }
   }
@@ -3079,6 +3158,9 @@ impl ExecTypeReasonInt {
   pub const Replaced: u8 = 0x000d;
   pub const FirstTradeOnAggressiveOrder: u8 = 0x000e;
   pub const Rejected: u8 = 0x000f;
+  pub const CancelonBuyOnlyStateEntry: u8 = 0x0010;
+  pub const CancelonKnockedOutStateEntry: u8 = 0x0011;
+  pub const CancelByRiskManagement: u8 = 0x0012;
 }
 
 #[allow(dead_code)]
@@ -3089,7 +3171,7 @@ impl BytesValidator for ExecTypeReason {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u8::from_le_bytes).unwrap_unchecked();
-  matches!(disc, ExecTypeReasonInt::NA | ExecTypeReasonInt::CancelOnDisconnect | ExecTypeReasonInt::Expired | ExecTypeReasonInt::Triggered | ExecTypeReasonInt::CancelOnSuspension | ExecTypeReasonInt::OrderRestatement | ExecTypeReasonInt::IcebergOrderRefill | ExecTypeReasonInt::CancelByStp | ExecTypeReasonInt::CancelByCorporateAction | ExecTypeReasonInt::CancelByMassCancel | ExecTypeReasonInt::CancelIocFokOrder | ExecTypeReasonInt::CancelByMarketOperations | ExecTypeReasonInt::Replaced | ExecTypeReasonInt::FirstTradeOnAggressiveOrder | ExecTypeReasonInt::Rejected)
+  matches!(disc, ExecTypeReasonInt::NA | ExecTypeReasonInt::CancelOnDisconnect | ExecTypeReasonInt::Expired | ExecTypeReasonInt::Triggered | ExecTypeReasonInt::CancelOnSuspension | ExecTypeReasonInt::OrderRestatement | ExecTypeReasonInt::IcebergOrderRefill | ExecTypeReasonInt::CancelByStp | ExecTypeReasonInt::CancelByCorporateAction | ExecTypeReasonInt::CancelByMassCancel | ExecTypeReasonInt::CancelIocFokOrder | ExecTypeReasonInt::CancelByMarketOperations | ExecTypeReasonInt::Replaced | ExecTypeReasonInt::FirstTradeOnAggressiveOrder | ExecTypeReasonInt::Rejected | ExecTypeReasonInt::CancelonBuyOnlyStateEntry | ExecTypeReasonInt::CancelonKnockedOutStateEntry | ExecTypeReasonInt::CancelByRiskManagement)
     }
   }
 
@@ -3282,6 +3364,10 @@ pub enum MassQuoteRejectionReason {
   InvalidPartyIdForInvestmentDecisionMaker = 0x0430,
   /// Invalid PartyRoleQualifier (2376) for PartyID (448)
   InvalidPartyRoleQualifierForPartyId = 0x0433,
+  /// Missing ClearingMemberCode
+  MissingClearingMemberCode = 0x0434,
+  /// Forbidden ClearingMemberCode
+  ForbiddenClearingMemberCode = 0x0435,
   /// Multiple quotes for the same instrument within Mass Quote message.
   DuplicateInstrument = 0x04b2,
   /// Invalid quotes count value.
@@ -3311,6 +3397,8 @@ impl std::convert::TryFrom<u16> for MassQuoteRejectionReason {
       0x042f => Ok(Self::InvalidPartyIdForExecutingTrader),
       0x0430 => Ok(Self::InvalidPartyIdForInvestmentDecisionMaker),
       0x0433 => Ok(Self::InvalidPartyRoleQualifierForPartyId),
+      0x0434 => Ok(Self::MissingClearingMemberCode),
+      0x0435 => Ok(Self::ForbiddenClearingMemberCode),
       0x04b2 => Ok(Self::DuplicateInstrument),
       0x04b4 => Ok(Self::InvalidQuotesCount),
       0x04ba => Ok(Self::ForbiddenOrderCapacityValue),
@@ -3334,6 +3422,8 @@ impl MassQuoteRejectionReasonInt {
   pub const InvalidPartyIdForExecutingTrader: u16 = 0x042f;
   pub const InvalidPartyIdForInvestmentDecisionMaker: u16 = 0x0430;
   pub const InvalidPartyRoleQualifierForPartyId: u16 = 0x0433;
+  pub const MissingClearingMemberCode: u16 = 0x0434;
+  pub const ForbiddenClearingMemberCode: u16 = 0x0435;
   pub const DuplicateInstrument: u16 = 0x04b2;
   pub const InvalidQuotesCount: u16 = 0x04b4;
   pub const ForbiddenOrderCapacityValue: u16 = 0x04ba;
@@ -3347,7 +3437,7 @@ impl BytesValidator for MassQuoteRejectionReason {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u16::from_le_bytes).unwrap_unchecked();
-  matches!(disc, MassQuoteRejectionReasonInt::NA | MassQuoteRejectionReasonInt::ExchangeClosed | MassQuoteRejectionReasonInt::Other | MassQuoteRejectionReasonInt::InvalidExecutionTrader | MassQuoteRejectionReasonInt::InvalidDecisionMaker | MassQuoteRejectionReasonInt::InvalidClientId | MassQuoteRejectionReasonInt::InvalidPartyRoleQualifierForClientId | MassQuoteRejectionReasonInt::InvalidPartyRoleQualifierForExecutingTrader | MassQuoteRejectionReasonInt::InvalidPartyRoleQualifierForInvestmentDecisionMaker | MassQuoteRejectionReasonInt::InvalidPartyIdForClientId | MassQuoteRejectionReasonInt::InvalidPartyIdForExecutingTrader | MassQuoteRejectionReasonInt::InvalidPartyIdForInvestmentDecisionMaker | MassQuoteRejectionReasonInt::InvalidPartyRoleQualifierForPartyId | MassQuoteRejectionReasonInt::DuplicateInstrument | MassQuoteRejectionReasonInt::InvalidQuotesCount | MassQuoteRejectionReasonInt::ForbiddenOrderCapacityValue)
+  matches!(disc, MassQuoteRejectionReasonInt::NA | MassQuoteRejectionReasonInt::ExchangeClosed | MassQuoteRejectionReasonInt::Other | MassQuoteRejectionReasonInt::InvalidExecutionTrader | MassQuoteRejectionReasonInt::InvalidDecisionMaker | MassQuoteRejectionReasonInt::InvalidClientId | MassQuoteRejectionReasonInt::InvalidPartyRoleQualifierForClientId | MassQuoteRejectionReasonInt::InvalidPartyRoleQualifierForExecutingTrader | MassQuoteRejectionReasonInt::InvalidPartyRoleQualifierForInvestmentDecisionMaker | MassQuoteRejectionReasonInt::InvalidPartyIdForClientId | MassQuoteRejectionReasonInt::InvalidPartyIdForExecutingTrader | MassQuoteRejectionReasonInt::InvalidPartyIdForInvestmentDecisionMaker | MassQuoteRejectionReasonInt::InvalidPartyRoleQualifierForPartyId | MassQuoteRejectionReasonInt::MissingClearingMemberCode | MassQuoteRejectionReasonInt::ForbiddenClearingMemberCode | MassQuoteRejectionReasonInt::DuplicateInstrument | MassQuoteRejectionReasonInt::InvalidQuotesCount | MassQuoteRejectionReasonInt::ForbiddenOrderCapacityValue)
     }
   }
 

@@ -103,8 +103,9 @@ void MarketData::start(const std::string snapshotHost, const uint16_t snapshotPo
         if (!ec) {
             spdlog::info("connected to market-data/snapshot");
 
-            spdlog::info("start reading from market-data/snapshot");
             login(token_, connectionId_);
+
+            spdlog::info("start reading from market-data/snapshot");
 
             read_snapshot();
         } else {
@@ -171,6 +172,41 @@ void MarketData::dispatch(Message &message, EventSource source) {
         throw online_market_data_exception("unexpected message sequence number");
     }
 
+    if (pheader->isEncrypted) {
+        switch (pheader->msgType) {
+            case MsgType::OrderAdd: {
+                decryption_.decrypt(buffer_cast<OrderAdd*>(header));
+                spdlog::debug("OrderAdd decrypted");
+                break;
+            }
+            case MsgType::OrderModify: {
+                decryption_.decrypt(buffer_cast<OrderModify*>(header));
+                spdlog::debug("OrderModify decrypted");
+                break;
+            }
+            case MsgType::OrderExecute: {
+                decryption_.decrypt(buffer_cast<OrderExecute*>(header));
+                spdlog::debug("OrderExecute decrypted");
+                break;
+            }
+            case MsgType::TopPriceLevelUpdate: {
+                decryption_.decrypt(buffer_cast<TopPriceLevelUpdate*>(header));
+                spdlog::debug("TopPriceLevelUpdate decrypted");
+                break;
+            }
+            case MsgType::PriceLevelSnapshot: {
+                decryption_.decrypt(buffer_cast<PriceLevelSnapshot*>(header));
+                spdlog::debug("PriceLevelSnapshot decrypted");
+                break;
+            }
+            case MsgType::ProductSummary: {
+                decryption_.decrypt(buffer_cast<ProductSummary*>(header));
+                spdlog::debug("ProductSummary decrypted");
+                break;
+            }
+        }
+    }
+
     if (dispatch_table_.find(pheader->msgType) != dispatch_table_.end()) {
         std::any msg = dispatch_table_[pheader->msgType](message);
         for (CallbackWrapper& callbackWrapper: callback_wrappers_) {
@@ -222,26 +258,6 @@ void MarketData::read_stream() {
                     MsgType2Name.find(pheader->msgType)->second, +pheader->seqNum,
                     (unsigned int)pheader->msgType, +pheader->length);
 
-                if (pheader->isEncrypted) {
-                    switch (pheader->msgType) {
-                        case MsgType::OrderAdd: {
-                            decryption_.decrypt(buffer_cast<OrderAdd*>(header));
-                            spdlog::debug("OrderAdd decrypted");
-                            break;
-                        }
-                        case MsgType::OrderModify: {
-                            decryption_.decrypt(buffer_cast<OrderModify*>(header));
-                            spdlog::debug("OrderModify decrypted");
-                            break;
-                        }
-                        case MsgType::OrderExecute: {
-                            decryption_.decrypt(buffer_cast<OrderExecute*>(header));
-                            spdlog::debug("OrderExecute decrypted");
-                            break;
-                        }
-                    }
-                }
-
                 dispatch(message_stream_, EventSource::stream);
 
                 read_stream();
@@ -269,26 +285,6 @@ void MarketData::read_replay() {
                 "{{ seqNum: {}, msgType: {}, length: {} }}",
                 MsgType2Name.find(pheader->msgType)->second, +pheader->seqNum,
                 (unsigned int)pheader->msgType, +pheader->length);
-
-            if (pheader->isEncrypted) {
-                switch (pheader->msgType) {
-                    case MsgType::OrderAdd: {
-                        decryption_.decrypt(buffer_cast<OrderAdd*>(header));
-                        spdlog::debug("OrderAdd decrypted");
-                        break;
-                    }
-                    case MsgType::OrderModify: {
-                        decryption_.decrypt(buffer_cast<OrderModify*>(header));
-                        spdlog::debug("OrderModify decrypted");
-                        break;
-                    }
-                    case MsgType::OrderExecute: {
-                        decryption_.decrypt(buffer_cast<OrderExecute*>(header));
-                        spdlog::debug("OrderExecute decrypted");
-                        break;
-                    }
-                }
-            }
 
             dispatch(message_replay_, EventSource::replay);
         } else {

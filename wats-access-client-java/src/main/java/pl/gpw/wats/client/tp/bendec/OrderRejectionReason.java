@@ -226,6 +226,14 @@ public enum OrderRejectionReason {
      */
     INVALIDPARTYROLEQUALIFIERFORPARTYID(1075),
     /**
+     * Missing ClearingMemberCode
+     */
+    MISSINGCLEARINGMEMBERCODE(1076),
+    /**
+     * Forbidden ClearingMemberCode
+     */
+    FORBIDDENCLEARINGMEMBERCODE(1077),
+    /**
      * Mass Quote not allowed for selected Market Model.
      */
     MASSQUOTENOTALLOWEDFORSELECTEDMARKETMODEL(1201),
@@ -257,6 +265,14 @@ public enum OrderRejectionReason {
      * TriggerPrice (1102) must be lower than LP buy quote for sell Stop Order
      */
     TRIGGERPRICEMUSTBELOWERTHANLPBUYQUOTE(1309),
+    /**
+     * Market Making in Hybrid market model is only possible using Mass Quote message.
+     */
+    MARKETMAKINGVIAMASSQUOTEONLYONHYBRIDMARKET(1310),
+    /**
+     * During BuyOnly  state in Hybrid market model sell quotes are not accepted
+     */
+    SELLQUOTESNOTALLOWEDDURINGBUYONLYSTATE(1311),
     /**
      * Only one sell order is allowed for IPO instrument
      */
@@ -328,7 +344,11 @@ public enum OrderRejectionReason {
     /**
      * Maximum order count has exceeded the risk limit.
      */
-    MAXORDERCOUNTEXCEEDED(7021);
+    MAXORDERCOUNTEXCEEDED(7021),
+    /**
+     * Rejected due to kill switch.
+     */
+    KILLSWITCH(7022);
     
     private final int value;
     private final int byteLength = 2;

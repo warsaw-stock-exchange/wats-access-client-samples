@@ -15,7 +15,7 @@ pub(super) fn init_tracing() {
 }
 
 /// Create a WATS client
-pub(super) async fn create_client(tp_connection_id: u16, tp_token: [u8; 8], md_connection_id: u16, md_token: [u8; 8]) -> Result<Client> {
+pub(super) async fn create_client_with_omd(tp_connection_id: u16, tp_token: [u8; 8], md_connection_id: u16, md_token: [u8; 8]) -> Result<Client> {
     debug!("Creating new client");
 
     let wats_config = crate::config::get_config()?;
@@ -30,6 +30,23 @@ pub(super) async fn create_client(tp_connection_id: u16, tp_token: [u8; 8], md_c
     .await?
     .login(tp_connection_id, tp_token, md_connection_id, md_token)
     .await
+}
+
+pub(super) async fn create_client_with_bbo(tp_connection_id: u16, tp_token: [u8; 8], md_connection_id: u16, md_token: [u8; 8]) -> Result<Client> {
+  debug!("Creating new client");
+
+  let wats_config = crate::config::get_config()?;
+
+  ClientBuilder::connect(
+      wats_config.tp_addr(),
+      wats_config.bbo_addr(),
+      wats_config.bbo_snap_addr(),
+      wats_config.bbo_replay_addr(),
+      wats_config.multicast_interface(),
+  )
+  .await?
+  .login(tp_connection_id, tp_token, md_connection_id, md_token)
+  .await
 }
 
 // Fetch messages buffer up to `last_replay_seq_num` from `LoginResponse`.

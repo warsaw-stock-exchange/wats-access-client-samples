@@ -1,5 +1,5 @@
 use crate::messages::{
-  bytes_validator::BytesValidator, generated::market_data,
+  bytes_validator::BytesValidator, generated::market_data as md,
 };
 use std::{convert::TryInto, fmt};
 
@@ -13,17 +13,17 @@ pub mod md_version {
   /// - low nibble of MSB - minor protocol version
   /// - high nibble of LSB - release version
   /// - low nibble of LSB - patch-level version
-  pub const VERSION: super::market_data::MsgVersion = 0x1000;
+  pub const VERSION: super::md::MsgVersion = 0x1000;
 }
 
-impl market_data::Message {
+impl md::Message {
   #[inline(always)]
-  fn get_header(&self) -> &market_data::Header {
+  fn get_header(&self) -> &md::Header {
     unsafe { &self.heartbeat.header }
   }
 
   #[inline(always)]
-  fn get_header_mut(&mut self) -> &mut market_data::Header {
+  fn get_header_mut(&mut self) -> &mut md::Header {
     unsafe { &mut self.heartbeat.header }
   }
 
@@ -33,32 +33,32 @@ impl market_data::Message {
   }
 
   #[inline(always)]
-  pub fn set_seq_num(&mut self, seq_num: market_data::SeqNum) {
+  pub fn set_seq_num(&mut self, seq_num: md::SeqNum) {
     self.get_header_mut().seq_num = seq_num;
   }
 
   #[inline(always)]
-  pub fn seq_num(&self) -> market_data::SeqNum {
+  pub fn seq_num(&self) -> md::SeqNum {
     self.get_header().seq_num
   }
 
   #[inline(always)]
-  pub fn set_timestamp(&mut self, timestamp: market_data::Timestamp) {
+  pub fn set_timestamp(&mut self, timestamp: md::Timestamp) {
     self.get_header_mut().timestamp = timestamp;
   }
 
   #[inline(always)]
-  pub fn timestamp(&self) -> market_data::Timestamp {
+  pub fn timestamp(&self) -> md::Timestamp {
     self.get_header().timestamp
   }
 
   #[inline(always)]
-  pub fn set_source_timestamp(&mut self, timestamp: market_data::Timestamp) {
+  pub fn set_source_timestamp(&mut self, timestamp: md::Timestamp) {
     self.get_header_mut().source_timestamp = timestamp;
   }
 
   #[inline(always)]
-  pub fn source_timestamp(&self) -> market_data::Timestamp {
+  pub fn source_timestamp(&self) -> md::Timestamp {
     self.get_header().source_timestamp
   }
 
@@ -100,30 +100,30 @@ impl market_data::Message {
     self.get_header_mut().version = md_version::VERSION;
   }
 
-  pub fn new_heartbeat() -> market_data::Message {
-    market_data::Message {
-      heartbeat: market_data::Heartbeat {
-        header: market_data::Header::new(market_data::MsgType::Heartbeat),
+  pub fn new_heartbeat() -> md::Message {
+    md::Message {
+      heartbeat: md::Heartbeat {
+        header: md::Header::new(md::MsgType::Heartbeat),
       },
     }
   }
 
   #[inline(always)]
-  pub fn msg_type(&self) -> market_data::MsgType {
+  pub fn msg_type(&self) -> md::MsgType {
     self.get_header().msg_type
   }
 }
 
-impl market_data::Header {
+impl md::Header {
   #[inline(always)]
-  pub fn new(msg_type: market_data::MsgType) -> market_data::Header {
-    market_data::Header {
-      length: market_data::Message::size_of(msg_type) as u16,
+  pub fn new(msg_type: md::MsgType) -> md::Header {
+    md::Header {
+      length: md::Message::size_of(msg_type) as u16,
       version: md_version::VERSION,
       msg_type,
       seq_num: 0,
-      timestamp: market_data::Timestamp::new(0),
-      source_timestamp: market_data::Timestamp::new(0),
+      timestamp: md::Timestamp::new(0),
+      source_timestamp: md::Timestamp::new(0),
       is_encrypted: false,
       encryption_key_id: 0,
       encryption_offset: 0,
@@ -133,13 +133,13 @@ impl market_data::Header {
   }
 }
 
-impl Default for market_data::Message {
+impl Default for md::Message {
   fn default() -> Self {
     Self {
-      heartbeat: market_data::Heartbeat {
-        header: market_data::Header {
-          msg_type: market_data::MsgType::Heartbeat,
-          length: std::mem::size_of::<market_data::Heartbeat>() as u16,
+      heartbeat: md::Heartbeat {
+        header: md::Header {
+          msg_type: md::MsgType::Heartbeat,
+          length: std::mem::size_of::<md::Heartbeat>() as u16,
           ..Default::default()
         }
       },
@@ -149,17 +149,17 @@ impl Default for market_data::Message {
 
 struct Invalid;
 
-/// Get message lenght out of `market_data::Header` bytes
-fn get_message_lenght(bytes: &[u8]) -> Result<market_data::MsgLength, Invalid> {
-  bytes[memoffset::span_of!(market_data::Header, length)]
+/// Get message lenght out of `md::Header` bytes
+fn get_message_lenght(bytes: &[u8]) -> Result<md::MsgLength, Invalid> {
+  bytes[memoffset::span_of!(md::Header, length)]
     .try_into()
-    .map(market_data::MsgLength::from_le_bytes)
+    .map(md::MsgLength::from_le_bytes)
     .map_err(|_| Invalid)
 }
 
-/// Get message type out of `market_data::Header` bytes
-fn get_msg_type(bytes: &[u8]) -> Result<market_data::MsgType, Invalid> {
-  let value = bytes[memoffset::span_of!(market_data::Header, msg_type)]
+/// Get message type out of `md::Header` bytes
+fn get_msg_type(bytes: &[u8]) -> Result<md::MsgType, Invalid> {
+  let value = bytes[memoffset::span_of!(md::Header, msg_type)]
     .try_into()
     .map(u16::from_le_bytes)
     .map_err(|_| Invalid)?;
@@ -167,13 +167,13 @@ fn get_msg_type(bytes: &[u8]) -> Result<market_data::MsgType, Invalid> {
   value.try_into().map_err(|_| Invalid)
 }
 
-impl market_data::Login {
+impl md::Login {
   fn is_valid_inner(bytes: &[u8]) -> Result<(), Invalid> {
-    // Is buffer the same size as market_data::Login struct
+    // Is buffer the same size as md::Login struct
     let size_valid = bytes.len() == std::mem::size_of::<Self>();
     // Is declared size correct
     let lenght_valid = bytes.len() == get_message_lenght(bytes)? as usize;
-    let type_valid = market_data::MsgType::Login == get_msg_type(bytes)?;
+    let type_valid = md::MsgType::Login == get_msg_type(bytes)?;
 
     if size_valid
       && lenght_valid
@@ -192,7 +192,7 @@ impl market_data::Login {
   }
 }
 
-impl market_data::Timestamp {
+impl md::Timestamp {
   pub const fn new(value: u64) -> Self {
     Self(value)
   }
@@ -202,13 +202,13 @@ impl market_data::Timestamp {
   }
 }
 
-impl From<u64> for market_data::Timestamp {
+impl From<u64> for md::Timestamp {
   fn from(value: u64) -> Self {
-    market_data::Timestamp::new(value)
+    md::Timestamp::new(value)
   }
 }
 
-impl fmt::Display for market_data::Timestamp {
+impl fmt::Display for md::Timestamp {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     self.0.fmt(f)
   }

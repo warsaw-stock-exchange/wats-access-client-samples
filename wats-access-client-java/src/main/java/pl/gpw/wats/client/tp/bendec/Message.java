@@ -75,6 +75,8 @@ public interface Message {
                 return Optional.of(new OrderMassCancelResponse(bytes));
             case BIDOFFERUPDATE:
                 return Optional.of(new BidOfferUpdate(bytes));
+            case GAPFILL:
+                return Optional.of(new GapFill(bytes));
             case TESTEVENT:
                 return Optional.of(new TestEvent(bytes));
             default:
@@ -118,6 +120,7 @@ public interface Message {
         put(OrderMassCancel.class, MsgType.ORDERMASSCANCEL);
         put(OrderMassCancelResponse.class, MsgType.ORDERMASSCANCELRESPONSE);
         put(BidOfferUpdate.class, MsgType.BIDOFFERUPDATE);
+        put(GapFill.class, MsgType.GAPFILL);
         put(TestEvent.class, MsgType.TESTEVENT);
     }};
     
@@ -149,6 +152,7 @@ public interface Message {
         put(MsgType.ORDERMASSCANCEL, OrderMassCancel.class);
         put(MsgType.ORDERMASSCANCELRESPONSE, OrderMassCancelResponse.class);
         put(MsgType.BIDOFFERUPDATE, BidOfferUpdate.class);
+        put(MsgType.GAPFILL, GapFill.class);
         put(MsgType.TESTEVENT, TestEvent.class);
     }};
 }

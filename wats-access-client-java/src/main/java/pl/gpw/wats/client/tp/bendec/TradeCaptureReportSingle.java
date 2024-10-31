@@ -7,10 +7,10 @@ import java.nio.ByteBuffer;
 /**
  * <h2>TradeCaptureReportSingle</h2>
  * <p>Trade Capture Report - single side.</p>
- * <p>Byte length: 196</p>
+ * <p>Byte length: 198</p>
  * <p>Header header - Header. | size 16</p>
  * <p>ElementId > long (u32) instrumentId - ID of the instrument included in the order. | size 4</p>
- * <p>TradeReportId > String (u8[]) tradeReportId - Unique identifier of the trade capture report. | size 20</p>
+ * <p>TradeReportId > String (u8[]) tradeReportId - Unique identifier of the trade capture report. | size 21</p>
  * <p>OrderId > BigInteger (u64) secondaryTradeReportId - ID of the trade capture report. | size 8</p>
  * <p>TradeId > long (u32) tradeId - The unique ID assigned to the trade entity once it is received or matched by the exchange or central counterparty. | size 4</p>
  * <p>TradeReportTransType tradeReportTransType - Identifies Trade Report message transaction type. | size 1</p>
@@ -18,7 +18,7 @@ import java.nio.ByteBuffer;
  * <p>TradeType tradeType - Type of trade. | size 1</p>
  * <p>AlgorithmicTradeIndicator algorithmicTradeIndicator - Indicates algorithmic trader. | size 1</p>
  * <p>ExecType execType - Type of execution being reported. Uses subset of ExecType for trade capture reports. | size 1</p>
- * <p>TradeReportRefID > String (u8[]) tradeReportRefId - Reference identifier used with Cancel and Replace transaction types. The TradeReportID that is being referenced for trade correction or cancelation. | size 20</p>
+ * <p>TradeReportRefID > String (u8[]) tradeReportRefId - Reference identifier used with Cancel and Replace transaction types. The TradeReportID that is being referenced for trade correction or cancelation. | size 21</p>
  * <p>Quantity > BigInteger (u64) lastQty - Quantity (e.g. shares) bought/sold on this (last) fill. | size 8</p>
  * <p>Price > long (i64) lastPx - Price of this (last) fill. | size 8</p>
  * <p>Date > long (u32) settlementDate - Settlement date of the trade is equal to current date plus actual settlement offset calendar days. | size 4</p>
@@ -44,7 +44,7 @@ public class TradeCaptureReportSingle implements ByteSerializable, Message {
     private OrderSide side;
     private String counterpartyCode;
     private TcrParty tcrParty;
-    public static final int byteLength = 196;
+    public static final int byteLength = 198;
     
     public TradeCaptureReportSingle(Header header, long instrumentId, String tradeReportId, BigInteger secondaryTradeReportId, long tradeId, TradeReportTransType tradeReportTransType, TradeReportType tradeReportType, TradeType tradeType, AlgorithmicTradeIndicator algorithmicTradeIndicator, ExecType execType, String tradeReportRefId, BigInteger lastQty, long lastPx, long settlementDate, OrderSide side, String counterpartyCode, TcrParty tcrParty) {
         this.header = header;
@@ -69,21 +69,21 @@ public class TradeCaptureReportSingle implements ByteSerializable, Message {
     public TradeCaptureReportSingle(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
         this.instrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 16);
-        this.tradeReportId = BendecUtils.stringFromByteArray(bytes, offset + 20, 20);
-        this.secondaryTradeReportId = BendecUtils.uInt64FromByteArray(bytes, offset + 40);
-        this.tradeId = BendecUtils.uInt32FromByteArray(bytes, offset + 48);
-        this.tradeReportTransType = TradeReportTransType.getTradeReportTransType(bytes, offset + 52);
-        this.tradeReportType = TradeReportType.getTradeReportType(bytes, offset + 53);
-        this.tradeType = TradeType.getTradeType(bytes, offset + 54);
-        this.algorithmicTradeIndicator = AlgorithmicTradeIndicator.getAlgorithmicTradeIndicator(bytes, offset + 55);
-        this.execType = ExecType.getExecType(bytes, offset + 56);
-        this.tradeReportRefId = BendecUtils.stringFromByteArray(bytes, offset + 57, 20);
-        this.lastQty = BendecUtils.uInt64FromByteArray(bytes, offset + 77);
-        this.lastPx = BendecUtils.int64FromByteArray(bytes, offset + 85);
-        this.settlementDate = BendecUtils.uInt32FromByteArray(bytes, offset + 93);
-        this.side = OrderSide.getOrderSide(bytes, offset + 97);
-        this.counterpartyCode = BendecUtils.stringFromByteArray(bytes, offset + 98, 16);
-        this.tcrParty = new TcrParty(bytes, offset + 114);
+        this.tradeReportId = BendecUtils.stringFromByteArray(bytes, offset + 20, 21);
+        this.secondaryTradeReportId = BendecUtils.uInt64FromByteArray(bytes, offset + 41);
+        this.tradeId = BendecUtils.uInt32FromByteArray(bytes, offset + 49);
+        this.tradeReportTransType = TradeReportTransType.getTradeReportTransType(bytes, offset + 53);
+        this.tradeReportType = TradeReportType.getTradeReportType(bytes, offset + 54);
+        this.tradeType = TradeType.getTradeType(bytes, offset + 55);
+        this.algorithmicTradeIndicator = AlgorithmicTradeIndicator.getAlgorithmicTradeIndicator(bytes, offset + 56);
+        this.execType = ExecType.getExecType(bytes, offset + 57);
+        this.tradeReportRefId = BendecUtils.stringFromByteArray(bytes, offset + 58, 21);
+        this.lastQty = BendecUtils.uInt64FromByteArray(bytes, offset + 79);
+        this.lastPx = BendecUtils.int64FromByteArray(bytes, offset + 87);
+        this.settlementDate = BendecUtils.uInt32FromByteArray(bytes, offset + 95);
+        this.side = OrderSide.getOrderSide(bytes, offset + 99);
+        this.counterpartyCode = BendecUtils.stringFromByteArray(bytes, offset + 100, 16);
+        this.tcrParty = new TcrParty(bytes, offset + 116);
     }
     
     public TradeCaptureReportSingle(byte[] bytes) {
@@ -336,7 +336,7 @@ public class TradeCaptureReportSingle implements ByteSerializable, Message {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
-        buffer.put(BendecUtils.stringToByteArray(this.tradeReportId, 20));
+        buffer.put(BendecUtils.stringToByteArray(this.tradeReportId, 21));
         buffer.put(BendecUtils.uInt64ToByteArray(this.secondaryTradeReportId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.tradeId));
         tradeReportTransType.toBytes(buffer);
@@ -344,7 +344,7 @@ public class TradeCaptureReportSingle implements ByteSerializable, Message {
         tradeType.toBytes(buffer);
         algorithmicTradeIndicator.toBytes(buffer);
         execType.toBytes(buffer);
-        buffer.put(BendecUtils.stringToByteArray(this.tradeReportRefId, 20));
+        buffer.put(BendecUtils.stringToByteArray(this.tradeReportRefId, 21));
         buffer.put(BendecUtils.uInt64ToByteArray(this.lastQty));
         buffer.put(BendecUtils.int64ToByteArray(this.lastPx));
         buffer.put(BendecUtils.uInt32ToByteArray(this.settlementDate));
@@ -358,7 +358,7 @@ public class TradeCaptureReportSingle implements ByteSerializable, Message {
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
-        buffer.put(BendecUtils.stringToByteArray(this.tradeReportId, 20));
+        buffer.put(BendecUtils.stringToByteArray(this.tradeReportId, 21));
         buffer.put(BendecUtils.uInt64ToByteArray(this.secondaryTradeReportId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.tradeId));
         tradeReportTransType.toBytes(buffer);
@@ -366,7 +366,7 @@ public class TradeCaptureReportSingle implements ByteSerializable, Message {
         tradeType.toBytes(buffer);
         algorithmicTradeIndicator.toBytes(buffer);
         execType.toBytes(buffer);
-        buffer.put(BendecUtils.stringToByteArray(this.tradeReportRefId, 20));
+        buffer.put(BendecUtils.stringToByteArray(this.tradeReportRefId, 21));
         buffer.put(BendecUtils.uInt64ToByteArray(this.lastQty));
         buffer.put(BendecUtils.int64ToByteArray(this.lastPx));
         buffer.put(BendecUtils.uInt32ToByteArray(this.settlementDate));

@@ -1,5 +1,13 @@
 # Changes history for WATS Access Client common data
 
+## 1.3
+
+**No changes**
+
+## 1.2
+
+**No changes**
+
 ## 1.1
 
 * **Change:** Documentation and QuickFIX XML replaced with URL to official documentation distribution

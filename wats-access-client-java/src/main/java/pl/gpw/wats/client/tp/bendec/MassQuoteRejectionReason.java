@@ -62,6 +62,14 @@ public enum MassQuoteRejectionReason {
      */
     INVALIDPARTYROLEQUALIFIERFORPARTYID(1075),
     /**
+     * Missing ClearingMemberCode
+     */
+    MISSINGCLEARINGMEMBERCODE(1076),
+    /**
+     * Forbidden ClearingMemberCode
+     */
+    FORBIDDENCLEARINGMEMBERCODE(1077),
+    /**
      * Multiple quotes for the same instrument within Mass Quote message.
      */
     DUPLICATEINSTRUMENT(1202),

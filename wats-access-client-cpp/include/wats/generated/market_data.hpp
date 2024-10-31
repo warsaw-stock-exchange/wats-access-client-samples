@@ -51,6 +51,7 @@ enum class MsgType: uint16_t {
     InstrumentSummary = 671,
     ProductSummary = 672,
     PositionReport = 801,
+    ExternalUnderlying = 806,
     TestEvent = 8192
 };
 
@@ -94,6 +95,7 @@ static const std::map<std::string, MsgType> Name2MsgType {
     { "InstrumentSummary", MsgType::InstrumentSummary },
     { "ProductSummary", MsgType::ProductSummary },
     { "PositionReport", MsgType::PositionReport },
+    { "ExternalUnderlying", MsgType::ExternalUnderlying },
     { "TestEvent", MsgType::TestEvent }
 };
 
@@ -137,6 +139,7 @@ static const std::map<MsgType, std::string> MsgType2Name {
     { MsgType::InstrumentSummary, "InstrumentSummary" },
     { MsgType::ProductSummary, "ProductSummary" },
     { MsgType::PositionReport, "PositionReport" },
+    { MsgType::ExternalUnderlying, "ExternalUnderlying" },
     { MsgType::TestEvent, "TestEvent" }
 };
 
@@ -400,41 +403,35 @@ static const std::map<TradingPhaseType, std::string> TradingPhaseType2Name {
 
 enum class InstrumentStatus: uint8_t {
     Active = 1,
-    Inactive = 2,
     MarketOperationsSuspension = 3,
     OutsideCollarsStatic = 4,
     OutsideCollarsDynamic = 5,
     RegulatorySuspension = 6,
-    TechnicalHalt = 7,
     HybridNoQuotes = 8,
     HybridKnockout = 9,
-    HybridPause = 10
+    HybridKnockoutByIssuer = 10
 };
 
 static const std::map<std::string, InstrumentStatus> Name2InstrumentStatus {
     { "Active", InstrumentStatus::Active },
-    { "Inactive", InstrumentStatus::Inactive },
     { "MarketOperationsSuspension", InstrumentStatus::MarketOperationsSuspension },
     { "OutsideCollarsStatic", InstrumentStatus::OutsideCollarsStatic },
     { "OutsideCollarsDynamic", InstrumentStatus::OutsideCollarsDynamic },
     { "RegulatorySuspension", InstrumentStatus::RegulatorySuspension },
-    { "TechnicalHalt", InstrumentStatus::TechnicalHalt },
     { "HybridNoQuotes", InstrumentStatus::HybridNoQuotes },
     { "HybridKnockout", InstrumentStatus::HybridKnockout },
-    { "HybridPause", InstrumentStatus::HybridPause }
+    { "HybridKnockoutByIssuer", InstrumentStatus::HybridKnockoutByIssuer }
 };
 
 static const std::map<InstrumentStatus, std::string> InstrumentStatus2Name {
     { InstrumentStatus::Active, "Active" },
-    { InstrumentStatus::Inactive, "Inactive" },
     { InstrumentStatus::MarketOperationsSuspension, "MarketOperationsSuspension" },
     { InstrumentStatus::OutsideCollarsStatic, "OutsideCollarsStatic" },
     { InstrumentStatus::OutsideCollarsDynamic, "OutsideCollarsDynamic" },
     { InstrumentStatus::RegulatorySuspension, "RegulatorySuspension" },
-    { InstrumentStatus::TechnicalHalt, "TechnicalHalt" },
     { InstrumentStatus::HybridNoQuotes, "HybridNoQuotes" },
     { InstrumentStatus::HybridKnockout, "HybridKnockout" },
-    { InstrumentStatus::HybridPause, "HybridPause" }
+    { InstrumentStatus::HybridKnockoutByIssuer, "HybridKnockoutByIssuer" }
 };
 
 
@@ -2909,6 +2906,7 @@ struct Instrument {
     ElementId calendarId;
     ElementId marketStructureId;
     ElementId tickTableId;
+    ElementId referenceInstrumentId;
     ElementId collarGroupId;
     ElementId tradingScheduleId;
     InstrumentDescription description;
@@ -2955,6 +2953,7 @@ struct Instrument {
     Kid kid;
     Date kidIssueDate;
     uint8_t valueAtRisk;
+    ElementId externalUnderlyingId;
 
     friend std::ostream &operator << (std::ostream &, const Instrument &);
 };
@@ -3521,6 +3520,20 @@ struct PositionReport {
     friend std::ostream &operator << (std::ostream &, const PositionReport &);
 };
 
+struct ExternalUnderlying {
+    Header header;
+    ElementId externalUnderlyingId;
+    ProductIdentification productIdentification;
+    ProductIdentificationType productIdentificationType;
+    Code productCode;
+    Name productName;
+    MicCode mic;
+    Currency nominalCurrency;
+    Currency tradingCurrency;
+
+    friend std::ostream &operator << (std::ostream &, const ExternalUnderlying &);
+};
+
 union Message {
     Heartbeat uHeartbeat;
     OrderAdd uOrderAdd;
@@ -3562,6 +3575,7 @@ union Message {
     News uNews;
     TestEvent uTestEvent;
     PositionReport uPositionReport;
+    ExternalUnderlying uExternalUnderlying;
 };
   
   #pragma pack(pop)

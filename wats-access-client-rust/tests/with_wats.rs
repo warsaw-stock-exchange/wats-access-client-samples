@@ -3,20 +3,16 @@
 //!
 //! By design, WATS allows only a single TCP connection per connection id and resends all messages when login in again.
 //! To isolate the communication you need a separate connection_id for each client/test. This can be done with
-//! `create_client` function macro.
+//! `create_client_with_xxx` function macro.
 //!
 //! ```rust
-//! let client = utils::create_client(id, token);
+//! let client = utils::create_client_with_omd(id, token);
 //! ```
 
 use crate::utils::{init_tracing, simple_order_add, simple_trade_capture_report_dual};
 use chrono::{DateTime, Datelike, Local};
 use utils::simple_order_modify;
-use std::collections::HashMap;
-use std::time::Duration;
-use tokio::time::sleep;
 use wats_access_client_rust::messages::{market_data, trading_port as tp};
-use wats_access_client_rust::{Bbo, Dmd};
 
 mod config;
 mod utils;
@@ -29,7 +25,7 @@ async fn basic_client_login_logout() {
     init_tracing();
     let wats_config = config::get_config().unwrap();
 
-    let mut client = utils::create_client(
+    let mut client = utils::create_client_with_omd(
         wats_config.connection_01_id(),
         wats_config.connection_01_token(),
         wats_config.connection_04_id(),
@@ -51,7 +47,7 @@ async fn limit_order() {
     init_tracing();
     let wats_config = config::get_config().unwrap();
 
-    let mut client_a = utils::create_client(
+    let mut client_a = utils::create_client_with_omd(
       wats_config.connection_01_id(),
       wats_config.connection_01_token(),
       wats_config.connection_04_id(),
@@ -61,7 +57,7 @@ async fn limit_order() {
     .unwrap();
     utils::fetch_messages(&mut client_a).await;
 
-    let mut client_b = utils::create_client(
+    let mut client_b = utils::create_client_with_omd(
       wats_config.connection_02_id(),
       wats_config.connection_02_token(),
       wats_config.connection_04_id(),
@@ -144,7 +140,7 @@ async fn modify_in_fly() {
     init_tracing();
     let wats_config = config::get_config().unwrap();
 
-    let mut client = utils::create_client(
+    let mut client = utils::create_client_with_omd(
       wats_config.connection_01_id(),
       wats_config.connection_01_token(),
       wats_config.connection_04_id(),
@@ -279,7 +275,7 @@ async fn bad_instrument_id() {
     init_tracing();
     let wats_config = config::get_config().unwrap();
 
-    let mut client = utils::create_client(
+    let mut client = utils::create_client_with_omd(
       wats_config.connection_01_id(),
       wats_config.connection_01_token(),
       wats_config.connection_04_id(),
@@ -320,7 +316,7 @@ async fn bad_price() {
     init_tracing();
     let wats_config = config::get_config().unwrap();
 
-    let mut client = utils::create_client(
+    let mut client = utils::create_client_with_omd(
       wats_config.connection_01_id(),
       wats_config.connection_01_token(),
       wats_config.connection_04_id(),
@@ -362,7 +358,7 @@ async fn order_cancel_ok() {
     init_tracing();
     let wats_config = config::get_config().unwrap();
 
-    let mut client = utils::create_client(
+    let mut client = utils::create_client_with_omd(
       wats_config.connection_01_id(),
       wats_config.connection_01_token(),
       wats_config.connection_04_id(),
@@ -426,7 +422,7 @@ async fn order_cancel_bad_order_id() {
     init_tracing();
     let wats_config = config::get_config().unwrap();
 
-    let mut client = utils::create_client(
+    let mut client = utils::create_client_with_omd(
       wats_config.connection_01_id(),
       wats_config.connection_01_token(),
       wats_config.connection_04_id(),
@@ -490,7 +486,7 @@ async fn price_violates_tick_table() {
     init_tracing();
     let wats_config = config::get_config().unwrap();
 
-    let mut client = utils::create_client(
+    let mut client = utils::create_client_with_omd(
       wats_config.connection_01_id(),
       wats_config.connection_01_token(),
       wats_config.connection_04_id(),
@@ -541,7 +537,7 @@ async fn no_gap_in_omd_msg() {
     init_tracing();
     let wats_config = config::get_config().unwrap();
 
-    let mut client = utils::create_client(
+    let mut client = utils::create_client_with_omd(
       wats_config.connection_01_id(),
       wats_config.connection_01_token(),
       wats_config.connection_04_id(),
@@ -581,7 +577,7 @@ async fn request_omd_replay() {
     init_tracing();
     let wats_config = config::get_config().unwrap();
 
-    let mut client = utils::create_client(
+    let mut client = utils::create_client_with_omd(
       wats_config.connection_01_id(),
       wats_config.connection_01_token(),
       wats_config.connection_04_id(),
@@ -598,37 +594,6 @@ async fn request_omd_replay() {
     client.logout().await.unwrap();
 }
 
-/// Request a replay of all DMD messages
-#[tokio::test]
-#[ignore]
-async fn request_dmd_replay() {
-    init_tracing();
-    let wats_config = config::get_config().unwrap();
-
-    let limit_order_instrument_id = wats_config.limit_order_instrument_id();
-    let modify_in_fly_instrument_id = wats_config.modify_in_fly_instrument_id();
-
-    let mut dmd = Dmd::new(wats_config.dmd_addr(), wats_config.dmd_replay_addr())
-        .await
-        .unwrap();
-
-    #[allow(clippy::reversed_empty_ranges)]
-    dmd.request_dmd_replay(1..0).await.unwrap();
-
-    let dmd_tradable_product: Vec<_> = dmd
-        .messages()
-        .filter_map(|msg| {
-            if msg.msg_type() == market_data::MsgType::Instrument {
-                Some(unsafe { msg.instrument }.instrument_id)
-            } else {
-                None
-            }
-        })
-        .collect();
-    assert!(dmd_tradable_product.contains(&limit_order_instrument_id));
-    assert!(dmd_tradable_product.contains(&modify_in_fly_instrument_id));
-}
-
 /// Put buy and sell orders. Assert correct PriceLevelSnapshot
 #[tokio::test]
 #[ignore]
@@ -636,33 +601,15 @@ async fn bbo_price_level() {
     init_tracing();
     let wats_config = config::get_config().unwrap();
 
-    // Connect to BBO replay service
-    let mut bbo = Bbo::new(
-        wats_config.bbo_addr(),
-        wats_config.bbo_snap_addr(),
-        wats_config.bbo_replay_addr(),
-    )
-    .await
-    .unwrap();
-
-    // Assert initial state of BBO and then fetch all messages
-    assert_eq!(0, bbo.last_seq_num());
-
-    #[allow(clippy::reversed_empty_ranges)]
-    bbo.request_bbo_replay(1..0).await.unwrap();
-    let bbo_last_seq_num = bbo.last_seq_num();
-
-    ////////////////////////////////////////////////
-    //             TRAIDING PORT PART
-    ////////////////////////////////////////////////
+    // Let's trade
 
     // Create trading port client
-    let mut client = utils::create_client(
+    let mut client = utils::create_client_with_bbo(
       wats_config.connection_01_id(),
       wats_config.connection_01_token(),
-      wats_config.connection_04_id(),
-      wats_config.connection_04_token()
-  )
+      wats_config.connection_03_id(),
+      wats_config.connection_03_token()
+    )
     .await
     .unwrap();
 
@@ -728,55 +675,46 @@ async fn bbo_price_level() {
     let resp = client.get_order_add_resp().await.unwrap();
     assert_eq!(resp.status, tp::OrderStatus::New);
 
-    client.logout().await.unwrap();
-
-    ////////////////////////////////////////////////
-    //                 BACK TO BBO
-    ////////////////////////////////////////////////
-
+    // Loop over BBO
     let (buy, sell) = loop {
-        bbo.request_bbo_replay(bbo_last_seq_num..0).await.unwrap();
 
-        let msgs: HashMap<_, _> = bbo
-            .messages()
-            .filter_map(|msg| {
-                if msg.msg_type() == market_data::MsgType::PriceLevelSnapshot {
-                    Some(unsafe { msg.price_level_snapshot })
-                } else {
-                    None
-                }
-            })
-            .filter(|msg| {
-                msg.header.seq_num > bbo_last_seq_num
-                    && msg.instrument_id == wats_config.bbo_instrument_id()
-            })
-            .map(|msg| (msg.header.seq_num, msg))
-            .collect();
+      // Pull last OrderAdd message from Online Market Data
+      if let Some(gap) = client.pull_msg_from_omd().await.unwrap() {
+        client.request_omd_replay(gap).await.unwrap();
+      }
 
-        if msgs.len() == 4 {
-            let last = msgs.values().last().unwrap();
+      let price_level_snapshot = client
+        .omd_messages()
+        .filter_map(|msg| {
+          if msg.msg_type() == market_data::MsgType::PriceLevelSnapshot {
+              Some(unsafe { msg.price_level_snapshot })
+          } else {
+              None
+          }
+        })
+        .last()
+        .unwrap();
 
-            let buy: Vec<_> = last
-                .buy
-                .iter()
-                .filter(|price_lvl| price_lvl.order_count > 0)
-                .cloned()
-                .collect();
+      let buy: Vec<_> = price_level_snapshot
+          .buy
+          .iter()
+          .filter(|price_lvl| price_lvl.order_count > 0)
+          .cloned()
+          .collect();
 
-            let sell: Vec<_> = last
-                .sell
-                .iter()
-                .filter(|price_lvl| price_lvl.order_count > 0)
-                .cloned()
-                .collect();
+      let sell: Vec<_> = price_level_snapshot
+          .sell
+          .iter()
+          .filter(|price_lvl| price_lvl.order_count > 0)
+          .cloned()
+          .collect();
 
-            if buy.len() == 2 && sell.len() == 2 {
-                break (buy, sell);
-            }
-        }
-
-        sleep(Duration::from_millis(500)).await;
+      if buy.len() == 2 && sell.len() == 2 {
+          break (buy, sell);
+      }
     };
+
+    client.logout().await.unwrap();
 
     // Assert correct price level for buy
     assert_eq!(2, buy.len());
@@ -805,7 +743,7 @@ async fn orders_in_phase() {
 
     let wats_config = config::get_config().unwrap();
 
-    let mut client = utils::create_client(
+    let mut client = utils::create_client_with_omd(
       wats_config.connection_01_id(),
       wats_config.connection_01_token(),
       wats_config.connection_04_id(),
@@ -844,7 +782,7 @@ async fn ptc() {
 
     let wats_config = config::get_config().unwrap();
 
-    let mut client = utils::create_client(
+    let mut client = utils::create_client_with_omd(
       wats_config.connection_01_id(),
       wats_config.connection_01_token(),
       wats_config.connection_04_id(),
@@ -976,7 +914,7 @@ async fn order_book_based_on_market_data() {
 
     let wats_config = config::get_config().unwrap();
 
-    let mut client_a = utils::create_client(
+    let mut client_a = utils::create_client_with_omd(
       wats_config.connection_01_id(),
       wats_config.connection_01_token(),
       wats_config.connection_04_id(),
@@ -986,7 +924,7 @@ async fn order_book_based_on_market_data() {
     .unwrap();
     utils::fetch_messages_until_heartbeat(&mut client_a).await;
 
-    let mut client_b = utils::create_client(
+    let mut client_b = utils::create_client_with_omd(
       wats_config.connection_02_id(),
       wats_config.connection_02_token(),
       wats_config.connection_04_id(),
@@ -1227,7 +1165,7 @@ fn settlement_date(d: DateTime<Local>) -> u32 {
 async fn block_dual() {
     let wats_config = config::get_config().unwrap();
 
-    let mut client = utils::create_client(
+    let mut client = utils::create_client_with_omd(
       wats_config.connection_01_id(),
       wats_config.connection_01_token(),
       wats_config.connection_04_id(),

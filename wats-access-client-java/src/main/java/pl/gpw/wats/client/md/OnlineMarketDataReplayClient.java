@@ -72,6 +72,7 @@ public class OnlineMarketDataReplayClient {
         } else if (read > 0) {
             buffer.flip();
             while (buffer.hasRemaining()) {
+                // Replay stream is finished with two bytes zero pair
                 if (buffer.remaining() < 4) {
                     break;
                 }

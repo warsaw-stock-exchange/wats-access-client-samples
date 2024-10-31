@@ -1,6 +1,6 @@
 {
   "$schema": "./schema.json",
-  "version": 2054,
+  "version": 2060,
   "typeDefinitions": {
     "marketData": [
       {
@@ -1734,11 +1734,6 @@
             "Financial instrument is active."
           ],
           [
-            "Inactive",
-            2,
-            "Financial instrument is inactive and is not trading."
-          ],
-          [
             "MarketOperationsSuspension",
             3,
             "Manual suspension by Market Operations."
@@ -1759,11 +1754,6 @@
             "Regulatory suspension"
           ],
           [
-            "TechnicalHalt",
-            7,
-            "TechnicalHalt."
-          ],
-          [
             "HybridNoQuotes",
             8,
             "Hybrid no valid quotes."
@@ -1774,9 +1764,9 @@
             "Hybrid knockout."
           ],
           [
-            "HybridPause",
+            "HybridKnockoutByIssuer",
             10,
-            "Hybrid pause."
+            "Hybrid knockout by issuer."
           ]
         ]
       },
@@ -3985,7 +3975,10 @@
           {
             "name": "instrumentId",
             "type": "ElementId",
-            "description": "ID of financial instrument."
+            "description": "ID of financial instrument.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "side",
@@ -3995,12 +3988,18 @@
           {
             "name": "price",
             "type": "Price",
-            "description": "Order (limit) price."
+            "description": "Order (limit) price.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "quantity",
             "type": "Quantity",
-            "description": "Order quantity."
+            "description": "Order quantity.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "mmQuote",
@@ -4044,12 +4043,18 @@
           {
             "name": "quantity",
             "type": "Quantity",
-            "description": "Remaining un-executed order quantity."
+            "description": "Remaining un-executed order quantity.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "instrumentId",
             "type": "ElementId",
-            "description": "ID of financial instrument."
+            "description": "ID of financial instrument.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "publicOrderId",
@@ -4059,17 +4064,26 @@
           {
             "name": "executionId",
             "type": "TradeId",
-            "description": "ID of the underlying trade (equal to TradeID in Trade.)"
+            "description": "ID of the underlying trade (equal to TradeID in Trade.)",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "executionPrice",
             "type": "Price",
-            "description": "Price at which the order was executed."
+            "description": "Price at which the order was executed.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "executionQuantity",
             "type": "Quantity",
-            "description": "The order’s executed quantity."
+            "description": "The order’s executed quantity.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           }
         ]
       },
@@ -4086,7 +4100,10 @@
           {
             "name": "instrumentId",
             "type": "ElementId",
-            "description": "ID of financial instrument."
+            "description": "ID of financial instrument.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "publicOrderId",
@@ -4096,12 +4113,18 @@
           {
             "name": "price",
             "type": "Price",
-            "description": "New order price."
+            "description": "New order price.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "quantity",
             "type": "Quantity",
-            "description": "New order quantity."
+            "description": "New order quantity.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "priorityFlag",
@@ -4123,17 +4146,26 @@
           {
             "name": "instrumentId",
             "type": "ElementId",
-            "description": "ID of financial instrument."
+            "description": "ID of financial instrument.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "price",
             "type": "Price",
-            "description": "BBO level 1 price level in currency units."
+            "description": "BBO level 1 price level in currency units.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "quantity",
             "type": "Quantity",
-            "description": "BBO level 1 quantity at price level."
+            "description": "BBO level 1 quantity at price level.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "side",
@@ -4143,7 +4175,10 @@
           {
             "name": "orderCount",
             "type": "OrderCount",
-            "description": "Number of open orders at BBO level 1."
+            "description": "Number of open orders at BBO level 1.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           }
         ]
       },
@@ -4219,17 +4254,26 @@
           {
             "name": "price",
             "type": "Price",
-            "description": "Price level in currency units."
+            "description": "Price level in currency units.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "quantity",
             "type": "Quantity",
-            "description": "Quantity of securities available at a given price level."
+            "description": "Quantity of securities available at a given price level.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "orderCount",
             "type": "OrderCount",
-            "description": "Number of open orders at a given price level."
+            "description": "Number of open orders at a given price level.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           }
         ]
       },
@@ -4681,6 +4725,11 @@
             "description": "ID of the tick table used for the financial instrument."
           },
           {
+            "name": "referenceInstrumentId",
+            "type": "ElementId",
+            "description": "Identifier of reference instrument."
+          },
+          {
             "name": "collarGroupId",
             "type": "ElementId",
             "description": "Collar group ID."
@@ -4909,6 +4958,11 @@
             "name": "valueAtRisk",
             "type": "u8",
             "description": "Value at risk."
+          },
+          {
+            "name": "externalUnderlyingId",
+            "type": "ElementId",
+            "description": "External underlying ID."
           }
         ]
       },
@@ -5771,7 +5825,10 @@
           {
             "name": "instrumentId",
             "type": "ElementId",
-            "description": "Identifier of the instrument."
+            "description": "Identifier of the instrument.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "marketModelType",
@@ -5781,12 +5838,18 @@
           {
             "name": "lastTradedPrice",
             "type": "Price",
-            "description": "Last Traded Price (LTP)."
+            "description": "Last Traded Price (LTP).",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "closingPrice",
             "type": "Price",
-            "description": "Closing Price (CP)."
+            "description": "Closing Price (CP).",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "closingPriceType",
@@ -5796,7 +5859,10 @@
           {
             "name": "adjustedClosingPrice",
             "type": "Price",
-            "description": "Adjusted Closing Price (ACP)."
+            "description": "Adjusted Closing Price (ACP).",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "adjustedClosingPriceReason",
@@ -5806,12 +5872,18 @@
           {
             "name": "pctChange",
             "type": "PercentageChange",
-            "description": "Percentage change from last session closing price."
+            "description": "Percentage change from last session closing price.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "vwap",
             "type": "Price",
-            "description": "Volume-weighted average price for the market model in which there is an instrument."
+            "description": "Volume-weighted average price for the market model in which there is an instrument.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "noTrades",
@@ -5821,37 +5893,58 @@
           {
             "name": "totalVolume",
             "type": "Quantity",
-            "description": "Total transaction volume."
+            "description": "Total transaction volume.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "totalValue",
             "type": "Value",
-            "description": "Total transaction value."
+            "description": "Total transaction value.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "openingPrice",
             "type": "Price",
-            "description": "The price of the first trade on the current trading day."
+            "description": "The price of the first trade on the current trading day.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "maxPrice",
             "type": "Price",
-            "description": "Highest price of the instrument on the current trading day."
+            "description": "Highest price of the instrument on the current trading day.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "minPrice",
             "type": "Price",
-            "description": "Lowest price of the instrument on the current trading day."
+            "description": "Lowest price of the instrument on the current trading day.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "settlementPrice",
             "type": "Price",
-            "description": "Settlement price."
+            "description": "Settlement price.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "settlementValue",
             "type": "Price",
-            "description": "Settlement value."
+            "description": "Settlement value.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "endTradingDate",
@@ -5903,12 +5996,18 @@
           {
             "name": "productIdentification",
             "type": "ProductIdentification",
-            "description": "Product identification, e.g. ISIN number."
+            "description": "Product identification, e.g. ISIN number.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "productId",
             "type": "ElementId",
-            "description": "ID of the product."
+            "description": "ID of the product.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "mic",
@@ -5938,7 +6037,10 @@
           {
             "name": "tradingValueCurrency",
             "type": "Value",
-            "description": "The field comprises the trading value expressed in trading currency."
+            "description": "The field comprises the trading value expressed in trading currency.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "status",
@@ -5958,7 +6060,10 @@
           {
             "name": "markerPriceChange",
             "type": "ChangeIndicator",
-            "description": "The field contains the market of the percentage change of the instrument closing price from the current session in relation to the reference price."
+            "description": "The field contains the market of the percentage change of the instrument closing price from the current session in relation to the reference price.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "lowerLiquidity",
@@ -5973,7 +6078,10 @@
           {
             "name": "impliedVolatility",
             "type": "Number",
-            "description": "Implied volatility."
+            "description": "Implied volatility.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "dividendRate",
@@ -5983,32 +6091,50 @@
           {
             "name": "delta",
             "type": "Number",
-            "description": "Value of Delta indicator from the current session."
+            "description": "Value of Delta indicator from the current session.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "gamma",
             "type": "Number",
-            "description": "Value of Gamma indicator from the current session."
+            "description": "Value of Gamma indicator from the current session.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "rho",
             "type": "Number",
-            "description": "Value of Rho indicator from the current session."
+            "description": "Value of Rho indicator from the current session.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "theta",
             "type": "Number",
-            "description": "Value of Theta indicator from the current session."
+            "description": "Value of Theta indicator from the current session.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "vega",
             "type": "Number",
-            "description": "Value of Vega indicator from the current session."
+            "description": "Value of Vega indicator from the current session.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "volatility",
             "type": "Number",
-            "description": "Volatility to be calculated is based on the implied volatility (provided in field ImpliedVolatility) according to algorithm worked out by the WSE, which is available on the website: www.opcje.gpw.pl."
+            "description": "Volatility to be calculated is based on the implied volatility (provided in field ImpliedVolatility) according to algorithm worked out by the WSE, which is available on the website: www.opcje.gpw.pl.",
+            "$metadata": {
+              "isEncrypted": true
+            }
           },
           {
             "name": "optionsStrikePrice",
@@ -6723,6 +6849,11 @@
             "Report of open positions."
           ],
           [
+            "ExternalUnderlying",
+            806,
+            "The message contains a list of underlyings not traded in WATS. It concerns underlyings for derivatives and structured products."
+          ],
+          [
             "TestEvent",
             8192,
             "A message to relay test scenario information"
@@ -6885,6 +7016,58 @@
         ]
       },
       {
+        "kind": "Struct",
+        "name": "ExternalUnderlying",
+        "description": "The message contains a list of underlyings not traded in WATS. It concerns underlyings for derivatives and structured products.",
+        "fields": [
+          {
+            "name": "header",
+            "type": "Header",
+            "description": "Message header."
+          },
+          {
+            "name": "externalUnderlyingId",
+            "type": "ElementId",
+            "description": "External underlying ID."
+          },
+          {
+            "name": "productIdentification",
+            "type": "ProductIdentification",
+            "description": "Product identification."
+          },
+          {
+            "name": "productIdentificationType",
+            "type": "ProductIdentificationType",
+            "description": "Product identification type."
+          },
+          {
+            "name": "productCode",
+            "type": "Code",
+            "description": "Product code."
+          },
+          {
+            "name": "productName",
+            "type": "Name",
+            "description": "Product name."
+          },
+          {
+            "name": "mic",
+            "type": "MicCode",
+            "description": "Market Identifier Code."
+          },
+          {
+            "name": "nominalCurrency",
+            "type": "Currency",
+            "description": "Nominal currency."
+          },
+          {
+            "name": "tradingCurrency",
+            "type": "Currency",
+            "description": "Trading currency."
+          }
+        ]
+      },
+      {
         "kind": "Union",
         "name": "Message",
         "members": [
@@ -6927,7 +7110,8 @@
           "ProductSummary",
           "News",
           "TestEvent",
-          "PositionReport"
+          "PositionReport",
+          "ExternalUnderlying"
         ],
         "discriminator": [
           "header",

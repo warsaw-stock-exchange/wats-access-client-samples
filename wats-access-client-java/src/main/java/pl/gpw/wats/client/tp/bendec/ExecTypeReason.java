@@ -68,7 +68,19 @@ public enum ExecTypeReason {
     /**
      * Order rejected.
      */
-    REJECTED(15);
+    REJECTED(15),
+    /**
+     * Cancel on BuyOnly state entry
+     */
+    CANCELONBUYONLYSTATEENTRY(16),
+    /**
+     * Cancel on KnockedOut state entry
+     */
+    CANCELONKNOCKEDOUTSTATEENTRY(17),
+    /**
+     * Order cancelled due to exceeding RMA post trade limit.
+     */
+    CANCELBYRISKMANAGEMENT(18);
     
     private final int value;
     private final int byteLength = 1;

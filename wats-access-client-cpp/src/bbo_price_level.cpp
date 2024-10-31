@@ -128,21 +128,15 @@ int main() {
 
     io_context.reset();
 
-    // Let's submit a series of orders
+    // Let's see what Best Bid Offer service has to say
+    best_bid_offer.start(config);
+
+    // Now let's submit a series of orders
     trading_port.start(config);
 
     io_context.run();
 
     trading_port.stop();
-
-    std::this_thread::sleep_for(1000ms);
-
-    io_context.reset();
-
-    // Now let's see what Best Bid Offer service has to say
-    best_bid_offer.start(config);
-
-    io_context.run();
 
     best_bid_offer.stop();
 

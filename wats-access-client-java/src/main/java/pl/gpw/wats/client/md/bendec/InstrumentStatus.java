@@ -14,10 +14,6 @@ public enum InstrumentStatus {
      */
     ACTIVE(1),
     /**
-     * Financial instrument is inactive and is not trading.
-     */
-    INACTIVE(2),
-    /**
      * Manual suspension by Market Operations.
      */
     MARKETOPERATIONSSUSPENSION(3),
@@ -34,10 +30,6 @@ public enum InstrumentStatus {
      */
     REGULATORYSUSPENSION(6),
     /**
-     * TechnicalHalt.
-     */
-    TECHNICALHALT(7),
-    /**
      * Hybrid no valid quotes.
      */
     HYBRIDNOQUOTES(8),
@@ -46,9 +38,9 @@ public enum InstrumentStatus {
      */
     HYBRIDKNOCKOUT(9),
     /**
-     * Hybrid pause.
+     * Hybrid knockout by issuer.
      */
-    HYBRIDPAUSE(10);
+    HYBRIDKNOCKOUTBYISSUER(10);
     
     private final int value;
     private final int byteLength = 1;

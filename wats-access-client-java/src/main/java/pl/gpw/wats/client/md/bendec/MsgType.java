@@ -166,6 +166,10 @@ public enum MsgType {
      */
     POSITIONREPORT(801),
     /**
+     * The message contains a list of underlyings not traded in WATS. It concerns underlyings for derivatives and structured products.
+     */
+    EXTERNALUNDERLYING(806),
+    /**
      * A message to relay test scenario information
      */
     TESTEVENT(8192);

@@ -93,7 +93,7 @@ pub type Weekdays = [bool; 7];
 
 
 /// Market Identifier Code (MIC) as specified in ISO 10383.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Default)]
 pub struct MicCode(pub(crate) [AnsiChar; 4]);
 impl MicCode {
   pub fn new(v: [AnsiChar; 4]) -> Self {
@@ -149,7 +149,7 @@ pub type EncryptionGroupKey = [u8; 32];
 
 
 /// Product identification, for example its ISIN number.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Default)]
 pub struct ProductIdentification(pub(crate) [AnsiChar; 30]);
 impl ProductIdentification {
   pub fn new(v: [AnsiChar; 30]) -> Self {
@@ -1312,8 +1312,6 @@ impl std::convert::TryFrom<u8> for ProductSubtype {
 pub enum InstrumentStatus {
   /// Financial instrument is active.
   Active = 0x0001,
-  /// Financial instrument is inactive and is not trading.
-  Inactive = 0x0002,
   /// Manual suspension by Market Operations.
   MarketOperationsSuspension = 0x0003,
   /// Outside static trade price collars.
@@ -1322,14 +1320,12 @@ pub enum InstrumentStatus {
   OutsideCollarsDynamic = 0x0005,
   /// Regulatory suspension
   RegulatorySuspension = 0x0006,
-  /// TechnicalHalt.
-  TechnicalHalt = 0x0007,
   /// Hybrid no valid quotes.
   HybridNoQuotes = 0x0008,
   /// Hybrid knockout.
   HybridKnockout = 0x0009,
-  /// Hybrid pause.
-  HybridPause = 0x000a,
+  /// Hybrid knockout by issuer.
+  HybridKnockoutByIssuer = 0x000a,
 }
 impl Default for InstrumentStatus {
   fn default() -> Self {
@@ -1341,15 +1337,13 @@ impl std::convert::TryFrom<u8> for InstrumentStatus {
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
       0x0001 => Ok(Self::Active),
-      0x0002 => Ok(Self::Inactive),
       0x0003 => Ok(Self::MarketOperationsSuspension),
       0x0004 => Ok(Self::OutsideCollarsStatic),
       0x0005 => Ok(Self::OutsideCollarsDynamic),
       0x0006 => Ok(Self::RegulatorySuspension),
-      0x0007 => Ok(Self::TechnicalHalt),
       0x0008 => Ok(Self::HybridNoQuotes),
       0x0009 => Ok(Self::HybridKnockout),
-      0x000a => Ok(Self::HybridPause),
+      0x000a => Ok(Self::HybridKnockoutByIssuer),
       other => Err(InvalidVariant::new(other as u32, "InstrumentStatus")),
     }
   }
@@ -2951,8 +2945,8 @@ pub struct OrderModify {
 
 /// BBO Level 1.
 #[repr(C, packed)]
-#[derive(Serialize, Deserialize, Clone, Copy)]
-#[serde(deny_unknown_fields)]
+#[derive(Serialize, Deserialize, Clone, Copy, Default)]
+#[serde(deny_unknown_fields, default)]
 #[serde(rename_all = "camelCase")]
 pub struct TopPriceLevelUpdate {
   /// Message header.
@@ -2971,8 +2965,8 @@ pub struct TopPriceLevelUpdate {
 
 /// BBO price levels and volumes.
 #[repr(C, packed)]
-#[derive(Serialize, Deserialize, Clone, Copy)]
-#[serde(deny_unknown_fields)]
+#[derive(Serialize, Deserialize, Clone, Copy, Default)]
+#[serde(deny_unknown_fields, default)]
 #[serde(rename_all = "camelCase")]
 pub struct PriceLevelSnapshot {
   /// Message header.
@@ -3328,6 +3322,8 @@ pub struct Instrument {
   pub market_structure_id: ElementId,
   /// ID of the tick table used for the financial instrument.
   pub tick_table_id: ElementId,
+  /// Identifier of reference instrument.
+  pub reference_instrument_id: ElementId,
   /// Collar group ID.
   pub collar_group_id: ElementId,
   /// Trading schedule ID.
@@ -3420,6 +3416,8 @@ pub struct Instrument {
   pub kid_issue_date: Date,
   /// Value at risk.
   pub value_at_risk: u8,
+  /// External underlying ID.
+  pub external_underlying_id: ElementId,
 }
 
 /// Start of a new trading phase.
@@ -3889,8 +3887,8 @@ pub struct InstrumentSummary {
 
 /// Provides brief instrument summary.
 #[repr(C, packed)]
-#[derive(Serialize, Deserialize, Clone, Copy)]
-#[serde(deny_unknown_fields)]
+#[derive(Serialize, Deserialize, Clone, Copy, Default)]
+#[serde(deny_unknown_fields, default)]
 #[serde(rename_all = "camelCase")]
 pub struct SingleInstrumentSummary {
   /// Identifier of the instrument.
@@ -3935,8 +3933,8 @@ pub struct SingleInstrumentSummary {
 
 /// Session day product summary.
 #[repr(C, packed)]
-#[derive(Serialize, Deserialize, Clone, Copy)]
-#[serde(deny_unknown_fields)]
+#[derive(Serialize, Deserialize, Clone, Copy, Default)]
+#[serde(deny_unknown_fields, default)]
 #[serde(rename_all = "camelCase")]
 pub struct ProductSummary {
   /// Message header.
@@ -4561,6 +4559,8 @@ pub enum MsgType {
   ProductSummary = 0x02a0,
   /// Report of open positions.
   PositionReport = 0x0321,
+  /// The message contains a list of underlyings not traded in WATS. It concerns underlyings for derivatives and structured products.
+  ExternalUnderlying = 0x0326,
   /// A message to relay test scenario information
   TestEvent = 0x2000,
 }
@@ -4612,6 +4612,7 @@ impl std::convert::TryFrom<u16> for MsgType {
       0x029f => Ok(Self::InstrumentSummary),
       0x02a0 => Ok(Self::ProductSummary),
       0x0321 => Ok(Self::PositionReport),
+      0x0326 => Ok(Self::ExternalUnderlying),
       0x2000 => Ok(Self::TestEvent),
       other => Err(InvalidVariant::new(other as u32, "MsgType")),
     }
@@ -4659,6 +4660,7 @@ impl MsgTypeInt {
   pub const InstrumentSummary: u16 = 0x029f;
   pub const ProductSummary: u16 = 0x02a0;
   pub const PositionReport: u16 = 0x0321;
+  pub const ExternalUnderlying: u16 = 0x0326;
   pub const TestEvent: u16 = 0x2000;
 }
 
@@ -4670,7 +4672,7 @@ impl BytesValidator for MsgType {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u16::from_le_bytes).unwrap_unchecked();
-  matches!(disc, MsgTypeInt::Heartbeat | MsgTypeInt::OrderAdd | MsgTypeInt::OrderModify | MsgTypeInt::OrderDelete | MsgTypeInt::OrderExecute | MsgTypeInt::TradingSessionStatus | MsgTypeInt::EncryptionKey | MsgTypeInt::InstrumentStatusChange | MsgTypeInt::TradingPhaseScheduleEntry | MsgTypeInt::TickTableEntry | MsgTypeInt::WeekPlan | MsgTypeInt::CalendarException | MsgTypeInt::AccruedInterestTableEntry | MsgTypeInt::IndexationTableEntry | MsgTypeInt::Trade | MsgTypeInt::CollarTableEntry | MsgTypeInt::TopPriceLevelUpdate | MsgTypeInt::PriceLevelSnapshot | MsgTypeInt::AuctionUpdate | MsgTypeInt::AuctionSummary | MsgTypeInt::PriceUpdate | MsgTypeInt::OrderCollars | MsgTypeInt::TradeCollars | MsgTypeInt::MarketStructure | MsgTypeInt::Instrument | MsgTypeInt::CollarGroup | MsgTypeInt::OrderBookEvent | MsgTypeInt::RealTimeIndex | MsgTypeInt::IndexSummary | MsgTypeInt::IndexPortfolioEntry | MsgTypeInt::IndexParams | MsgTypeInt::News | MsgTypeInt::Login | MsgTypeInt::LoginResponse | MsgTypeInt::Logout | MsgTypeInt::EndOfSnapshot | MsgTypeInt::InstrumentSummary | MsgTypeInt::ProductSummary | MsgTypeInt::PositionReport | MsgTypeInt::TestEvent)
+  matches!(disc, MsgTypeInt::Heartbeat | MsgTypeInt::OrderAdd | MsgTypeInt::OrderModify | MsgTypeInt::OrderDelete | MsgTypeInt::OrderExecute | MsgTypeInt::TradingSessionStatus | MsgTypeInt::EncryptionKey | MsgTypeInt::InstrumentStatusChange | MsgTypeInt::TradingPhaseScheduleEntry | MsgTypeInt::TickTableEntry | MsgTypeInt::WeekPlan | MsgTypeInt::CalendarException | MsgTypeInt::AccruedInterestTableEntry | MsgTypeInt::IndexationTableEntry | MsgTypeInt::Trade | MsgTypeInt::CollarTableEntry | MsgTypeInt::TopPriceLevelUpdate | MsgTypeInt::PriceLevelSnapshot | MsgTypeInt::AuctionUpdate | MsgTypeInt::AuctionSummary | MsgTypeInt::PriceUpdate | MsgTypeInt::OrderCollars | MsgTypeInt::TradeCollars | MsgTypeInt::MarketStructure | MsgTypeInt::Instrument | MsgTypeInt::CollarGroup | MsgTypeInt::OrderBookEvent | MsgTypeInt::RealTimeIndex | MsgTypeInt::IndexSummary | MsgTypeInt::IndexPortfolioEntry | MsgTypeInt::IndexParams | MsgTypeInt::News | MsgTypeInt::Login | MsgTypeInt::LoginResponse | MsgTypeInt::Logout | MsgTypeInt::EndOfSnapshot | MsgTypeInt::InstrumentSummary | MsgTypeInt::ProductSummary | MsgTypeInt::PositionReport | MsgTypeInt::ExternalUnderlying | MsgTypeInt::TestEvent)
     }
   }
 
@@ -4810,6 +4812,32 @@ pub struct PositionReport {
   pub trade_id: TradeId,
 }
 
+/// The message contains a list of underlyings not traded in WATS. It concerns underlyings for derivatives and structured products.
+#[repr(C, packed)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
+#[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
+pub struct ExternalUnderlying {
+  /// Message header.
+  pub header: Header,
+  /// External underlying ID.
+  pub external_underlying_id: ElementId,
+  /// Product identification.
+  pub product_identification: ProductIdentification,
+  /// Product identification type.
+  pub product_identification_type: ProductIdentificationType,
+  /// Product code.
+  pub product_code: Code,
+  /// Product name.
+  pub product_name: Name,
+  /// Market Identifier Code.
+  pub mic: MicCode,
+  /// Nominal currency.
+  pub nominal_currency: Currency,
+  /// Trading currency.
+  pub trading_currency: Currency,
+}
+
 
 pub union Message {
   pub heartbeat: Heartbeat,
@@ -4852,6 +4880,7 @@ pub union Message {
   pub news: News,
   pub test_event: TestEvent,
   pub position_report: PositionReport,
+  pub external_underlying: ExternalUnderlying,
 }
 
 impl Serialize for Message {
@@ -4900,7 +4929,8 @@ impl Serialize for Message {
         MsgType::ProductSummary => self.product_summary.serialize(serializer),
         MsgType::News => self.news.serialize(serializer),
         MsgType::TestEvent => self.test_event.serialize(serializer),
-        MsgType::PositionReport => self.position_report.serialize(serializer), 
+        MsgType::PositionReport => self.position_report.serialize(serializer),
+        MsgType::ExternalUnderlying => self.external_underlying.serialize(serializer), 
       }
     }
   }
@@ -4952,6 +4982,7 @@ impl Message {
       MsgType::News => News::deserialize(de).map(|v| Message { news: v }),
       MsgType::TestEvent => TestEvent::deserialize(de).map(|v| Message { test_event: v }),
       MsgType::PositionReport => PositionReport::deserialize(de).map(|v| Message { position_report: v }),
+      MsgType::ExternalUnderlying => ExternalUnderlying::deserialize(de).map(|v| Message { external_underlying: v }),
     }
   }
 }
@@ -4999,6 +5030,7 @@ impl Message {
       MsgType::News => std::mem::size_of::<News>(),
       MsgType::TestEvent => std::mem::size_of::<TestEvent>(),
       MsgType::PositionReport => std::mem::size_of::<PositionReport>(),
+      MsgType::ExternalUnderlying => std::mem::size_of::<ExternalUnderlying>(),
     }
   }
 }

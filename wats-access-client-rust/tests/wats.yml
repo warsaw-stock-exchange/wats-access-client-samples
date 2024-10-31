@@ -35,16 +35,6 @@ bbo_replay:
   host: 127.0.0.1
   port: 10032
 
-# Delayed Market Data multicast group address
-dmd_stream:
-  host: 224.4.1.1
-  port: 10031
-
-# Delayed Market Data replay
-dmd_replay:
-  host: 127.0.0.1
-  port: 10034
-
 multicast_interface: 127.0.0.1
 
 connection_01:
@@ -53,6 +43,10 @@ connection_01:
 
 connection_02:
   id: 589
+  token: ABCDEFGH
+
+connection_03:
+  id: 609
   token: ABCDEFGH
 
 connection_04:

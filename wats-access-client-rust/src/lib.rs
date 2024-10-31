@@ -5,7 +5,7 @@
 //! own WATS client in Rust.
 
 use crate::{
-    messages::{market_data, trading_port as tp, replay},
+    messages::{market_data as md, replay, trading_port as tp},
     utils::{create_md_codec, create_tp_codec, TradingPortMsg},
 };
 use anyhow::{Context, Result};
@@ -20,6 +20,7 @@ use std::{
     collections::HashMap,
     net::{Ipv4Addr, SocketAddr},
     ops::Range,
+    mem,
 };
 use tokio::{
     io::AsyncWriteExt,
@@ -125,14 +126,14 @@ impl Client {
         Ok(())
     }
 
-    pub fn omd_messages(&self) -> impl Iterator<Item = &market_data::Message> {
+    pub fn omd_messages(&self) -> impl Iterator<Item = &md::Message> {
         self.snap.md_message.iter()
     }
 
     pub fn omd_tick_table(
         &self,
         tick_table_id: &u32,
-    ) -> Option<&Vec<(market_data::TickSize, market_data::Bound)>> {
+    ) -> Option<&Vec<(md::TickSize, md::Bound)>> {
         self.snap.tick_tables.get(tick_table_id)
     }
 
@@ -385,7 +386,7 @@ impl Client {
     ///
     /// Returns the gap between last `md_last_seq_num` value and `seq_num` in
     /// received Market Data message. If the gap is bigger than 1 message it
-    /// means that something is missing. In that case return the gap. It is 
+    /// means that something is missing. In that case return the gap. It is
     /// caller's responsibility to request missing messages from replay.
     ///
     /// If the gap is 1 proceed with processing OMD message and update
@@ -541,15 +542,15 @@ impl ClientBuilder {
 
     /// Pull the latest Online Market Data snapshot and store essential data
     /// for further reference. The snapshot is required to fetch encryption
-    /// keys and [`market_data::TickTableEntry`] for [`tp::OrderAdd`] validation.
+    /// keys and [`md::TickTableEntry`] for [`tp::OrderAdd`] validation.
     async fn get_market_data_snapshot(
         &mut self,
         connection_id: u16,
         token: [u8; 8],
     ) -> Result<Snapshot> {
         // Login to OMD Snapshot
-        let login = market_data::Login {
-            header: market_data::Header::new(market_data::MsgType::Login),
+        let login = md::Login {
+            header: md::Header::new(md::MsgType::Login),
             connection_id,
             token,
         };
@@ -566,18 +567,18 @@ impl ClientBuilder {
             .context("No snapshot login response")?
             .context("Codec error in snapshot login response")?;
 
-        // Check if the response is [`market_data::LoginResponse`] message and the result is ok.
-        let login_resp = unsafe { from_bytes::<market_data::LoginResponse>(&bytes) };
+        // Check if the response is [`md::LoginResponse`] message and the result is ok.
+        let login_resp = unsafe { from_bytes::<md::LoginResponse>(&bytes) };
 
-        if !(bytes.len() == std::mem::size_of::<market_data::LoginResponse>() && {
+        if !(bytes.len() == std::mem::size_of::<md::LoginResponse>() && {
             login_resp.header.msg_type
         }
-            == market_data::MsgType::LoginResponse)
+            == md::MsgType::LoginResponse)
         {
             anyhow::bail!("Bad snapshot login response")
         }
 
-        if login_resp.result != market_data::LoginResult::Ok {
+        if login_resp.result != md::LoginResult::Ok {
             anyhow::bail!("Snapshot login failed: {:?}", login_resp.result)
         }
 
@@ -586,7 +587,7 @@ impl ClientBuilder {
 
         let mut snap: Snapshot = Default::default();
 
-        // Read untill `market_data::EndOfSnapshot`. `last_seq_num` in `EndOfSnapshot`
+        // Read untill `md::EndOfSnapshot`. `last_seq_num` in `EndOfSnapshot`
         // message identifies last Market Data message that was used to
         // create a snapshot.
         snap.md_last_seq_num = loop {
@@ -597,9 +598,9 @@ impl ClientBuilder {
                 .context("End of snapshot stream")?
                 .context("Bad message in snapshot stream")?;
 
-            let msg = unsafe { &mut *(msg.as_ptr() as *mut crate::messages::market_data::Message) };
+            let msg = unsafe { &mut *(msg.as_ptr() as *mut md::Message) };
 
-            if msg.msg_type() == market_data::MsgType::EndOfSnapshot {
+            if msg.msg_type() == md::MsgType::EndOfSnapshot {
                 break unsafe { &msg.end_of_snapshot }.last_seq_num;
             }
 
@@ -671,8 +672,8 @@ impl ClientBuilder {
 
 /// Connect to the Market Data stream.
 ///
-/// Join the IPv4 multicast group associated with the Market Data and 
-/// return [`UdpFramed`] stream of [`market_data::Message`].
+/// Join the IPv4 multicast group associated with the Market Data and
+/// return [`UdpFramed`] stream of [`md::Message`].
 ///
 /// `addr` is the Ipv4 socket address of a multicast group that the Market Data
 /// push messages to.
@@ -727,41 +728,114 @@ async fn connect_to_omd_snapshot(
 }
 
 fn get_cipher_for_msg(
-    encryption_keys: &[market_data::EncryptionKey],
-    msg: &market_data::Message,
+  encryption_keys: &[md::EncryptionKey],
+  encryption_key_id: u32,
+  encryption_key_offset: u64,
 ) -> Option<ChaCha20> {
-    let encryption_key_id = msg
-        .is_encrypted()
-        .then(|| msg.encryption_key_id())?;
+  if encryption_key_id == 0 { return None }
 
-    let encryption_keys: Vec<_> = encryption_keys
-        .iter()
-        .filter(|key| key.id == encryption_key_id)
-        .collect();
-    assert_eq!(encryption_keys.len(), 1);
+  let encryption_keys: Vec<_> = encryption_keys
+      .iter()
+      .filter(|key| key.id == encryption_key_id)
+      .collect();
 
-    let mut cipher = ChaCha20::new(
-        &encryption_keys[0].secret_key.into(),
-        [0u8; NONCE_SIZE].as_slice().into(),
-    );
-    cipher.seek(msg.encryption_key_offset());
-    Some(cipher)
+  // Case when user is intentionally NOT ALLOWED to decrypt certain elements
+  // should be serviced here. Now the code will stop on missing decryptiopn key.
+  assert_eq!(encryption_keys.len(), 1);
+
+  let mut cipher = ChaCha20::new(
+      &encryption_keys[0].secret_key.into(),
+      [0u8; NONCE_SIZE].as_slice().into(),
+  );
+  cipher.seek(encryption_key_offset);
+  Some(cipher)
 }
 
 #[derive(Default)]
 struct Snapshot {
     md_last_seq_num: u32,
-    peg: Vec<market_data::EncryptionKey>,
-    tradable_products: HashMap<tp::ElementId, market_data::ElementId>,
+    peg: Vec<md::EncryptionKey>,
+    tradable_products: HashMap<tp::ElementId, md::ElementId>,
     tick_tables:
-        HashMap<market_data::ElementId, Vec<(market_data::TickSize, market_data::Bound)>>,
-    md_message: Vec<market_data::Message>,
+        HashMap<md::ElementId, Vec<(md::TickSize, md::Bound)>>,
+    md_message: Vec<md::Message>,
 }
 
-impl Snapshot {
-    fn match_message(&mut self, msg: &mut market_data::Message) -> Result<Option<Range<u32>>> {
-        let cipher = get_cipher_for_msg(&self.peg, msg);
+/// Applies keystream on a field of a message
+/// by copying the value
+macro_rules! apply_on_field  {
+  ($e:expr, $cipher:expr) => {
+    {
+      let mut tmp = $e;
+      let size = tmp.apply_keystream($cipher);
+      $e = tmp;
+      size
+    }
+  };
+}
 
+pub unsafe trait Binarize {
+  /// Returns the length in bytes of the object
+  fn length(&self) -> usize;
+
+  unsafe fn as_bytes_mut(&mut self) -> &mut [u8] {
+    let ptr = self as *mut Self as *mut u8;
+    let len = self.length();
+
+    // Assert against malicious `Binarize::length` implementation
+    debug_assert!(len <= std::mem::size_of_val::<Self>(self));
+
+    std::slice::from_raw_parts_mut(ptr, len)
+  }
+}
+
+macro_rules! impl_binarize {
+  ($name:ty) => {
+    // This implementation is very much safe - it just returns full size of an object
+    unsafe impl Binarize for $name {
+      fn length(&self) -> usize {
+        mem::size_of::<Self>()
+      }
+    }
+  };
+}
+
+impl_binarize!(u8);
+impl_binarize!(i64);
+impl_binarize!(u16);
+impl_binarize!(u32);
+impl_binarize!(u64);
+impl_binarize!(md::ProductIdentification);
+impl_binarize!(md::ChangeIndicator);
+impl_binarize!(md::Timestamp);
+
+pub trait ApplyKeystream {
+  fn apply_keystream(&mut self, cipher: &mut ChaCha20) -> usize;
+}
+
+macro_rules! impl_apply_keystream {
+  ($name:ty) => {
+    impl ApplyKeystream for $name {
+      #[inline(always)]
+      fn apply_keystream(&mut self, cipher: &mut ChaCha20) -> usize {
+        cipher.apply_keystream(unsafe { self.as_bytes_mut() });
+        mem::size_of::<Self>()
+      }
+    }
+  };
+}
+
+impl_apply_keystream!(u8);
+impl_apply_keystream!(i64);
+impl_apply_keystream!(u16);
+impl_apply_keystream!(u32);
+impl_apply_keystream!(u64);
+impl_apply_keystream!(md::Timestamp);
+impl_apply_keystream!(md::ProductIdentification);
+impl_apply_keystream!(md::ChangeIndicator);
+
+impl Snapshot {
+    fn match_message(&mut self, msg: &mut md::Message) -> Result<Option<Range<u32>>> {
         let seq_num = msg.seq_num();
         let gap = seq_num.abs_diff(self.md_last_seq_num);
         if gap > 1 {
@@ -771,7 +845,7 @@ impl Snapshot {
         self.md_last_seq_num = seq_num;
 
         match msg.msg_type() {
-            market_data::MsgType::EncryptionKey => {
+            md::MsgType::EncryptionKey => {
                 let encryption_key = unsafe { msg.encryption_key };
                 trace!(
                     "MD EncryptionKey: {}",
@@ -779,7 +853,7 @@ impl Snapshot {
                 );
                 self.peg.push(encryption_key);
             }
-            market_data::MsgType::Instrument => {
+            md::MsgType::Instrument => {
                 let instrument = unsafe { msg.instrument };
                 trace!(
                     "MD TradableProduct: {}",
@@ -792,9 +866,9 @@ impl Snapshot {
                 self.tradable_products
                     .insert(instrument_id, tick_table_id);
 
-                self.md_message.push(market_data::Message { instrument });
+                self.md_message.push(md::Message { instrument });
             }
-            market_data::MsgType::TickTableEntry => {
+            md::MsgType::TickTableEntry => {
                 let tick_table_entry = unsafe { msg.tick_table_entry };
                 trace!(
                     "MD TickTableEntry: {}",
@@ -810,20 +884,15 @@ impl Snapshot {
                     .or_default()
                     .push((tick_size, lower_bound));
             }
-            market_data::MsgType::OrderAdd => {
+            md::MsgType::OrderAdd => {
                 let msg = unsafe { &mut msg.order_add };
+                let cipher = get_cipher_for_msg(&self.peg,
+                    msg.header.encryption_key_id,
+                    msg.header.encryption_offset);
                 if let Some(mut cipher) = cipher {
-                    let mut instrument_id = msg.instrument_id.to_le_bytes();
-                    cipher.apply_keystream(&mut instrument_id);
-                    msg.instrument_id = u32::from_le_bytes(instrument_id);
-
-                    let mut price = { msg.price }.to_le_bytes();
-                    cipher.apply_keystream(&mut price);
-                    msg.price = i64::from_le_bytes(price);
-
-                    let mut quantity = msg.quantity.to_le_bytes();
-                    cipher.apply_keystream(&mut quantity);
-                    msg.quantity = u64::from_le_bytes(quantity);
+                    apply_on_field!(msg.instrument_id, &mut cipher);
+                    apply_on_field!(msg.price, &mut cipher);
+                    apply_on_field!(msg.quantity, &mut cipher);
                 }
 
                 let mut order_add = Default::default();
@@ -834,18 +903,17 @@ impl Snapshot {
                     serde_json::to_string(&order_add).unwrap()
                 );
 
-                self.md_message.push(market_data::Message { order_add });
+                self.md_message.push(md::Message { order_add });
             }
-            market_data::MsgType::OrderModify => {
+            md::MsgType::OrderModify => {
                 let msg = unsafe { &mut msg.order_modify };
+                let cipher = get_cipher_for_msg(&self.peg,
+                    msg.header.encryption_key_id,
+                    msg.header.encryption_offset);
                 if let Some(mut cipher) = cipher {
-                    let mut price = { msg.price }.to_le_bytes();
-                    cipher.apply_keystream(&mut price);
-                    msg.price = i64::from_le_bytes(price);
-
-                    let mut quantity = msg.quantity.to_le_bytes();
-                    cipher.apply_keystream(&mut quantity);
-                    msg.quantity = u64::from_le_bytes(quantity);
+                    apply_on_field!(msg.instrument_id, &mut cipher);
+                    apply_on_field!(msg.price, &mut cipher);
+                    apply_on_field!(msg.quantity, &mut cipher);
                 }
 
                 let mut order_modify = Default::default();
@@ -856,26 +924,19 @@ impl Snapshot {
                     serde_json::to_string(&order_modify).unwrap()
                 );
 
-                self.md_message.push(market_data::Message { order_modify });
+                self.md_message.push(md::Message { order_modify });
             }
-            market_data::MsgType::OrderExecute => {
+            md::MsgType::OrderExecute => {
                 let msg = unsafe { &mut msg.order_execute };
+                let cipher = get_cipher_for_msg(&self.peg,
+                    msg.header.encryption_key_id,
+                    msg.header.encryption_offset);
                 if let Some(mut cipher) = cipher {
-                    let mut quantity = msg.quantity.to_le_bytes();
-                    cipher.apply_keystream(&mut quantity);
-                    msg.quantity = u64::from_le_bytes(quantity);
-
-                    let mut execution_id = msg.execution_id.to_le_bytes();
-                    cipher.apply_keystream(&mut execution_id);
-                    msg.execution_id = u32::from_le_bytes(execution_id);
-
-                    let mut execution_price = { msg.execution_price }.to_le_bytes();
-                    cipher.apply_keystream(&mut execution_price);
-                    msg.execution_price = i64::from_le_bytes(execution_price);
-
-                    let mut execution_quantity = msg.execution_quantity.to_le_bytes();
-                    cipher.apply_keystream(&mut execution_quantity);
-                    msg.execution_quantity = u64::from_le_bytes(execution_quantity);
+                    apply_on_field!(msg.quantity, &mut cipher);
+                    apply_on_field!(msg.instrument_id, &mut cipher);
+                    apply_on_field!(msg.execution_id, &mut cipher);
+                    apply_on_field!(msg.execution_price, &mut cipher);
+                    apply_on_field!(msg.execution_quantity, &mut cipher);
                 }
 
                 let mut order_execute = Default::default();
@@ -886,45 +947,181 @@ impl Snapshot {
                     serde_json::to_string(&order_execute).unwrap()
                 );
 
-                self.md_message.push(market_data::Message { order_execute });
+                self.md_message.push(md::Message { order_execute });
             }
-            market_data::MsgType::OrderDelete => {
+            md::MsgType::TopPriceLevelUpdate => {
+                let msg = unsafe { &mut msg.top_price_level_update };
+                let cipher = get_cipher_for_msg(&self.peg,
+                    msg.header.encryption_key_id,
+                    msg.header.encryption_offset);
+                if let Some(mut cipher) = cipher {
+                    apply_on_field!(msg.instrument_id, &mut cipher);
+                    apply_on_field!(msg.price, &mut cipher);
+                    apply_on_field!(msg.quantity, &mut cipher);
+                    apply_on_field!(msg.order_count, &mut cipher);
+                }
+
+                let mut top_price_level_update = Default::default();
+                std::mem::swap(&mut top_price_level_update, msg);
+
+                debug!(
+                    "MD TopPriceLevelUpdate: {}",
+                    serde_json::to_string(&top_price_level_update).unwrap()
+                );
+
+                self.md_message.push(md::Message {
+                    top_price_level_update,
+                });
+            }
+            md::MsgType::PriceLevelSnapshot => {
+                let msg = unsafe { &mut msg.price_level_snapshot };
+                for level in msg.buy.iter_mut().filter(|level| level.is_encrypted) {
+                    let cipher = get_cipher_for_msg(&mut self.peg,
+                      level.encryption_key_id,
+                      level.encryption_offset);
+
+                    if let Some(mut cipher) = cipher {
+                      apply_on_field!(level.price, &mut cipher);
+                      apply_on_field!(level.quantity, &mut cipher);
+                      apply_on_field!(level.order_count, &mut cipher);
+                    }
+                }
+                for level in msg.sell.iter_mut().filter(|level| level.is_encrypted) {
+                  let cipher = get_cipher_for_msg(&mut self.peg,
+                    level.encryption_key_id,
+                    level.encryption_offset);
+
+                  if let Some(mut cipher) = cipher {
+                    apply_on_field!(level.price, &mut cipher);
+                    apply_on_field!(level.quantity, &mut cipher);
+                    apply_on_field!(level.order_count, &mut cipher);
+                  }
+                }
+
+                let mut price_level_snapshot = Default::default();
+                std::mem::swap(&mut price_level_snapshot, msg);
+
+                debug!(
+                    "MD PriceLevelSnapshot: {}",
+                    serde_json::to_string(&price_level_snapshot).unwrap()
+                );
+
+                self.md_message.push(md::Message {
+                    price_level_snapshot,
+                });
+            }
+            md::MsgType::ProductSummary => {
+                let msg = unsafe { &mut msg.product_summary };
+                let cipher = get_cipher_for_msg(&self.peg,
+                    msg.header.encryption_key_id,
+                    msg.header.encryption_offset);
+                if let Some(mut cipher) = cipher {
+                    apply_on_field!(msg.product_identification, &mut cipher);
+                    apply_on_field!(msg.product_id, &mut cipher);
+
+                    apply_on_field!(msg.clob_instrument.instrument_id, &mut cipher);
+                    apply_on_field!(msg.clob_instrument.last_traded_price, &mut cipher);
+                    apply_on_field!(msg.clob_instrument.closing_price, &mut cipher);
+                    apply_on_field!(msg.clob_instrument.adjusted_closing_price, &mut cipher);
+                    apply_on_field!(msg.clob_instrument.pct_change, &mut cipher);
+                    apply_on_field!(msg.clob_instrument.vwap, &mut cipher);
+                    apply_on_field!(msg.clob_instrument.total_volume, &mut cipher);
+                    apply_on_field!(msg.clob_instrument.total_value, &mut cipher);
+                    apply_on_field!(msg.clob_instrument.opening_price, &mut cipher);
+                    apply_on_field!(msg.clob_instrument.max_price, &mut cipher);
+                    apply_on_field!(msg.clob_instrument.min_price, &mut cipher);
+                    apply_on_field!(msg.clob_instrument.settlement_price, &mut cipher);
+                    apply_on_field!(msg.clob_instrument.settlement_value, &mut cipher);
+
+                    apply_on_field!(msg.cross_instrument.instrument_id, &mut cipher);
+                    apply_on_field!(msg.cross_instrument.last_traded_price, &mut cipher);
+                    apply_on_field!(msg.cross_instrument.closing_price, &mut cipher);
+                    apply_on_field!(msg.cross_instrument.adjusted_closing_price, &mut cipher);
+                    apply_on_field!(msg.cross_instrument.pct_change, &mut cipher);
+                    apply_on_field!(msg.cross_instrument.vwap, &mut cipher);
+                    apply_on_field!(msg.cross_instrument.total_volume, &mut cipher);
+                    apply_on_field!(msg.cross_instrument.total_value, &mut cipher);
+                    apply_on_field!(msg.cross_instrument.opening_price, &mut cipher);
+                    apply_on_field!(msg.cross_instrument.max_price, &mut cipher);
+                    apply_on_field!(msg.cross_instrument.min_price, &mut cipher);
+                    apply_on_field!(msg.cross_instrument.settlement_price, &mut cipher);
+                    apply_on_field!(msg.cross_instrument.settlement_value, &mut cipher);
+
+                    apply_on_field!(msg.block_instrument.instrument_id, &mut cipher);
+                    apply_on_field!(msg.block_instrument.last_traded_price, &mut cipher);
+                    apply_on_field!(msg.block_instrument.closing_price, &mut cipher);
+                    apply_on_field!(msg.block_instrument.adjusted_closing_price, &mut cipher);
+                    apply_on_field!(msg.block_instrument.pct_change, &mut cipher);
+                    apply_on_field!(msg.block_instrument.vwap, &mut cipher);
+                    apply_on_field!(msg.block_instrument.total_volume, &mut cipher);
+                    apply_on_field!(msg.block_instrument.total_value, &mut cipher);
+                    apply_on_field!(msg.block_instrument.opening_price, &mut cipher);
+                    apply_on_field!(msg.block_instrument.max_price, &mut cipher);
+                    apply_on_field!(msg.block_instrument.min_price, &mut cipher);
+                    apply_on_field!(msg.block_instrument.settlement_price, &mut cipher);
+                    apply_on_field!(msg.block_instrument.settlement_value, &mut cipher);
+
+                    apply_on_field!(msg.hybrid_instrument.instrument_id, &mut cipher);
+                    apply_on_field!(msg.hybrid_instrument.last_traded_price, &mut cipher);
+                    apply_on_field!(msg.hybrid_instrument.closing_price, &mut cipher);
+                    apply_on_field!(msg.hybrid_instrument.adjusted_closing_price, &mut cipher);
+                    apply_on_field!(msg.hybrid_instrument.pct_change, &mut cipher);
+                    apply_on_field!(msg.hybrid_instrument.vwap, &mut cipher);
+                    apply_on_field!(msg.hybrid_instrument.total_volume, &mut cipher);
+                    apply_on_field!(msg.hybrid_instrument.total_value, &mut cipher);
+                    apply_on_field!(msg.hybrid_instrument.opening_price, &mut cipher);
+                    apply_on_field!(msg.hybrid_instrument.max_price, &mut cipher);
+                    apply_on_field!(msg.hybrid_instrument.min_price, &mut cipher);
+                    apply_on_field!(msg.hybrid_instrument.settlement_price, &mut cipher);
+                    apply_on_field!(msg.hybrid_instrument.settlement_value, &mut cipher);
+
+                    apply_on_field!(msg.trading_value_currency, &mut cipher);
+                    apply_on_field!(msg.marker_price_change, &mut cipher);
+                    apply_on_field!(msg.implied_volatility, &mut cipher);
+                    apply_on_field!(msg.delta, &mut cipher);
+                    apply_on_field!(msg.gamma, &mut cipher);
+                    apply_on_field!(msg.rho, &mut cipher);
+                    apply_on_field!(msg.theta, &mut cipher);
+                    apply_on_field!(msg.vega, &mut cipher);
+                    apply_on_field!(msg.volatility, &mut cipher);
+                }
+
+                let mut product_summary = Default::default();
+                std::mem::swap(&mut product_summary, msg);
+
+                debug!(
+                    "MD ProductSummary: {}",
+                    serde_json::to_string(&product_summary).unwrap()
+                );
+
+                self.md_message.push(md::Message { product_summary });
+            }
+            md::MsgType::OrderDelete => {
                 let order_delete = unsafe { msg.order_delete };
                 debug!(
                     "MD OrderDelete: {}",
                     serde_json::to_string(&order_delete).unwrap()
                 );
 
-                self.md_message.push(market_data::Message { order_delete });
+                self.md_message.push(md::Message { order_delete });
             }
-            market_data::MsgType::PriceUpdate => {
+            md::MsgType::PriceUpdate => {
                 let price_update = unsafe { msg.price_update };
                 trace!(
                     "MD PriceUpdate: {}",
                     serde_json::to_string(&price_update).unwrap()
                 );
 
-                self.md_message.push(market_data::Message { price_update });
+                self.md_message.push(md::Message { price_update });
             }
-            market_data::MsgType::PriceLevelSnapshot => {
-                let price_level_snapshot = unsafe { msg.price_level_snapshot };
-                trace!(
-                    "MD PriceLevelSnapshot: {}",
-                    serde_json::to_string(&price_level_snapshot).unwrap()
-                );
-
-                self.md_message.push(market_data::Message {
-                    price_level_snapshot,
-                });
-            }
-            market_data::MsgType::Trade => {
+            md::MsgType::Trade => {
                 let trade = unsafe { msg.trade };
                 debug!("MD Trade: {}", serde_json::to_string(&trade).unwrap());
 
-                self.md_message.push(market_data::Message { trade });
+                self.md_message.push(md::Message { trade });
             }
             msg_type => {
-                if TryInto::<market_data::MsgType>::try_into(msg_type as u16).is_err() {
+                if TryInto::<md::MsgType>::try_into(msg_type as u16).is_err() {
                     anyhow::bail!("Bad msg type: {}", msg_type as u16,);
                 }
                 trace!("Ignore {:?}", msg_type);
@@ -973,15 +1170,12 @@ impl Snapshot {
                 break;
             };
 
-            if bytes.len() < std::mem::size_of::<market_data::Header>() {
+            // Replay stream is finished with two bytes zero pair
+            if bytes.len() < std::mem::size_of::<md::Header>() {
                 break;
             }
 
-            let msg = unsafe { &mut *(bytes.as_ptr() as *mut market_data::Message) };
-
-            // if msg.msg_type() == market_data::MsgType::EndOfSnapshot {
-            //     break;
-            // }
+            let msg = unsafe { &mut *(bytes.as_ptr() as *mut md::Message) };
 
             if self.match_message(msg).is_err() {
                 break;
@@ -1002,110 +1196,13 @@ impl Snapshot {
                 .context("No MD message")?
                 .context("MD codec error")?
                 .0;
-            let msg = unsafe { &mut *(msg.as_ptr() as *mut market_data::Message) };
+            let msg = unsafe { &mut *(msg.as_ptr() as *mut md::Message) };
 
-            if msg.msg_type() == market_data::MsgType::Heartbeat {
+            if msg.msg_type() == md::MsgType::Heartbeat {
                 continue;
             }
 
             return self.match_message(msg);
         }
-    }
-}
-
-pub struct Dmd {
-    snap: Snapshot,
-    dmd_framed: UdpFramed<LengthDelimitedCodec>,
-    replay_addr: SocketAddr,
-}
-
-impl Dmd {
-    pub async fn new(
-        dmd_addr: impl ToSocketAddrs,
-        replay_addr: impl ToSocketAddrs,
-    ) -> Result<Self> {
-        let dmd_framed = market_data_framed(dmd_addr, None).await?;
-
-        let replay_addr = tokio::net::lookup_host(replay_addr)
-            .await?
-            .next()
-            .context("Could not lookup replay address")?;
-
-        Ok(Self {
-            snap: Default::default(),
-            dmd_framed,
-            replay_addr,
-        })
-    }
-
-    #[instrument(skip_all)]
-    pub async fn pull_msg_from_dmd(&mut self) -> Result<()> {
-        self.snap.pull_msg_from_md(&mut self.dmd_framed).await?;
-        Ok(())
-    }
-
-    /// Request a replay of Delayed Market Data messages within given range
-    #[instrument(skip_all)]
-    pub async fn request_dmd_replay(&mut self, range: Range<u32>) -> Result<()> {
-        self.snap.request_md_replay(self.replay_addr, range).await
-    }
-
-    pub fn messages(&self) -> impl Iterator<Item = &market_data::Message> {
-        self.snap.md_message.iter()
-    }
-}
-
-#[allow(dead_code)]
-pub struct Bbo {
-    snap: Snapshot,
-    bbo_framed: UdpFramed<LengthDelimitedCodec>,
-    snap_rx: FramedRead<OwnedReadHalf, LengthDelimitedCodec>,
-    snap_tx: OwnedWriteHalf,
-    replay_addr: SocketAddr,
-}
-
-impl Bbo {
-    pub async fn new(
-        bbo_addr: impl ToSocketAddrs,
-        snapshot_addr: impl ToSocketAddrs,
-        replay_addr: impl ToSocketAddrs
-    ) -> Result<Self> {
-        let bbo_framed = market_data_framed(bbo_addr, None).await?;
-
-        // Establish a TCP connection to Best Bid Offer snapshot.
-        let (snap_rx, snap_tx) = connect_to_omd_snapshot(snapshot_addr).await?;
-
-        let replay_addr = tokio::net::lookup_host(replay_addr)
-            .await?
-            .next()
-            .context("Could not lookup replay address")?;
-
-        Ok(Self {
-            snap: Default::default(),
-            bbo_framed,
-            snap_rx,
-            snap_tx,
-            replay_addr,
-        })
-    }
-
-    #[instrument(skip_all)]
-    pub async fn pull_msg_from_bbo(&mut self) -> Result<()> {
-        self.snap.pull_msg_from_md(&mut self.bbo_framed).await?;
-        Ok(())
-    }
-
-    /// Request a replay of BBO messages within given range
-    #[instrument(skip_all)]
-    pub async fn request_bbo_replay(&mut self, range: Range<u32>) -> Result<()> {
-        self.snap.request_md_replay(self.replay_addr, range).await
-    }
-
-    pub fn last_seq_num(&self) -> u32 {
-        self.snap.md_last_seq_num
-    }
-
-    pub fn messages(&self) -> impl Iterator<Item = &market_data::Message> {
-        self.snap.md_message.iter()
     }
 }

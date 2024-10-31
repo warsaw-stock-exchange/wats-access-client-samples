@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 /**
  * <h2>Instrument</h2>
  * <p>Definition of a financial instrument.</p>
- * <p>Byte length: 729</p>
+ * <p>Byte length: 737</p>
  * <p>Header header - Message header. | size 42</p>
  * <p>ElementId > long (u32) instrumentId - ID of financial instrument. | size 4</p>
  * <p>ProductType productType - Type of the product. | size 1</p>
@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
  * <p>ElementId > long (u32) calendarId - ID of trading calendar for the financial instrument. | size 4</p>
  * <p>ElementId > long (u32) marketStructureId - ID of the financial instrument’s market segment. | size 4</p>
  * <p>ElementId > long (u32) tickTableId - ID of the tick table used for the financial instrument. | size 4</p>
+ * <p>ElementId > long (u32) referenceInstrumentId - Identifier of reference instrument. | size 4</p>
  * <p>ElementId > long (u32) collarGroupId - Collar group ID. | size 4</p>
  * <p>ElementId > long (u32) tradingScheduleId - Trading schedule ID. | size 4</p>
  * <p>InstrumentDescription > String (u8[]) description - Financial instrument code. | size 64</p>
@@ -68,6 +69,7 @@ import java.nio.ByteBuffer;
  * <p>Kid > String (u8[]) kid - KID. | size 128</p>
  * <p>Date > long (u32) kidIssueDate - KID issue date. | size 4</p>
  * <p>u8 > int valueAtRisk - Value at risk. | size 1</p>
+ * <p>ElementId > long (u32) externalUnderlyingId - External underlying ID. | size 4</p>
  */
 public class Instrument implements ByteSerializable, Message {
     private Header header;
@@ -84,6 +86,7 @@ public class Instrument implements ByteSerializable, Message {
     private long calendarId;
     private long marketStructureId;
     private long tickTableId;
+    private long referenceInstrumentId;
     private long collarGroupId;
     private long tradingScheduleId;
     private String description;
@@ -130,9 +133,10 @@ public class Instrument implements ByteSerializable, Message {
     private String kid;
     private long kidIssueDate;
     private int valueAtRisk;
-    public static final int byteLength = 729;
+    private long externalUnderlyingId;
+    public static final int byteLength = 737;
     
-    public Instrument(Header header, long instrumentId, ProductType productType, ProductSubtype productSubtype, long firstTradingDate, long lastTradingDate, long productId, Currency currency, long icebergMinValue, long lotSize, PriceExpressionType priceExpressionType, long calendarId, long marketStructureId, long tickTableId, long collarGroupId, long tradingScheduleId, String description, String mic, long nominalValue, NominalValueType nominalValueType, long multiplier, long strikePrice, Currency strikePriceCurrency, String productIdentification, ProductIdentificationType productIdentificationType, long settlementCalendarId, CouponType bondCouponType, long preTradeCheckMinPrice, long preTradeCheckMaxPrice, BigInteger preTradeCheckMinQuantity, BigInteger preTradeCheckMaxQuantity, long preTradeCheckMaxValue, long preTradeCheckMinValue, boolean liquidity, MarketModelType marketModelType, String issuer, Country issuerRegCountry, long underlyingInstrumentId, String productCode, String cfi, String fisn, BigInteger issueSize, Currency nominalCurrency, UsIndicator usIndicator, long expiryDate, int versionNumber, SettlementType settlementType, OptionType optionType, ExerciseType exerciseType, String productName, long referencePrice, InstrumentStatus status, long initialPhaseId, long thresholdMax, long thresholdMin, LeverageFlag isLeverage, long accruedInterestValue, String kid, long kidIssueDate, int valueAtRisk) {
+    public Instrument(Header header, long instrumentId, ProductType productType, ProductSubtype productSubtype, long firstTradingDate, long lastTradingDate, long productId, Currency currency, long icebergMinValue, long lotSize, PriceExpressionType priceExpressionType, long calendarId, long marketStructureId, long tickTableId, long referenceInstrumentId, long collarGroupId, long tradingScheduleId, String description, String mic, long nominalValue, NominalValueType nominalValueType, long multiplier, long strikePrice, Currency strikePriceCurrency, String productIdentification, ProductIdentificationType productIdentificationType, long settlementCalendarId, CouponType bondCouponType, long preTradeCheckMinPrice, long preTradeCheckMaxPrice, BigInteger preTradeCheckMinQuantity, BigInteger preTradeCheckMaxQuantity, long preTradeCheckMaxValue, long preTradeCheckMinValue, boolean liquidity, MarketModelType marketModelType, String issuer, Country issuerRegCountry, long underlyingInstrumentId, String productCode, String cfi, String fisn, BigInteger issueSize, Currency nominalCurrency, UsIndicator usIndicator, long expiryDate, int versionNumber, SettlementType settlementType, OptionType optionType, ExerciseType exerciseType, String productName, long referencePrice, InstrumentStatus status, long initialPhaseId, long thresholdMax, long thresholdMin, LeverageFlag isLeverage, long accruedInterestValue, String kid, long kidIssueDate, int valueAtRisk, long externalUnderlyingId) {
         this.header = header;
         this.instrumentId = instrumentId;
         this.productType = productType;
@@ -147,6 +151,7 @@ public class Instrument implements ByteSerializable, Message {
         this.calendarId = calendarId;
         this.marketStructureId = marketStructureId;
         this.tickTableId = tickTableId;
+        this.referenceInstrumentId = referenceInstrumentId;
         this.collarGroupId = collarGroupId;
         this.tradingScheduleId = tradingScheduleId;
         this.description = description;
@@ -193,6 +198,7 @@ public class Instrument implements ByteSerializable, Message {
         this.kid = kid;
         this.kidIssueDate = kidIssueDate;
         this.valueAtRisk = valueAtRisk;
+        this.externalUnderlyingId = externalUnderlyingId;
     }
     
     public Instrument(byte[] bytes, int offset) {
@@ -210,52 +216,54 @@ public class Instrument implements ByteSerializable, Message {
         this.calendarId = BendecUtils.uInt32FromByteArray(bytes, offset + 75);
         this.marketStructureId = BendecUtils.uInt32FromByteArray(bytes, offset + 79);
         this.tickTableId = BendecUtils.uInt32FromByteArray(bytes, offset + 83);
-        this.collarGroupId = BendecUtils.uInt32FromByteArray(bytes, offset + 87);
-        this.tradingScheduleId = BendecUtils.uInt32FromByteArray(bytes, offset + 91);
-        this.description = BendecUtils.stringFromByteArray(bytes, offset + 95, 64);
-        this.mic = BendecUtils.stringFromByteArray(bytes, offset + 159, 4);
-        this.nominalValue = BendecUtils.int64FromByteArray(bytes, offset + 163);
-        this.nominalValueType = NominalValueType.getNominalValueType(bytes, offset + 171);
-        this.multiplier = BendecUtils.int64FromByteArray(bytes, offset + 172);
-        this.strikePrice = BendecUtils.int64FromByteArray(bytes, offset + 180);
-        this.strikePriceCurrency = Currency.getCurrency(bytes, offset + 188);
-        this.productIdentification = BendecUtils.stringFromByteArray(bytes, offset + 190, 30);
-        this.productIdentificationType = ProductIdentificationType.getProductIdentificationType(bytes, offset + 220);
-        this.settlementCalendarId = BendecUtils.uInt32FromByteArray(bytes, offset + 221);
-        this.bondCouponType = CouponType.getCouponType(bytes, offset + 225);
-        this.preTradeCheckMinPrice = BendecUtils.int64FromByteArray(bytes, offset + 226);
-        this.preTradeCheckMaxPrice = BendecUtils.int64FromByteArray(bytes, offset + 234);
-        this.preTradeCheckMinQuantity = BendecUtils.uInt64FromByteArray(bytes, offset + 242);
-        this.preTradeCheckMaxQuantity = BendecUtils.uInt64FromByteArray(bytes, offset + 250);
-        this.preTradeCheckMaxValue = BendecUtils.int64FromByteArray(bytes, offset + 258);
-        this.preTradeCheckMinValue = BendecUtils.int64FromByteArray(bytes, offset + 266);
-        this.liquidity = BendecUtils.booleanFromByteArray(bytes, offset + 274);
-        this.marketModelType = MarketModelType.getMarketModelType(bytes, offset + 275);
-        this.issuer = BendecUtils.stringFromByteArray(bytes, offset + 276, 150);
-        this.issuerRegCountry = Country.getCountry(bytes, offset + 426);
-        this.underlyingInstrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 428);
-        this.productCode = BendecUtils.stringFromByteArray(bytes, offset + 432, 16);
-        this.cfi = BendecUtils.stringFromByteArray(bytes, offset + 448, 6);
-        this.fisn = BendecUtils.stringFromByteArray(bytes, offset + 454, 35);
-        this.issueSize = BendecUtils.uInt64FromByteArray(bytes, offset + 489);
-        this.nominalCurrency = Currency.getCurrency(bytes, offset + 497);
-        this.usIndicator = UsIndicator.getUsIndicator(bytes, offset + 499);
-        this.expiryDate = BendecUtils.uInt32FromByteArray(bytes, offset + 500);
-        this.versionNumber = BendecUtils.uInt8FromByteArray(bytes, offset + 504);
-        this.settlementType = SettlementType.getSettlementType(bytes, offset + 505);
-        this.optionType = OptionType.getOptionType(bytes, offset + 506);
-        this.exerciseType = ExerciseType.getExerciseType(bytes, offset + 507);
-        this.productName = BendecUtils.stringFromByteArray(bytes, offset + 508, 50);
-        this.referencePrice = BendecUtils.int64FromByteArray(bytes, offset + 558);
-        this.status = InstrumentStatus.getInstrumentStatus(bytes, offset + 566);
-        this.initialPhaseId = BendecUtils.uInt32FromByteArray(bytes, offset + 567);
-        this.thresholdMax = BendecUtils.int64FromByteArray(bytes, offset + 571);
-        this.thresholdMin = BendecUtils.int64FromByteArray(bytes, offset + 579);
-        this.isLeverage = LeverageFlag.getLeverageFlag(bytes, offset + 587);
-        this.accruedInterestValue = BendecUtils.int64FromByteArray(bytes, offset + 588);
-        this.kid = BendecUtils.stringFromByteArray(bytes, offset + 596, 128);
-        this.kidIssueDate = BendecUtils.uInt32FromByteArray(bytes, offset + 724);
-        this.valueAtRisk = BendecUtils.uInt8FromByteArray(bytes, offset + 728);
+        this.referenceInstrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 87);
+        this.collarGroupId = BendecUtils.uInt32FromByteArray(bytes, offset + 91);
+        this.tradingScheduleId = BendecUtils.uInt32FromByteArray(bytes, offset + 95);
+        this.description = BendecUtils.stringFromByteArray(bytes, offset + 99, 64);
+        this.mic = BendecUtils.stringFromByteArray(bytes, offset + 163, 4);
+        this.nominalValue = BendecUtils.int64FromByteArray(bytes, offset + 167);
+        this.nominalValueType = NominalValueType.getNominalValueType(bytes, offset + 175);
+        this.multiplier = BendecUtils.int64FromByteArray(bytes, offset + 176);
+        this.strikePrice = BendecUtils.int64FromByteArray(bytes, offset + 184);
+        this.strikePriceCurrency = Currency.getCurrency(bytes, offset + 192);
+        this.productIdentification = BendecUtils.stringFromByteArray(bytes, offset + 194, 30);
+        this.productIdentificationType = ProductIdentificationType.getProductIdentificationType(bytes, offset + 224);
+        this.settlementCalendarId = BendecUtils.uInt32FromByteArray(bytes, offset + 225);
+        this.bondCouponType = CouponType.getCouponType(bytes, offset + 229);
+        this.preTradeCheckMinPrice = BendecUtils.int64FromByteArray(bytes, offset + 230);
+        this.preTradeCheckMaxPrice = BendecUtils.int64FromByteArray(bytes, offset + 238);
+        this.preTradeCheckMinQuantity = BendecUtils.uInt64FromByteArray(bytes, offset + 246);
+        this.preTradeCheckMaxQuantity = BendecUtils.uInt64FromByteArray(bytes, offset + 254);
+        this.preTradeCheckMaxValue = BendecUtils.int64FromByteArray(bytes, offset + 262);
+        this.preTradeCheckMinValue = BendecUtils.int64FromByteArray(bytes, offset + 270);
+        this.liquidity = BendecUtils.booleanFromByteArray(bytes, offset + 278);
+        this.marketModelType = MarketModelType.getMarketModelType(bytes, offset + 279);
+        this.issuer = BendecUtils.stringFromByteArray(bytes, offset + 280, 150);
+        this.issuerRegCountry = Country.getCountry(bytes, offset + 430);
+        this.underlyingInstrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 432);
+        this.productCode = BendecUtils.stringFromByteArray(bytes, offset + 436, 16);
+        this.cfi = BendecUtils.stringFromByteArray(bytes, offset + 452, 6);
+        this.fisn = BendecUtils.stringFromByteArray(bytes, offset + 458, 35);
+        this.issueSize = BendecUtils.uInt64FromByteArray(bytes, offset + 493);
+        this.nominalCurrency = Currency.getCurrency(bytes, offset + 501);
+        this.usIndicator = UsIndicator.getUsIndicator(bytes, offset + 503);
+        this.expiryDate = BendecUtils.uInt32FromByteArray(bytes, offset + 504);
+        this.versionNumber = BendecUtils.uInt8FromByteArray(bytes, offset + 508);
+        this.settlementType = SettlementType.getSettlementType(bytes, offset + 509);
+        this.optionType = OptionType.getOptionType(bytes, offset + 510);
+        this.exerciseType = ExerciseType.getExerciseType(bytes, offset + 511);
+        this.productName = BendecUtils.stringFromByteArray(bytes, offset + 512, 50);
+        this.referencePrice = BendecUtils.int64FromByteArray(bytes, offset + 562);
+        this.status = InstrumentStatus.getInstrumentStatus(bytes, offset + 570);
+        this.initialPhaseId = BendecUtils.uInt32FromByteArray(bytes, offset + 571);
+        this.thresholdMax = BendecUtils.int64FromByteArray(bytes, offset + 575);
+        this.thresholdMin = BendecUtils.int64FromByteArray(bytes, offset + 583);
+        this.isLeverage = LeverageFlag.getLeverageFlag(bytes, offset + 591);
+        this.accruedInterestValue = BendecUtils.int64FromByteArray(bytes, offset + 592);
+        this.kid = BendecUtils.stringFromByteArray(bytes, offset + 600, 128);
+        this.kidIssueDate = BendecUtils.uInt32FromByteArray(bytes, offset + 728);
+        this.valueAtRisk = BendecUtils.uInt8FromByteArray(bytes, offset + 732);
+        this.externalUnderlyingId = BendecUtils.uInt32FromByteArray(bytes, offset + 733);
     }
     
     public Instrument(byte[] bytes) {
@@ -361,6 +369,13 @@ public class Instrument implements ByteSerializable, Message {
      */
     public long getTickTableId() {
         return this.tickTableId;
+    }
+    
+    /**
+     * @return Identifier of reference instrument.
+     */
+    public long getReferenceInstrumentId() {
+        return this.referenceInstrumentId;
     }
     
     /**
@@ -686,6 +701,13 @@ public class Instrument implements ByteSerializable, Message {
     }
     
     /**
+     * @return External underlying ID.
+     */
+    public long getExternalUnderlyingId() {
+        return this.externalUnderlyingId;
+    }
+    
+    /**
      * @param header Message header.
      */
     public void setHeader(Header header) {
@@ -781,6 +803,13 @@ public class Instrument implements ByteSerializable, Message {
      */
     public void setTickTableId(long tickTableId) {
         this.tickTableId = tickTableId;
+    }
+    
+    /**
+     * @param referenceInstrumentId Identifier of reference instrument.
+     */
+    public void setReferenceInstrumentId(long referenceInstrumentId) {
+        this.referenceInstrumentId = referenceInstrumentId;
     }
     
     /**
@@ -1105,6 +1134,13 @@ public class Instrument implements ByteSerializable, Message {
         this.valueAtRisk = valueAtRisk;
     }
     
+    /**
+     * @param externalUnderlyingId External underlying ID.
+     */
+    public void setExternalUnderlyingId(long externalUnderlyingId) {
+        this.externalUnderlyingId = externalUnderlyingId;
+    }
+    
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -1122,6 +1158,7 @@ public class Instrument implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt32ToByteArray(this.calendarId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.marketStructureId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.tickTableId));
+        buffer.put(BendecUtils.uInt32ToByteArray(this.referenceInstrumentId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.collarGroupId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.tradingScheduleId));
         buffer.put(BendecUtils.stringToByteArray(this.description, 64));
@@ -1168,6 +1205,7 @@ public class Instrument implements ByteSerializable, Message {
         buffer.put(BendecUtils.stringToByteArray(this.kid, 128));
         buffer.put(BendecUtils.uInt32ToByteArray(this.kidIssueDate));
         buffer.put(BendecUtils.uInt8ToByteArray(this.valueAtRisk));
+        buffer.put(BendecUtils.uInt32ToByteArray(this.externalUnderlyingId));
         return buffer.array();
     }
     
@@ -1187,6 +1225,7 @@ public class Instrument implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt32ToByteArray(this.calendarId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.marketStructureId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.tickTableId));
+        buffer.put(BendecUtils.uInt32ToByteArray(this.referenceInstrumentId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.collarGroupId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.tradingScheduleId));
         buffer.put(BendecUtils.stringToByteArray(this.description, 64));
@@ -1233,6 +1272,7 @@ public class Instrument implements ByteSerializable, Message {
         buffer.put(BendecUtils.stringToByteArray(this.kid, 128));
         buffer.put(BendecUtils.uInt32ToByteArray(this.kidIssueDate));
         buffer.put(BendecUtils.uInt8ToByteArray(this.valueAtRisk));
+        buffer.put(BendecUtils.uInt32ToByteArray(this.externalUnderlyingId));
     }
     
     @Override
@@ -1251,6 +1291,7 @@ public class Instrument implements ByteSerializable, Message {
         calendarId,
         marketStructureId,
         tickTableId,
+        referenceInstrumentId,
         collarGroupId,
         tradingScheduleId,
         description,
@@ -1296,7 +1337,8 @@ public class Instrument implements ByteSerializable, Message {
         accruedInterestValue,
         kid,
         kidIssueDate,
-        valueAtRisk);
+        valueAtRisk,
+        externalUnderlyingId);
     }
     
     @Override
@@ -1316,6 +1358,7 @@ public class Instrument implements ByteSerializable, Message {
             ", calendarId=" + calendarId +
             ", marketStructureId=" + marketStructureId +
             ", tickTableId=" + tickTableId +
+            ", referenceInstrumentId=" + referenceInstrumentId +
             ", collarGroupId=" + collarGroupId +
             ", tradingScheduleId=" + tradingScheduleId +
             ", description=" + description +
@@ -1362,6 +1405,7 @@ public class Instrument implements ByteSerializable, Message {
             ", kid=" + kid +
             ", kidIssueDate=" + kidIssueDate +
             ", valueAtRisk=" + valueAtRisk +
+            ", externalUnderlyingId=" + externalUnderlyingId +
             "}";
     }
 }

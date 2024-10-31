@@ -58,12 +58,16 @@ public:
         CryptoPP::SecByteBlock nonce);
     Decryption::KeyNonce retrieveKeyNonce(omd::messages::ElementId id);
 
-    void decrypt_chunk(omd::messages::ElementId encryptionKeyId, 
+    void decrypt_chunk(omd::messages::ElementId encryptionKeyId,
         CryptoPP::byte* data, size_t size);
 
     void decrypt(omd::messages::OrderAdd* message);
     void decrypt(omd::messages::OrderModify* message);
     void decrypt(omd::messages::OrderExecute* message);
+    void decrypt(omd::messages::TopPriceLevelUpdate* message);
+    void decrypt(omd::messages::PriceLevelSnapshot* message);
+    void decrypt(omd::messages::PriceLevel* message);
+    void decrypt(omd::messages::ProductSummary* message);
 };
 
 #endif // DECRYPT_HPP

@@ -101,6 +101,8 @@ public interface Message {
                 return Optional.of(new TestEvent(bytes));
             case POSITIONREPORT:
                 return Optional.of(new PositionReport(bytes));
+            case EXTERNALUNDERLYING:
+                return Optional.of(new ExternalUnderlying(bytes));
             default:
                 return Optional.empty();
         }
@@ -155,6 +157,7 @@ public interface Message {
         put(News.class, MsgType.NEWS);
         put(TestEvent.class, MsgType.TESTEVENT);
         put(PositionReport.class, MsgType.POSITIONREPORT);
+        put(ExternalUnderlying.class, MsgType.EXTERNALUNDERLYING);
     }};
     
     HashMap<MsgType, Class> typeToClassMap = new HashMap<>() {{
@@ -198,5 +201,6 @@ public interface Message {
         put(MsgType.NEWS, News.class);
         put(MsgType.TESTEVENT, TestEvent.class);
         put(MsgType.POSITIONREPORT, PositionReport.class);
+        put(MsgType.EXTERNALUNDERLYING, ExternalUnderlying.class);
     }};
 }

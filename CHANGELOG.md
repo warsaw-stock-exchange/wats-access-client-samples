@@ -1,5 +1,13 @@
 # Changes history for WATS Access Clients samples
 
+## 1.3
+
+* **Change:** Message definitions (contract) updated to version 1.3.8
+
+## 1.1
+
+* **Change:** Message definitions (contract) updated to version 1.1.5
+
 ## 1.0
 
 * **Change:** Access Clients (connectivity example code) repositories updated and adapted to version 1.0

@@ -48,7 +48,15 @@ public enum RejectReason {
     /**
      * Invalid algorithmic trade indicator.
      */
-    INVALIDALGORITHMICTRADEINDICATOR(9);
+    INVALIDALGORITHMICTRADEINDICATOR(9),
+    /**
+     * Invalid Trade report ID.
+     */
+    INVALIDTRADEREPORTID(10),
+    /**
+     * GapFill seqNum should be higher than current seqNum
+     */
+    INVALIDGAPFILLSEQNUM(11);
     
     private final int value;
     private final int byteLength = 1;

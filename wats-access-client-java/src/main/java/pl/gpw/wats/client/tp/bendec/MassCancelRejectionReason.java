@@ -40,7 +40,11 @@ public enum MassCancelRejectionReason {
     /**
      * Operation on redistributed instruments forbidden.
      */
-    OPERATIONONREDISTRIBUTEDINSTRUMENTSFORBIDDEN(1056);
+    OPERATIONONREDISTRIBUTEDINSTRUMENTSFORBIDDEN(1056),
+    /**
+     * Request not allowed on sponsored connection.
+     */
+    REQUESTNOTALLOWEDONSPONSOREDCONNECTION(2025);
     
     private final int value;
     private final int byteLength = 2;
