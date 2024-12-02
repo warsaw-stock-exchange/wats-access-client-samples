@@ -2,7 +2,7 @@
 
 ## 1.3.0
 
-* **Change:** Message definitions (contract) updated to version 1.3.8
+* **Change:** Message definitions (contract) updated to version 1.3.10
 
 ## 1.2.0
 

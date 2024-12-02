@@ -2,11 +2,19 @@
 
 ## 1.3
 
-* **Change:** Message definitions (contract) updated to version 1.3.8
+* **Change:** Access Clients (connectivity example code) repositories updated and adapted to version 1.3
+* **Change:** QuickFIX XML templates updated to 1.3
+
+## 1.2
+
+* **Change:** Access Clients (connectivity example code) repositories updated and adapted to version 1.2
+* **Change:** QuickFIX XML templates updated to 1.2
 
 ## 1.1
 
-* **Change:** Message definitions (contract) updated to version 1.1.5
+* **Change:** Access Clients (connectivity example code) repositories updated and adapted to version 1.1
+* **Change:** Documentation updated to version 1.1
+* **Change:** QuickFIX XML templates updated to 1.1
 
 ## 1.0
 
@@ -52,4 +60,4 @@
 
 ## 0.36
 
-* Initial release
+* Initial
