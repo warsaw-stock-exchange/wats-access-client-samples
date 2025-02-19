@@ -92,7 +92,11 @@ public enum TradingPhaseType {
     /**
      * Tender offer phase
      */
-    TENDEROFFER(21);
+    TENDEROFFER(21),
+    /**
+     * Hybrid pre trade BuyOnly phase
+     */
+    HYBRIDPRETRADEBUYONLY(22);
     
     private final int value;
     private final int byteLength = 1;

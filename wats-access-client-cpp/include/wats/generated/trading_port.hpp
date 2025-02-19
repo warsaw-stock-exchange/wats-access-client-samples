@@ -193,7 +193,6 @@ struct LoginResponse {
 
     friend std::ostream &operator << (std::ostream &, const LoginResponse &);
 };
-using OnBehalfOf = uint16_t;
 using STPId = uint8_t;
 using ElementId = uint32_t;
 
@@ -379,6 +378,7 @@ struct MifidFields {
     friend std::ostream &operator << (std::ostream &, const MifidFields &);
 };
 using Memo = AnsiChar[18];
+using ClientOrderId = AnsiChar[20];
 using ClearingCode = AnsiChar[20];
 
 enum class ClearingIdentifier: uint8_t {
@@ -415,10 +415,10 @@ static const std::map<ExecInst, std::string> ExecInst2Name {
     { ExecInst::CancelOnConnectionLoss, "CancelOnConnectionLoss" }
 };
 
+using InterestedParty = AnsiChar[8];
 
 struct OrderAdd {
     Header header;
-    OnBehalfOf onBehalfOf;
     STPId stpId;
     ElementId instrumentId;
     OrderType orderType;
@@ -434,10 +434,12 @@ struct OrderAdd {
     MifidFields mifidFields;
     Timestamp expire;
     Memo memo;
+    ClientOrderId clientOrderId;
     ClearingCode clearingMemberCode;
     ClearingIdentifier clearingMemberClearingIdentifier;
     ExecInst execInst;
     uint8_t feeStructureId;
+    InterestedParty interestedParty;
 
     friend std::ostream &operator << (std::ostream &, const OrderAdd &);
 };
@@ -490,6 +492,7 @@ enum class OrderRejectionReason: uint16_t {
     WrongDisplayQtyValue = 1013,
     InvalidDisplayQty = 1014,
     IcebergOrderValueLessThanRequired = 1015,
+    CodDisabledForTheConnectionId = 1019,
     OrderQuantityMustBeGreaterThanMinimumQuantity = 1025,
     OrderQuantityMustBeLowerThanMaximumQuantity = 1026,
     OrderPriceMustBeGreaterThanMinimumPrice = 1027,
@@ -512,6 +515,8 @@ enum class OrderRejectionReason: uint16_t {
     ExpireDateExceedsLimit = 1049,
     PriceBelowLowCollar = 1037,
     PriceAboveHighCollar = 1038,
+    FirmIsNotAMarketMaker = 1050,
+    MissingOrderOriginationForSponsoredAccessConnection = 1055,
     OperationOnRedistributedInstrumentsForbidden = 1056,
     FirmNotAuthorizedToBuyAndSellTheInstrument = 1057,
     FirmNotAuthorizedToBuyTheInstrument = 1058,
@@ -529,6 +534,10 @@ enum class OrderRejectionReason: uint16_t {
     InvalidPartyRoleQualifierForPartyId = 1075,
     MissingClearingMemberCode = 1076,
     ForbiddenClearingMemberCode = 1077,
+    InvalidClientIdForSponsoredConnection = 1078,
+    InvalidOrdTypeForSponsoredConnection = 1079,
+    ForbiddenOrderCapacityValueForSponsoredConnection = 1080,
+    MarketModelNotSupportedOnSponsoredConnection = 1081,
     MassQuoteNotAllowedForSelectedMarketModel = 1201,
     InstrumentClosed = 1203,
     InvalidBidAskSpread = 1208,
@@ -539,6 +548,7 @@ enum class OrderRejectionReason: uint16_t {
     TriggerPriceMustBeLowerThanLpBuyQuote = 1309,
     MarketMakingViaMassQuoteOnlyOnHybridMarket = 1310,
     SellQuotesNotAllowedDuringBuyOnlyState = 1311,
+    InstrumentKnockedOut = 1312,
     OnlyOneSellOrderIsAllowedForIpo = 1401,
     RequestNotAllowedForBlockInstrument = 2026,
     RequestNotAllowedForCrossInstrument = 2028,
@@ -546,6 +556,8 @@ enum class OrderRejectionReason: uint16_t {
     RiskMaximumOrderVolumeExceeded = 7001,
     RiskMaximumOrderValueExceeded = 7002,
     RiskOrderPriceCollarExceeded = 7003,
+    DynamicOrderPriceCollarNotDefined = 7004,
+    StaticOrderPriceCollarNotDefined = 7005,
     TotalTradedValueExceeded = 7011,
     TotalTradedBuyValueExceeded = 7012,
     TotalTradedSellValueExceeded = 7013,
@@ -578,6 +590,7 @@ static const std::map<std::string, OrderRejectionReason> Name2OrderRejectionReas
     { "WrongDisplayQtyValue", OrderRejectionReason::WrongDisplayQtyValue },
     { "InvalidDisplayQty", OrderRejectionReason::InvalidDisplayQty },
     { "IcebergOrderValueLessThanRequired", OrderRejectionReason::IcebergOrderValueLessThanRequired },
+    { "CodDisabledForTheConnectionId", OrderRejectionReason::CodDisabledForTheConnectionId },
     { "OrderQuantityMustBeGreaterThanMinimumQuantity", OrderRejectionReason::OrderQuantityMustBeGreaterThanMinimumQuantity },
     { "OrderQuantityMustBeLowerThanMaximumQuantity", OrderRejectionReason::OrderQuantityMustBeLowerThanMaximumQuantity },
     { "OrderPriceMustBeGreaterThanMinimumPrice", OrderRejectionReason::OrderPriceMustBeGreaterThanMinimumPrice },
@@ -600,6 +613,8 @@ static const std::map<std::string, OrderRejectionReason> Name2OrderRejectionReas
     { "ExpireDateExceedsLimit", OrderRejectionReason::ExpireDateExceedsLimit },
     { "PriceBelowLowCollar", OrderRejectionReason::PriceBelowLowCollar },
     { "PriceAboveHighCollar", OrderRejectionReason::PriceAboveHighCollar },
+    { "FirmIsNotAMarketMaker", OrderRejectionReason::FirmIsNotAMarketMaker },
+    { "MissingOrderOriginationForSponsoredAccessConnection", OrderRejectionReason::MissingOrderOriginationForSponsoredAccessConnection },
     { "OperationOnRedistributedInstrumentsForbidden", OrderRejectionReason::OperationOnRedistributedInstrumentsForbidden },
     { "FirmNotAuthorizedToBuyAndSellTheInstrument", OrderRejectionReason::FirmNotAuthorizedToBuyAndSellTheInstrument },
     { "FirmNotAuthorizedToBuyTheInstrument", OrderRejectionReason::FirmNotAuthorizedToBuyTheInstrument },
@@ -617,6 +632,10 @@ static const std::map<std::string, OrderRejectionReason> Name2OrderRejectionReas
     { "InvalidPartyRoleQualifierForPartyId", OrderRejectionReason::InvalidPartyRoleQualifierForPartyId },
     { "MissingClearingMemberCode", OrderRejectionReason::MissingClearingMemberCode },
     { "ForbiddenClearingMemberCode", OrderRejectionReason::ForbiddenClearingMemberCode },
+    { "InvalidClientIdForSponsoredConnection", OrderRejectionReason::InvalidClientIdForSponsoredConnection },
+    { "InvalidOrdTypeForSponsoredConnection", OrderRejectionReason::InvalidOrdTypeForSponsoredConnection },
+    { "ForbiddenOrderCapacityValueForSponsoredConnection", OrderRejectionReason::ForbiddenOrderCapacityValueForSponsoredConnection },
+    { "MarketModelNotSupportedOnSponsoredConnection", OrderRejectionReason::MarketModelNotSupportedOnSponsoredConnection },
     { "MassQuoteNotAllowedForSelectedMarketModel", OrderRejectionReason::MassQuoteNotAllowedForSelectedMarketModel },
     { "InstrumentClosed", OrderRejectionReason::InstrumentClosed },
     { "InvalidBidAskSpread", OrderRejectionReason::InvalidBidAskSpread },
@@ -627,6 +646,7 @@ static const std::map<std::string, OrderRejectionReason> Name2OrderRejectionReas
     { "TriggerPriceMustBeLowerThanLpBuyQuote", OrderRejectionReason::TriggerPriceMustBeLowerThanLpBuyQuote },
     { "MarketMakingViaMassQuoteOnlyOnHybridMarket", OrderRejectionReason::MarketMakingViaMassQuoteOnlyOnHybridMarket },
     { "SellQuotesNotAllowedDuringBuyOnlyState", OrderRejectionReason::SellQuotesNotAllowedDuringBuyOnlyState },
+    { "InstrumentKnockedOut", OrderRejectionReason::InstrumentKnockedOut },
     { "OnlyOneSellOrderIsAllowedForIpo", OrderRejectionReason::OnlyOneSellOrderIsAllowedForIpo },
     { "RequestNotAllowedForBlockInstrument", OrderRejectionReason::RequestNotAllowedForBlockInstrument },
     { "RequestNotAllowedForCrossInstrument", OrderRejectionReason::RequestNotAllowedForCrossInstrument },
@@ -634,6 +654,8 @@ static const std::map<std::string, OrderRejectionReason> Name2OrderRejectionReas
     { "RiskMaximumOrderVolumeExceeded", OrderRejectionReason::RiskMaximumOrderVolumeExceeded },
     { "RiskMaximumOrderValueExceeded", OrderRejectionReason::RiskMaximumOrderValueExceeded },
     { "RiskOrderPriceCollarExceeded", OrderRejectionReason::RiskOrderPriceCollarExceeded },
+    { "DynamicOrderPriceCollarNotDefined", OrderRejectionReason::DynamicOrderPriceCollarNotDefined },
+    { "StaticOrderPriceCollarNotDefined", OrderRejectionReason::StaticOrderPriceCollarNotDefined },
     { "TotalTradedValueExceeded", OrderRejectionReason::TotalTradedValueExceeded },
     { "TotalTradedBuyValueExceeded", OrderRejectionReason::TotalTradedBuyValueExceeded },
     { "TotalTradedSellValueExceeded", OrderRejectionReason::TotalTradedSellValueExceeded },
@@ -666,6 +688,7 @@ static const std::map<OrderRejectionReason, std::string> OrderRejectionReason2Na
     { OrderRejectionReason::WrongDisplayQtyValue, "WrongDisplayQtyValue" },
     { OrderRejectionReason::InvalidDisplayQty, "InvalidDisplayQty" },
     { OrderRejectionReason::IcebergOrderValueLessThanRequired, "IcebergOrderValueLessThanRequired" },
+    { OrderRejectionReason::CodDisabledForTheConnectionId, "CodDisabledForTheConnectionId" },
     { OrderRejectionReason::OrderQuantityMustBeGreaterThanMinimumQuantity, "OrderQuantityMustBeGreaterThanMinimumQuantity" },
     { OrderRejectionReason::OrderQuantityMustBeLowerThanMaximumQuantity, "OrderQuantityMustBeLowerThanMaximumQuantity" },
     { OrderRejectionReason::OrderPriceMustBeGreaterThanMinimumPrice, "OrderPriceMustBeGreaterThanMinimumPrice" },
@@ -688,6 +711,8 @@ static const std::map<OrderRejectionReason, std::string> OrderRejectionReason2Na
     { OrderRejectionReason::ExpireDateExceedsLimit, "ExpireDateExceedsLimit" },
     { OrderRejectionReason::PriceBelowLowCollar, "PriceBelowLowCollar" },
     { OrderRejectionReason::PriceAboveHighCollar, "PriceAboveHighCollar" },
+    { OrderRejectionReason::FirmIsNotAMarketMaker, "FirmIsNotAMarketMaker" },
+    { OrderRejectionReason::MissingOrderOriginationForSponsoredAccessConnection, "MissingOrderOriginationForSponsoredAccessConnection" },
     { OrderRejectionReason::OperationOnRedistributedInstrumentsForbidden, "OperationOnRedistributedInstrumentsForbidden" },
     { OrderRejectionReason::FirmNotAuthorizedToBuyAndSellTheInstrument, "FirmNotAuthorizedToBuyAndSellTheInstrument" },
     { OrderRejectionReason::FirmNotAuthorizedToBuyTheInstrument, "FirmNotAuthorizedToBuyTheInstrument" },
@@ -705,6 +730,10 @@ static const std::map<OrderRejectionReason, std::string> OrderRejectionReason2Na
     { OrderRejectionReason::InvalidPartyRoleQualifierForPartyId, "InvalidPartyRoleQualifierForPartyId" },
     { OrderRejectionReason::MissingClearingMemberCode, "MissingClearingMemberCode" },
     { OrderRejectionReason::ForbiddenClearingMemberCode, "ForbiddenClearingMemberCode" },
+    { OrderRejectionReason::InvalidClientIdForSponsoredConnection, "InvalidClientIdForSponsoredConnection" },
+    { OrderRejectionReason::InvalidOrdTypeForSponsoredConnection, "InvalidOrdTypeForSponsoredConnection" },
+    { OrderRejectionReason::ForbiddenOrderCapacityValueForSponsoredConnection, "ForbiddenOrderCapacityValueForSponsoredConnection" },
+    { OrderRejectionReason::MarketModelNotSupportedOnSponsoredConnection, "MarketModelNotSupportedOnSponsoredConnection" },
     { OrderRejectionReason::MassQuoteNotAllowedForSelectedMarketModel, "MassQuoteNotAllowedForSelectedMarketModel" },
     { OrderRejectionReason::InstrumentClosed, "InstrumentClosed" },
     { OrderRejectionReason::InvalidBidAskSpread, "InvalidBidAskSpread" },
@@ -715,6 +744,7 @@ static const std::map<OrderRejectionReason, std::string> OrderRejectionReason2Na
     { OrderRejectionReason::TriggerPriceMustBeLowerThanLpBuyQuote, "TriggerPriceMustBeLowerThanLpBuyQuote" },
     { OrderRejectionReason::MarketMakingViaMassQuoteOnlyOnHybridMarket, "MarketMakingViaMassQuoteOnlyOnHybridMarket" },
     { OrderRejectionReason::SellQuotesNotAllowedDuringBuyOnlyState, "SellQuotesNotAllowedDuringBuyOnlyState" },
+    { OrderRejectionReason::InstrumentKnockedOut, "InstrumentKnockedOut" },
     { OrderRejectionReason::OnlyOneSellOrderIsAllowedForIpo, "OnlyOneSellOrderIsAllowedForIpo" },
     { OrderRejectionReason::RequestNotAllowedForBlockInstrument, "RequestNotAllowedForBlockInstrument" },
     { OrderRejectionReason::RequestNotAllowedForCrossInstrument, "RequestNotAllowedForCrossInstrument" },
@@ -722,6 +752,8 @@ static const std::map<OrderRejectionReason, std::string> OrderRejectionReason2Na
     { OrderRejectionReason::RiskMaximumOrderVolumeExceeded, "RiskMaximumOrderVolumeExceeded" },
     { OrderRejectionReason::RiskMaximumOrderValueExceeded, "RiskMaximumOrderValueExceeded" },
     { OrderRejectionReason::RiskOrderPriceCollarExceeded, "RiskOrderPriceCollarExceeded" },
+    { OrderRejectionReason::DynamicOrderPriceCollarNotDefined, "DynamicOrderPriceCollarNotDefined" },
+    { OrderRejectionReason::StaticOrderPriceCollarNotDefined, "StaticOrderPriceCollarNotDefined" },
     { OrderRejectionReason::TotalTradedValueExceeded, "TotalTradedValueExceeded" },
     { OrderRejectionReason::TotalTradedBuyValueExceeded, "TotalTradedBuyValueExceeded" },
     { OrderRejectionReason::TotalTradedSellValueExceeded, "TotalTradedSellValueExceeded" },
@@ -897,7 +929,8 @@ enum class ConnectionCloseReason: uint8_t {
     SyncFail = 4,
     AntiFloodingThresholdExceeded = 5,
     ConnectionConfigChanged = 6,
-    CloseOps = 7
+    CloseOps = 7,
+    Disconnect = 8
 };
 
 static const std::map<std::string, ConnectionCloseReason> Name2ConnectionCloseReason {
@@ -907,7 +940,8 @@ static const std::map<std::string, ConnectionCloseReason> Name2ConnectionCloseRe
     { "SyncFail", ConnectionCloseReason::SyncFail },
     { "AntiFloodingThresholdExceeded", ConnectionCloseReason::AntiFloodingThresholdExceeded },
     { "ConnectionConfigChanged", ConnectionCloseReason::ConnectionConfigChanged },
-    { "CloseOps", ConnectionCloseReason::CloseOps }
+    { "CloseOps", ConnectionCloseReason::CloseOps },
+    { "Disconnect", ConnectionCloseReason::Disconnect }
 };
 
 static const std::map<ConnectionCloseReason, std::string> ConnectionCloseReason2Name {
@@ -917,7 +951,8 @@ static const std::map<ConnectionCloseReason, std::string> ConnectionCloseReason2
     { ConnectionCloseReason::SyncFail, "SyncFail" },
     { ConnectionCloseReason::AntiFloodingThresholdExceeded, "AntiFloodingThresholdExceeded" },
     { ConnectionCloseReason::ConnectionConfigChanged, "ConnectionConfigChanged" },
-    { ConnectionCloseReason::CloseOps, "CloseOps" }
+    { ConnectionCloseReason::CloseOps, "CloseOps" },
+    { ConnectionCloseReason::Disconnect, "Disconnect" }
 };
 
 
@@ -1118,6 +1153,7 @@ struct TcrParty {
     ElementId orderRestrictions;
     ElementId orderOrigination;
     uint8_t feeStructureId;
+    InterestedParty interestedParty;
     Memo memo;
 
     friend std::ostream &operator << (std::ostream &, const TcrParty &);
@@ -1226,6 +1262,7 @@ enum class TcrRejectionReason: uint16_t {
     InvalidPartyRoleQualifierForPartyId = 1075,
     MissingClearingMemberCode = 1076,
     ForbiddenClearingMemberCode = 1077,
+    MarketModelNotSupportedOnSponsoredConnection = 1081,
     NotAuthorizedToQuoteInstrument = 1209,
     UnknownTradeReport = 2001,
     DuplicateTradeReportId = 2002,
@@ -1279,6 +1316,7 @@ static const std::map<std::string, TcrRejectionReason> Name2TcrRejectionReason {
     { "InvalidPartyRoleQualifierForPartyId", TcrRejectionReason::InvalidPartyRoleQualifierForPartyId },
     { "MissingClearingMemberCode", TcrRejectionReason::MissingClearingMemberCode },
     { "ForbiddenClearingMemberCode", TcrRejectionReason::ForbiddenClearingMemberCode },
+    { "MarketModelNotSupportedOnSponsoredConnection", TcrRejectionReason::MarketModelNotSupportedOnSponsoredConnection },
     { "NotAuthorizedToQuoteInstrument", TcrRejectionReason::NotAuthorizedToQuoteInstrument },
     { "UnknownTradeReport", TcrRejectionReason::UnknownTradeReport },
     { "DuplicateTradeReportId", TcrRejectionReason::DuplicateTradeReportId },
@@ -1332,6 +1370,7 @@ static const std::map<TcrRejectionReason, std::string> TcrRejectionReason2Name {
     { TcrRejectionReason::InvalidPartyRoleQualifierForPartyId, "InvalidPartyRoleQualifierForPartyId" },
     { TcrRejectionReason::MissingClearingMemberCode, "MissingClearingMemberCode" },
     { TcrRejectionReason::ForbiddenClearingMemberCode, "ForbiddenClearingMemberCode" },
+    { TcrRejectionReason::MarketModelNotSupportedOnSponsoredConnection, "MarketModelNotSupportedOnSponsoredConnection" },
     { TcrRejectionReason::NotAuthorizedToQuoteInstrument, "NotAuthorizedToQuoteInstrument" },
     { TcrRejectionReason::UnknownTradeReport, "UnknownTradeReport" },
     { TcrRejectionReason::DuplicateTradeReportId, "DuplicateTradeReportId" },
@@ -1391,7 +1430,6 @@ struct Quotes {
 
 struct MassQuote {
     Header header;
-    OnBehalfOf onBehalfOf;
     STPId stpId;
     Capacity capacity;
     Account account;
@@ -1401,6 +1439,9 @@ struct MassQuote {
     ClearingCode clearingMemberCode;
     ClearingIdentifier clearingMemberClearingIdentifier;
     Quotes quotes;
+    uint8_t feeStructureId;
+    InterestedParty interestedParty;
+    ClientOrderId quoteId;
 
     friend std::ostream &operator << (std::ostream &, const MassQuote &);
 };
@@ -1449,15 +1490,20 @@ enum class MassQuoteRejectionReason: uint16_t {
     InvalidPartyRoleQualifierForClientId = 1008,
     InvalidPartyRoleQualifierForExecutingTrader = 1009,
     InvalidPartyRoleQualifierForInvestmentDecisionMaker = 1010,
+    MissingOrderOriginationForSponsoredAccessConnection = 1055,
     InvalidPartyIdForClientId = 1070,
     InvalidPartyIdForExecutingTrader = 1071,
     InvalidPartyIdForInvestmentDecisionMaker = 1072,
     InvalidPartyRoleQualifierForPartyId = 1075,
     MissingClearingMemberCode = 1076,
     ForbiddenClearingMemberCode = 1077,
+    InvalidClientIdForSponsoredConnection = 1078,
+    ForbiddenOrderCapacityValueForSponsoredConnection = 1080,
+    MarketModelNotSupportedOnSponsoredConnection = 1081,
     DuplicateInstrument = 1202,
     InvalidQuotesCount = 1204,
-    ForbiddenOrderCapacityValue = 1210
+    ForbiddenOrderCapacityValue = 1210,
+    LiquidityProvisionActivityFlagNotSetForMassQuote = 1212
 };
 
 static const std::map<std::string, MassQuoteRejectionReason> Name2MassQuoteRejectionReason {
@@ -1470,15 +1516,20 @@ static const std::map<std::string, MassQuoteRejectionReason> Name2MassQuoteRejec
     { "InvalidPartyRoleQualifierForClientId", MassQuoteRejectionReason::InvalidPartyRoleQualifierForClientId },
     { "InvalidPartyRoleQualifierForExecutingTrader", MassQuoteRejectionReason::InvalidPartyRoleQualifierForExecutingTrader },
     { "InvalidPartyRoleQualifierForInvestmentDecisionMaker", MassQuoteRejectionReason::InvalidPartyRoleQualifierForInvestmentDecisionMaker },
+    { "MissingOrderOriginationForSponsoredAccessConnection", MassQuoteRejectionReason::MissingOrderOriginationForSponsoredAccessConnection },
     { "InvalidPartyIdForClientId", MassQuoteRejectionReason::InvalidPartyIdForClientId },
     { "InvalidPartyIdForExecutingTrader", MassQuoteRejectionReason::InvalidPartyIdForExecutingTrader },
     { "InvalidPartyIdForInvestmentDecisionMaker", MassQuoteRejectionReason::InvalidPartyIdForInvestmentDecisionMaker },
     { "InvalidPartyRoleQualifierForPartyId", MassQuoteRejectionReason::InvalidPartyRoleQualifierForPartyId },
     { "MissingClearingMemberCode", MassQuoteRejectionReason::MissingClearingMemberCode },
     { "ForbiddenClearingMemberCode", MassQuoteRejectionReason::ForbiddenClearingMemberCode },
+    { "InvalidClientIdForSponsoredConnection", MassQuoteRejectionReason::InvalidClientIdForSponsoredConnection },
+    { "ForbiddenOrderCapacityValueForSponsoredConnection", MassQuoteRejectionReason::ForbiddenOrderCapacityValueForSponsoredConnection },
+    { "MarketModelNotSupportedOnSponsoredConnection", MassQuoteRejectionReason::MarketModelNotSupportedOnSponsoredConnection },
     { "DuplicateInstrument", MassQuoteRejectionReason::DuplicateInstrument },
     { "InvalidQuotesCount", MassQuoteRejectionReason::InvalidQuotesCount },
-    { "ForbiddenOrderCapacityValue", MassQuoteRejectionReason::ForbiddenOrderCapacityValue }
+    { "ForbiddenOrderCapacityValue", MassQuoteRejectionReason::ForbiddenOrderCapacityValue },
+    { "LiquidityProvisionActivityFlagNotSetForMassQuote", MassQuoteRejectionReason::LiquidityProvisionActivityFlagNotSetForMassQuote }
 };
 
 static const std::map<MassQuoteRejectionReason, std::string> MassQuoteRejectionReason2Name {
@@ -1491,15 +1542,20 @@ static const std::map<MassQuoteRejectionReason, std::string> MassQuoteRejectionR
     { MassQuoteRejectionReason::InvalidPartyRoleQualifierForClientId, "InvalidPartyRoleQualifierForClientId" },
     { MassQuoteRejectionReason::InvalidPartyRoleQualifierForExecutingTrader, "InvalidPartyRoleQualifierForExecutingTrader" },
     { MassQuoteRejectionReason::InvalidPartyRoleQualifierForInvestmentDecisionMaker, "InvalidPartyRoleQualifierForInvestmentDecisionMaker" },
+    { MassQuoteRejectionReason::MissingOrderOriginationForSponsoredAccessConnection, "MissingOrderOriginationForSponsoredAccessConnection" },
     { MassQuoteRejectionReason::InvalidPartyIdForClientId, "InvalidPartyIdForClientId" },
     { MassQuoteRejectionReason::InvalidPartyIdForExecutingTrader, "InvalidPartyIdForExecutingTrader" },
     { MassQuoteRejectionReason::InvalidPartyIdForInvestmentDecisionMaker, "InvalidPartyIdForInvestmentDecisionMaker" },
     { MassQuoteRejectionReason::InvalidPartyRoleQualifierForPartyId, "InvalidPartyRoleQualifierForPartyId" },
     { MassQuoteRejectionReason::MissingClearingMemberCode, "MissingClearingMemberCode" },
     { MassQuoteRejectionReason::ForbiddenClearingMemberCode, "ForbiddenClearingMemberCode" },
+    { MassQuoteRejectionReason::InvalidClientIdForSponsoredConnection, "InvalidClientIdForSponsoredConnection" },
+    { MassQuoteRejectionReason::ForbiddenOrderCapacityValueForSponsoredConnection, "ForbiddenOrderCapacityValueForSponsoredConnection" },
+    { MassQuoteRejectionReason::MarketModelNotSupportedOnSponsoredConnection, "MarketModelNotSupportedOnSponsoredConnection" },
     { MassQuoteRejectionReason::DuplicateInstrument, "DuplicateInstrument" },
     { MassQuoteRejectionReason::InvalidQuotesCount, "InvalidQuotesCount" },
-    { MassQuoteRejectionReason::ForbiddenOrderCapacityValue, "ForbiddenOrderCapacityValue" }
+    { MassQuoteRejectionReason::ForbiddenOrderCapacityValue, "ForbiddenOrderCapacityValue" },
+    { MassQuoteRejectionReason::LiquidityProvisionActivityFlagNotSetForMassQuote, "LiquidityProvisionActivityFlagNotSetForMassQuote" }
 };
 
 
@@ -1509,6 +1565,7 @@ struct MassQuoteResponse {
     QuoteOrderResponses responses;
     MassQuoteStatus status;
     MassQuoteRejectionReason reason;
+    uint8_t feeStructureId;
 
     friend std::ostream &operator << (std::ostream &, const MassQuoteResponse &);
 };
@@ -1559,6 +1616,8 @@ static const std::map<CommandResult, std::string> CommandResult2Name {
 enum class CommandRejectionCode: uint16_t {
     Other = 99,
     UnknownInstrument = 1001,
+    InstrumentAlreadyKnockedOut = 1313,
+    MmCannotRevokeMarketOperationKnockOut = 1314,
     ExchangeClosed = 3002,
     FirmNotAuthorizedToQuoteInstrument = 3009,
     CommandNotAllowedInCurrentState = 3020
@@ -1567,6 +1626,8 @@ enum class CommandRejectionCode: uint16_t {
 static const std::map<std::string, CommandRejectionCode> Name2CommandRejectionCode {
     { "Other", CommandRejectionCode::Other },
     { "UnknownInstrument", CommandRejectionCode::UnknownInstrument },
+    { "InstrumentAlreadyKnockedOut", CommandRejectionCode::InstrumentAlreadyKnockedOut },
+    { "MmCannotRevokeMarketOperationKnockOut", CommandRejectionCode::MmCannotRevokeMarketOperationKnockOut },
     { "ExchangeClosed", CommandRejectionCode::ExchangeClosed },
     { "FirmNotAuthorizedToQuoteInstrument", CommandRejectionCode::FirmNotAuthorizedToQuoteInstrument },
     { "CommandNotAllowedInCurrentState", CommandRejectionCode::CommandNotAllowedInCurrentState }
@@ -1575,6 +1636,8 @@ static const std::map<std::string, CommandRejectionCode> Name2CommandRejectionCo
 static const std::map<CommandRejectionCode, std::string> CommandRejectionCode2Name {
     { CommandRejectionCode::Other, "Other" },
     { CommandRejectionCode::UnknownInstrument, "UnknownInstrument" },
+    { CommandRejectionCode::InstrumentAlreadyKnockedOut, "InstrumentAlreadyKnockedOut" },
+    { CommandRejectionCode::MmCannotRevokeMarketOperationKnockOut, "MmCannotRevokeMarketOperationKnockOut" },
     { CommandRejectionCode::ExchangeClosed, "ExchangeClosed" },
     { CommandRejectionCode::FirmNotAuthorizedToQuoteInstrument, "FirmNotAuthorizedToQuoteInstrument" },
     { CommandRejectionCode::CommandNotAllowedInCurrentState, "CommandNotAllowedInCurrentState" }
@@ -1677,6 +1740,7 @@ struct OrderMassCancel {
 };
 
 enum class MassCancelRejectionReason: uint16_t {
+    Other = 99,
     NA = 101,
     UnknownInstrument = 1001,
     InvalidExecutionTrader = 1005,
@@ -1689,6 +1753,7 @@ enum class MassCancelRejectionReason: uint16_t {
 };
 
 static const std::map<std::string, MassCancelRejectionReason> Name2MassCancelRejectionReason {
+    { "Other", MassCancelRejectionReason::Other },
     { "NA", MassCancelRejectionReason::NA },
     { "UnknownInstrument", MassCancelRejectionReason::UnknownInstrument },
     { "InvalidExecutionTrader", MassCancelRejectionReason::InvalidExecutionTrader },
@@ -1701,6 +1766,7 @@ static const std::map<std::string, MassCancelRejectionReason> Name2MassCancelRej
 };
 
 static const std::map<MassCancelRejectionReason, std::string> MassCancelRejectionReason2Name {
+    { MassCancelRejectionReason::Other, "Other" },
     { MassCancelRejectionReason::NA, "NA" },
     { MassCancelRejectionReason::UnknownInstrument, "UnknownInstrument" },
     { MassCancelRejectionReason::InvalidExecutionTrader, "InvalidExecutionTrader" },

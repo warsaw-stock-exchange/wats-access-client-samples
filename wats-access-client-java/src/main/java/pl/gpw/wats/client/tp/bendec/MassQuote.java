@@ -7,9 +7,8 @@ import java.nio.ByteBuffer;
 /**
  * <h2>MassQuote</h2>
  * <p>Mass Quote</p>
- * <p>Byte length: 1173</p>
+ * <p>Byte length: 1200</p>
  * <p>Header header - Message header. | size 16</p>
- * <p>OnBehalfOf > int (u16) onBehalfOf | size 2</p>
  * <p>STPId > int (u8) stpId - An ID assigned by the client used in Self Match Prevention mechanism. | size 1</p>
  * <p>Capacity capacity - Capacity of the party making the order (either principal or agency). | size 1</p>
  * <p>Account > String (u8[]) account - Account mnemonic as agreed between buy and sell sides. | size 16</p>
@@ -19,10 +18,12 @@ import java.nio.ByteBuffer;
  * <p>ClearingCode > String (u8[]) clearingMemberCode - Clearing member code. | size 20</p>
  * <p>ClearingIdentifier clearingMemberClearingIdentifier - Clearing member's clearing identifier. | size 1</p>
  * <p>Quotes quotes - The array of quotes. | size 1081</p>
+ * <p>u8 > int feeStructureId - Optional identifier of a fee scheme for billing purposes. | size 1</p>
+ * <p>InterestedParty > String (u8[]) interestedParty - 3rd party interested in this order or trade. | size 8</p>
+ * <p>ClientOrderId > String (u8[]) quoteId - Arbitrary user provided value associated with the mass quote. | size 20</p>
  */
 public class MassQuote implements ByteSerializable, Message {
     private Header header;
-    private int onBehalfOf;
     private int stpId;
     private Capacity capacity;
     private String account;
@@ -32,11 +33,13 @@ public class MassQuote implements ByteSerializable, Message {
     private String clearingMemberCode;
     private ClearingIdentifier clearingMemberClearingIdentifier;
     private Quotes quotes;
-    public static final int byteLength = 1173;
+    private int feeStructureId;
+    private String interestedParty;
+    private String quoteId;
+    public static final int byteLength = 1200;
     
-    public MassQuote(Header header, int onBehalfOf, int stpId, Capacity capacity, String account, AccountType accountType, MifidFields mifidFields, String memo, String clearingMemberCode, ClearingIdentifier clearingMemberClearingIdentifier, Quotes quotes) {
+    public MassQuote(Header header, int stpId, Capacity capacity, String account, AccountType accountType, MifidFields mifidFields, String memo, String clearingMemberCode, ClearingIdentifier clearingMemberClearingIdentifier, Quotes quotes, int feeStructureId, String interestedParty, String quoteId) {
         this.header = header;
-        this.onBehalfOf = onBehalfOf;
         this.stpId = stpId;
         this.capacity = capacity;
         this.account = account;
@@ -46,20 +49,25 @@ public class MassQuote implements ByteSerializable, Message {
         this.clearingMemberCode = clearingMemberCode;
         this.clearingMemberClearingIdentifier = clearingMemberClearingIdentifier;
         this.quotes = quotes;
+        this.feeStructureId = feeStructureId;
+        this.interestedParty = interestedParty;
+        this.quoteId = quoteId;
     }
     
     public MassQuote(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
-        this.onBehalfOf = BendecUtils.uInt16FromByteArray(bytes, offset + 16);
-        this.stpId = BendecUtils.uInt8FromByteArray(bytes, offset + 18);
-        this.capacity = Capacity.getCapacity(bytes, offset + 19);
-        this.account = BendecUtils.stringFromByteArray(bytes, offset + 20, 16);
-        this.accountType = AccountType.getAccountType(bytes, offset + 36);
-        this.mifidFields = new MifidFields(bytes, offset + 37);
-        this.memo = BendecUtils.stringFromByteArray(bytes, offset + 53, 18);
-        this.clearingMemberCode = BendecUtils.stringFromByteArray(bytes, offset + 71, 20);
-        this.clearingMemberClearingIdentifier = ClearingIdentifier.getClearingIdentifier(bytes, offset + 91);
-        this.quotes = new Quotes(bytes, offset + 92);
+        this.stpId = BendecUtils.uInt8FromByteArray(bytes, offset + 16);
+        this.capacity = Capacity.getCapacity(bytes, offset + 17);
+        this.account = BendecUtils.stringFromByteArray(bytes, offset + 18, 16);
+        this.accountType = AccountType.getAccountType(bytes, offset + 34);
+        this.mifidFields = new MifidFields(bytes, offset + 35);
+        this.memo = BendecUtils.stringFromByteArray(bytes, offset + 51, 18);
+        this.clearingMemberCode = BendecUtils.stringFromByteArray(bytes, offset + 69, 20);
+        this.clearingMemberClearingIdentifier = ClearingIdentifier.getClearingIdentifier(bytes, offset + 89);
+        this.quotes = new Quotes(bytes, offset + 90);
+        this.feeStructureId = BendecUtils.uInt8FromByteArray(bytes, offset + 1171);
+        this.interestedParty = BendecUtils.stringFromByteArray(bytes, offset + 1172, 8);
+        this.quoteId = BendecUtils.stringFromByteArray(bytes, offset + 1180, 20);
     }
     
     public MassQuote(byte[] bytes) {
@@ -74,10 +82,6 @@ public class MassQuote implements ByteSerializable, Message {
      */
     public Header getHeader() {
         return this.header;
-    }
-    
-    public int getOnBehalfOf() {
-        return this.onBehalfOf;
     }
     
     /**
@@ -138,14 +142,31 @@ public class MassQuote implements ByteSerializable, Message {
     }
     
     /**
+     * @return Optional identifier of a fee scheme for billing purposes.
+     */
+    public int getFeeStructureId() {
+        return this.feeStructureId;
+    }
+    
+    /**
+     * @return 3rd party interested in this order or trade.
+     */
+    public String getInterestedParty() {
+        return this.interestedParty;
+    }
+    
+    /**
+     * @return Arbitrary user provided value associated with the mass quote.
+     */
+    public String getQuoteId() {
+        return this.quoteId;
+    }
+    
+    /**
      * @param header Message header.
      */
     public void setHeader(Header header) {
         this.header = header;
-    }
-    
-    public void setOnBehalfOf(int onBehalfOf) {
-        this.onBehalfOf = onBehalfOf;
     }
     
     /**
@@ -205,11 +226,31 @@ public class MassQuote implements ByteSerializable, Message {
         this.quotes = quotes;
     }
     
+    /**
+     * @param feeStructureId Optional identifier of a fee scheme for billing purposes.
+     */
+    public void setFeeStructureId(int feeStructureId) {
+        this.feeStructureId = feeStructureId;
+    }
+    
+    /**
+     * @param interestedParty 3rd party interested in this order or trade.
+     */
+    public void setInterestedParty(String interestedParty) {
+        this.interestedParty = interestedParty;
+    }
+    
+    /**
+     * @param quoteId Arbitrary user provided value associated with the mass quote.
+     */
+    public void setQuoteId(String quoteId) {
+        this.quoteId = quoteId;
+    }
+    
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         header.toBytes(buffer);
-        buffer.put(BendecUtils.uInt16ToByteArray(this.onBehalfOf));
         buffer.put(BendecUtils.uInt8ToByteArray(this.stpId));
         capacity.toBytes(buffer);
         buffer.put(BendecUtils.stringToByteArray(this.account, 16));
@@ -219,13 +260,15 @@ public class MassQuote implements ByteSerializable, Message {
         buffer.put(BendecUtils.stringToByteArray(this.clearingMemberCode, 20));
         clearingMemberClearingIdentifier.toBytes(buffer);
         quotes.toBytes(buffer);
+        buffer.put(BendecUtils.uInt8ToByteArray(this.feeStructureId));
+        buffer.put(BendecUtils.stringToByteArray(this.interestedParty, 8));
+        buffer.put(BendecUtils.stringToByteArray(this.quoteId, 20));
         return buffer.array();
     }
     
     @Override  
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
-        buffer.put(BendecUtils.uInt16ToByteArray(this.onBehalfOf));
         buffer.put(BendecUtils.uInt8ToByteArray(this.stpId));
         capacity.toBytes(buffer);
         buffer.put(BendecUtils.stringToByteArray(this.account, 16));
@@ -235,12 +278,14 @@ public class MassQuote implements ByteSerializable, Message {
         buffer.put(BendecUtils.stringToByteArray(this.clearingMemberCode, 20));
         clearingMemberClearingIdentifier.toBytes(buffer);
         quotes.toBytes(buffer);
+        buffer.put(BendecUtils.uInt8ToByteArray(this.feeStructureId));
+        buffer.put(BendecUtils.stringToByteArray(this.interestedParty, 8));
+        buffer.put(BendecUtils.stringToByteArray(this.quoteId, 20));
     }
     
     @Override
     public int hashCode() {
         return Objects.hash(header,
-        onBehalfOf,
         stpId,
         capacity,
         account,
@@ -249,14 +294,16 @@ public class MassQuote implements ByteSerializable, Message {
         memo,
         clearingMemberCode,
         clearingMemberClearingIdentifier,
-        quotes);
+        quotes,
+        feeStructureId,
+        interestedParty,
+        quoteId);
     }
     
     @Override
     public String toString() {
         return "MassQuote {" +
             "header=" + header +
-            ", onBehalfOf=" + onBehalfOf +
             ", stpId=" + stpId +
             ", capacity=" + capacity +
             ", account=" + account +
@@ -266,6 +313,9 @@ public class MassQuote implements ByteSerializable, Message {
             ", clearingMemberCode=" + clearingMemberCode +
             ", clearingMemberClearingIdentifier=" + clearingMemberClearingIdentifier +
             ", quotes=" + quotes +
+            ", feeStructureId=" + feeStructureId +
+            ", interestedParty=" + interestedParty +
+            ", quoteId=" + quoteId +
             "}";
     }
 }

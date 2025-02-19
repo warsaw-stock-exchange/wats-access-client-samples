@@ -10,17 +10,21 @@ import java.nio.ByteBuffer;
  */
 public enum QuotationSystem {
     /**
+     * Not Applicable.
+     */
+    NA(1),
+    /**
      * Single price quotation system with a single fixing.
      */
-    SINGLEPRICESINGLEFIXING(1),
+    SINGLEPRICESINGLEFIXING(2),
     /**
      * Continuous trading.
      */
-    CONTINUOUSTRADING(2),
+    CONTINUOUSTRADING(3),
     /**
      * Single price quotation system with two fixings.
      */
-    SINGLEPRICETWOFIXINGS(3);
+    SINGLEPRICETWOFIXINGS(4);
     
     private final int value;
     private final int byteLength = 1;

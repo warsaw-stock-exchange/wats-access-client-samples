@@ -285,7 +285,9 @@ enum class TradingSessionEvent: uint8_t {
     InitialReferenceDataStart = 4,
     InitialReferenceDataEnd = 5,
     PreviousDayRestateStart = 6,
-    PreviousDayRestateEnd = 7
+    PreviousDayRestateEnd = 7,
+    NextSessionReferenceDataStart = 8,
+    NextSessionReferenceDataEnd = 9
 };
 
 static const std::map<std::string, TradingSessionEvent> Name2TradingSessionEvent {
@@ -295,7 +297,9 @@ static const std::map<std::string, TradingSessionEvent> Name2TradingSessionEvent
     { "InitialReferenceDataStart", TradingSessionEvent::InitialReferenceDataStart },
     { "InitialReferenceDataEnd", TradingSessionEvent::InitialReferenceDataEnd },
     { "PreviousDayRestateStart", TradingSessionEvent::PreviousDayRestateStart },
-    { "PreviousDayRestateEnd", TradingSessionEvent::PreviousDayRestateEnd }
+    { "PreviousDayRestateEnd", TradingSessionEvent::PreviousDayRestateEnd },
+    { "NextSessionReferenceDataStart", TradingSessionEvent::NextSessionReferenceDataStart },
+    { "NextSessionReferenceDataEnd", TradingSessionEvent::NextSessionReferenceDataEnd }
 };
 
 static const std::map<TradingSessionEvent, std::string> TradingSessionEvent2Name {
@@ -305,7 +309,9 @@ static const std::map<TradingSessionEvent, std::string> TradingSessionEvent2Name
     { TradingSessionEvent::InitialReferenceDataStart, "InitialReferenceDataStart" },
     { TradingSessionEvent::InitialReferenceDataEnd, "InitialReferenceDataEnd" },
     { TradingSessionEvent::PreviousDayRestateStart, "PreviousDayRestateStart" },
-    { TradingSessionEvent::PreviousDayRestateEnd, "PreviousDayRestateEnd" }
+    { TradingSessionEvent::PreviousDayRestateEnd, "PreviousDayRestateEnd" },
+    { TradingSessionEvent::NextSessionReferenceDataStart, "NextSessionReferenceDataStart" },
+    { TradingSessionEvent::NextSessionReferenceDataEnd, "NextSessionReferenceDataEnd" }
 };
 
 
@@ -349,7 +355,8 @@ enum class TradingPhaseType: uint8_t {
     HybridPreTrade = 18,
     UnsuspensionAuction = 19,
     Ipo = 20,
-    TenderOffer = 21
+    TenderOffer = 21,
+    HybridPreTradeBuyOnly = 22
 };
 
 static const std::map<std::string, TradingPhaseType> Name2TradingPhaseType {
@@ -373,7 +380,8 @@ static const std::map<std::string, TradingPhaseType> Name2TradingPhaseType {
     { "HybridPreTrade", TradingPhaseType::HybridPreTrade },
     { "UnsuspensionAuction", TradingPhaseType::UnsuspensionAuction },
     { "Ipo", TradingPhaseType::Ipo },
-    { "TenderOffer", TradingPhaseType::TenderOffer }
+    { "TenderOffer", TradingPhaseType::TenderOffer },
+    { "HybridPreTradeBuyOnly", TradingPhaseType::HybridPreTradeBuyOnly }
 };
 
 static const std::map<TradingPhaseType, std::string> TradingPhaseType2Name {
@@ -397,7 +405,8 @@ static const std::map<TradingPhaseType, std::string> TradingPhaseType2Name {
     { TradingPhaseType::HybridPreTrade, "HybridPreTrade" },
     { TradingPhaseType::UnsuspensionAuction, "UnsuspensionAuction" },
     { TradingPhaseType::Ipo, "Ipo" },
-    { TradingPhaseType::TenderOffer, "TenderOffer" }
+    { TradingPhaseType::TenderOffer, "TenderOffer" },
+    { TradingPhaseType::HybridPreTradeBuyOnly, "HybridPreTradeBuyOnly" }
 };
 
 
@@ -3129,6 +3138,7 @@ struct IndexPortfolioEntry {
     MicCode mic;
     Currency currency;
     uint64_t instrumentPacket;
+    bool suspended;
 
     friend std::ostream &operator << (std::ostream &, const IndexPortfolioEntry &);
 };
@@ -3338,37 +3348,6 @@ struct SingleInstrumentSummary {
     friend std::ostream &operator << (std::ostream &, const SingleInstrumentSummary &);
 };
 
-enum class Market: uint8_t {
-    Primary = 1,
-    Parallel = 2,
-    NewConnectPriceDriven = 3,
-    NewConnectOrderDriven = 4,
-    CatalystRegulated = 5,
-    CatalystAso = 6,
-    Other = 7
-};
-
-static const std::map<std::string, Market> Name2Market {
-    { "Primary", Market::Primary },
-    { "Parallel", Market::Parallel },
-    { "NewConnectPriceDriven", Market::NewConnectPriceDriven },
-    { "NewConnectOrderDriven", Market::NewConnectOrderDriven },
-    { "CatalystRegulated", Market::CatalystRegulated },
-    { "CatalystAso", Market::CatalystAso },
-    { "Other", Market::Other }
-};
-
-static const std::map<Market, std::string> Market2Name {
-    { Market::Primary, "Primary" },
-    { Market::Parallel, "Parallel" },
-    { Market::NewConnectPriceDriven, "NewConnectPriceDriven" },
-    { Market::NewConnectOrderDriven, "NewConnectOrderDriven" },
-    { Market::CatalystRegulated, "CatalystRegulated" },
-    { Market::CatalystAso, "CatalystAso" },
-    { Market::Other, "Other" }
-};
-
-
 enum class ChangeIndicator: uint8_t {
     Increase = 1,
     Decrease = 2,
@@ -3392,18 +3371,21 @@ static const std::map<ChangeIndicator, std::string> ChangeIndicator2Name {
 
 
 enum class QuotationSystem: uint8_t {
-    SinglePriceSingleFixing = 1,
-    ContinuousTrading = 2,
-    SinglePriceTwoFixings = 3
+    NA = 1,
+    SinglePriceSingleFixing = 2,
+    ContinuousTrading = 3,
+    SinglePriceTwoFixings = 4
 };
 
 static const std::map<std::string, QuotationSystem> Name2QuotationSystem {
+    { "NA", QuotationSystem::NA },
     { "SinglePriceSingleFixing", QuotationSystem::SinglePriceSingleFixing },
     { "ContinuousTrading", QuotationSystem::ContinuousTrading },
     { "SinglePriceTwoFixings", QuotationSystem::SinglePriceTwoFixings }
 };
 
 static const std::map<QuotationSystem, std::string> QuotationSystem2Name {
+    { QuotationSystem::NA, "NA" },
     { QuotationSystem::SinglePriceSingleFixing, "SinglePriceSingleFixing" },
     { QuotationSystem::ContinuousTrading, "ContinuousTrading" },
     { QuotationSystem::SinglePriceTwoFixings, "SinglePriceTwoFixings" }
@@ -3427,7 +3409,7 @@ struct ProductSummary {
     Value tradingValueCurrency;
     InstrumentStatus status;
     uint16_t sector;
-    Market market;
+    uint8_t market;
     ChangeIndicator markerPriceChange;
     bool lowerLiquidity;
     Number multiplier;

@@ -36,7 +36,11 @@ public enum ConnectionCloseReason {
     /**
      * Service closed the connection because of an exchange operation  (e.g. supervision operation).
      */
-    CLOSEOPS(7);
+    CLOSEOPS(7),
+    /**
+     * Service closed the connection because of an internal operation (e.g. grace period end).
+     */
+    DISCONNECT(8);
     
     private final int value;
     private final int byteLength = 1;

@@ -1,6 +1,6 @@
 {
   "$schema": "./schema.json",
-  "version": 2060,
+  "version": 2064,
   "typeDefinitions": {
     "marketData": [
       {
@@ -1880,6 +1880,11 @@
             "TenderOffer",
             21,
             "Tender offer phase"
+          ],
+          [
+            "HybridPreTradeBuyOnly",
+            22,
+            "Hybrid pre trade BuyOnly phase"
           ]
         ]
       },
@@ -2080,49 +2085,6 @@
       },
       {
         "kind": "Enum",
-        "name": "Market",
-        "description": "Defines the market the instrument belongs to.",
-        "underlying": "u8",
-        "variants": [
-          [
-            "Primary",
-            1,
-            "Primary market."
-          ],
-          [
-            "Parallel",
-            2,
-            "Parallel market."
-          ],
-          [
-            "NewConnectPriceDriven",
-            3,
-            "New Connect Market (price driven market)."
-          ],
-          [
-            "NewConnectOrderDriven",
-            4,
-            "New Connect Market (order driven market)."
-          ],
-          [
-            "CatalystRegulated",
-            5,
-            "Catalyst Regulated Market."
-          ],
-          [
-            "CatalystAso",
-            6,
-            " Catalyst ASO."
-          ],
-          [
-            "Other",
-            7,
-            "Other market."
-          ]
-        ]
-      },
-      {
-        "kind": "Enum",
         "name": "ChangeIndicator",
         "description": "Defines a value change indicator (e.g. market price).",
         "underlying": "u8",
@@ -2156,18 +2118,23 @@
         "underlying": "u8",
         "variants": [
           [
-            "SinglePriceSingleFixing",
+            "NA",
             1,
+            "Not Applicable."
+          ],
+          [
+            "SinglePriceSingleFixing",
+            2,
             "Single price quotation system with a single fixing."
           ],
           [
             "ContinuousTrading",
-            2,
+            3,
             "Continuous trading."
           ],
           [
             "SinglePriceTwoFixings",
-            3,
+            4,
             "Single price quotation system with two fixings."
           ]
         ]
@@ -4564,6 +4531,16 @@
             "PreviousDayRestateEnd",
             7,
             "Previous day restate end."
+          ],
+          [
+            "NextSessionReferenceDataStart",
+            8,
+            "Next session reference data start."
+          ],
+          [
+            "NextSessionReferenceDataEnd",
+            9,
+            "Next session reference data end."
           ]
         ]
       },
@@ -5645,6 +5622,11 @@
             "name": "instrumentPacket",
             "type": "u64",
             "description": "Instrument packet in index portfolio / of information product. Number of units (usually stocks/shares) of a given instrument in the index portfolio or in the information product."
+          },
+          {
+            "name": "suspended",
+            "type": "bool",
+            "description": "Is instrument suspended."
           }
         ]
       },
@@ -6054,8 +6036,8 @@
           },
           {
             "name": "market",
-            "type": "Market",
-            "description": "Defines the market the instrument belongs to."
+            "type": "u8",
+            "description": "Defines the market the instrument belongs to. The field assumes were described in the WATS Market Data documentation."
           },
           {
             "name": "markerPriceChange",

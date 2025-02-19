@@ -12,7 +12,6 @@ inline btp::messages::OrderAdd simple_order_add(
     btp::messages::Quantity quantity) {
 
     return btp::messages::OrderAdd {
-        .onBehalfOf = 0,
         .stpId = 0,
         .instrumentId = instrument_id,
         .orderType = btp::messages::OrderType::Limit,
@@ -42,7 +41,7 @@ inline btp::messages::OrderAdd simple_order_add(
         .clearingMemberCode = "",
         .clearingMemberClearingIdentifier =
             btp::messages::ClearingIdentifier::NotApplicable,
-        .execInst = btp::messages::ExecInst::CancelOnConnectionLoss
+        .execInst = btp::messages::ExecInst::None
     };
 }
 

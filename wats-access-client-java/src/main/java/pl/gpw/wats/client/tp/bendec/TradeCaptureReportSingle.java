@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 /**
  * <h2>TradeCaptureReportSingle</h2>
  * <p>Trade Capture Report - single side.</p>
- * <p>Byte length: 198</p>
+ * <p>Byte length: 206</p>
  * <p>Header header - Header. | size 16</p>
  * <p>ElementId > long (u32) instrumentId - ID of the instrument included in the order. | size 4</p>
  * <p>TradeReportId > String (u8[]) tradeReportId - Unique identifier of the trade capture report. | size 21</p>
@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
  * <p>Date > long (u32) settlementDate - Settlement date of the trade is equal to current date plus actual settlement offset calendar days. | size 4</p>
  * <p>OrderSide side - Side of order. | size 1</p>
  * <p>CcpCode > String (u8[]) counterpartyCode - CCP code of the counterparty. | size 16</p>
- * <p>TcrParty tcrParty - TCR party. | size 82</p>
+ * <p>TcrParty tcrParty - TCR party. | size 90</p>
  */
 public class TradeCaptureReportSingle implements ByteSerializable, Message {
     private Header header;
@@ -44,7 +44,7 @@ public class TradeCaptureReportSingle implements ByteSerializable, Message {
     private OrderSide side;
     private String counterpartyCode;
     private TcrParty tcrParty;
-    public static final int byteLength = 198;
+    public static final int byteLength = 206;
     
     public TradeCaptureReportSingle(Header header, long instrumentId, String tradeReportId, BigInteger secondaryTradeReportId, long tradeId, TradeReportTransType tradeReportTransType, TradeReportType tradeReportType, TradeType tradeType, AlgorithmicTradeIndicator algorithmicTradeIndicator, ExecType execType, String tradeReportRefId, BigInteger lastQty, long lastPx, long settlementDate, OrderSide side, String counterpartyCode, TcrParty tcrParty) {
         this.header = header;

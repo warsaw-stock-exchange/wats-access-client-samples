@@ -134,6 +134,10 @@ public enum TcrRejectionReason {
      */
     FORBIDDENCLEARINGMEMBERCODE(1077),
     /**
+     * Market Model not supported sponsored connection
+     */
+    MARKETMODELNOTSUPPORTEDONSPONSOREDCONNECTION(1081),
+    /**
      * Firm is not a Market Maker for this SecurityID (48).
      */
     NOTAUTHORIZEDTOQUOTEINSTRUMENT(1209),

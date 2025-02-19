@@ -78,6 +78,10 @@ public enum OrderRejectionReason {
      */
     ICEBERGORDERVALUELESSTHANREQUIRED(1015),
     /**
+     * Attempt to submit an order with ExecInst = CancelOnConnectionLoss, while CoD being disabled for the ConnectionID used..
+     */
+    CODDISABLEDFORTHECONNECTIONID(1019),
+    /**
      * The order quantity must be greater than the minimum quanity.
      */
     ORDERQUANTITYMUSTBEGREATERTHANMINIMUMQUANTITY(1025),
@@ -166,6 +170,14 @@ public enum OrderRejectionReason {
      */
     PRICEABOVEHIGHCOLLAR(1038),
     /**
+     * Firm is not a Market Maker for this SecurityID (48)
+     */
+    FIRMISNOTAMARKETMAKER(1050),
+    /**
+     * Missing OrderOrigination for sponsored access connection.
+     */
+    MISSINGORDERORIGINATIONFORSPONSOREDACCESSCONNECTION(1055),
+    /**
      * Operation on redistributed instruments forbidden.
      */
     OPERATIONONREDISTRIBUTEDINSTRUMENTSFORBIDDEN(1056),
@@ -234,6 +246,22 @@ public enum OrderRejectionReason {
      */
     FORBIDDENCLEARINGMEMBERCODE(1077),
     /**
+     * Invalid Client ID for sponsored connection
+     */
+    INVALIDCLIENTIDFORSPONSOREDCONNECTION(1078),
+    /**
+     * Invalid OrdType for sponsored connection
+     */
+    INVALIDORDTYPEFORSPONSOREDCONNECTION(1079),
+    /**
+     * Forbidden OrderCapacity value for sponsored connection
+     */
+    FORBIDDENORDERCAPACITYVALUEFORSPONSOREDCONNECTION(1080),
+    /**
+     * Market Model not supported sponsored connection
+     */
+    MARKETMODELNOTSUPPORTEDONSPONSOREDCONNECTION(1081),
+    /**
      * Mass Quote not allowed for selected Market Model.
      */
     MASSQUOTENOTALLOWEDFORSELECTEDMARKETMODEL(1201),
@@ -274,6 +302,10 @@ public enum OrderRejectionReason {
      */
     SELLQUOTESNOTALLOWEDDURINGBUYONLYSTATE(1311),
     /**
+     * As soon as the instrument's knock-out barrier is reached by the underlying, any orders/quotes are no longer accepted into the order book.
+     */
+    INSTRUMENTKNOCKEDOUT(1312),
+    /**
      * Only one sell order is allowed for IPO instrument
      */
     ONLYONESELLORDERISALLOWEDFORIPO(1401),
@@ -301,6 +333,14 @@ public enum OrderRejectionReason {
      * The order price has exceeded the risk limit.
      */
     RISKORDERPRICECOLLAREXCEEDED(7003),
+    /**
+     * Dynamic Order Price Collar not defined.
+     */
+    DYNAMICORDERPRICECOLLARNOTDEFINED(7004),
+    /**
+     * Static Order Price Collar not defined.
+     */
+    STATICORDERPRICECOLLARNOTDEFINED(7005),
     /**
      * Total traded value has exceeded the risk limit.
      */

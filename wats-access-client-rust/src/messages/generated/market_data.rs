@@ -1395,6 +1395,8 @@ pub enum TradingPhaseType {
   Ipo = 0x0014,
   /// Tender offer phase
   TenderOffer = 0x0015,
+  /// Hybrid pre trade BuyOnly phase
+  HybridPreTradeBuyOnly = 0x0016,
 }
 impl Default for TradingPhaseType {
   fn default() -> Self {
@@ -1426,6 +1428,7 @@ impl std::convert::TryFrom<u8> for TradingPhaseType {
       0x0013 => Ok(Self::UnsuspensionAuction),
       0x0014 => Ok(Self::Ipo),
       0x0015 => Ok(Self::TenderOffer),
+      0x0016 => Ok(Self::HybridPreTradeBuyOnly),
       other => Err(InvalidVariant::new(other as u32, "TradingPhaseType")),
     }
   }
@@ -1619,46 +1622,6 @@ impl std::convert::TryFrom<u8> for AdjustedClosingPriceReason {
   }
 }
 
-/// Defines the market the instrument belongs to.
-#[repr(u8)]
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
-pub enum Market {
-  /// Primary market.
-  Primary = 0x0001,
-  /// Parallel market.
-  Parallel = 0x0002,
-  /// New Connect Market (price driven market).
-  NewConnectPriceDriven = 0x0003,
-  /// New Connect Market (order driven market).
-  NewConnectOrderDriven = 0x0004,
-  /// Catalyst Regulated Market.
-  CatalystRegulated = 0x0005,
-  ///  Catalyst ASO.
-  CatalystAso = 0x0006,
-  /// Other market.
-  Other = 0x0007,
-}
-impl Default for Market {
-  fn default() -> Self {
-    Self::Primary
-  }
-}
-impl std::convert::TryFrom<u8> for Market {
-  type Error = InvalidVariant;
-  fn try_from(value: u8) -> Result<Self, Self::Error> {
-    match value {
-      0x0001 => Ok(Self::Primary),
-      0x0002 => Ok(Self::Parallel),
-      0x0003 => Ok(Self::NewConnectPriceDriven),
-      0x0004 => Ok(Self::NewConnectOrderDriven),
-      0x0005 => Ok(Self::CatalystRegulated),
-      0x0006 => Ok(Self::CatalystAso),
-      0x0007 => Ok(Self::Other),
-      other => Err(InvalidVariant::new(other as u32, "Market")),
-    }
-  }
-}
-
 /// Defines a value change indicator (e.g. market price).
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
@@ -1694,25 +1657,28 @@ impl std::convert::TryFrom<u8> for ChangeIndicator {
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum QuotationSystem {
+  /// Not Applicable.
+  NA = 0x0001,
   /// Single price quotation system with a single fixing.
-  SinglePriceSingleFixing = 0x0001,
+  SinglePriceSingleFixing = 0x0002,
   /// Continuous trading.
-  ContinuousTrading = 0x0002,
+  ContinuousTrading = 0x0003,
   /// Single price quotation system with two fixings.
-  SinglePriceTwoFixings = 0x0003,
+  SinglePriceTwoFixings = 0x0004,
 }
 impl Default for QuotationSystem {
   fn default() -> Self {
-    Self::SinglePriceSingleFixing
+    Self::NA
   }
 }
 impl std::convert::TryFrom<u8> for QuotationSystem {
   type Error = InvalidVariant;
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
-      0x0001 => Ok(Self::SinglePriceSingleFixing),
-      0x0002 => Ok(Self::ContinuousTrading),
-      0x0003 => Ok(Self::SinglePriceTwoFixings),
+      0x0001 => Ok(Self::NA),
+      0x0002 => Ok(Self::SinglePriceSingleFixing),
+      0x0003 => Ok(Self::ContinuousTrading),
+      0x0004 => Ok(Self::SinglePriceTwoFixings),
       other => Err(InvalidVariant::new(other as u32, "QuotationSystem")),
     }
   }
@@ -3204,6 +3170,10 @@ pub enum TradingSessionEvent {
   PreviousDayRestateStart = 0x0006,
   /// Previous day restate end.
   PreviousDayRestateEnd = 0x0007,
+  /// Next session reference data start.
+  NextSessionReferenceDataStart = 0x0008,
+  /// Next session reference data end.
+  NextSessionReferenceDataEnd = 0x0009,
 }
 impl Default for TradingSessionEvent {
   fn default() -> Self {
@@ -3221,6 +3191,8 @@ impl std::convert::TryFrom<u8> for TradingSessionEvent {
       0x0005 => Ok(Self::InitialReferenceDataEnd),
       0x0006 => Ok(Self::PreviousDayRestateStart),
       0x0007 => Ok(Self::PreviousDayRestateEnd),
+      0x0008 => Ok(Self::NextSessionReferenceDataStart),
+      0x0009 => Ok(Self::NextSessionReferenceDataEnd),
       other => Err(InvalidVariant::new(other as u32, "TradingSessionEvent")),
     }
   }
@@ -3805,6 +3777,8 @@ pub struct IndexPortfolioEntry {
   pub currency: Currency,
   /// Instrument packet in index portfolio / of information product. Number of units (usually stocks/shares) of a given instrument in the index portfolio or in the information product.
   pub instrument_packet: u64,
+  /// Is instrument suspended.
+  pub suspended: bool,
 }
 
 /// The metadata message for the given index.
@@ -3969,8 +3943,8 @@ pub struct ProductSummary {
   pub status: InstrumentStatus,
   /// Defines the sector of the economy that the company belongs to. Possible values for shares, the field assumes were described in the WATS Market Data documentation.
   pub sector: u16,
-  /// Defines the market the instrument belongs to.
-  pub market: Market,
+  /// Defines the market the instrument belongs to. The field assumes were described in the WATS Market Data documentation.
+  pub market: u8,
   /// The field contains the market of the percentage change of the instrument closing price from the current session in relation to the reference price.
   pub marker_price_change: ChangeIndicator,
   /// The positive field value (true) informs if the company was qualified to Lower Liquidity Space. A negative value has the opposite meaning.

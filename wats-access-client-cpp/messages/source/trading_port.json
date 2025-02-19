@@ -1,5 +1,5 @@
 {
-  "version": 1096,
+  "version": 1108,
   "typeDefinitions": [
     {
       "kind": "Primitive",
@@ -106,12 +106,6 @@
     },
     {
       "kind": "Alias",
-      "name": "OnBehalfOf",
-      "alias": "u16",
-      "description": "ID of the client party on behalf which order is requested."
-    },
-    {
-      "kind": "Alias",
       "name": "STPId",
       "alias": "u8",
       "description": "An ID assigned by the client used in Self Trade Prevention mechanism."
@@ -199,6 +193,20 @@
       "description": "Free format text string."
     },
     {
+      "kind": "Array",
+      "name": "InterestedParty",
+      "type": "AnsiChar",
+      "length": 8,
+      "description": "3rd party interested in this order or trade."
+    },
+    {
+      "kind": "Array",
+      "name": "ClientOrderId",
+      "type": "AnsiChar",
+      "length": 20,
+      "description": "Arbitrary user provided value associated with the order."
+    },
+    {
       "kind": "Enum",
       "name": "AccountType",
       "description": "Account type.",
@@ -284,6 +292,11 @@
           "CloseOps",
           7,
           "Service closed the connection because of an exchange operation  (e.g. supervision operation)."
+        ],
+        [
+          "Disconnect",
+          8,
+          "Service closed the connection because of an internal operation (e.g. grace period end)."
         ]
       ]
     },
@@ -544,6 +557,11 @@
           "The value of the iceberg order is less than the required."
         ],
         [
+          "CodDisabledForTheConnectionId",
+          1019,
+          "Attempt to submit an order with ExecInst = CancelOnConnectionLoss, while CoD being disabled for the ConnectionID used.."
+        ],
+        [
           "OrderQuantityMustBeGreaterThanMinimumQuantity",
           1025,
           "The order quantity must be greater than the minimum quanity."
@@ -654,6 +672,16 @@
           "The validation for collars has failed. The price is too high."
         ],
         [
+          "FirmIsNotAMarketMaker",
+          1050,
+          "Firm is not a Market Maker for this SecurityID (48)"
+        ],
+        [
+          "MissingOrderOriginationForSponsoredAccessConnection",
+          1055,
+          "Missing OrderOrigination for sponsored access connection."
+        ],
+        [
           "OperationOnRedistributedInstrumentsForbidden",
           1056,
           "Operation on redistributed instruments forbidden."
@@ -739,6 +767,26 @@
           "Forbidden ClearingMemberCode"
         ],
         [
+          "InvalidClientIdForSponsoredConnection",
+          1078,
+          "Invalid Client ID for sponsored connection"
+        ],
+        [
+          "InvalidOrdTypeForSponsoredConnection",
+          1079,
+          "Invalid OrdType for sponsored connection"
+        ],
+        [
+          "ForbiddenOrderCapacityValueForSponsoredConnection",
+          1080,
+          "Forbidden OrderCapacity value for sponsored connection"
+        ],
+        [
+          "MarketModelNotSupportedOnSponsoredConnection",
+          1081,
+          "Market Model not supported sponsored connection"
+        ],
+        [
           "MassQuoteNotAllowedForSelectedMarketModel",
           1201,
           "Mass Quote not allowed for selected Market Model."
@@ -789,6 +837,11 @@
           "During BuyOnly  state in Hybrid market model sell quotes are not accepted"
         ],
         [
+          "InstrumentKnockedOut",
+          1312,
+          "As soon as the instrument's knock-out barrier is reached by the underlying, any orders/quotes are no longer accepted into the order book."
+        ],
+        [
           "OnlyOneSellOrderIsAllowedForIpo",
           1401,
           "Only one sell order is allowed for IPO instrument"
@@ -822,6 +875,16 @@
           "RiskOrderPriceCollarExceeded",
           7003,
           "The order price has exceeded the risk limit."
+        ],
+        [
+          "DynamicOrderPriceCollarNotDefined",
+          7004,
+          "Dynamic Order Price Collar not defined."
+        ],
+        [
+          "StaticOrderPriceCollarNotDefined",
+          7005,
+          "Static Order Price Collar not defined."
         ],
         [
           "TotalTradedValueExceeded",
@@ -1276,11 +1339,6 @@
           "description": "Header."
         },
         {
-          "name": "onBehalfOf",
-          "type": "OnBehalfOf",
-          "description": "ID of the client party on behalf which order is submitted. The default value is 0."
-        },
-        {
           "name": "stpId",
           "type": "STPId",
           "description": "ID assigned by the client used in the Self Trade Prevention mechanism."
@@ -1356,6 +1414,11 @@
           "description": "Free text."
         },
         {
+          "name": "clientOrderId",
+          "type": "ClientOrderId",
+          "description": "Arbitrary user provided value associated with the order."
+        },
+        {
           "name": "clearingMemberCode",
           "type": "ClearingCode",
           "description": "Clearing member code."
@@ -1374,6 +1437,11 @@
           "name": "feeStructureId",
           "type": "u8",
           "description": "Optional identifier of a fee scheme for billing purposes."
+        },
+        {
+          "name": "interestedParty",
+          "type": "InterestedParty",
+          "description": "3rd party interested in this order or trade."
         }
       ]
     },
@@ -1568,6 +1636,11 @@
       "description": "Indicates a mass cancel rejection reason.",
       "underlying": "u16",
       "variants": [
+        [
+          "Other",
+          99,
+          "Other."
+        ],
         [
           "NA",
           101,
@@ -2055,6 +2128,11 @@
           "Forbidden ClearingMemberCode"
         ],
         [
+          "MarketModelNotSupportedOnSponsoredConnection",
+          1081,
+          "Market Model not supported sponsored connection"
+        ],
+        [
           "NotAuthorizedToQuoteInstrument",
           1209,
           "Firm is not a Market Maker for this SecurityID (48)."
@@ -2200,6 +2278,11 @@
           "name": "feeStructureId",
           "type": "u8",
           "description": "Optional identifier of a fee scheme for billing purposes."
+        },
+        {
+          "name": "interestedParty",
+          "type": "InterestedParty",
+          "description": "3rd party interested in this order or trade."
         },
         {
           "name": "memo",
@@ -3009,10 +3092,6 @@
           "description": "Message header."
         },
         {
-          "name": "onBehalfOf",
-          "type": "OnBehalfOf"
-        },
-        {
           "name": "stpId",
           "type": "STPId",
           "description": "An ID assigned by the client used in Self Match Prevention mechanism."
@@ -3054,6 +3133,21 @@
           "name": "quotes",
           "type": "Quotes",
           "description": "The array of quotes."
+        },
+        {
+          "name": "feeStructureId",
+          "type": "u8",
+          "description": "Optional identifier of a fee scheme for billing purposes."
+        },
+        {
+          "name": "interestedParty",
+          "type": "InterestedParty",
+          "description": "3rd party interested in this order or trade."
+        },
+        {
+          "name": "quoteId",
+          "type": "ClientOrderId",
+          "description": "Arbitrary user provided value associated with the mass quote."
         }
       ]
     },
@@ -3159,6 +3253,11 @@
           "Invalid Party Role Qualifier for Investment Decision Maker Party group"
         ],
         [
+          "MissingOrderOriginationForSponsoredAccessConnection",
+          1055,
+          "Missing OrderOrigination for sponsored access connection."
+        ],
+        [
           "InvalidPartyIdForClientId",
           1070,
           "Invalid PartyID (448) for Client ID"
@@ -3189,6 +3288,21 @@
           "Forbidden ClearingMemberCode"
         ],
         [
+          "InvalidClientIdForSponsoredConnection",
+          1078,
+          "Invalid Client ID for sponsored connection"
+        ],
+        [
+          "ForbiddenOrderCapacityValueForSponsoredConnection",
+          1080,
+          "Forbidden OrderCapacity value for sponsored connection"
+        ],
+        [
+          "MarketModelNotSupportedOnSponsoredConnection",
+          1081,
+          "Market Model not supported sponsored connection"
+        ],
+        [
           "DuplicateInstrument",
           1202,
           "Multiple quotes for the same instrument within Mass Quote message."
@@ -3202,6 +3316,11 @@
           "ForbiddenOrderCapacityValue",
           1210,
           "Forbidden OrderCapacity (528) value for Mass Quote."
+        ],
+        [
+          "LiquidityProvisionActivityFlagNotSetForMassQuote",
+          1212,
+          "LiquidityProvisionActivity flag (within mifidFields.flags) in binary Mass Quote meesage must be always set to 1."
         ]
       ]
     },
@@ -3258,6 +3377,11 @@
           "name": "reason",
           "type": "MassQuoteRejectionReason",
           "description": "Reason for rejecting the given mass quote order."
+        },
+        {
+          "name": "feeStructureId",
+          "type": "u8",
+          "description": "Optional identifier of a fee scheme for billing purposes."
         }
       ]
     },
@@ -3274,6 +3398,16 @@
         [
           "UnknownInstrument",
           1001
+        ],
+        [
+          "InstrumentAlreadyKnockedOut",
+          1313,
+          "Attempt to knock-out an instrument that is already in knocked-out state."
+        ],
+        [
+          "MmCannotRevokeMarketOperationKnockOut",
+          1314,
+          "Market Maker's attempt to revoke Market Operation's knock-out on an instrument."
         ],
         [
           "ExchangeClosed",

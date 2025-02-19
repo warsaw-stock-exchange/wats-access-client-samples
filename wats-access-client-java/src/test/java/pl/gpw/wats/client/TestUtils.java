@@ -22,7 +22,6 @@ public class TestUtils {
                     BigInteger.ZERO
                 ),
                 0,
-                0,
                 instrumentId,
                 OrderType.LIMIT,
                 TimeInForce.DAY,
@@ -43,9 +42,11 @@ public class TestUtils {
                 BigInteger.ZERO,
                 "",
                 "",
+                "",
                 ClearingIdentifier.NOTAPPLICABLE,
-                new ExecInst(ExecInstOptions.CANCELONCONNECTIONLOSS.getOptionValue()),
-                0
+                new ExecInst(ExecInstOptions.NONE.getOptionValue()),
+                0,
+                ""
             );
     }
 
@@ -130,6 +131,7 @@ public class TestUtils {
                     0,
                     0,
                     0,
+                    "",
                     ""
                 ),
                 new TcrParty(
@@ -147,6 +149,7 @@ public class TestUtils {
                     0,
                     0,
                     0,
+                    "",
                     ""
                 )
             );

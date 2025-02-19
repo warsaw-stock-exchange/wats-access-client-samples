@@ -1,5 +1,10 @@
 # Changes history for WATS Access Clients samples
 
+## 1.5
+
+* **Change:** Access Clients (connectivity example code) repositories updated and adapted to version 1.5
+* **Change:** QuickFIX XML templates removed because they are published on official project's website (https://gpwwats.pl/dokumentacja-i-faq)
+
 ## 1.3
 
 * **Change:** Access Clients (connectivity example code) repositories updated and adapted to version 1.3
@@ -60,4 +65,4 @@
 
 ## 0.36
 
-* Initial
+* Initial release

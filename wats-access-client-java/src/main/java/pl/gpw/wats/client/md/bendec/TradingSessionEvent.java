@@ -36,7 +36,15 @@ public enum TradingSessionEvent {
     /**
      * Previous day restate end.
      */
-    PREVIOUSDAYRESTATEEND(7);
+    PREVIOUSDAYRESTATEEND(7),
+    /**
+     * Next session reference data start.
+     */
+    NEXTSESSIONREFERENCEDATASTART(8),
+    /**
+     * Next session reference data end.
+     */
+    NEXTSESSIONREFERENCEDATAEND(9);
     
     private final int value;
     private final int byteLength = 1;

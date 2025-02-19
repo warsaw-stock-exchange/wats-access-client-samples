@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 /**
  * <h2>TcrParty</h2>
  * <p>Information about Trade Capture Report party.</p>
- * <p>Byte length: 82</p>
+ * <p>Byte length: 90</p>
  * <p>MifidFields mifidFields - Fields related to the MiFID directive. | size 16</p>
  * <p>ClearingCode > String (u8[]) clearingMemberCode - Clearing member code. | size 20</p>
  * <p>ClearingIdentifier clearingMemberClearingIdentifier - Clearing member's clearing identifier. | size 1</p>
@@ -17,6 +17,7 @@ import java.nio.ByteBuffer;
  * <p>ElementId > long (u32) orderRestrictions - Restrictions associated with an order. | size 4</p>
  * <p>ElementId > long (u32) orderOrigination - Identifies the origin of the order. | size 4</p>
  * <p>u8 > int feeStructureId - Optional identifier of a fee scheme for billing purposes. | size 1</p>
+ * <p>InterestedParty > String (u8[]) interestedParty - 3rd party interested in this order or trade. | size 8</p>
  * <p>Memo > String (u8[]) memo - Free text. | size 18</p>
  */
 public class TcrParty implements ByteSerializable {
@@ -29,10 +30,11 @@ public class TcrParty implements ByteSerializable {
     private long orderRestrictions;
     private long orderOrigination;
     private int feeStructureId;
+    private String interestedParty;
     private String memo;
-    public static final int byteLength = 82;
+    public static final int byteLength = 90;
     
-    public TcrParty(MifidFields mifidFields, String clearingMemberCode, ClearingIdentifier clearingMemberClearingIdentifier, String account, AccountType accountType, Capacity orderCapacity, long orderRestrictions, long orderOrigination, int feeStructureId, String memo) {
+    public TcrParty(MifidFields mifidFields, String clearingMemberCode, ClearingIdentifier clearingMemberClearingIdentifier, String account, AccountType accountType, Capacity orderCapacity, long orderRestrictions, long orderOrigination, int feeStructureId, String interestedParty, String memo) {
         this.mifidFields = mifidFields;
         this.clearingMemberCode = clearingMemberCode;
         this.clearingMemberClearingIdentifier = clearingMemberClearingIdentifier;
@@ -42,6 +44,7 @@ public class TcrParty implements ByteSerializable {
         this.orderRestrictions = orderRestrictions;
         this.orderOrigination = orderOrigination;
         this.feeStructureId = feeStructureId;
+        this.interestedParty = interestedParty;
         this.memo = memo;
     }
     
@@ -55,7 +58,8 @@ public class TcrParty implements ByteSerializable {
         this.orderRestrictions = BendecUtils.uInt32FromByteArray(bytes, offset + 55);
         this.orderOrigination = BendecUtils.uInt32FromByteArray(bytes, offset + 59);
         this.feeStructureId = BendecUtils.uInt8FromByteArray(bytes, offset + 63);
-        this.memo = BendecUtils.stringFromByteArray(bytes, offset + 64, 18);
+        this.interestedParty = BendecUtils.stringFromByteArray(bytes, offset + 64, 8);
+        this.memo = BendecUtils.stringFromByteArray(bytes, offset + 72, 18);
     }
     
     public TcrParty(byte[] bytes) {
@@ -129,6 +133,13 @@ public class TcrParty implements ByteSerializable {
     }
     
     /**
+     * @return 3rd party interested in this order or trade.
+     */
+    public String getInterestedParty() {
+        return this.interestedParty;
+    }
+    
+    /**
      * @return Free text.
      */
     public String getMemo() {
@@ -199,6 +210,13 @@ public class TcrParty implements ByteSerializable {
     }
     
     /**
+     * @param interestedParty 3rd party interested in this order or trade.
+     */
+    public void setInterestedParty(String interestedParty) {
+        this.interestedParty = interestedParty;
+    }
+    
+    /**
      * @param memo Free text.
      */
     public void setMemo(String memo) {
@@ -217,6 +235,7 @@ public class TcrParty implements ByteSerializable {
         buffer.put(BendecUtils.uInt32ToByteArray(this.orderRestrictions));
         buffer.put(BendecUtils.uInt32ToByteArray(this.orderOrigination));
         buffer.put(BendecUtils.uInt8ToByteArray(this.feeStructureId));
+        buffer.put(BendecUtils.stringToByteArray(this.interestedParty, 8));
         buffer.put(BendecUtils.stringToByteArray(this.memo, 18));
         return buffer.array();
     }
@@ -232,6 +251,7 @@ public class TcrParty implements ByteSerializable {
         buffer.put(BendecUtils.uInt32ToByteArray(this.orderRestrictions));
         buffer.put(BendecUtils.uInt32ToByteArray(this.orderOrigination));
         buffer.put(BendecUtils.uInt8ToByteArray(this.feeStructureId));
+        buffer.put(BendecUtils.stringToByteArray(this.interestedParty, 8));
         buffer.put(BendecUtils.stringToByteArray(this.memo, 18));
     }
     
@@ -246,6 +266,7 @@ public class TcrParty implements ByteSerializable {
         orderRestrictions,
         orderOrigination,
         feeStructureId,
+        interestedParty,
         memo);
     }
     
@@ -261,6 +282,7 @@ public class TcrParty implements ByteSerializable {
             ", orderRestrictions=" + orderRestrictions +
             ", orderOrigination=" + orderOrigination +
             ", feeStructureId=" + feeStructureId +
+            ", interestedParty=" + interestedParty +
             ", memo=" + memo +
             "}";
     }

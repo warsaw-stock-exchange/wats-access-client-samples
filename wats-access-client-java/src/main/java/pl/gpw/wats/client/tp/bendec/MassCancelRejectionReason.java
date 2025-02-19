@@ -10,6 +10,10 @@ import java.nio.ByteBuffer;
  */
 public enum MassCancelRejectionReason {
     /**
+     * Other.
+     */
+    OTHER(99),
+    /**
      * Not applicable.
      */
     NA(101),

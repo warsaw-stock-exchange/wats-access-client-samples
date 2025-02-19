@@ -46,6 +46,10 @@ public enum MassQuoteRejectionReason {
      */
     INVALIDPARTYROLEQUALIFIERFORINVESTMENTDECISIONMAKER(1010),
     /**
+     * Missing OrderOrigination for sponsored access connection.
+     */
+    MISSINGORDERORIGINATIONFORSPONSOREDACCESSCONNECTION(1055),
+    /**
      * Invalid PartyID (448) for Client ID
      */
     INVALIDPARTYIDFORCLIENTID(1070),
@@ -70,6 +74,18 @@ public enum MassQuoteRejectionReason {
      */
     FORBIDDENCLEARINGMEMBERCODE(1077),
     /**
+     * Invalid Client ID for sponsored connection
+     */
+    INVALIDCLIENTIDFORSPONSOREDCONNECTION(1078),
+    /**
+     * Forbidden OrderCapacity value for sponsored connection
+     */
+    FORBIDDENORDERCAPACITYVALUEFORSPONSOREDCONNECTION(1080),
+    /**
+     * Market Model not supported sponsored connection
+     */
+    MARKETMODELNOTSUPPORTEDONSPONSOREDCONNECTION(1081),
+    /**
      * Multiple quotes for the same instrument within Mass Quote message.
      */
     DUPLICATEINSTRUMENT(1202),
@@ -80,7 +96,11 @@ public enum MassQuoteRejectionReason {
     /**
      * Forbidden OrderCapacity (528) value for Mass Quote.
      */
-    FORBIDDENORDERCAPACITYVALUE(1210);
+    FORBIDDENORDERCAPACITYVALUE(1210),
+    /**
+     * LiquidityProvisionActivity flag (within mifidFields.flags) in binary Mass Quote meesage must be always set to 1.
+     */
+    LIQUIDITYPROVISIONACTIVITYFLAGNOTSETFORMASSQUOTE(1212);
     
     private final int value;
     private final int byteLength = 2;

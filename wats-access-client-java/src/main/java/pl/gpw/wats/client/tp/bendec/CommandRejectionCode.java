@@ -11,6 +11,14 @@ import java.nio.ByteBuffer;
 public enum CommandRejectionCode {
     OTHER(99),
     UNKNOWNINSTRUMENT(1001),
+    /**
+     * Attempt to knock-out an instrument that is already in knocked-out state.
+     */
+    INSTRUMENTALREADYKNOCKEDOUT(1313),
+    /**
+     * Market Maker's attempt to revoke Market Operation's knock-out on an instrument.
+     */
+    MMCANNOTREVOKEMARKETOPERATIONKNOCKOUT(1314),
     EXCHANGECLOSED(3002),
     FIRMNOTAUTHORIZEDTOQUOTEINSTRUMENT(3009),
     COMMANDNOTALLOWEDINCURRENTSTATE(3020);

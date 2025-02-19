@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 /**
  * <h2>TradeCaptureReportDual</h2>
  * <p>Trade Capture Report - dual sided.</p>
- * <p>Byte length: 255</p>
+ * <p>Byte length: 271</p>
  * <p>Header header - Header. | size 16</p>
  * <p>ElementId > long (u32) instrumentId - ID of the instrument included in the order. | size 4</p>
  * <p>TradeReportId > String (u8[]) tradeReportId - Unique identifier of trade capture report. | size 21</p>
@@ -21,8 +21,8 @@ import java.nio.ByteBuffer;
  * <p>Quantity > BigInteger (u64) lastQty - Quantity (e.g. shares) bought/sold on this (last) fill. | size 8</p>
  * <p>Price > long (i64) lastPx - Price of this (last) fill. | size 8</p>
  * <p>Date > long (u32) settlementDate - Settlement date of the trade is equal to current date plus actual settlement offset calendar days. | size 4</p>
- * <p>TcrParty tcrPartyBuy - TCR party - buy side. | size 82</p>
- * <p>TcrParty tcrPartySell - TCR party - sell side. | size 82</p>
+ * <p>TcrParty tcrPartyBuy - TCR party - buy side. | size 90</p>
+ * <p>TcrParty tcrPartySell - TCR party - sell side. | size 90</p>
  */
 public class TradeCaptureReportDual implements ByteSerializable, Message {
     private Header header;
@@ -40,7 +40,7 @@ public class TradeCaptureReportDual implements ByteSerializable, Message {
     private long settlementDate;
     private TcrParty tcrPartyBuy;
     private TcrParty tcrPartySell;
-    public static final int byteLength = 255;
+    public static final int byteLength = 271;
     
     public TradeCaptureReportDual(Header header, long instrumentId, String tradeReportId, long tradeId, TradeReportTransType tradeReportTransType, TradeReportType tradeReportType, TradeType tradeType, AlgorithmicTradeIndicator algorithmicTradeIndicator, ExecType execType, String tradeReportRefId, BigInteger lastQty, long lastPx, long settlementDate, TcrParty tcrPartyBuy, TcrParty tcrPartySell) {
         this.header = header;
@@ -75,7 +75,7 @@ public class TradeCaptureReportDual implements ByteSerializable, Message {
         this.lastPx = BendecUtils.int64FromByteArray(bytes, offset + 79);
         this.settlementDate = BendecUtils.uInt32FromByteArray(bytes, offset + 87);
         this.tcrPartyBuy = new TcrParty(bytes, offset + 91);
-        this.tcrPartySell = new TcrParty(bytes, offset + 173);
+        this.tcrPartySell = new TcrParty(bytes, offset + 181);
     }
     
     public TradeCaptureReportDual(byte[] bytes) {

@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
  * <p>Value > long (i64) tradingValueCurrency - The field comprises the trading value expressed in trading currency. | size 8</p>
  * <p>InstrumentStatus status - Financial instrument status. | size 1</p>
  * <p>u16 > int sector - Defines the sector of the economy that the company belongs to. Possible values for shares, the field assumes were described in the WATS Market Data documentation. | size 2</p>
- * <p>Market market - Defines the market the instrument belongs to. | size 1</p>
+ * <p>u8 > int market - Defines the market the instrument belongs to. The field assumes were described in the WATS Market Data documentation. | size 1</p>
  * <p>ChangeIndicator markerPriceChange - The field contains the market of the percentage change of the instrument closing price from the current session in relation to the reference price. | size 1</p>
  * <p>bool > boolean lowerLiquidity - The positive field value (true) informs if the company was qualified to Lower Liquidity Space. A negative value has the opposite meaning. | size 1</p>
  * <p>Number > long (i64) multiplier - Instrument multiplier. | size 8</p>
@@ -61,7 +61,7 @@ public class ProductSummary implements ByteSerializable, Message {
     private long tradingValueCurrency;
     private InstrumentStatus status;
     private int sector;
-    private Market market;
+    private int market;
     private ChangeIndicator markerPriceChange;
     private boolean lowerLiquidity;
     private long multiplier;
@@ -82,7 +82,7 @@ public class ProductSummary implements ByteSerializable, Message {
     private boolean liquiditySupportPge;
     public static final int byteLength = 679;
     
-    public ProductSummary(Header header, SingleInstrumentSummary clobInstrument, SingleInstrumentSummary crossInstrument, SingleInstrumentSummary blockInstrument, SingleInstrumentSummary hybridInstrument, ProductIdentificationType productIdentificationType, String productIdentification, long productId, String mic, long AccumulatedInterest, long interestRate, Currency currency, long sessionDate, long tradingValueCurrency, InstrumentStatus status, int sector, Market market, ChangeIndicator markerPriceChange, boolean lowerLiquidity, long multiplier, long impliedVolatility, long dividendRate, long delta, long gamma, long rho, long theta, long vega, long volatility, long optionsStrikePrice, boolean dividend, boolean subscriptionRight, boolean interimDividendRight, boolean split, QuotationSystem quotationSystem, boolean liquiditySupportPge) {
+    public ProductSummary(Header header, SingleInstrumentSummary clobInstrument, SingleInstrumentSummary crossInstrument, SingleInstrumentSummary blockInstrument, SingleInstrumentSummary hybridInstrument, ProductIdentificationType productIdentificationType, String productIdentification, long productId, String mic, long AccumulatedInterest, long interestRate, Currency currency, long sessionDate, long tradingValueCurrency, InstrumentStatus status, int sector, int market, ChangeIndicator markerPriceChange, boolean lowerLiquidity, long multiplier, long impliedVolatility, long dividendRate, long delta, long gamma, long rho, long theta, long vega, long volatility, long optionsStrikePrice, boolean dividend, boolean subscriptionRight, boolean interimDividendRight, boolean split, QuotationSystem quotationSystem, boolean liquiditySupportPge) {
         this.header = header;
         this.clobInstrument = clobInstrument;
         this.crossInstrument = crossInstrument;
@@ -137,7 +137,7 @@ public class ProductSummary implements ByteSerializable, Message {
         this.tradingValueCurrency = BendecUtils.int64FromByteArray(bytes, offset + 579);
         this.status = InstrumentStatus.getInstrumentStatus(bytes, offset + 587);
         this.sector = BendecUtils.uInt16FromByteArray(bytes, offset + 588);
-        this.market = Market.getMarket(bytes, offset + 590);
+        this.market = BendecUtils.uInt8FromByteArray(bytes, offset + 590);
         this.markerPriceChange = ChangeIndicator.getChangeIndicator(bytes, offset + 591);
         this.lowerLiquidity = BendecUtils.booleanFromByteArray(bytes, offset + 592);
         this.multiplier = BendecUtils.int64FromByteArray(bytes, offset + 593);
@@ -278,9 +278,9 @@ public class ProductSummary implements ByteSerializable, Message {
     }
     
     /**
-     * @return Defines the market the instrument belongs to.
+     * @return Defines the market the instrument belongs to. The field assumes were described in the WATS Market Data documentation.
      */
-    public Market getMarket() {
+    public int getMarket() {
         return this.market;
     }
     
@@ -523,9 +523,9 @@ public class ProductSummary implements ByteSerializable, Message {
     }
     
     /**
-     * @param market Defines the market the instrument belongs to.
+     * @param market Defines the market the instrument belongs to. The field assumes were described in the WATS Market Data documentation.
      */
-    public void setMarket(Market market) {
+    public void setMarket(int market) {
         this.market = market;
     }
     
@@ -674,7 +674,7 @@ public class ProductSummary implements ByteSerializable, Message {
         buffer.put(BendecUtils.int64ToByteArray(this.tradingValueCurrency));
         status.toBytes(buffer);
         buffer.put(BendecUtils.uInt16ToByteArray(this.sector));
-        market.toBytes(buffer);
+        buffer.put(BendecUtils.uInt8ToByteArray(this.market));
         markerPriceChange.toBytes(buffer);
         buffer.put(BendecUtils.booleanToByteArray(this.lowerLiquidity));
         buffer.put(BendecUtils.int64ToByteArray(this.multiplier));
@@ -714,7 +714,7 @@ public class ProductSummary implements ByteSerializable, Message {
         buffer.put(BendecUtils.int64ToByteArray(this.tradingValueCurrency));
         status.toBytes(buffer);
         buffer.put(BendecUtils.uInt16ToByteArray(this.sector));
-        market.toBytes(buffer);
+        buffer.put(BendecUtils.uInt8ToByteArray(this.market));
         markerPriceChange.toBytes(buffer);
         buffer.put(BendecUtils.booleanToByteArray(this.lowerLiquidity));
         buffer.put(BendecUtils.int64ToByteArray(this.multiplier));

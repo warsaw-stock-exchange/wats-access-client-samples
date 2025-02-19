@@ -7,9 +7,8 @@ import java.nio.ByteBuffer;
 /**
  * <h2>OrderAdd</h2>
  * <p>Message used to add new orders to the system.</p>
- * <p>Byte length: 141</p>
+ * <p>Byte length: 167</p>
  * <p>Header header - Header. | size 16</p>
- * <p>OnBehalfOf > int (u16) onBehalfOf - ID of the client party on behalf which order is submitted. The default value is 0. | size 2</p>
  * <p>STPId > int (u8) stpId - ID assigned by the client used in the Self Trade Prevention mechanism. | size 1</p>
  * <p>ElementId > long (u32) instrumentId - ID of the instrument being traded. | size 4</p>
  * <p>OrderType orderType - Indicates the order type. | size 1</p>
@@ -25,14 +24,15 @@ import java.nio.ByteBuffer;
  * <p>MifidFields mifidFields - Fields related to the MiFID directive. | size 16</p>
  * <p>Timestamp > BigInteger (u64) expire - Expiration time indicating the validity of the order - relevant only when TimeInForce is set to GTD (Good Till Date) or GTT (Good Till Time). | size 8</p>
  * <p>Memo > String (u8[]) memo - Free text. | size 18</p>
+ * <p>ClientOrderId > String (u8[]) clientOrderId - Arbitrary user provided value associated with the order. | size 20</p>
  * <p>ClearingCode > String (u8[]) clearingMemberCode - Clearing member code. | size 20</p>
  * <p>ClearingIdentifier clearingMemberClearingIdentifier - Clearing member's clearing identifier. | size 1</p>
  * <p>ExecInst execInst - Instructions for order handling on exchange trading floor. | size 1</p>
  * <p>u8 > int feeStructureId - Optional identifier of a fee scheme for billing purposes. | size 1</p>
+ * <p>InterestedParty > String (u8[]) interestedParty - 3rd party interested in this order or trade. | size 8</p>
  */
 public class OrderAdd implements ByteSerializable, Message {
     private Header header;
-    private int onBehalfOf;
     private int stpId;
     private long instrumentId;
     private OrderType orderType;
@@ -48,15 +48,16 @@ public class OrderAdd implements ByteSerializable, Message {
     private MifidFields mifidFields;
     private BigInteger expire;
     private String memo;
+    private String clientOrderId;
     private String clearingMemberCode;
     private ClearingIdentifier clearingMemberClearingIdentifier;
     private ExecInst execInst;
     private int feeStructureId;
-    public static final int byteLength = 141;
+    private String interestedParty;
+    public static final int byteLength = 167;
     
-    public OrderAdd(Header header, int onBehalfOf, int stpId, long instrumentId, OrderType orderType, TimeInForce timeInForce, OrderSide side, long price, long triggerPrice, BigInteger quantity, BigInteger displayQty, Capacity capacity, String account, AccountType accountType, MifidFields mifidFields, BigInteger expire, String memo, String clearingMemberCode, ClearingIdentifier clearingMemberClearingIdentifier, ExecInst execInst, int feeStructureId) {
+    public OrderAdd(Header header, int stpId, long instrumentId, OrderType orderType, TimeInForce timeInForce, OrderSide side, long price, long triggerPrice, BigInteger quantity, BigInteger displayQty, Capacity capacity, String account, AccountType accountType, MifidFields mifidFields, BigInteger expire, String memo, String clientOrderId, String clearingMemberCode, ClearingIdentifier clearingMemberClearingIdentifier, ExecInst execInst, int feeStructureId, String interestedParty) {
         this.header = header;
-        this.onBehalfOf = onBehalfOf;
         this.stpId = stpId;
         this.instrumentId = instrumentId;
         this.orderType = orderType;
@@ -72,34 +73,37 @@ public class OrderAdd implements ByteSerializable, Message {
         this.mifidFields = mifidFields;
         this.expire = expire;
         this.memo = memo;
+        this.clientOrderId = clientOrderId;
         this.clearingMemberCode = clearingMemberCode;
         this.clearingMemberClearingIdentifier = clearingMemberClearingIdentifier;
         this.execInst = execInst;
         this.feeStructureId = feeStructureId;
+        this.interestedParty = interestedParty;
     }
     
     public OrderAdd(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
-        this.onBehalfOf = BendecUtils.uInt16FromByteArray(bytes, offset + 16);
-        this.stpId = BendecUtils.uInt8FromByteArray(bytes, offset + 18);
-        this.instrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 19);
-        this.orderType = OrderType.getOrderType(bytes, offset + 23);
-        this.timeInForce = TimeInForce.getTimeInForce(bytes, offset + 24);
-        this.side = OrderSide.getOrderSide(bytes, offset + 25);
-        this.price = BendecUtils.int64FromByteArray(bytes, offset + 26);
-        this.triggerPrice = BendecUtils.int64FromByteArray(bytes, offset + 34);
-        this.quantity = BendecUtils.uInt64FromByteArray(bytes, offset + 42);
-        this.displayQty = BendecUtils.uInt64FromByteArray(bytes, offset + 50);
-        this.capacity = Capacity.getCapacity(bytes, offset + 58);
-        this.account = BendecUtils.stringFromByteArray(bytes, offset + 59, 16);
-        this.accountType = AccountType.getAccountType(bytes, offset + 75);
-        this.mifidFields = new MifidFields(bytes, offset + 76);
-        this.expire = BendecUtils.uInt64FromByteArray(bytes, offset + 92);
-        this.memo = BendecUtils.stringFromByteArray(bytes, offset + 100, 18);
-        this.clearingMemberCode = BendecUtils.stringFromByteArray(bytes, offset + 118, 20);
-        this.clearingMemberClearingIdentifier = ClearingIdentifier.getClearingIdentifier(bytes, offset + 138);
-        this.execInst = new ExecInst(bytes, offset + 139);
-        this.feeStructureId = BendecUtils.uInt8FromByteArray(bytes, offset + 140);
+        this.stpId = BendecUtils.uInt8FromByteArray(bytes, offset + 16);
+        this.instrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 17);
+        this.orderType = OrderType.getOrderType(bytes, offset + 21);
+        this.timeInForce = TimeInForce.getTimeInForce(bytes, offset + 22);
+        this.side = OrderSide.getOrderSide(bytes, offset + 23);
+        this.price = BendecUtils.int64FromByteArray(bytes, offset + 24);
+        this.triggerPrice = BendecUtils.int64FromByteArray(bytes, offset + 32);
+        this.quantity = BendecUtils.uInt64FromByteArray(bytes, offset + 40);
+        this.displayQty = BendecUtils.uInt64FromByteArray(bytes, offset + 48);
+        this.capacity = Capacity.getCapacity(bytes, offset + 56);
+        this.account = BendecUtils.stringFromByteArray(bytes, offset + 57, 16);
+        this.accountType = AccountType.getAccountType(bytes, offset + 73);
+        this.mifidFields = new MifidFields(bytes, offset + 74);
+        this.expire = BendecUtils.uInt64FromByteArray(bytes, offset + 90);
+        this.memo = BendecUtils.stringFromByteArray(bytes, offset + 98, 18);
+        this.clientOrderId = BendecUtils.stringFromByteArray(bytes, offset + 116, 20);
+        this.clearingMemberCode = BendecUtils.stringFromByteArray(bytes, offset + 136, 20);
+        this.clearingMemberClearingIdentifier = ClearingIdentifier.getClearingIdentifier(bytes, offset + 156);
+        this.execInst = new ExecInst(bytes, offset + 157);
+        this.feeStructureId = BendecUtils.uInt8FromByteArray(bytes, offset + 158);
+        this.interestedParty = BendecUtils.stringFromByteArray(bytes, offset + 159, 8);
     }
     
     public OrderAdd(byte[] bytes) {
@@ -114,13 +118,6 @@ public class OrderAdd implements ByteSerializable, Message {
      */
     public Header getHeader() {
         return this.header;
-    }
-    
-    /**
-     * @return ID of the client party on behalf which order is submitted. The default value is 0.
-     */
-    public int getOnBehalfOf() {
-        return this.onBehalfOf;
     }
     
     /**
@@ -229,6 +226,13 @@ public class OrderAdd implements ByteSerializable, Message {
     }
     
     /**
+     * @return Arbitrary user provided value associated with the order.
+     */
+    public String getClientOrderId() {
+        return this.clientOrderId;
+    }
+    
+    /**
      * @return Clearing member code.
      */
     public String getClearingMemberCode() {
@@ -257,17 +261,17 @@ public class OrderAdd implements ByteSerializable, Message {
     }
     
     /**
+     * @return 3rd party interested in this order or trade.
+     */
+    public String getInterestedParty() {
+        return this.interestedParty;
+    }
+    
+    /**
      * @param header Header.
      */
     public void setHeader(Header header) {
         this.header = header;
-    }
-    
-    /**
-     * @param onBehalfOf ID of the client party on behalf which order is submitted. The default value is 0.
-     */
-    public void setOnBehalfOf(int onBehalfOf) {
-        this.onBehalfOf = onBehalfOf;
     }
     
     /**
@@ -376,6 +380,13 @@ public class OrderAdd implements ByteSerializable, Message {
     }
     
     /**
+     * @param clientOrderId Arbitrary user provided value associated with the order.
+     */
+    public void setClientOrderId(String clientOrderId) {
+        this.clientOrderId = clientOrderId;
+    }
+    
+    /**
      * @param clearingMemberCode Clearing member code.
      */
     public void setClearingMemberCode(String clearingMemberCode) {
@@ -403,11 +414,17 @@ public class OrderAdd implements ByteSerializable, Message {
         this.feeStructureId = feeStructureId;
     }
     
+    /**
+     * @param interestedParty 3rd party interested in this order or trade.
+     */
+    public void setInterestedParty(String interestedParty) {
+        this.interestedParty = interestedParty;
+    }
+    
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         header.toBytes(buffer);
-        buffer.put(BendecUtils.uInt16ToByteArray(this.onBehalfOf));
         buffer.put(BendecUtils.uInt8ToByteArray(this.stpId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
         orderType.toBytes(buffer);
@@ -423,17 +440,18 @@ public class OrderAdd implements ByteSerializable, Message {
         mifidFields.toBytes(buffer);
         buffer.put(BendecUtils.uInt64ToByteArray(this.expire));
         buffer.put(BendecUtils.stringToByteArray(this.memo, 18));
+        buffer.put(BendecUtils.stringToByteArray(this.clientOrderId, 20));
         buffer.put(BendecUtils.stringToByteArray(this.clearingMemberCode, 20));
         clearingMemberClearingIdentifier.toBytes(buffer);
         execInst.toBytes(buffer);
         buffer.put(BendecUtils.uInt8ToByteArray(this.feeStructureId));
+        buffer.put(BendecUtils.stringToByteArray(this.interestedParty, 8));
         return buffer.array();
     }
     
     @Override  
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
-        buffer.put(BendecUtils.uInt16ToByteArray(this.onBehalfOf));
         buffer.put(BendecUtils.uInt8ToByteArray(this.stpId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
         orderType.toBytes(buffer);
@@ -449,16 +467,17 @@ public class OrderAdd implements ByteSerializable, Message {
         mifidFields.toBytes(buffer);
         buffer.put(BendecUtils.uInt64ToByteArray(this.expire));
         buffer.put(BendecUtils.stringToByteArray(this.memo, 18));
+        buffer.put(BendecUtils.stringToByteArray(this.clientOrderId, 20));
         buffer.put(BendecUtils.stringToByteArray(this.clearingMemberCode, 20));
         clearingMemberClearingIdentifier.toBytes(buffer);
         execInst.toBytes(buffer);
         buffer.put(BendecUtils.uInt8ToByteArray(this.feeStructureId));
+        buffer.put(BendecUtils.stringToByteArray(this.interestedParty, 8));
     }
     
     @Override
     public int hashCode() {
         return Objects.hash(header,
-        onBehalfOf,
         stpId,
         instrumentId,
         orderType,
@@ -474,17 +493,18 @@ public class OrderAdd implements ByteSerializable, Message {
         mifidFields,
         expire,
         memo,
+        clientOrderId,
         clearingMemberCode,
         clearingMemberClearingIdentifier,
         execInst,
-        feeStructureId);
+        feeStructureId,
+        interestedParty);
     }
     
     @Override
     public String toString() {
         return "OrderAdd {" +
             "header=" + header +
-            ", onBehalfOf=" + onBehalfOf +
             ", stpId=" + stpId +
             ", instrumentId=" + instrumentId +
             ", orderType=" + orderType +
@@ -500,10 +520,12 @@ public class OrderAdd implements ByteSerializable, Message {
             ", mifidFields=" + mifidFields +
             ", expire=" + expire +
             ", memo=" + memo +
+            ", clientOrderId=" + clientOrderId +
             ", clearingMemberCode=" + clearingMemberCode +
             ", clearingMemberClearingIdentifier=" + clearingMemberClearingIdentifier +
             ", execInst=" + execInst +
             ", feeStructureId=" + feeStructureId +
+            ", interestedParty=" + interestedParty +
             "}";
     }
 }
