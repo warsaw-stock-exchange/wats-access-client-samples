@@ -94,6 +94,10 @@ public enum TcrRejectionReason {
      */
     PRICEABOVEHIGHCOLLAR(1038),
     /**
+     * Firm is not a Market Maker for this SecurityID (48)
+     */
+    FIRMISNOTAMARKETMAKER(1050),
+    /**
      * Operation on redistributed instruments forbidden.
      */
     OPERATIONONREDISTRIBUTEDINSTRUMENTSFORBIDDEN(1056),
@@ -109,6 +113,10 @@ public enum TcrRejectionReason {
      * Firm has not been granted permission to sell the selected instrument (only buying is allowed). Order entry/modification/cancellation on the sell side is not possible.
      */
     FIRMNOTAUTHORIZEDTOSELLTHEINSTRUMENT(1059),
+    /**
+     * Entry/modification/cancellation of orders and quotes is not possible when an instrument is suspended.
+     */
+    OPERATIONSONORDERSANDQUOTESFORBIDDENDURINGINSTRUMENTSUSPENSION(1061),
     /**
      * Invalid PartyID (448) for Client ID
      */

@@ -1,5 +1,5 @@
 {
-  "version": 1108,
+  "version": 1113,
   "typeDefinitions": [
     {
       "kind": "Primitive",
@@ -173,10 +173,10 @@
     },
     {
       "kind": "Array",
-      "name": "CcpCode",
+      "name": "ParticipantCode",
       "type": "AnsiChar",
       "length": 16,
-      "description": "CCP code."
+      "description": "Participant code."
     },
     {
       "kind": "Array",
@@ -627,6 +627,11 @@
           "Invalid TimeInForce for selected market model"
         ],
         [
+          "ForbiddenOrdTypeAndTimeInForceCombinationForMarketSegment",
+          1042,
+          "Time In Force vs. Order Type combination restriction per Market Segment imposed by Market Operator."
+        ],
+        [
           "ExpireTimeCannotBeModified",
           1043,
           "ExpireTime (126) cannot be modified."
@@ -700,6 +705,16 @@
           "FirmNotAuthorizedToSellTheInstrument",
           1059,
           "Firm has not been granted permission to sell the selected instrument (only buying is allowed). Order entry/modification/cancellation on the sell side is not possible."
+        ],
+        [
+          "OperationsOnOrdersAndQuotesForbiddenDuringUncrossing",
+          1060,
+          "Entry/modification/cancellation of orders and quotes is not possible when an instrument is being uncrossed."
+        ],
+        [
+          "OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension",
+          1061,
+          "Entry/modification/cancellation of orders and quotes is not possible when an instrument is suspended."
         ],
         [
           "TriggerPriceNotAllowed",
@@ -2078,6 +2093,11 @@
           "The validation for collars has failed. The price is too high."
         ],
         [
+          "FirmIsNotAMarketMaker",
+          1050,
+          "Firm is not a Market Maker for this SecurityID (48)"
+        ],
+        [
           "OperationOnRedistributedInstrumentsForbidden",
           1056,
           "Operation on redistributed instruments forbidden."
@@ -2096,6 +2116,11 @@
           "FirmNotAuthorizedToSellTheInstrument",
           1059,
           "Firm has not been granted permission to sell the selected instrument (only buying is allowed). Order entry/modification/cancellation on the sell side is not possible."
+        ],
+        [
+          "OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension",
+          1061,
+          "Entry/modification/cancellation of orders and quotes is not possible when an instrument is suspended."
         ],
         [
           "InvalidPartyIdForClientId",
@@ -2465,8 +2490,8 @@
         },
         {
           "name": "counterpartyCode",
-          "type": "CcpCode",
-          "description": "CCP code of the counterparty."
+          "type": "ParticipantCode",
+          "description": "Participant code of the counterparty."
         },
         {
           "name": "tcrParty",
@@ -3256,6 +3281,11 @@
           "MissingOrderOriginationForSponsoredAccessConnection",
           1055,
           "Missing OrderOrigination for sponsored access connection."
+        ],
+        [
+          "OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension",
+          1061,
+          "Entry/modification/cancellation of orders and quotes is not possible when an instrument is suspended."
         ],
         [
           "InvalidPartyIdForClientId",

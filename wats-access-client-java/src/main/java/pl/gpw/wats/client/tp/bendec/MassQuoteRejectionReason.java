@@ -50,6 +50,10 @@ public enum MassQuoteRejectionReason {
      */
     MISSINGORDERORIGINATIONFORSPONSOREDACCESSCONNECTION(1055),
     /**
+     * Entry/modification/cancellation of orders and quotes is not possible when an instrument is suspended.
+     */
+    OPERATIONSONORDERSANDQUOTESFORBIDDENDURINGINSTRUMENTSUSPENSION(1061),
+    /**
      * Invalid PartyID (448) for Client ID
      */
     INVALIDPARTYIDFORCLIENTID(1070),

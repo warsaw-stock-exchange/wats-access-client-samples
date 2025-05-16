@@ -506,6 +506,7 @@ enum class OrderRejectionReason: uint16_t {
     InvalidTimeInForceForOrderType = 1039,
     InvalidTimeInForceForCurrentMarketPhase = 1040,
     InvalidTimeInForceForSelectedMarketModel = 1041,
+    ForbiddenOrdTypeAndTimeInForceCombinationForMarketSegment = 1042,
     ExpireTimeCannotBeModified = 1043,
     ObsoleteExpireDate = 1044,
     ExpireDateInPast = 1045,
@@ -521,6 +522,8 @@ enum class OrderRejectionReason: uint16_t {
     FirmNotAuthorizedToBuyAndSellTheInstrument = 1057,
     FirmNotAuthorizedToBuyTheInstrument = 1058,
     FirmNotAuthorizedToSellTheInstrument = 1059,
+    OperationsOnOrdersAndQuotesForbiddenDuringUncrossing = 1060,
+    OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension = 1061,
     TriggerPriceNotAllowed = 1063,
     TriggerPriceNotHigherThanLTP = 1064,
     TriggerPriceNotLowerThanLTP = 1065,
@@ -604,6 +607,7 @@ static const std::map<std::string, OrderRejectionReason> Name2OrderRejectionReas
     { "InvalidTimeInForceForOrderType", OrderRejectionReason::InvalidTimeInForceForOrderType },
     { "InvalidTimeInForceForCurrentMarketPhase", OrderRejectionReason::InvalidTimeInForceForCurrentMarketPhase },
     { "InvalidTimeInForceForSelectedMarketModel", OrderRejectionReason::InvalidTimeInForceForSelectedMarketModel },
+    { "ForbiddenOrdTypeAndTimeInForceCombinationForMarketSegment", OrderRejectionReason::ForbiddenOrdTypeAndTimeInForceCombinationForMarketSegment },
     { "ExpireTimeCannotBeModified", OrderRejectionReason::ExpireTimeCannotBeModified },
     { "ObsoleteExpireDate", OrderRejectionReason::ObsoleteExpireDate },
     { "ExpireDateInPast", OrderRejectionReason::ExpireDateInPast },
@@ -619,6 +623,8 @@ static const std::map<std::string, OrderRejectionReason> Name2OrderRejectionReas
     { "FirmNotAuthorizedToBuyAndSellTheInstrument", OrderRejectionReason::FirmNotAuthorizedToBuyAndSellTheInstrument },
     { "FirmNotAuthorizedToBuyTheInstrument", OrderRejectionReason::FirmNotAuthorizedToBuyTheInstrument },
     { "FirmNotAuthorizedToSellTheInstrument", OrderRejectionReason::FirmNotAuthorizedToSellTheInstrument },
+    { "OperationsOnOrdersAndQuotesForbiddenDuringUncrossing", OrderRejectionReason::OperationsOnOrdersAndQuotesForbiddenDuringUncrossing },
+    { "OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension", OrderRejectionReason::OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension },
     { "TriggerPriceNotAllowed", OrderRejectionReason::TriggerPriceNotAllowed },
     { "TriggerPriceNotHigherThanLTP", OrderRejectionReason::TriggerPriceNotHigherThanLTP },
     { "TriggerPriceNotLowerThanLTP", OrderRejectionReason::TriggerPriceNotLowerThanLTP },
@@ -702,6 +708,7 @@ static const std::map<OrderRejectionReason, std::string> OrderRejectionReason2Na
     { OrderRejectionReason::InvalidTimeInForceForOrderType, "InvalidTimeInForceForOrderType" },
     { OrderRejectionReason::InvalidTimeInForceForCurrentMarketPhase, "InvalidTimeInForceForCurrentMarketPhase" },
     { OrderRejectionReason::InvalidTimeInForceForSelectedMarketModel, "InvalidTimeInForceForSelectedMarketModel" },
+    { OrderRejectionReason::ForbiddenOrdTypeAndTimeInForceCombinationForMarketSegment, "ForbiddenOrdTypeAndTimeInForceCombinationForMarketSegment" },
     { OrderRejectionReason::ExpireTimeCannotBeModified, "ExpireTimeCannotBeModified" },
     { OrderRejectionReason::ObsoleteExpireDate, "ObsoleteExpireDate" },
     { OrderRejectionReason::ExpireDateInPast, "ExpireDateInPast" },
@@ -717,6 +724,8 @@ static const std::map<OrderRejectionReason, std::string> OrderRejectionReason2Na
     { OrderRejectionReason::FirmNotAuthorizedToBuyAndSellTheInstrument, "FirmNotAuthorizedToBuyAndSellTheInstrument" },
     { OrderRejectionReason::FirmNotAuthorizedToBuyTheInstrument, "FirmNotAuthorizedToBuyTheInstrument" },
     { OrderRejectionReason::FirmNotAuthorizedToSellTheInstrument, "FirmNotAuthorizedToSellTheInstrument" },
+    { OrderRejectionReason::OperationsOnOrdersAndQuotesForbiddenDuringUncrossing, "OperationsOnOrdersAndQuotesForbiddenDuringUncrossing" },
+    { OrderRejectionReason::OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension, "OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension" },
     { OrderRejectionReason::TriggerPriceNotAllowed, "TriggerPriceNotAllowed" },
     { OrderRejectionReason::TriggerPriceNotHigherThanLTP, "TriggerPriceNotHigherThanLTP" },
     { OrderRejectionReason::TriggerPriceNotLowerThanLTP, "TriggerPriceNotLowerThanLTP" },
@@ -1141,7 +1150,7 @@ static const std::map<ExecType, std::string> ExecType2Name {
 
 using TradeReportRefID = AnsiChar[21];
 using Date = uint32_t;
-using CcpCode = AnsiChar[16];
+using ParticipantCode = AnsiChar[16];
 
 struct TcrParty {
     MifidFields mifidFields;
@@ -1175,7 +1184,7 @@ struct TradeCaptureReportSingle {
     Price lastPx;
     Date settlementDate;
     OrderSide side;
-    CcpCode counterpartyCode;
+    ParticipantCode counterpartyCode;
     TcrParty tcrParty;
 
     friend std::ostream &operator << (std::ostream &, const TradeCaptureReportSingle &);
@@ -1252,10 +1261,12 @@ enum class TcrRejectionReason: uint16_t {
     OrderValueMustBeLowerThanMaximumValue = 1031,
     PriceBelowLowCollar = 1037,
     PriceAboveHighCollar = 1038,
+    FirmIsNotAMarketMaker = 1050,
     OperationOnRedistributedInstrumentsForbidden = 1056,
     FirmNotAuthorizedToBuyAndSellTheInstrument = 1057,
     FirmNotAuthorizedToBuyTheInstrument = 1058,
     FirmNotAuthorizedToSellTheInstrument = 1059,
+    OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension = 1061,
     InvalidPartyIdForClientId = 1070,
     InvalidPartyIdForExecutingTrader = 1071,
     InvalidPartyIdForInvestmentDecisionMaker = 1072,
@@ -1306,10 +1317,12 @@ static const std::map<std::string, TcrRejectionReason> Name2TcrRejectionReason {
     { "OrderValueMustBeLowerThanMaximumValue", TcrRejectionReason::OrderValueMustBeLowerThanMaximumValue },
     { "PriceBelowLowCollar", TcrRejectionReason::PriceBelowLowCollar },
     { "PriceAboveHighCollar", TcrRejectionReason::PriceAboveHighCollar },
+    { "FirmIsNotAMarketMaker", TcrRejectionReason::FirmIsNotAMarketMaker },
     { "OperationOnRedistributedInstrumentsForbidden", TcrRejectionReason::OperationOnRedistributedInstrumentsForbidden },
     { "FirmNotAuthorizedToBuyAndSellTheInstrument", TcrRejectionReason::FirmNotAuthorizedToBuyAndSellTheInstrument },
     { "FirmNotAuthorizedToBuyTheInstrument", TcrRejectionReason::FirmNotAuthorizedToBuyTheInstrument },
     { "FirmNotAuthorizedToSellTheInstrument", TcrRejectionReason::FirmNotAuthorizedToSellTheInstrument },
+    { "OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension", TcrRejectionReason::OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension },
     { "InvalidPartyIdForClientId", TcrRejectionReason::InvalidPartyIdForClientId },
     { "InvalidPartyIdForExecutingTrader", TcrRejectionReason::InvalidPartyIdForExecutingTrader },
     { "InvalidPartyIdForInvestmentDecisionMaker", TcrRejectionReason::InvalidPartyIdForInvestmentDecisionMaker },
@@ -1360,10 +1373,12 @@ static const std::map<TcrRejectionReason, std::string> TcrRejectionReason2Name {
     { TcrRejectionReason::OrderValueMustBeLowerThanMaximumValue, "OrderValueMustBeLowerThanMaximumValue" },
     { TcrRejectionReason::PriceBelowLowCollar, "PriceBelowLowCollar" },
     { TcrRejectionReason::PriceAboveHighCollar, "PriceAboveHighCollar" },
+    { TcrRejectionReason::FirmIsNotAMarketMaker, "FirmIsNotAMarketMaker" },
     { TcrRejectionReason::OperationOnRedistributedInstrumentsForbidden, "OperationOnRedistributedInstrumentsForbidden" },
     { TcrRejectionReason::FirmNotAuthorizedToBuyAndSellTheInstrument, "FirmNotAuthorizedToBuyAndSellTheInstrument" },
     { TcrRejectionReason::FirmNotAuthorizedToBuyTheInstrument, "FirmNotAuthorizedToBuyTheInstrument" },
     { TcrRejectionReason::FirmNotAuthorizedToSellTheInstrument, "FirmNotAuthorizedToSellTheInstrument" },
+    { TcrRejectionReason::OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension, "OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension" },
     { TcrRejectionReason::InvalidPartyIdForClientId, "InvalidPartyIdForClientId" },
     { TcrRejectionReason::InvalidPartyIdForExecutingTrader, "InvalidPartyIdForExecutingTrader" },
     { TcrRejectionReason::InvalidPartyIdForInvestmentDecisionMaker, "InvalidPartyIdForInvestmentDecisionMaker" },
@@ -1491,6 +1506,7 @@ enum class MassQuoteRejectionReason: uint16_t {
     InvalidPartyRoleQualifierForExecutingTrader = 1009,
     InvalidPartyRoleQualifierForInvestmentDecisionMaker = 1010,
     MissingOrderOriginationForSponsoredAccessConnection = 1055,
+    OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension = 1061,
     InvalidPartyIdForClientId = 1070,
     InvalidPartyIdForExecutingTrader = 1071,
     InvalidPartyIdForInvestmentDecisionMaker = 1072,
@@ -1517,6 +1533,7 @@ static const std::map<std::string, MassQuoteRejectionReason> Name2MassQuoteRejec
     { "InvalidPartyRoleQualifierForExecutingTrader", MassQuoteRejectionReason::InvalidPartyRoleQualifierForExecutingTrader },
     { "InvalidPartyRoleQualifierForInvestmentDecisionMaker", MassQuoteRejectionReason::InvalidPartyRoleQualifierForInvestmentDecisionMaker },
     { "MissingOrderOriginationForSponsoredAccessConnection", MassQuoteRejectionReason::MissingOrderOriginationForSponsoredAccessConnection },
+    { "OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension", MassQuoteRejectionReason::OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension },
     { "InvalidPartyIdForClientId", MassQuoteRejectionReason::InvalidPartyIdForClientId },
     { "InvalidPartyIdForExecutingTrader", MassQuoteRejectionReason::InvalidPartyIdForExecutingTrader },
     { "InvalidPartyIdForInvestmentDecisionMaker", MassQuoteRejectionReason::InvalidPartyIdForInvestmentDecisionMaker },
@@ -1543,6 +1560,7 @@ static const std::map<MassQuoteRejectionReason, std::string> MassQuoteRejectionR
     { MassQuoteRejectionReason::InvalidPartyRoleQualifierForExecutingTrader, "InvalidPartyRoleQualifierForExecutingTrader" },
     { MassQuoteRejectionReason::InvalidPartyRoleQualifierForInvestmentDecisionMaker, "InvalidPartyRoleQualifierForInvestmentDecisionMaker" },
     { MassQuoteRejectionReason::MissingOrderOriginationForSponsoredAccessConnection, "MissingOrderOriginationForSponsoredAccessConnection" },
+    { MassQuoteRejectionReason::OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension, "OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension" },
     { MassQuoteRejectionReason::InvalidPartyIdForClientId, "InvalidPartyIdForClientId" },
     { MassQuoteRejectionReason::InvalidPartyIdForExecutingTrader, "InvalidPartyIdForExecutingTrader" },
     { MassQuoteRejectionReason::InvalidPartyIdForInvestmentDecisionMaker, "InvalidPartyIdForInvestmentDecisionMaker" },

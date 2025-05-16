@@ -1,4 +1,8 @@
-# Changes history for WATS Access Clients samples
+# Changes history for WATS Access Clients and Documentation
+
+## 1.5.4
+
+* **Change:** Access Clients (connectivity example code) repositories updated and adapted to version 1.5.4
 
 ## 1.5
 

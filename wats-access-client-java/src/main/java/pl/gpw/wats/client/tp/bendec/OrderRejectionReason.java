@@ -134,6 +134,10 @@ public enum OrderRejectionReason {
      */
     INVALIDTIMEINFORCEFORSELECTEDMARKETMODEL(1041),
     /**
+     * Time In Force vs. Order Type combination restriction per Market Segment imposed by Market Operator.
+     */
+    FORBIDDENORDTYPEANDTIMEINFORCECOMBINATIONFORMARKETSEGMENT(1042),
+    /**
      * ExpireTime (126) cannot be modified.
      */
     EXPIRETIMECANNOTBEMODIFIED(1043),
@@ -193,6 +197,14 @@ public enum OrderRejectionReason {
      * Firm has not been granted permission to sell the selected instrument (only buying is allowed). Order entry/modification/cancellation on the sell side is not possible.
      */
     FIRMNOTAUTHORIZEDTOSELLTHEINSTRUMENT(1059),
+    /**
+     * Entry/modification/cancellation of orders and quotes is not possible when an instrument is being uncrossed.
+     */
+    OPERATIONSONORDERSANDQUOTESFORBIDDENDURINGUNCROSSING(1060),
+    /**
+     * Entry/modification/cancellation of orders and quotes is not possible when an instrument is suspended.
+     */
+    OPERATIONSONORDERSANDQUOTESFORBIDDENDURINGINSTRUMENTSUSPENSION(1061),
     /**
      * The trigger price not allowed for a specified order type.
      */

@@ -129,8 +129,8 @@ pub type Account = [AnsiChar; 16];
 
 
 
-/// CCP code.
-pub type CcpCode = [AnsiChar; 16];
+/// Participant code.
+pub type ParticipantCode = [AnsiChar; 16];
 
 
 
@@ -656,6 +656,8 @@ pub enum OrderRejectionReason {
   InvalidTimeInForceForCurrentMarketPhase = 0x0410,
   /// Invalid TimeInForce for selected market model
   InvalidTimeInForceForSelectedMarketModel = 0x0411,
+  /// Time In Force vs. Order Type combination restriction per Market Segment imposed by Market Operator.
+  ForbiddenOrdTypeAndTimeInForceCombinationForMarketSegment = 0x0412,
   /// ExpireTime (126) cannot be modified.
   ExpireTimeCannotBeModified = 0x0413,
   /// ExpireDate (432) not allowed for selected TimeInForce (59).
@@ -686,6 +688,10 @@ pub enum OrderRejectionReason {
   FirmNotAuthorizedToBuyTheInstrument = 0x0422,
   /// Firm has not been granted permission to sell the selected instrument (only buying is allowed). Order entry/modification/cancellation on the sell side is not possible.
   FirmNotAuthorizedToSellTheInstrument = 0x0423,
+  /// Entry/modification/cancellation of orders and quotes is not possible when an instrument is being uncrossed.
+  OperationsOnOrdersAndQuotesForbiddenDuringUncrossing = 0x0424,
+  /// Entry/modification/cancellation of orders and quotes is not possible when an instrument is suspended.
+  OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension = 0x0425,
   /// The trigger price not allowed for a specified order type.
   TriggerPriceNotAllowed = 0x0427,
   /// The trigger price is not higher than the last trade price.
@@ -825,6 +831,7 @@ impl std::convert::TryFrom<u16> for OrderRejectionReason {
       0x040f => Ok(Self::InvalidTimeInForceForOrderType),
       0x0410 => Ok(Self::InvalidTimeInForceForCurrentMarketPhase),
       0x0411 => Ok(Self::InvalidTimeInForceForSelectedMarketModel),
+      0x0412 => Ok(Self::ForbiddenOrdTypeAndTimeInForceCombinationForMarketSegment),
       0x0413 => Ok(Self::ExpireTimeCannotBeModified),
       0x0414 => Ok(Self::ObsoleteExpireDate),
       0x0415 => Ok(Self::ExpireDateInPast),
@@ -840,6 +847,8 @@ impl std::convert::TryFrom<u16> for OrderRejectionReason {
       0x0421 => Ok(Self::FirmNotAuthorizedToBuyAndSellTheInstrument),
       0x0422 => Ok(Self::FirmNotAuthorizedToBuyTheInstrument),
       0x0423 => Ok(Self::FirmNotAuthorizedToSellTheInstrument),
+      0x0424 => Ok(Self::OperationsOnOrdersAndQuotesForbiddenDuringUncrossing),
+      0x0425 => Ok(Self::OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension),
       0x0427 => Ok(Self::TriggerPriceNotAllowed),
       0x0428 => Ok(Self::TriggerPriceNotHigherThanLTP),
       0x0429 => Ok(Self::TriggerPriceNotLowerThanLTP),
@@ -927,6 +936,7 @@ impl OrderRejectionReasonInt {
   pub const InvalidTimeInForceForOrderType: u16 = 0x040f;
   pub const InvalidTimeInForceForCurrentMarketPhase: u16 = 0x0410;
   pub const InvalidTimeInForceForSelectedMarketModel: u16 = 0x0411;
+  pub const ForbiddenOrdTypeAndTimeInForceCombinationForMarketSegment: u16 = 0x0412;
   pub const ExpireTimeCannotBeModified: u16 = 0x0413;
   pub const ObsoleteExpireDate: u16 = 0x0414;
   pub const ExpireDateInPast: u16 = 0x0415;
@@ -942,6 +952,8 @@ impl OrderRejectionReasonInt {
   pub const FirmNotAuthorizedToBuyAndSellTheInstrument: u16 = 0x0421;
   pub const FirmNotAuthorizedToBuyTheInstrument: u16 = 0x0422;
   pub const FirmNotAuthorizedToSellTheInstrument: u16 = 0x0423;
+  pub const OperationsOnOrdersAndQuotesForbiddenDuringUncrossing: u16 = 0x0424;
+  pub const OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension: u16 = 0x0425;
   pub const TriggerPriceNotAllowed: u16 = 0x0427;
   pub const TriggerPriceNotHigherThanLTP: u16 = 0x0428;
   pub const TriggerPriceNotLowerThanLTP: u16 = 0x0429;
@@ -1001,7 +1013,7 @@ impl BytesValidator for OrderRejectionReason {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u16::from_le_bytes).unwrap_unchecked();
-  matches!(disc, OrderRejectionReasonInt::NA | OrderRejectionReasonInt::UnknownOrder | OrderRejectionReasonInt::ExchangeClosed | OrderRejectionReasonInt::InvalidPriceIncrement | OrderRejectionReasonInt::Other | OrderRejectionReasonInt::InstrumentPhaseNoTrading | OrderRejectionReasonInt::UnknownInstrument | OrderRejectionReasonInt::InvalidExecutionTrader | OrderRejectionReasonInt::InvalidDecisionMaker | OrderRejectionReasonInt::InvalidClientId | OrderRejectionReasonInt::InvalidPartyRoleQualifierForClientId | OrderRejectionReasonInt::InvalidPartyRoleQualifierForExecutingTrader | OrderRejectionReasonInt::InvalidPartyRoleQualifierForInvestmentDecisionMaker | OrderRejectionReasonInt::CannotModifyMifidFlags | OrderRejectionReasonInt::WrongDisplayQtyValue | OrderRejectionReasonInt::InvalidDisplayQty | OrderRejectionReasonInt::IcebergOrderValueLessThanRequired | OrderRejectionReasonInt::CodDisabledForTheConnectionId | OrderRejectionReasonInt::OrderQuantityMustBeGreaterThanMinimumQuantity | OrderRejectionReasonInt::OrderQuantityMustBeLowerThanMaximumQuantity | OrderRejectionReasonInt::OrderPriceMustBeGreaterThanMinimumPrice | OrderRejectionReasonInt::OrderPriceMustBeLowerThanMaximumPrice | OrderRejectionReasonInt::OrderPriceMustBeNonzero | OrderRejectionReasonInt::OrderValueMustBeGreaterThanMinimumValue | OrderRejectionReasonInt::OrderValueMustBeLowerThanMaximumValue | OrderRejectionReasonInt::InvalidOrdTypeForSelectedMarketModel | OrderRejectionReasonInt::LeavesQuantityMustBeGreaterThanZeroAfterModification | OrderRejectionReasonInt::PriceNotAllowed | OrderRejectionReasonInt::InvalidTimeInForceForOrderType | OrderRejectionReasonInt::InvalidTimeInForceForCurrentMarketPhase | OrderRejectionReasonInt::InvalidTimeInForceForSelectedMarketModel | OrderRejectionReasonInt::ExpireTimeCannotBeModified | OrderRejectionReasonInt::ObsoleteExpireDate | OrderRejectionReasonInt::ExpireDateInPast | OrderRejectionReasonInt::ObsoleteExpireTime | OrderRejectionReasonInt::ExpireTimeInPast | OrderRejectionReasonInt::AmbigousExpire | OrderRejectionReasonInt::ExpireDateExceedsLimit | OrderRejectionReasonInt::PriceBelowLowCollar | OrderRejectionReasonInt::PriceAboveHighCollar | OrderRejectionReasonInt::FirmIsNotAMarketMaker | OrderRejectionReasonInt::MissingOrderOriginationForSponsoredAccessConnection | OrderRejectionReasonInt::OperationOnRedistributedInstrumentsForbidden | OrderRejectionReasonInt::FirmNotAuthorizedToBuyAndSellTheInstrument | OrderRejectionReasonInt::FirmNotAuthorizedToBuyTheInstrument | OrderRejectionReasonInt::FirmNotAuthorizedToSellTheInstrument | OrderRejectionReasonInt::TriggerPriceNotAllowed | OrderRejectionReasonInt::TriggerPriceNotHigherThanLTP | OrderRejectionReasonInt::TriggerPriceNotLowerThanLTP | OrderRejectionReasonInt::TriggerPriceLowerThanPrice | OrderRejectionReasonInt::TriggerPriceHigherThanPrice | OrderRejectionReasonInt::TriggerPriceModifiedForActivatedOrder | OrderRejectionReasonInt::TriggerPriceMustBeGreaterThanZero | OrderRejectionReasonInt::InvalidPartyIdForClientId | OrderRejectionReasonInt::InvalidPartyIdForExecutingTrader | OrderRejectionReasonInt::InvalidPartyIdForInvestmentDecisionMaker | OrderRejectionReasonInt::InvalidPartyRoleQualifierForPartyId | OrderRejectionReasonInt::MissingClearingMemberCode | OrderRejectionReasonInt::ForbiddenClearingMemberCode | OrderRejectionReasonInt::InvalidClientIdForSponsoredConnection | OrderRejectionReasonInt::InvalidOrdTypeForSponsoredConnection | OrderRejectionReasonInt::ForbiddenOrderCapacityValueForSponsoredConnection | OrderRejectionReasonInt::MarketModelNotSupportedOnSponsoredConnection | OrderRejectionReasonInt::MassQuoteNotAllowedForSelectedMarketModel | OrderRejectionReasonInt::InstrumentClosed | OrderRejectionReasonInt::InvalidBidAskSpread | OrderRejectionReasonInt::NotAuthorizedToQuoteInstrument | OrderRejectionReasonInt::BuyOrderNotAllowed | OrderRejectionReasonInt::StopOrdersNotAllowed | OrderRejectionReasonInt::TriggerPriceMustBeHigherThanLpSellQuote | OrderRejectionReasonInt::TriggerPriceMustBeLowerThanLpBuyQuote | OrderRejectionReasonInt::MarketMakingViaMassQuoteOnlyOnHybridMarket | OrderRejectionReasonInt::SellQuotesNotAllowedDuringBuyOnlyState | OrderRejectionReasonInt::InstrumentKnockedOut | OrderRejectionReasonInt::OnlyOneSellOrderIsAllowedForIpo | OrderRejectionReasonInt::RequestNotAllowedForBlockInstrument | OrderRejectionReasonInt::RequestNotAllowedForCrossInstrument | OrderRejectionReasonInt::RiskLimitNotDefined | OrderRejectionReasonInt::RiskMaximumOrderVolumeExceeded | OrderRejectionReasonInt::RiskMaximumOrderValueExceeded | OrderRejectionReasonInt::RiskOrderPriceCollarExceeded | OrderRejectionReasonInt::DynamicOrderPriceCollarNotDefined | OrderRejectionReasonInt::StaticOrderPriceCollarNotDefined | OrderRejectionReasonInt::TotalTradedValueExceeded | OrderRejectionReasonInt::TotalTradedBuyValueExceeded | OrderRejectionReasonInt::TotalTradedSellValueExceeded | OrderRejectionReasonInt::TotalOpenValueExceeded | OrderRejectionReasonInt::TotalOpenBuyValueExceeded | OrderRejectionReasonInt::TotalOpenSellValueExceeded | OrderRejectionReasonInt::TotalRiskValueExceeded | OrderRejectionReasonInt::TotalBuyRiskValueExceeded | OrderRejectionReasonInt::TotalSellRiskValueExceeded | OrderRejectionReasonInt::TotalNetRiskValueExceeded | OrderRejectionReasonInt::MaxOrderCountExceeded | OrderRejectionReasonInt::KillSwitch)
+  matches!(disc, OrderRejectionReasonInt::NA | OrderRejectionReasonInt::UnknownOrder | OrderRejectionReasonInt::ExchangeClosed | OrderRejectionReasonInt::InvalidPriceIncrement | OrderRejectionReasonInt::Other | OrderRejectionReasonInt::InstrumentPhaseNoTrading | OrderRejectionReasonInt::UnknownInstrument | OrderRejectionReasonInt::InvalidExecutionTrader | OrderRejectionReasonInt::InvalidDecisionMaker | OrderRejectionReasonInt::InvalidClientId | OrderRejectionReasonInt::InvalidPartyRoleQualifierForClientId | OrderRejectionReasonInt::InvalidPartyRoleQualifierForExecutingTrader | OrderRejectionReasonInt::InvalidPartyRoleQualifierForInvestmentDecisionMaker | OrderRejectionReasonInt::CannotModifyMifidFlags | OrderRejectionReasonInt::WrongDisplayQtyValue | OrderRejectionReasonInt::InvalidDisplayQty | OrderRejectionReasonInt::IcebergOrderValueLessThanRequired | OrderRejectionReasonInt::CodDisabledForTheConnectionId | OrderRejectionReasonInt::OrderQuantityMustBeGreaterThanMinimumQuantity | OrderRejectionReasonInt::OrderQuantityMustBeLowerThanMaximumQuantity | OrderRejectionReasonInt::OrderPriceMustBeGreaterThanMinimumPrice | OrderRejectionReasonInt::OrderPriceMustBeLowerThanMaximumPrice | OrderRejectionReasonInt::OrderPriceMustBeNonzero | OrderRejectionReasonInt::OrderValueMustBeGreaterThanMinimumValue | OrderRejectionReasonInt::OrderValueMustBeLowerThanMaximumValue | OrderRejectionReasonInt::InvalidOrdTypeForSelectedMarketModel | OrderRejectionReasonInt::LeavesQuantityMustBeGreaterThanZeroAfterModification | OrderRejectionReasonInt::PriceNotAllowed | OrderRejectionReasonInt::InvalidTimeInForceForOrderType | OrderRejectionReasonInt::InvalidTimeInForceForCurrentMarketPhase | OrderRejectionReasonInt::InvalidTimeInForceForSelectedMarketModel | OrderRejectionReasonInt::ForbiddenOrdTypeAndTimeInForceCombinationForMarketSegment | OrderRejectionReasonInt::ExpireTimeCannotBeModified | OrderRejectionReasonInt::ObsoleteExpireDate | OrderRejectionReasonInt::ExpireDateInPast | OrderRejectionReasonInt::ObsoleteExpireTime | OrderRejectionReasonInt::ExpireTimeInPast | OrderRejectionReasonInt::AmbigousExpire | OrderRejectionReasonInt::ExpireDateExceedsLimit | OrderRejectionReasonInt::PriceBelowLowCollar | OrderRejectionReasonInt::PriceAboveHighCollar | OrderRejectionReasonInt::FirmIsNotAMarketMaker | OrderRejectionReasonInt::MissingOrderOriginationForSponsoredAccessConnection | OrderRejectionReasonInt::OperationOnRedistributedInstrumentsForbidden | OrderRejectionReasonInt::FirmNotAuthorizedToBuyAndSellTheInstrument | OrderRejectionReasonInt::FirmNotAuthorizedToBuyTheInstrument | OrderRejectionReasonInt::FirmNotAuthorizedToSellTheInstrument | OrderRejectionReasonInt::OperationsOnOrdersAndQuotesForbiddenDuringUncrossing | OrderRejectionReasonInt::OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension | OrderRejectionReasonInt::TriggerPriceNotAllowed | OrderRejectionReasonInt::TriggerPriceNotHigherThanLTP | OrderRejectionReasonInt::TriggerPriceNotLowerThanLTP | OrderRejectionReasonInt::TriggerPriceLowerThanPrice | OrderRejectionReasonInt::TriggerPriceHigherThanPrice | OrderRejectionReasonInt::TriggerPriceModifiedForActivatedOrder | OrderRejectionReasonInt::TriggerPriceMustBeGreaterThanZero | OrderRejectionReasonInt::InvalidPartyIdForClientId | OrderRejectionReasonInt::InvalidPartyIdForExecutingTrader | OrderRejectionReasonInt::InvalidPartyIdForInvestmentDecisionMaker | OrderRejectionReasonInt::InvalidPartyRoleQualifierForPartyId | OrderRejectionReasonInt::MissingClearingMemberCode | OrderRejectionReasonInt::ForbiddenClearingMemberCode | OrderRejectionReasonInt::InvalidClientIdForSponsoredConnection | OrderRejectionReasonInt::InvalidOrdTypeForSponsoredConnection | OrderRejectionReasonInt::ForbiddenOrderCapacityValueForSponsoredConnection | OrderRejectionReasonInt::MarketModelNotSupportedOnSponsoredConnection | OrderRejectionReasonInt::MassQuoteNotAllowedForSelectedMarketModel | OrderRejectionReasonInt::InstrumentClosed | OrderRejectionReasonInt::InvalidBidAskSpread | OrderRejectionReasonInt::NotAuthorizedToQuoteInstrument | OrderRejectionReasonInt::BuyOrderNotAllowed | OrderRejectionReasonInt::StopOrdersNotAllowed | OrderRejectionReasonInt::TriggerPriceMustBeHigherThanLpSellQuote | OrderRejectionReasonInt::TriggerPriceMustBeLowerThanLpBuyQuote | OrderRejectionReasonInt::MarketMakingViaMassQuoteOnlyOnHybridMarket | OrderRejectionReasonInt::SellQuotesNotAllowedDuringBuyOnlyState | OrderRejectionReasonInt::InstrumentKnockedOut | OrderRejectionReasonInt::OnlyOneSellOrderIsAllowedForIpo | OrderRejectionReasonInt::RequestNotAllowedForBlockInstrument | OrderRejectionReasonInt::RequestNotAllowedForCrossInstrument | OrderRejectionReasonInt::RiskLimitNotDefined | OrderRejectionReasonInt::RiskMaximumOrderVolumeExceeded | OrderRejectionReasonInt::RiskMaximumOrderValueExceeded | OrderRejectionReasonInt::RiskOrderPriceCollarExceeded | OrderRejectionReasonInt::DynamicOrderPriceCollarNotDefined | OrderRejectionReasonInt::StaticOrderPriceCollarNotDefined | OrderRejectionReasonInt::TotalTradedValueExceeded | OrderRejectionReasonInt::TotalTradedBuyValueExceeded | OrderRejectionReasonInt::TotalTradedSellValueExceeded | OrderRejectionReasonInt::TotalOpenValueExceeded | OrderRejectionReasonInt::TotalOpenBuyValueExceeded | OrderRejectionReasonInt::TotalOpenSellValueExceeded | OrderRejectionReasonInt::TotalRiskValueExceeded | OrderRejectionReasonInt::TotalBuyRiskValueExceeded | OrderRejectionReasonInt::TotalSellRiskValueExceeded | OrderRejectionReasonInt::TotalNetRiskValueExceeded | OrderRejectionReasonInt::MaxOrderCountExceeded | OrderRejectionReasonInt::KillSwitch)
     }
   }
 
@@ -2105,6 +2117,8 @@ pub enum TcrRejectionReason {
   PriceBelowLowCollar = 0x040d,
   /// The validation for collars has failed. The price is too high.
   PriceAboveHighCollar = 0x040e,
+  /// Firm is not a Market Maker for this SecurityID (48)
+  FirmIsNotAMarketMaker = 0x041a,
   /// Operation on redistributed instruments forbidden.
   OperationOnRedistributedInstrumentsForbidden = 0x0420,
   /// Firm has not been granted permission to buy and sell the selected instrument. Order entry/modification/cancellation is not possible.
@@ -2113,6 +2127,8 @@ pub enum TcrRejectionReason {
   FirmNotAuthorizedToBuyTheInstrument = 0x0422,
   /// Firm has not been granted permission to sell the selected instrument (only buying is allowed). Order entry/modification/cancellation on the sell side is not possible.
   FirmNotAuthorizedToSellTheInstrument = 0x0423,
+  /// Entry/modification/cancellation of orders and quotes is not possible when an instrument is suspended.
+  OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension = 0x0425,
   /// Invalid PartyID (448) for Client ID
   InvalidPartyIdForClientId = 0x042e,
   /// Invalid PartyID (448) for Executing Trader
@@ -2196,10 +2212,12 @@ impl std::convert::TryFrom<u16> for TcrRejectionReason {
       0x0407 => Ok(Self::OrderValueMustBeLowerThanMaximumValue),
       0x040d => Ok(Self::PriceBelowLowCollar),
       0x040e => Ok(Self::PriceAboveHighCollar),
+      0x041a => Ok(Self::FirmIsNotAMarketMaker),
       0x0420 => Ok(Self::OperationOnRedistributedInstrumentsForbidden),
       0x0421 => Ok(Self::FirmNotAuthorizedToBuyAndSellTheInstrument),
       0x0422 => Ok(Self::FirmNotAuthorizedToBuyTheInstrument),
       0x0423 => Ok(Self::FirmNotAuthorizedToSellTheInstrument),
+      0x0425 => Ok(Self::OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension),
       0x042e => Ok(Self::InvalidPartyIdForClientId),
       0x042f => Ok(Self::InvalidPartyIdForExecutingTrader),
       0x0430 => Ok(Self::InvalidPartyIdForInvestmentDecisionMaker),
@@ -2254,10 +2272,12 @@ impl TcrRejectionReasonInt {
   pub const OrderValueMustBeLowerThanMaximumValue: u16 = 0x0407;
   pub const PriceBelowLowCollar: u16 = 0x040d;
   pub const PriceAboveHighCollar: u16 = 0x040e;
+  pub const FirmIsNotAMarketMaker: u16 = 0x041a;
   pub const OperationOnRedistributedInstrumentsForbidden: u16 = 0x0420;
   pub const FirmNotAuthorizedToBuyAndSellTheInstrument: u16 = 0x0421;
   pub const FirmNotAuthorizedToBuyTheInstrument: u16 = 0x0422;
   pub const FirmNotAuthorizedToSellTheInstrument: u16 = 0x0423;
+  pub const OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension: u16 = 0x0425;
   pub const InvalidPartyIdForClientId: u16 = 0x042e;
   pub const InvalidPartyIdForExecutingTrader: u16 = 0x042f;
   pub const InvalidPartyIdForInvestmentDecisionMaker: u16 = 0x0430;
@@ -2294,7 +2314,7 @@ impl BytesValidator for TcrRejectionReason {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u16::from_le_bytes).unwrap_unchecked();
-  matches!(disc, TcrRejectionReasonInt::NA | TcrRejectionReasonInt::ExchangeClosed | TcrRejectionReasonInt::InvalidPriceIncrement | TcrRejectionReasonInt::Other | TcrRejectionReasonInt::InstrumentPhaseNoTrading | TcrRejectionReasonInt::UnknownInstrument | TcrRejectionReasonInt::InvalidExecutionTrader | TcrRejectionReasonInt::InvalidDecisionMaker | TcrRejectionReasonInt::InvalidClientId | TcrRejectionReasonInt::InvalidPartyRoleQualifierForClientId | TcrRejectionReasonInt::InvalidPartyRoleQualifierForExecutingTrader | TcrRejectionReasonInt::InvalidPartyRoleQualifierForInvestmentDecisionMaker | TcrRejectionReasonInt::OrderQuantityMustBeGreaterThanMinimumQuantity | TcrRejectionReasonInt::OrderQuantityMustBeLowerThanMaximumQuantity | TcrRejectionReasonInt::OrderPriceMustBeGreaterThanMinimumPrice | TcrRejectionReasonInt::OrderPriceMustBeLowerThanMaximumPrice | TcrRejectionReasonInt::OrderPriceMustBeNonzero | TcrRejectionReasonInt::OrderValueMustBeGreaterThanMinimumValue | TcrRejectionReasonInt::OrderValueMustBeLowerThanMaximumValue | TcrRejectionReasonInt::PriceBelowLowCollar | TcrRejectionReasonInt::PriceAboveHighCollar | TcrRejectionReasonInt::OperationOnRedistributedInstrumentsForbidden | TcrRejectionReasonInt::FirmNotAuthorizedToBuyAndSellTheInstrument | TcrRejectionReasonInt::FirmNotAuthorizedToBuyTheInstrument | TcrRejectionReasonInt::FirmNotAuthorizedToSellTheInstrument | TcrRejectionReasonInt::InvalidPartyIdForClientId | TcrRejectionReasonInt::InvalidPartyIdForExecutingTrader | TcrRejectionReasonInt::InvalidPartyIdForInvestmentDecisionMaker | TcrRejectionReasonInt::InvalidPartyRoleQualifierForPartyId | TcrRejectionReasonInt::MissingClearingMemberCode | TcrRejectionReasonInt::ForbiddenClearingMemberCode | TcrRejectionReasonInt::MarketModelNotSupportedOnSponsoredConnection | TcrRejectionReasonInt::NotAuthorizedToQuoteInstrument | TcrRejectionReasonInt::UnknownTradeReport | TcrRejectionReasonInt::DuplicateTradeReportId | TcrRejectionReasonInt::TradeReportTypeNotCompatibleWithTradeReportTransType | TcrRejectionReasonInt::InvalidExecType | TcrRejectionReasonInt::TradeReportRefIdNotAllowed | TcrRejectionReasonInt::SettlementDateCannotBeEarlierThanMinimumSettlementDate | TcrRejectionReasonInt::SettlementDateCannotBeLaterThanMaximumSettlementDate | TcrRejectionReasonInt::UnknownContraFirm | TcrRejectionReasonInt::SentAttributeDoesNotMatchOriginalValue | TcrRejectionReasonInt::RequestNotAllowedForBlockInstrument | TcrRejectionReasonInt::RequestNotAllowedForClobInstrument | TcrRejectionReasonInt::RequestNotAllowedForCrossInstrument | TcrRejectionReasonInt::CrossNotAllowedOutsideOfClobInstrumentSpread | TcrRejectionReasonInt::CrossPriceNotEqualToTheReferencePrice | TcrRejectionReasonInt::CrossNotAllowedDuringClobInstrumentAuctionOrSuspension | TcrRejectionReasonInt::ForbiddenSecondaryTradereportId | TcrRejectionReasonInt::UnknownSecondaryTradereportId | TcrRejectionReasonInt::NoTradeForClobReferenceInstrument)
+  matches!(disc, TcrRejectionReasonInt::NA | TcrRejectionReasonInt::ExchangeClosed | TcrRejectionReasonInt::InvalidPriceIncrement | TcrRejectionReasonInt::Other | TcrRejectionReasonInt::InstrumentPhaseNoTrading | TcrRejectionReasonInt::UnknownInstrument | TcrRejectionReasonInt::InvalidExecutionTrader | TcrRejectionReasonInt::InvalidDecisionMaker | TcrRejectionReasonInt::InvalidClientId | TcrRejectionReasonInt::InvalidPartyRoleQualifierForClientId | TcrRejectionReasonInt::InvalidPartyRoleQualifierForExecutingTrader | TcrRejectionReasonInt::InvalidPartyRoleQualifierForInvestmentDecisionMaker | TcrRejectionReasonInt::OrderQuantityMustBeGreaterThanMinimumQuantity | TcrRejectionReasonInt::OrderQuantityMustBeLowerThanMaximumQuantity | TcrRejectionReasonInt::OrderPriceMustBeGreaterThanMinimumPrice | TcrRejectionReasonInt::OrderPriceMustBeLowerThanMaximumPrice | TcrRejectionReasonInt::OrderPriceMustBeNonzero | TcrRejectionReasonInt::OrderValueMustBeGreaterThanMinimumValue | TcrRejectionReasonInt::OrderValueMustBeLowerThanMaximumValue | TcrRejectionReasonInt::PriceBelowLowCollar | TcrRejectionReasonInt::PriceAboveHighCollar | TcrRejectionReasonInt::FirmIsNotAMarketMaker | TcrRejectionReasonInt::OperationOnRedistributedInstrumentsForbidden | TcrRejectionReasonInt::FirmNotAuthorizedToBuyAndSellTheInstrument | TcrRejectionReasonInt::FirmNotAuthorizedToBuyTheInstrument | TcrRejectionReasonInt::FirmNotAuthorizedToSellTheInstrument | TcrRejectionReasonInt::OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension | TcrRejectionReasonInt::InvalidPartyIdForClientId | TcrRejectionReasonInt::InvalidPartyIdForExecutingTrader | TcrRejectionReasonInt::InvalidPartyIdForInvestmentDecisionMaker | TcrRejectionReasonInt::InvalidPartyRoleQualifierForPartyId | TcrRejectionReasonInt::MissingClearingMemberCode | TcrRejectionReasonInt::ForbiddenClearingMemberCode | TcrRejectionReasonInt::MarketModelNotSupportedOnSponsoredConnection | TcrRejectionReasonInt::NotAuthorizedToQuoteInstrument | TcrRejectionReasonInt::UnknownTradeReport | TcrRejectionReasonInt::DuplicateTradeReportId | TcrRejectionReasonInt::TradeReportTypeNotCompatibleWithTradeReportTransType | TcrRejectionReasonInt::InvalidExecType | TcrRejectionReasonInt::TradeReportRefIdNotAllowed | TcrRejectionReasonInt::SettlementDateCannotBeEarlierThanMinimumSettlementDate | TcrRejectionReasonInt::SettlementDateCannotBeLaterThanMaximumSettlementDate | TcrRejectionReasonInt::UnknownContraFirm | TcrRejectionReasonInt::SentAttributeDoesNotMatchOriginalValue | TcrRejectionReasonInt::RequestNotAllowedForBlockInstrument | TcrRejectionReasonInt::RequestNotAllowedForClobInstrument | TcrRejectionReasonInt::RequestNotAllowedForCrossInstrument | TcrRejectionReasonInt::CrossNotAllowedOutsideOfClobInstrumentSpread | TcrRejectionReasonInt::CrossPriceNotEqualToTheReferencePrice | TcrRejectionReasonInt::CrossNotAllowedDuringClobInstrumentAuctionOrSuspension | TcrRejectionReasonInt::ForbiddenSecondaryTradereportId | TcrRejectionReasonInt::UnknownSecondaryTradereportId | TcrRejectionReasonInt::NoTradeForClobReferenceInstrument)
     }
   }
 
@@ -2506,8 +2526,8 @@ pub struct TradeCaptureReportSingle {
   pub settlement_date: Date,
   /// Side of order.
   pub side: OrderSide,
-  /// CCP code of the counterparty.
-  pub counterparty_code: CcpCode,
+  /// Participant code of the counterparty.
+  pub counterparty_code: ParticipantCode,
   /// TCR party.
   pub tcr_party: TcrParty,
 }
@@ -2515,7 +2535,7 @@ impl BytesValidator for TradeCaptureReportSingle {
     #[inline]
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, header))) && ElementId::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, instrument_id))) && TradeReportId::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, trade_report_id))) && OrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, secondary_trade_report_id))) && TradeId::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, trade_id))) && TradeReportTransType::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, trade_report_trans_type))) && TradeReportType::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, trade_report_type))) && TradeType::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, trade_type))) && AlgorithmicTradeIndicator::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, algorithmic_trade_indicator))) && ExecType::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, exec_type))) && TradeReportRefID::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, trade_report_ref_id))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, last_qty))) && Price::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, last_px))) && Date::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, settlement_date))) && OrderSide::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, side))) && CcpCode::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, counterparty_code))) && TcrParty::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, tcr_party)))
+      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, header))) && ElementId::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, instrument_id))) && TradeReportId::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, trade_report_id))) && OrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, secondary_trade_report_id))) && TradeId::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, trade_id))) && TradeReportTransType::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, trade_report_trans_type))) && TradeReportType::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, trade_report_type))) && TradeType::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, trade_type))) && AlgorithmicTradeIndicator::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, algorithmic_trade_indicator))) && ExecType::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, exec_type))) && TradeReportRefID::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, trade_report_ref_id))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, last_qty))) && Price::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, last_px))) && Date::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, settlement_date))) && OrderSide::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, side))) && ParticipantCode::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, counterparty_code))) && TcrParty::is_valid(bytes.get_unchecked(memoffset::span_of!(TradeCaptureReportSingle, tcr_party)))
     }
   }
 
@@ -3425,6 +3445,8 @@ pub enum MassQuoteRejectionReason {
   InvalidPartyRoleQualifierForInvestmentDecisionMaker = 0x03f2,
   /// Missing OrderOrigination for sponsored access connection.
   MissingOrderOriginationForSponsoredAccessConnection = 0x041f,
+  /// Entry/modification/cancellation of orders and quotes is not possible when an instrument is suspended.
+  OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension = 0x0425,
   /// Invalid PartyID (448) for Client ID
   InvalidPartyIdForClientId = 0x042e,
   /// Invalid PartyID (448) for Executing Trader
@@ -3471,6 +3493,7 @@ impl std::convert::TryFrom<u16> for MassQuoteRejectionReason {
       0x03f1 => Ok(Self::InvalidPartyRoleQualifierForExecutingTrader),
       0x03f2 => Ok(Self::InvalidPartyRoleQualifierForInvestmentDecisionMaker),
       0x041f => Ok(Self::MissingOrderOriginationForSponsoredAccessConnection),
+      0x0425 => Ok(Self::OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension),
       0x042e => Ok(Self::InvalidPartyIdForClientId),
       0x042f => Ok(Self::InvalidPartyIdForExecutingTrader),
       0x0430 => Ok(Self::InvalidPartyIdForInvestmentDecisionMaker),
@@ -3501,6 +3524,7 @@ impl MassQuoteRejectionReasonInt {
   pub const InvalidPartyRoleQualifierForExecutingTrader: u16 = 0x03f1;
   pub const InvalidPartyRoleQualifierForInvestmentDecisionMaker: u16 = 0x03f2;
   pub const MissingOrderOriginationForSponsoredAccessConnection: u16 = 0x041f;
+  pub const OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension: u16 = 0x0425;
   pub const InvalidPartyIdForClientId: u16 = 0x042e;
   pub const InvalidPartyIdForExecutingTrader: u16 = 0x042f;
   pub const InvalidPartyIdForInvestmentDecisionMaker: u16 = 0x0430;
@@ -3524,7 +3548,7 @@ impl BytesValidator for MassQuoteRejectionReason {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u16::from_le_bytes).unwrap_unchecked();
-  matches!(disc, MassQuoteRejectionReasonInt::NA | MassQuoteRejectionReasonInt::ExchangeClosed | MassQuoteRejectionReasonInt::Other | MassQuoteRejectionReasonInt::InvalidExecutionTrader | MassQuoteRejectionReasonInt::InvalidDecisionMaker | MassQuoteRejectionReasonInt::InvalidClientId | MassQuoteRejectionReasonInt::InvalidPartyRoleQualifierForClientId | MassQuoteRejectionReasonInt::InvalidPartyRoleQualifierForExecutingTrader | MassQuoteRejectionReasonInt::InvalidPartyRoleQualifierForInvestmentDecisionMaker | MassQuoteRejectionReasonInt::MissingOrderOriginationForSponsoredAccessConnection | MassQuoteRejectionReasonInt::InvalidPartyIdForClientId | MassQuoteRejectionReasonInt::InvalidPartyIdForExecutingTrader | MassQuoteRejectionReasonInt::InvalidPartyIdForInvestmentDecisionMaker | MassQuoteRejectionReasonInt::InvalidPartyRoleQualifierForPartyId | MassQuoteRejectionReasonInt::MissingClearingMemberCode | MassQuoteRejectionReasonInt::ForbiddenClearingMemberCode | MassQuoteRejectionReasonInt::InvalidClientIdForSponsoredConnection | MassQuoteRejectionReasonInt::ForbiddenOrderCapacityValueForSponsoredConnection | MassQuoteRejectionReasonInt::MarketModelNotSupportedOnSponsoredConnection | MassQuoteRejectionReasonInt::DuplicateInstrument | MassQuoteRejectionReasonInt::InvalidQuotesCount | MassQuoteRejectionReasonInt::ForbiddenOrderCapacityValue | MassQuoteRejectionReasonInt::LiquidityProvisionActivityFlagNotSetForMassQuote)
+  matches!(disc, MassQuoteRejectionReasonInt::NA | MassQuoteRejectionReasonInt::ExchangeClosed | MassQuoteRejectionReasonInt::Other | MassQuoteRejectionReasonInt::InvalidExecutionTrader | MassQuoteRejectionReasonInt::InvalidDecisionMaker | MassQuoteRejectionReasonInt::InvalidClientId | MassQuoteRejectionReasonInt::InvalidPartyRoleQualifierForClientId | MassQuoteRejectionReasonInt::InvalidPartyRoleQualifierForExecutingTrader | MassQuoteRejectionReasonInt::InvalidPartyRoleQualifierForInvestmentDecisionMaker | MassQuoteRejectionReasonInt::MissingOrderOriginationForSponsoredAccessConnection | MassQuoteRejectionReasonInt::OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension | MassQuoteRejectionReasonInt::InvalidPartyIdForClientId | MassQuoteRejectionReasonInt::InvalidPartyIdForExecutingTrader | MassQuoteRejectionReasonInt::InvalidPartyIdForInvestmentDecisionMaker | MassQuoteRejectionReasonInt::InvalidPartyRoleQualifierForPartyId | MassQuoteRejectionReasonInt::MissingClearingMemberCode | MassQuoteRejectionReasonInt::ForbiddenClearingMemberCode | MassQuoteRejectionReasonInt::InvalidClientIdForSponsoredConnection | MassQuoteRejectionReasonInt::ForbiddenOrderCapacityValueForSponsoredConnection | MassQuoteRejectionReasonInt::MarketModelNotSupportedOnSponsoredConnection | MassQuoteRejectionReasonInt::DuplicateInstrument | MassQuoteRejectionReasonInt::InvalidQuotesCount | MassQuoteRejectionReasonInt::ForbiddenOrderCapacityValue | MassQuoteRejectionReasonInt::LiquidityProvisionActivityFlagNotSetForMassQuote)
     }
   }
 

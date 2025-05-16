@@ -23,7 +23,7 @@ import java.nio.ByteBuffer;
  * <p>Price > long (i64) lastPx - Price of this (last) fill. | size 8</p>
  * <p>Date > long (u32) settlementDate - Settlement date of the trade is equal to current date plus actual settlement offset calendar days. | size 4</p>
  * <p>OrderSide side - Side of order. | size 1</p>
- * <p>CcpCode > String (u8[]) counterpartyCode - CCP code of the counterparty. | size 16</p>
+ * <p>ParticipantCode > String (u8[]) counterpartyCode - Participant code of the counterparty. | size 16</p>
  * <p>TcrParty tcrParty - TCR party. | size 90</p>
  */
 public class TradeCaptureReportSingle implements ByteSerializable, Message {
@@ -199,7 +199,7 @@ public class TradeCaptureReportSingle implements ByteSerializable, Message {
     }
     
     /**
-     * @return CCP code of the counterparty.
+     * @return Participant code of the counterparty.
      */
     public String getCounterpartyCode() {
         return this.counterpartyCode;
@@ -318,7 +318,7 @@ public class TradeCaptureReportSingle implements ByteSerializable, Message {
     }
     
     /**
-     * @param counterpartyCode CCP code of the counterparty.
+     * @param counterpartyCode Participant code of the counterparty.
      */
     public void setCounterpartyCode(String counterpartyCode) {
         this.counterpartyCode = counterpartyCode;
