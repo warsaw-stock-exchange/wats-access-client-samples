@@ -44,7 +44,15 @@ public enum TradingSessionEvent {
     /**
      * Next session reference data end.
      */
-    NEXTSESSIONREFERENCEDATAEND(9);
+    NEXTSESSIONREFERENCEDATAEND(9),
+    /**
+     * Start of trading session MIC.
+     */
+    STARTOFTRADINGSESSIONMIC(12),
+    /**
+     * End of trading session MIC.
+     */
+    ENDOFTRADINGSESSIONMIC(13);
     
     private final int value;
     private final int byteLength = 1;

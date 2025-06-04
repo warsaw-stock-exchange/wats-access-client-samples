@@ -7,26 +7,23 @@ import java.nio.ByteBuffer;
 /**
  * <h2>TradingSessionStatus</h2>
  * <p>The Trading Session Status provides information on the status of a market and on a trading day events.</p>
- * <p>Byte length: 52</p>
+ * <p>Byte length: 51</p>
  * <p>Header header - Message header. | size 42</p>
  * <p>MicCode > String (u8[]) marketId - Market structure's Market Identifier Code (MIC) as specified in ISO 10383. | size 4</p>
  * <p>ElementId > long (u32) marketStructureId - ID of the financial instrument's market segment. | size 4</p>
- * <p>TradingSessionState tradingSessionState - State of the trading session. | size 1</p>
  * <p>TradingSessionEvent tradingSessionEvent - Identifies an event related to the trading status of a trading session. | size 1</p>
  */
 public class TradingSessionStatus implements ByteSerializable, Message {
     private Header header;
     private String marketId;
     private long marketStructureId;
-    private TradingSessionState tradingSessionState;
     private TradingSessionEvent tradingSessionEvent;
-    public static final int byteLength = 52;
+    public static final int byteLength = 51;
     
-    public TradingSessionStatus(Header header, String marketId, long marketStructureId, TradingSessionState tradingSessionState, TradingSessionEvent tradingSessionEvent) {
+    public TradingSessionStatus(Header header, String marketId, long marketStructureId, TradingSessionEvent tradingSessionEvent) {
         this.header = header;
         this.marketId = marketId;
         this.marketStructureId = marketStructureId;
-        this.tradingSessionState = tradingSessionState;
         this.tradingSessionEvent = tradingSessionEvent;
     }
     
@@ -34,8 +31,7 @@ public class TradingSessionStatus implements ByteSerializable, Message {
         this.header = new Header(bytes, offset);
         this.marketId = BendecUtils.stringFromByteArray(bytes, offset + 42, 4);
         this.marketStructureId = BendecUtils.uInt32FromByteArray(bytes, offset + 46);
-        this.tradingSessionState = TradingSessionState.getTradingSessionState(bytes, offset + 50);
-        this.tradingSessionEvent = TradingSessionEvent.getTradingSessionEvent(bytes, offset + 51);
+        this.tradingSessionEvent = TradingSessionEvent.getTradingSessionEvent(bytes, offset + 50);
     }
     
     public TradingSessionStatus(byte[] bytes) {
@@ -67,13 +63,6 @@ public class TradingSessionStatus implements ByteSerializable, Message {
     }
     
     /**
-     * @return State of the trading session.
-     */
-    public TradingSessionState getTradingSessionState() {
-        return this.tradingSessionState;
-    }
-    
-    /**
      * @return Identifies an event related to the trading status of a trading session.
      */
     public TradingSessionEvent getTradingSessionEvent() {
@@ -102,13 +91,6 @@ public class TradingSessionStatus implements ByteSerializable, Message {
     }
     
     /**
-     * @param tradingSessionState State of the trading session.
-     */
-    public void setTradingSessionState(TradingSessionState tradingSessionState) {
-        this.tradingSessionState = tradingSessionState;
-    }
-    
-    /**
      * @param tradingSessionEvent Identifies an event related to the trading status of a trading session.
      */
     public void setTradingSessionEvent(TradingSessionEvent tradingSessionEvent) {
@@ -121,7 +103,6 @@ public class TradingSessionStatus implements ByteSerializable, Message {
         header.toBytes(buffer);
         buffer.put(BendecUtils.stringToByteArray(this.marketId, 4));
         buffer.put(BendecUtils.uInt32ToByteArray(this.marketStructureId));
-        tradingSessionState.toBytes(buffer);
         tradingSessionEvent.toBytes(buffer);
         return buffer.array();
     }
@@ -131,7 +112,6 @@ public class TradingSessionStatus implements ByteSerializable, Message {
         header.toBytes(buffer);
         buffer.put(BendecUtils.stringToByteArray(this.marketId, 4));
         buffer.put(BendecUtils.uInt32ToByteArray(this.marketStructureId));
-        tradingSessionState.toBytes(buffer);
         tradingSessionEvent.toBytes(buffer);
     }
     
@@ -140,7 +120,6 @@ public class TradingSessionStatus implements ByteSerializable, Message {
         return Objects.hash(header,
         marketId,
         marketStructureId,
-        tradingSessionState,
         tradingSessionEvent);
     }
     
@@ -150,7 +129,6 @@ public class TradingSessionStatus implements ByteSerializable, Message {
             "header=" + header +
             ", marketId=" + marketId +
             ", marketStructureId=" + marketStructureId +
-            ", tradingSessionState=" + tradingSessionState +
             ", tradingSessionEvent=" + tradingSessionEvent +
             "}";
     }

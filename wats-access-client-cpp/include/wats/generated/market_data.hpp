@@ -259,25 +259,6 @@ struct OrderExecute {
 using AnsiChar = uint8_t;
 using MicCode = AnsiChar[4];
 
-enum class TradingSessionState: uint8_t {
-    Unknown = 1,
-    Open = 2,
-    Close = 3
-};
-
-static const std::map<std::string, TradingSessionState> Name2TradingSessionState {
-    { "Unknown", TradingSessionState::Unknown },
-    { "Open", TradingSessionState::Open },
-    { "Close", TradingSessionState::Close }
-};
-
-static const std::map<TradingSessionState, std::string> TradingSessionState2Name {
-    { TradingSessionState::Unknown, "Unknown" },
-    { TradingSessionState::Open, "Open" },
-    { TradingSessionState::Close, "Close" }
-};
-
-
 enum class TradingSessionEvent: uint8_t {
     NA = 1,
     StartOfTechnicalSession = 2,
@@ -287,7 +268,9 @@ enum class TradingSessionEvent: uint8_t {
     PreviousDayRestateStart = 6,
     PreviousDayRestateEnd = 7,
     NextSessionReferenceDataStart = 8,
-    NextSessionReferenceDataEnd = 9
+    NextSessionReferenceDataEnd = 9,
+    StartOfTradingSessionMIC = 12,
+    EndOfTradingSessionMIC = 13
 };
 
 static const std::map<std::string, TradingSessionEvent> Name2TradingSessionEvent {
@@ -299,7 +282,9 @@ static const std::map<std::string, TradingSessionEvent> Name2TradingSessionEvent
     { "PreviousDayRestateStart", TradingSessionEvent::PreviousDayRestateStart },
     { "PreviousDayRestateEnd", TradingSessionEvent::PreviousDayRestateEnd },
     { "NextSessionReferenceDataStart", TradingSessionEvent::NextSessionReferenceDataStart },
-    { "NextSessionReferenceDataEnd", TradingSessionEvent::NextSessionReferenceDataEnd }
+    { "NextSessionReferenceDataEnd", TradingSessionEvent::NextSessionReferenceDataEnd },
+    { "StartOfTradingSessionMIC", TradingSessionEvent::StartOfTradingSessionMIC },
+    { "EndOfTradingSessionMIC", TradingSessionEvent::EndOfTradingSessionMIC }
 };
 
 static const std::map<TradingSessionEvent, std::string> TradingSessionEvent2Name {
@@ -311,7 +296,9 @@ static const std::map<TradingSessionEvent, std::string> TradingSessionEvent2Name
     { TradingSessionEvent::PreviousDayRestateStart, "PreviousDayRestateStart" },
     { TradingSessionEvent::PreviousDayRestateEnd, "PreviousDayRestateEnd" },
     { TradingSessionEvent::NextSessionReferenceDataStart, "NextSessionReferenceDataStart" },
-    { TradingSessionEvent::NextSessionReferenceDataEnd, "NextSessionReferenceDataEnd" }
+    { TradingSessionEvent::NextSessionReferenceDataEnd, "NextSessionReferenceDataEnd" },
+    { TradingSessionEvent::StartOfTradingSessionMIC, "StartOfTradingSessionMIC" },
+    { TradingSessionEvent::EndOfTradingSessionMIC, "EndOfTradingSessionMIC" }
 };
 
 
@@ -319,7 +306,6 @@ struct TradingSessionStatus {
     Header header;
     MicCode marketId;
     ElementId marketStructureId;
-    TradingSessionState tradingSessionState;
     TradingSessionEvent tradingSessionEvent;
 
     friend std::ostream &operator << (std::ostream &, const TradingSessionStatus &);
@@ -412,6 +398,7 @@ static const std::map<TradingPhaseType, std::string> TradingPhaseType2Name {
 
 enum class InstrumentStatus: uint8_t {
     Active = 1,
+    Inactive = 2,
     MarketOperationsSuspension = 3,
     OutsideCollarsStatic = 4,
     OutsideCollarsDynamic = 5,
@@ -423,6 +410,7 @@ enum class InstrumentStatus: uint8_t {
 
 static const std::map<std::string, InstrumentStatus> Name2InstrumentStatus {
     { "Active", InstrumentStatus::Active },
+    { "Inactive", InstrumentStatus::Inactive },
     { "MarketOperationsSuspension", InstrumentStatus::MarketOperationsSuspension },
     { "OutsideCollarsStatic", InstrumentStatus::OutsideCollarsStatic },
     { "OutsideCollarsDynamic", InstrumentStatus::OutsideCollarsDynamic },
@@ -434,6 +422,7 @@ static const std::map<std::string, InstrumentStatus> Name2InstrumentStatus {
 
 static const std::map<InstrumentStatus, std::string> InstrumentStatus2Name {
     { InstrumentStatus::Active, "Active" },
+    { InstrumentStatus::Inactive, "Inactive" },
     { InstrumentStatus::MarketOperationsSuspension, "MarketOperationsSuspension" },
     { InstrumentStatus::OutsideCollarsStatic, "OutsideCollarsStatic" },
     { InstrumentStatus::OutsideCollarsDynamic, "OutsideCollarsDynamic" },
@@ -1803,7 +1792,8 @@ enum class ProductType: uint8_t {
     DerivativeOptions = 4,
     Index = 5,
     Currency = 6,
-    StructuredProduct = 7
+    StructuredProduct = 7,
+    Tracker = 9
 };
 
 static const std::map<std::string, ProductType> Name2ProductType {
@@ -1813,7 +1803,8 @@ static const std::map<std::string, ProductType> Name2ProductType {
     { "DerivativeOptions", ProductType::DerivativeOptions },
     { "Index", ProductType::Index },
     { "Currency", ProductType::Currency },
-    { "StructuredProduct", ProductType::StructuredProduct }
+    { "StructuredProduct", ProductType::StructuredProduct },
+    { "Tracker", ProductType::Tracker }
 };
 
 static const std::map<ProductType, std::string> ProductType2Name {
@@ -1823,7 +1814,8 @@ static const std::map<ProductType, std::string> ProductType2Name {
     { ProductType::DerivativeOptions, "DerivativeOptions" },
     { ProductType::Index, "Index" },
     { ProductType::Currency, "Currency" },
-    { ProductType::StructuredProduct, "StructuredProduct" }
+    { ProductType::StructuredProduct, "StructuredProduct" },
+    { ProductType::Tracker, "Tracker" }
 };
 
 
@@ -1837,7 +1829,7 @@ enum class ProductSubtype: uint8_t {
     BankSecurities = 7,
     Bond = 8,
     TreasuryBond = 9,
-    IssuedBond = 10,
+    AgencyBond = 10,
     MunicipalBond = 11,
     CorporateBankBond = 12,
     CorporateFirmBond = 13,
@@ -1881,7 +1873,9 @@ enum class ProductSubtype: uint8_t {
     StrategyPriceIndex = 51,
     StrategyTotalReturnIndex = 52,
     CommodityIndex = 53,
-    BondTotalReturnIndex = 54
+    BondTotalReturnIndex = 54,
+    SupranationalBond = 55,
+    WarrantWithKnockOut = 56
 };
 
 static const std::map<std::string, ProductSubtype> Name2ProductSubtype {
@@ -1894,7 +1888,7 @@ static const std::map<std::string, ProductSubtype> Name2ProductSubtype {
     { "BankSecurities", ProductSubtype::BankSecurities },
     { "Bond", ProductSubtype::Bond },
     { "TreasuryBond", ProductSubtype::TreasuryBond },
-    { "IssuedBond", ProductSubtype::IssuedBond },
+    { "AgencyBond", ProductSubtype::AgencyBond },
     { "MunicipalBond", ProductSubtype::MunicipalBond },
     { "CorporateBankBond", ProductSubtype::CorporateBankBond },
     { "CorporateFirmBond", ProductSubtype::CorporateFirmBond },
@@ -1938,7 +1932,9 @@ static const std::map<std::string, ProductSubtype> Name2ProductSubtype {
     { "StrategyPriceIndex", ProductSubtype::StrategyPriceIndex },
     { "StrategyTotalReturnIndex", ProductSubtype::StrategyTotalReturnIndex },
     { "CommodityIndex", ProductSubtype::CommodityIndex },
-    { "BondTotalReturnIndex", ProductSubtype::BondTotalReturnIndex }
+    { "BondTotalReturnIndex", ProductSubtype::BondTotalReturnIndex },
+    { "SupranationalBond", ProductSubtype::SupranationalBond },
+    { "WarrantWithKnockOut", ProductSubtype::WarrantWithKnockOut }
 };
 
 static const std::map<ProductSubtype, std::string> ProductSubtype2Name {
@@ -1951,7 +1947,7 @@ static const std::map<ProductSubtype, std::string> ProductSubtype2Name {
     { ProductSubtype::BankSecurities, "BankSecurities" },
     { ProductSubtype::Bond, "Bond" },
     { ProductSubtype::TreasuryBond, "TreasuryBond" },
-    { ProductSubtype::IssuedBond, "IssuedBond" },
+    { ProductSubtype::AgencyBond, "AgencyBond" },
     { ProductSubtype::MunicipalBond, "MunicipalBond" },
     { ProductSubtype::CorporateBankBond, "CorporateBankBond" },
     { ProductSubtype::CorporateFirmBond, "CorporateFirmBond" },
@@ -1995,7 +1991,9 @@ static const std::map<ProductSubtype, std::string> ProductSubtype2Name {
     { ProductSubtype::StrategyPriceIndex, "StrategyPriceIndex" },
     { ProductSubtype::StrategyTotalReturnIndex, "StrategyTotalReturnIndex" },
     { ProductSubtype::CommodityIndex, "CommodityIndex" },
-    { ProductSubtype::BondTotalReturnIndex, "BondTotalReturnIndex" }
+    { ProductSubtype::BondTotalReturnIndex, "BondTotalReturnIndex" },
+    { ProductSubtype::SupranationalBond, "SupranationalBond" },
+    { ProductSubtype::WarrantWithKnockOut, "WarrantWithKnockOut" }
 };
 
 using LotSize = uint32_t;
@@ -3277,7 +3275,10 @@ enum class AdjustedClosingPriceReason: uint8_t {
     Split = 5,
     ReverseSplit = 6,
     Bonus = 7,
-    SpinOff = 8
+    SpinOff = 8,
+    TickSizeChange = 9,
+    OrderPurge = 10,
+    OtherReason = 11
 };
 
 static const std::map<std::string, AdjustedClosingPriceReason> Name2AdjustedClosingPriceReason {
@@ -3288,7 +3289,10 @@ static const std::map<std::string, AdjustedClosingPriceReason> Name2AdjustedClos
     { "Split", AdjustedClosingPriceReason::Split },
     { "ReverseSplit", AdjustedClosingPriceReason::ReverseSplit },
     { "Bonus", AdjustedClosingPriceReason::Bonus },
-    { "SpinOff", AdjustedClosingPriceReason::SpinOff }
+    { "SpinOff", AdjustedClosingPriceReason::SpinOff },
+    { "TickSizeChange", AdjustedClosingPriceReason::TickSizeChange },
+    { "OrderPurge", AdjustedClosingPriceReason::OrderPurge },
+    { "OtherReason", AdjustedClosingPriceReason::OtherReason }
 };
 
 static const std::map<AdjustedClosingPriceReason, std::string> AdjustedClosingPriceReason2Name {
@@ -3299,7 +3303,10 @@ static const std::map<AdjustedClosingPriceReason, std::string> AdjustedClosingPr
     { AdjustedClosingPriceReason::Split, "Split" },
     { AdjustedClosingPriceReason::ReverseSplit, "ReverseSplit" },
     { AdjustedClosingPriceReason::Bonus, "Bonus" },
-    { AdjustedClosingPriceReason::SpinOff, "SpinOff" }
+    { AdjustedClosingPriceReason::SpinOff, "SpinOff" },
+    { AdjustedClosingPriceReason::TickSizeChange, "TickSizeChange" },
+    { AdjustedClosingPriceReason::OrderPurge, "OrderPurge" },
+    { AdjustedClosingPriceReason::OtherReason, "OtherReason" }
 };
 
 
@@ -3437,6 +3444,7 @@ using NewsText = AnsiChar[800];
 struct News {
     Header header;
     ElementId marketStructureId;
+    ElementId newsId;
     NewsTitle title;
     uint8_t entryNumber;
     uint8_t total;

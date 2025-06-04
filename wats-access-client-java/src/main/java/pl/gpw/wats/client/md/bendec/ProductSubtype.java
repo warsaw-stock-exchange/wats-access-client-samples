@@ -48,7 +48,7 @@ public enum ProductSubtype {
     /**
      * Bond issued by a government institution
      */
-    ISSUEDBOND(10),
+    AGENCYBOND(10),
     /**
      * Municipal Bond
      */
@@ -224,7 +224,15 @@ public enum ProductSubtype {
     /**
      * Bond total return index
      */
-    BONDTOTALRETURNINDEX(54);
+    BONDTOTALRETURNINDEX(54),
+    /**
+     * Supranational Bond
+     */
+    SUPRANATIONALBOND(55),
+    /**
+     * Warrant with Knock Out
+     */
+    WARRANTWITHKNOCKOUT(56);
     
     private final int value;
     private final int byteLength = 1;

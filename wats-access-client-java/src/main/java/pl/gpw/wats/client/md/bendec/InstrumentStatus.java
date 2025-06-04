@@ -14,6 +14,10 @@ public enum InstrumentStatus {
      */
     ACTIVE(1),
     /**
+     * Financial instrument is inactive and is not trading.
+     */
+    INACTIVE(2),
+    /**
      * Manual suspension by Market Operations.
      */
     MARKETOPERATIONSSUSPENSION(3),

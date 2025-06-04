@@ -206,6 +206,10 @@ public enum OrderRejectionReason {
      */
     OPERATIONSONORDERSANDQUOTESFORBIDDENDURINGINSTRUMENTSUSPENSION(1061),
     /**
+     * Operations on orders and quotes forbidden due to Drop Copy disconnection.
+     */
+    OPERATIONSONORDERSANDQUOTESFORBIDDENDUETODROPCOPYDISCONNECTION(1062),
+    /**
      * The trigger price not allowed for a specified order type.
      */
     TRIGGERPRICENOTALLOWED(1063),
@@ -273,6 +277,10 @@ public enum OrderRejectionReason {
      * Market Model not supported sponsored connection
      */
     MARKETMODELNOTSUPPORTEDONSPONSOREDCONNECTION(1081),
+    /**
+     * Invalid TimeInForce for sponsored connection
+     */
+    INVALIDTIMEINFORCEFORSPONSOREDCONNECTION(1083),
     /**
      * Mass Quote not allowed for selected Market Model.
      */

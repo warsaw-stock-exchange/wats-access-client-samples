@@ -524,6 +524,7 @@ enum class OrderRejectionReason: uint16_t {
     FirmNotAuthorizedToSellTheInstrument = 1059,
     OperationsOnOrdersAndQuotesForbiddenDuringUncrossing = 1060,
     OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension = 1061,
+    OperationsOnOrdersAndQuotesForbiddenDueToDropCopyDisconnection = 1062,
     TriggerPriceNotAllowed = 1063,
     TriggerPriceNotHigherThanLTP = 1064,
     TriggerPriceNotLowerThanLTP = 1065,
@@ -541,6 +542,7 @@ enum class OrderRejectionReason: uint16_t {
     InvalidOrdTypeForSponsoredConnection = 1079,
     ForbiddenOrderCapacityValueForSponsoredConnection = 1080,
     MarketModelNotSupportedOnSponsoredConnection = 1081,
+    InvalidTimeInForceForSponsoredConnection = 1083,
     MassQuoteNotAllowedForSelectedMarketModel = 1201,
     InstrumentClosed = 1203,
     InvalidBidAskSpread = 1208,
@@ -625,6 +627,7 @@ static const std::map<std::string, OrderRejectionReason> Name2OrderRejectionReas
     { "FirmNotAuthorizedToSellTheInstrument", OrderRejectionReason::FirmNotAuthorizedToSellTheInstrument },
     { "OperationsOnOrdersAndQuotesForbiddenDuringUncrossing", OrderRejectionReason::OperationsOnOrdersAndQuotesForbiddenDuringUncrossing },
     { "OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension", OrderRejectionReason::OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension },
+    { "OperationsOnOrdersAndQuotesForbiddenDueToDropCopyDisconnection", OrderRejectionReason::OperationsOnOrdersAndQuotesForbiddenDueToDropCopyDisconnection },
     { "TriggerPriceNotAllowed", OrderRejectionReason::TriggerPriceNotAllowed },
     { "TriggerPriceNotHigherThanLTP", OrderRejectionReason::TriggerPriceNotHigherThanLTP },
     { "TriggerPriceNotLowerThanLTP", OrderRejectionReason::TriggerPriceNotLowerThanLTP },
@@ -642,6 +645,7 @@ static const std::map<std::string, OrderRejectionReason> Name2OrderRejectionReas
     { "InvalidOrdTypeForSponsoredConnection", OrderRejectionReason::InvalidOrdTypeForSponsoredConnection },
     { "ForbiddenOrderCapacityValueForSponsoredConnection", OrderRejectionReason::ForbiddenOrderCapacityValueForSponsoredConnection },
     { "MarketModelNotSupportedOnSponsoredConnection", OrderRejectionReason::MarketModelNotSupportedOnSponsoredConnection },
+    { "InvalidTimeInForceForSponsoredConnection", OrderRejectionReason::InvalidTimeInForceForSponsoredConnection },
     { "MassQuoteNotAllowedForSelectedMarketModel", OrderRejectionReason::MassQuoteNotAllowedForSelectedMarketModel },
     { "InstrumentClosed", OrderRejectionReason::InstrumentClosed },
     { "InvalidBidAskSpread", OrderRejectionReason::InvalidBidAskSpread },
@@ -726,6 +730,7 @@ static const std::map<OrderRejectionReason, std::string> OrderRejectionReason2Na
     { OrderRejectionReason::FirmNotAuthorizedToSellTheInstrument, "FirmNotAuthorizedToSellTheInstrument" },
     { OrderRejectionReason::OperationsOnOrdersAndQuotesForbiddenDuringUncrossing, "OperationsOnOrdersAndQuotesForbiddenDuringUncrossing" },
     { OrderRejectionReason::OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension, "OperationsOnOrdersAndQuotesForbiddenDuringInstrumentSuspension" },
+    { OrderRejectionReason::OperationsOnOrdersAndQuotesForbiddenDueToDropCopyDisconnection, "OperationsOnOrdersAndQuotesForbiddenDueToDropCopyDisconnection" },
     { OrderRejectionReason::TriggerPriceNotAllowed, "TriggerPriceNotAllowed" },
     { OrderRejectionReason::TriggerPriceNotHigherThanLTP, "TriggerPriceNotHigherThanLTP" },
     { OrderRejectionReason::TriggerPriceNotLowerThanLTP, "TriggerPriceNotLowerThanLTP" },
@@ -743,6 +748,7 @@ static const std::map<OrderRejectionReason, std::string> OrderRejectionReason2Na
     { OrderRejectionReason::InvalidOrdTypeForSponsoredConnection, "InvalidOrdTypeForSponsoredConnection" },
     { OrderRejectionReason::ForbiddenOrderCapacityValueForSponsoredConnection, "ForbiddenOrderCapacityValueForSponsoredConnection" },
     { OrderRejectionReason::MarketModelNotSupportedOnSponsoredConnection, "MarketModelNotSupportedOnSponsoredConnection" },
+    { OrderRejectionReason::InvalidTimeInForceForSponsoredConnection, "InvalidTimeInForceForSponsoredConnection" },
     { OrderRejectionReason::MassQuoteNotAllowedForSelectedMarketModel, "MassQuoteNotAllowedForSelectedMarketModel" },
     { OrderRejectionReason::InstrumentClosed, "InstrumentClosed" },
     { OrderRejectionReason::InvalidBidAskSpread, "InvalidBidAskSpread" },
@@ -796,7 +802,8 @@ enum class ExecTypeReason: uint8_t {
     Rejected = 15,
     CancelonBuyOnlyStateEntry = 16,
     CancelonKnockedOutStateEntry = 17,
-    CancelByRiskManagement = 18
+    CancelByRiskManagement = 18,
+    CancelOnDcDisconnect = 19
 };
 
 static const std::map<std::string, ExecTypeReason> Name2ExecTypeReason {
@@ -817,7 +824,8 @@ static const std::map<std::string, ExecTypeReason> Name2ExecTypeReason {
     { "Rejected", ExecTypeReason::Rejected },
     { "CancelonBuyOnlyStateEntry", ExecTypeReason::CancelonBuyOnlyStateEntry },
     { "CancelonKnockedOutStateEntry", ExecTypeReason::CancelonKnockedOutStateEntry },
-    { "CancelByRiskManagement", ExecTypeReason::CancelByRiskManagement }
+    { "CancelByRiskManagement", ExecTypeReason::CancelByRiskManagement },
+    { "CancelOnDcDisconnect", ExecTypeReason::CancelOnDcDisconnect }
 };
 
 static const std::map<ExecTypeReason, std::string> ExecTypeReason2Name {
@@ -838,7 +846,8 @@ static const std::map<ExecTypeReason, std::string> ExecTypeReason2Name {
     { ExecTypeReason::Rejected, "Rejected" },
     { ExecTypeReason::CancelonBuyOnlyStateEntry, "CancelonBuyOnlyStateEntry" },
     { ExecTypeReason::CancelonKnockedOutStateEntry, "CancelonKnockedOutStateEntry" },
-    { ExecTypeReason::CancelByRiskManagement, "CancelByRiskManagement" }
+    { ExecTypeReason::CancelByRiskManagement, "CancelByRiskManagement" },
+    { ExecTypeReason::CancelOnDcDisconnect, "CancelOnDcDisconnect" }
 };
 
 
@@ -1194,6 +1203,7 @@ struct TradeCaptureReportDual {
     Header header;
     ElementId instrumentId;
     TradeReportId tradeReportId;
+    OrderId secondaryTradeReportId;
     TradeId tradeId;
     TradeReportTransType tradeReportTransType;
     TradeReportType tradeReportType;
@@ -1282,6 +1292,7 @@ enum class TcrRejectionReason: uint16_t {
     TradeReportRefIdNotAllowed = 2009,
     SettlementDateCannotBeEarlierThanMinimumSettlementDate = 2015,
     SettlementDateCannotBeLaterThanMaximumSettlementDate = 2016,
+    SettlementDateMustBeASettlementDay = 2017,
     UnknownContraFirm = 2022,
     SentAttributeDoesNotMatchOriginalValue = 2024,
     RequestNotAllowedForBlockInstrument = 2026,
@@ -1338,6 +1349,7 @@ static const std::map<std::string, TcrRejectionReason> Name2TcrRejectionReason {
     { "TradeReportRefIdNotAllowed", TcrRejectionReason::TradeReportRefIdNotAllowed },
     { "SettlementDateCannotBeEarlierThanMinimumSettlementDate", TcrRejectionReason::SettlementDateCannotBeEarlierThanMinimumSettlementDate },
     { "SettlementDateCannotBeLaterThanMaximumSettlementDate", TcrRejectionReason::SettlementDateCannotBeLaterThanMaximumSettlementDate },
+    { "SettlementDateMustBeASettlementDay", TcrRejectionReason::SettlementDateMustBeASettlementDay },
     { "UnknownContraFirm", TcrRejectionReason::UnknownContraFirm },
     { "SentAttributeDoesNotMatchOriginalValue", TcrRejectionReason::SentAttributeDoesNotMatchOriginalValue },
     { "RequestNotAllowedForBlockInstrument", TcrRejectionReason::RequestNotAllowedForBlockInstrument },
@@ -1394,6 +1406,7 @@ static const std::map<TcrRejectionReason, std::string> TcrRejectionReason2Name {
     { TcrRejectionReason::TradeReportRefIdNotAllowed, "TradeReportRefIdNotAllowed" },
     { TcrRejectionReason::SettlementDateCannotBeEarlierThanMinimumSettlementDate, "SettlementDateCannotBeEarlierThanMinimumSettlementDate" },
     { TcrRejectionReason::SettlementDateCannotBeLaterThanMaximumSettlementDate, "SettlementDateCannotBeLaterThanMaximumSettlementDate" },
+    { TcrRejectionReason::SettlementDateMustBeASettlementDay, "SettlementDateMustBeASettlementDay" },
     { TcrRejectionReason::UnknownContraFirm, "UnknownContraFirm" },
     { TcrRejectionReason::SentAttributeDoesNotMatchOriginalValue, "SentAttributeDoesNotMatchOriginalValue" },
     { TcrRejectionReason::RequestNotAllowedForBlockInstrument, "RequestNotAllowedForBlockInstrument" },

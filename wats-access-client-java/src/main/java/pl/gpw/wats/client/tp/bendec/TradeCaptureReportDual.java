@@ -7,10 +7,11 @@ import java.nio.ByteBuffer;
 /**
  * <h2>TradeCaptureReportDual</h2>
  * <p>Trade Capture Report - dual sided.</p>
- * <p>Byte length: 271</p>
+ * <p>Byte length: 279</p>
  * <p>Header header - Header. | size 16</p>
  * <p>ElementId > long (u32) instrumentId - ID of the instrument included in the order. | size 4</p>
  * <p>TradeReportId > String (u8[]) tradeReportId - Unique identifier of trade capture report. | size 21</p>
+ * <p>OrderId > BigInteger (u64) secondaryTradeReportId - ID of the trade capture report. | size 8</p>
  * <p>TradeId > long (u32) tradeId - The unique ID assigned to the trade entity once it is received or matched by the exchange or central counterparty. | size 4</p>
  * <p>TradeReportTransType tradeReportTransType - Identifies Trade Report message transaction type. | size 1</p>
  * <p>TradeReportType tradeReportType - Type of Trade Report. | size 1</p>
@@ -28,6 +29,7 @@ public class TradeCaptureReportDual implements ByteSerializable, Message {
     private Header header;
     private long instrumentId;
     private String tradeReportId;
+    private BigInteger secondaryTradeReportId;
     private long tradeId;
     private TradeReportTransType tradeReportTransType;
     private TradeReportType tradeReportType;
@@ -40,12 +42,13 @@ public class TradeCaptureReportDual implements ByteSerializable, Message {
     private long settlementDate;
     private TcrParty tcrPartyBuy;
     private TcrParty tcrPartySell;
-    public static final int byteLength = 271;
+    public static final int byteLength = 279;
     
-    public TradeCaptureReportDual(Header header, long instrumentId, String tradeReportId, long tradeId, TradeReportTransType tradeReportTransType, TradeReportType tradeReportType, TradeType tradeType, AlgorithmicTradeIndicator algorithmicTradeIndicator, ExecType execType, String tradeReportRefId, BigInteger lastQty, long lastPx, long settlementDate, TcrParty tcrPartyBuy, TcrParty tcrPartySell) {
+    public TradeCaptureReportDual(Header header, long instrumentId, String tradeReportId, BigInteger secondaryTradeReportId, long tradeId, TradeReportTransType tradeReportTransType, TradeReportType tradeReportType, TradeType tradeType, AlgorithmicTradeIndicator algorithmicTradeIndicator, ExecType execType, String tradeReportRefId, BigInteger lastQty, long lastPx, long settlementDate, TcrParty tcrPartyBuy, TcrParty tcrPartySell) {
         this.header = header;
         this.instrumentId = instrumentId;
         this.tradeReportId = tradeReportId;
+        this.secondaryTradeReportId = secondaryTradeReportId;
         this.tradeId = tradeId;
         this.tradeReportTransType = tradeReportTransType;
         this.tradeReportType = tradeReportType;
@@ -64,18 +67,19 @@ public class TradeCaptureReportDual implements ByteSerializable, Message {
         this.header = new Header(bytes, offset);
         this.instrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 16);
         this.tradeReportId = BendecUtils.stringFromByteArray(bytes, offset + 20, 21);
-        this.tradeId = BendecUtils.uInt32FromByteArray(bytes, offset + 41);
-        this.tradeReportTransType = TradeReportTransType.getTradeReportTransType(bytes, offset + 45);
-        this.tradeReportType = TradeReportType.getTradeReportType(bytes, offset + 46);
-        this.tradeType = TradeType.getTradeType(bytes, offset + 47);
-        this.algorithmicTradeIndicator = AlgorithmicTradeIndicator.getAlgorithmicTradeIndicator(bytes, offset + 48);
-        this.execType = ExecType.getExecType(bytes, offset + 49);
-        this.tradeReportRefId = BendecUtils.stringFromByteArray(bytes, offset + 50, 21);
-        this.lastQty = BendecUtils.uInt64FromByteArray(bytes, offset + 71);
-        this.lastPx = BendecUtils.int64FromByteArray(bytes, offset + 79);
-        this.settlementDate = BendecUtils.uInt32FromByteArray(bytes, offset + 87);
-        this.tcrPartyBuy = new TcrParty(bytes, offset + 91);
-        this.tcrPartySell = new TcrParty(bytes, offset + 181);
+        this.secondaryTradeReportId = BendecUtils.uInt64FromByteArray(bytes, offset + 41);
+        this.tradeId = BendecUtils.uInt32FromByteArray(bytes, offset + 49);
+        this.tradeReportTransType = TradeReportTransType.getTradeReportTransType(bytes, offset + 53);
+        this.tradeReportType = TradeReportType.getTradeReportType(bytes, offset + 54);
+        this.tradeType = TradeType.getTradeType(bytes, offset + 55);
+        this.algorithmicTradeIndicator = AlgorithmicTradeIndicator.getAlgorithmicTradeIndicator(bytes, offset + 56);
+        this.execType = ExecType.getExecType(bytes, offset + 57);
+        this.tradeReportRefId = BendecUtils.stringFromByteArray(bytes, offset + 58, 21);
+        this.lastQty = BendecUtils.uInt64FromByteArray(bytes, offset + 79);
+        this.lastPx = BendecUtils.int64FromByteArray(bytes, offset + 87);
+        this.settlementDate = BendecUtils.uInt32FromByteArray(bytes, offset + 95);
+        this.tcrPartyBuy = new TcrParty(bytes, offset + 99);
+        this.tcrPartySell = new TcrParty(bytes, offset + 189);
     }
     
     public TradeCaptureReportDual(byte[] bytes) {
@@ -104,6 +108,13 @@ public class TradeCaptureReportDual implements ByteSerializable, Message {
      */
     public String getTradeReportId() {
         return this.tradeReportId;
+    }
+    
+    /**
+     * @return ID of the trade capture report.
+     */
+    public BigInteger getSecondaryTradeReportId() {
+        return this.secondaryTradeReportId;
     }
     
     /**
@@ -212,6 +223,13 @@ public class TradeCaptureReportDual implements ByteSerializable, Message {
     }
     
     /**
+     * @param secondaryTradeReportId ID of the trade capture report.
+     */
+    public void setSecondaryTradeReportId(BigInteger secondaryTradeReportId) {
+        this.secondaryTradeReportId = secondaryTradeReportId;
+    }
+    
+    /**
      * @param tradeId The unique ID assigned to the trade entity once it is received or matched by the exchange or central counterparty.
      */
     public void setTradeId(long tradeId) {
@@ -301,6 +319,7 @@ public class TradeCaptureReportDual implements ByteSerializable, Message {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
         buffer.put(BendecUtils.stringToByteArray(this.tradeReportId, 21));
+        buffer.put(BendecUtils.uInt64ToByteArray(this.secondaryTradeReportId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.tradeId));
         tradeReportTransType.toBytes(buffer);
         tradeReportType.toBytes(buffer);
@@ -321,6 +340,7 @@ public class TradeCaptureReportDual implements ByteSerializable, Message {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
         buffer.put(BendecUtils.stringToByteArray(this.tradeReportId, 21));
+        buffer.put(BendecUtils.uInt64ToByteArray(this.secondaryTradeReportId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.tradeId));
         tradeReportTransType.toBytes(buffer);
         tradeReportType.toBytes(buffer);
@@ -340,6 +360,7 @@ public class TradeCaptureReportDual implements ByteSerializable, Message {
         return Objects.hash(header,
         instrumentId,
         tradeReportId,
+        secondaryTradeReportId,
         tradeId,
         tradeReportTransType,
         tradeReportType,
@@ -360,6 +381,7 @@ public class TradeCaptureReportDual implements ByteSerializable, Message {
             "header=" + header +
             ", instrumentId=" + instrumentId +
             ", tradeReportId=" + tradeReportId +
+            ", secondaryTradeReportId=" + secondaryTradeReportId +
             ", tradeId=" + tradeId +
             ", tradeReportTransType=" + tradeReportTransType +
             ", tradeReportType=" + tradeReportType +

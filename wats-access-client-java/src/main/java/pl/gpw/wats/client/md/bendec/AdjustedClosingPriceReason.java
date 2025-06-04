@@ -40,7 +40,19 @@ public enum AdjustedClosingPriceReason {
     /**
      * Spin-Off
      */
-    SPINOFF(8);
+    SPINOFF(8),
+    /**
+     * Tick Size Change
+     */
+    TICKSIZECHANGE(9),
+    /**
+     * Order Purge
+     */
+    ORDERPURGE(10),
+    /**
+     * Other reason
+     */
+    OTHERREASON(11);
     
     private final int value;
     private final int byteLength = 1;

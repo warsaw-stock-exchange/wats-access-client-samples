@@ -35,7 +35,7 @@ bbo_replay:
   host: 127.0.0.1
   port: 10032
 
-multicast_interface: 127.0.0.1
+multicast_interface: 172.20.100.65
 
 connection_01:
   id: 581

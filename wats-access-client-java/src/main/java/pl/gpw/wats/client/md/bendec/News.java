@@ -7,9 +7,10 @@ import java.nio.ByteBuffer;
 /**
  * <h2>News</h2>
  * <p>News message.</p>
- * <p>Byte length: 928</p>
+ * <p>Byte length: 932</p>
  * <p>Header header - Message header | size 42</p>
  * <p>ElementId > long (u32) marketStructureId - ID of the instrument's market structure. | size 4</p>
+ * <p>ElementId > long (u32) newsId - News id - The news id serves as a unique reference for tracking  purposes within the WATS system. | size 4</p>
  * <p>NewsTitle > String (u8[]) title - News title, unique per message. | size 80</p>
  * <p>u8 > int entryNumber - News entry number. | size 1</p>
  * <p>u8 > int total - Total number of news entries. | size 1</p>
@@ -18,15 +19,17 @@ import java.nio.ByteBuffer;
 public class News implements ByteSerializable, Message {
     private Header header;
     private long marketStructureId;
+    private long newsId;
     private String title;
     private int entryNumber;
     private int total;
     private String text;
-    public static final int byteLength = 928;
+    public static final int byteLength = 932;
     
-    public News(Header header, long marketStructureId, String title, int entryNumber, int total, String text) {
+    public News(Header header, long marketStructureId, long newsId, String title, int entryNumber, int total, String text) {
         this.header = header;
         this.marketStructureId = marketStructureId;
+        this.newsId = newsId;
         this.title = title;
         this.entryNumber = entryNumber;
         this.total = total;
@@ -36,10 +39,11 @@ public class News implements ByteSerializable, Message {
     public News(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
         this.marketStructureId = BendecUtils.uInt32FromByteArray(bytes, offset + 42);
-        this.title = BendecUtils.stringFromByteArray(bytes, offset + 46, 80);
-        this.entryNumber = BendecUtils.uInt8FromByteArray(bytes, offset + 126);
-        this.total = BendecUtils.uInt8FromByteArray(bytes, offset + 127);
-        this.text = BendecUtils.stringFromByteArray(bytes, offset + 128, 800);
+        this.newsId = BendecUtils.uInt32FromByteArray(bytes, offset + 46);
+        this.title = BendecUtils.stringFromByteArray(bytes, offset + 50, 80);
+        this.entryNumber = BendecUtils.uInt8FromByteArray(bytes, offset + 130);
+        this.total = BendecUtils.uInt8FromByteArray(bytes, offset + 131);
+        this.text = BendecUtils.stringFromByteArray(bytes, offset + 132, 800);
     }
     
     public News(byte[] bytes) {
@@ -61,6 +65,13 @@ public class News implements ByteSerializable, Message {
      */
     public long getMarketStructureId() {
         return this.marketStructureId;
+    }
+    
+    /**
+     * @return News id - The news id serves as a unique reference for tracking  purposes within the WATS system.
+     */
+    public long getNewsId() {
+        return this.newsId;
     }
     
     /**
@@ -106,6 +117,13 @@ public class News implements ByteSerializable, Message {
     }
     
     /**
+     * @param newsId News id - The news id serves as a unique reference for tracking  purposes within the WATS system.
+     */
+    public void setNewsId(long newsId) {
+        this.newsId = newsId;
+    }
+    
+    /**
      * @param title News title, unique per message.
      */
     public void setTitle(String title) {
@@ -138,6 +156,7 @@ public class News implements ByteSerializable, Message {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.marketStructureId));
+        buffer.put(BendecUtils.uInt32ToByteArray(this.newsId));
         buffer.put(BendecUtils.stringToByteArray(this.title, 80));
         buffer.put(BendecUtils.uInt8ToByteArray(this.entryNumber));
         buffer.put(BendecUtils.uInt8ToByteArray(this.total));
@@ -149,6 +168,7 @@ public class News implements ByteSerializable, Message {
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.marketStructureId));
+        buffer.put(BendecUtils.uInt32ToByteArray(this.newsId));
         buffer.put(BendecUtils.stringToByteArray(this.title, 80));
         buffer.put(BendecUtils.uInt8ToByteArray(this.entryNumber));
         buffer.put(BendecUtils.uInt8ToByteArray(this.total));
@@ -159,6 +179,7 @@ public class News implements ByteSerializable, Message {
     public int hashCode() {
         return Objects.hash(header,
         marketStructureId,
+        newsId,
         title,
         entryNumber,
         total,
@@ -170,6 +191,7 @@ public class News implements ByteSerializable, Message {
         return "News {" +
             "header=" + header +
             ", marketStructureId=" + marketStructureId +
+            ", newsId=" + newsId +
             ", title=" + title +
             ", entryNumber=" + entryNumber +
             ", total=" + total +

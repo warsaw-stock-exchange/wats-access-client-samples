@@ -1103,6 +1103,7 @@ pub enum ProductType {
   Currency = 0x0006,
   /// Structured Product
   StructuredProduct = 0x0007,
+  Tracker = 0x0009,
 }
 impl Default for ProductType {
   fn default() -> Self {
@@ -1120,6 +1121,7 @@ impl std::convert::TryFrom<u8> for ProductType {
       0x0005 => Ok(Self::Index),
       0x0006 => Ok(Self::Currency),
       0x0007 => Ok(Self::StructuredProduct),
+      0x0009 => Ok(Self::Tracker),
       other => Err(InvalidVariant::new(other as u32, "ProductType")),
     }
   }
@@ -1148,7 +1150,7 @@ pub enum ProductSubtype {
   /// Treasury Bond
   TreasuryBond = 0x0009,
   /// Bond issued by a government institution
-  IssuedBond = 0x000a,
+  AgencyBond = 0x000a,
   /// Municipal Bond
   MunicipalBond = 0x000b,
   /// Corporate Bond - bank
@@ -1237,6 +1239,10 @@ pub enum ProductSubtype {
   CommodityIndex = 0x0035,
   /// Bond total return index
   BondTotalReturnIndex = 0x0036,
+  /// Supranational Bond
+  SupranationalBond = 0x0037,
+  /// Warrant with Knock Out
+  WarrantWithKnockOut = 0x0038,
 }
 impl Default for ProductSubtype {
   fn default() -> Self {
@@ -1256,7 +1262,7 @@ impl std::convert::TryFrom<u8> for ProductSubtype {
       0x0007 => Ok(Self::BankSecurities),
       0x0008 => Ok(Self::Bond),
       0x0009 => Ok(Self::TreasuryBond),
-      0x000a => Ok(Self::IssuedBond),
+      0x000a => Ok(Self::AgencyBond),
       0x000b => Ok(Self::MunicipalBond),
       0x000c => Ok(Self::CorporateBankBond),
       0x000d => Ok(Self::CorporateFirmBond),
@@ -1301,6 +1307,8 @@ impl std::convert::TryFrom<u8> for ProductSubtype {
       0x0034 => Ok(Self::StrategyTotalReturnIndex),
       0x0035 => Ok(Self::CommodityIndex),
       0x0036 => Ok(Self::BondTotalReturnIndex),
+      0x0037 => Ok(Self::SupranationalBond),
+      0x0038 => Ok(Self::WarrantWithKnockOut),
       other => Err(InvalidVariant::new(other as u32, "ProductSubtype")),
     }
   }
@@ -1312,6 +1320,8 @@ impl std::convert::TryFrom<u8> for ProductSubtype {
 pub enum InstrumentStatus {
   /// Financial instrument is active.
   Active = 0x0001,
+  /// Financial instrument is inactive and is not trading.
+  Inactive = 0x0002,
   /// Manual suspension by Market Operations.
   MarketOperationsSuspension = 0x0003,
   /// Outside static trade price collars.
@@ -1337,6 +1347,7 @@ impl std::convert::TryFrom<u8> for InstrumentStatus {
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
       0x0001 => Ok(Self::Active),
+      0x0002 => Ok(Self::Inactive),
       0x0003 => Ok(Self::MarketOperationsSuspension),
       0x0004 => Ok(Self::OutsideCollarsStatic),
       0x0005 => Ok(Self::OutsideCollarsDynamic),
@@ -1599,6 +1610,12 @@ pub enum AdjustedClosingPriceReason {
   Bonus = 0x0007,
   /// Spin-Off
   SpinOff = 0x0008,
+  /// Tick Size Change
+  TickSizeChange = 0x0009,
+  /// Order Purge
+  OrderPurge = 0x000a,
+  /// Other reason
+  OtherReason = 0x000b,
 }
 impl Default for AdjustedClosingPriceReason {
   fn default() -> Self {
@@ -1617,6 +1634,9 @@ impl std::convert::TryFrom<u8> for AdjustedClosingPriceReason {
       0x0006 => Ok(Self::ReverseSplit),
       0x0007 => Ok(Self::Bonus),
       0x0008 => Ok(Self::SpinOff),
+      0x0009 => Ok(Self::TickSizeChange),
+      0x000a => Ok(Self::OrderPurge),
+      0x000b => Ok(Self::OtherReason),
       other => Err(InvalidVariant::new(other as u32, "AdjustedClosingPriceReason")),
     }
   }
@@ -3124,34 +3144,6 @@ pub struct TradeCollars {
   pub upper: Bound,
 }
 
-/// State of the trading session.
-#[repr(u8)]
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
-pub enum TradingSessionState {
-  /// Unknown (off).
-  Unknown = 0x0001,
-  /// Open.
-  Open = 0x0002,
-  /// Close.
-  Close = 0x0003,
-}
-impl Default for TradingSessionState {
-  fn default() -> Self {
-    Self::Unknown
-  }
-}
-impl std::convert::TryFrom<u8> for TradingSessionState {
-  type Error = InvalidVariant;
-  fn try_from(value: u8) -> Result<Self, Self::Error> {
-    match value {
-      0x0001 => Ok(Self::Unknown),
-      0x0002 => Ok(Self::Open),
-      0x0003 => Ok(Self::Close),
-      other => Err(InvalidVariant::new(other as u32, "TradingSessionState")),
-    }
-  }
-}
-
 /// Identifies an event related to the trading status of a trading session.
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
@@ -3174,6 +3166,10 @@ pub enum TradingSessionEvent {
   NextSessionReferenceDataStart = 0x0008,
   /// Next session reference data end.
   NextSessionReferenceDataEnd = 0x0009,
+  /// Start of trading session MIC.
+  StartOfTradingSessionMIC = 0x000c,
+  /// End of trading session MIC.
+  EndOfTradingSessionMIC = 0x000d,
 }
 impl Default for TradingSessionEvent {
   fn default() -> Self {
@@ -3193,6 +3189,8 @@ impl std::convert::TryFrom<u8> for TradingSessionEvent {
       0x0007 => Ok(Self::PreviousDayRestateEnd),
       0x0008 => Ok(Self::NextSessionReferenceDataStart),
       0x0009 => Ok(Self::NextSessionReferenceDataEnd),
+      0x000c => Ok(Self::StartOfTradingSessionMIC),
+      0x000d => Ok(Self::EndOfTradingSessionMIC),
       other => Err(InvalidVariant::new(other as u32, "TradingSessionEvent")),
     }
   }
@@ -3210,8 +3208,6 @@ pub struct TradingSessionStatus {
   pub market_id: MicCode,
   /// ID of the financial instrument's market segment.
   pub market_structure_id: ElementId,
-  /// State of the trading session.
-  pub trading_session_state: TradingSessionState,
   /// Identifies an event related to the trading status of a trading session.
   pub trading_session_event: TradingSessionEvent,
 }
@@ -4001,6 +3997,8 @@ pub struct News {
   pub header: Header,
   /// ID of the instrument's market structure.
   pub market_structure_id: ElementId,
+  /// News id - The news id serves as a unique reference for tracking  purposes within the WATS system.
+  pub news_id: ElementId,
   /// News title, unique per message.
   #[serde(with = "BigArray")]
   pub title: NewsTitle,

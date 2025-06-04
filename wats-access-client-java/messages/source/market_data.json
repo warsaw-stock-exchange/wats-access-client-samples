@@ -1,6 +1,6 @@
 {
   "$schema": "./schema.json",
-  "version": 2064,
+  "version": 2070,
   "typeDefinitions": {
     "marketData": [
       {
@@ -1441,6 +1441,10 @@
             "StructuredProduct",
             7,
             "Structured Product"
+          ],
+          [
+            "Tracker",
+            9
           ]
         ]
       },
@@ -1496,7 +1500,7 @@
             "Treasury Bond"
           ],
           [
-            "IssuedBond",
+            "AgencyBond",
             10,
             "Bond issued by a government institution"
           ],
@@ -1719,6 +1723,16 @@
             "BondTotalReturnIndex",
             54,
             "Bond total return index"
+          ],
+          [
+            "SupranationalBond",
+            55,
+            "Supranational Bond"
+          ],
+          [
+            "WarrantWithKnockOut",
+            56,
+            "Warrant with Knock Out"
           ]
         ]
       },
@@ -1732,6 +1746,11 @@
             "Active",
             1,
             "Financial instrument is active."
+          ],
+          [
+            "Inactive",
+            2,
+            "Financial instrument is inactive and is not trading."
           ],
           [
             "MarketOperationsSuspension",
@@ -2080,6 +2099,21 @@
             "SpinOff",
             8,
             "Spin-Off"
+          ],
+          [
+            "TickSizeChange",
+            9,
+            "Tick Size Change"
+          ],
+          [
+            "OrderPurge",
+            10,
+            "Order Purge"
+          ],
+          [
+            "OtherReason",
+            11,
+            "Other reason"
           ]
         ]
       },
@@ -4470,29 +4504,6 @@
       },
       {
         "kind": "Enum",
-        "name": "TradingSessionState",
-        "description": "State of the trading session.",
-        "underlying": "u8",
-        "variants": [
-          [
-            "Unknown",
-            1,
-            "Unknown (off)."
-          ],
-          [
-            "Open",
-            2,
-            "Open."
-          ],
-          [
-            "Close",
-            3,
-            "Close."
-          ]
-        ]
-      },
-      {
-        "kind": "Enum",
         "name": "TradingSessionEvent",
         "description": "Identifies an event related to the trading status of a trading session.",
         "underlying": "u8",
@@ -4541,6 +4552,16 @@
             "NextSessionReferenceDataEnd",
             9,
             "Next session reference data end."
+          ],
+          [
+            "StartOfTradingSessionMIC",
+            12,
+            "Start of trading session MIC."
+          ],
+          [
+            "EndOfTradingSessionMIC",
+            13,
+            "End of trading session MIC."
           ]
         ]
       },
@@ -4563,11 +4584,6 @@
             "name": "marketStructureId",
             "type": "ElementId",
             "description": "ID of the financial instrument's market segment."
-          },
-          {
-            "name": "tradingSessionState",
-            "type": "TradingSessionState",
-            "description": "State of the trading session."
           },
           {
             "name": "tradingSessionEvent",
@@ -6183,6 +6199,11 @@
             "name": "marketStructureId",
             "type": "ElementId",
             "description": "ID of the instrument's market structure."
+          },
+          {
+            "name": "newsId",
+            "type": "ElementId",
+            "description": "News id - The news id serves as a unique reference for tracking  purposes within the WATS system."
           },
           {
             "name": "title",

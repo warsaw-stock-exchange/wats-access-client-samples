@@ -78,9 +78,13 @@ public enum ExecTypeReason {
      */
     CANCELONKNOCKEDOUTSTATEENTRY(17),
     /**
-     * Order cancelled due to exceeding RMA post trade limit.
+     * Order cancelled due to exceeding RMA post trade limit
      */
-    CANCELBYRISKMANAGEMENT(18);
+    CANCELBYRISKMANAGEMENT(18),
+    /**
+     * Order cancelled due to drop copy disconnect
+     */
+    CANCELONDCDISCONNECT(19);
     
     private final int value;
     private final int byteLength = 1;

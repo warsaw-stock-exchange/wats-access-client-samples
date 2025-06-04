@@ -36,7 +36,8 @@ public enum ProductType {
     /**
      * Structured Product
      */
-    STRUCTUREDPRODUCT(7);
+    STRUCTUREDPRODUCT(7),
+    TRACKER(9);
     
     private final int value;
     private final int byteLength = 1;

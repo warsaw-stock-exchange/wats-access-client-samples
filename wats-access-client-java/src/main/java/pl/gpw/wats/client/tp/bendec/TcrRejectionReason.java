@@ -178,6 +178,10 @@ public enum TcrRejectionReason {
      */
     SETTLEMENTDATECANNOTBELATERTHANMAXIMUMSETTLEMENTDATE(2016),
     /**
+     * In case settlement date provided does not follow settlement calendar
+     */
+    SETTLEMENTDATEMUSTBEASETTLEMENTDAY(2017),
+    /**
      * Unknown contra firm.
      */
     UNKNOWNCONTRAFIRM(2022),

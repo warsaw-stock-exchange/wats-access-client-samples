@@ -1,5 +1,5 @@
 {
-  "version": 1113,
+  "version": 1117,
   "typeDefinitions": [
     {
       "kind": "Primitive",
@@ -717,6 +717,11 @@
           "Entry/modification/cancellation of orders and quotes is not possible when an instrument is suspended."
         ],
         [
+          "OperationsOnOrdersAndQuotesForbiddenDueToDropCopyDisconnection",
+          1062,
+          "Operations on orders and quotes forbidden due to Drop Copy disconnection."
+        ],
+        [
           "TriggerPriceNotAllowed",
           1063,
           "The trigger price not allowed for a specified order type."
@@ -800,6 +805,11 @@
           "MarketModelNotSupportedOnSponsoredConnection",
           1081,
           "Market Model not supported sponsored connection"
+        ],
+        [
+          "InvalidTimeInForceForSponsoredConnection",
+          1083,
+          "Invalid TimeInForce for sponsored connection"
         ],
         [
           "MassQuoteNotAllowedForSelectedMarketModel",
@@ -2198,6 +2208,11 @@
           "Settlement date cannot be later than maximum settlement date"
         ],
         [
+          "SettlementDateMustBeASettlementDay",
+          2017,
+          "In case settlement date provided does not follow settlement calendar"
+        ],
+        [
           "UnknownContraFirm",
           2022,
           "Unknown contra firm."
@@ -2519,6 +2534,11 @@
           "name": "tradeReportId",
           "type": "TradeReportId",
           "description": "Unique identifier of trade capture report."
+        },
+        {
+          "name": "secondaryTradeReportId",
+          "type": "OrderId",
+          "description": "ID of the trade capture report."
         },
         {
           "name": "tradeId",
@@ -3039,7 +3059,12 @@
         [
           "CancelByRiskManagement",
           18,
-          "Order cancelled due to exceeding RMA post trade limit."
+          "Order cancelled due to exceeding RMA post trade limit"
+        ],
+        [
+          "CancelOnDcDisconnect",
+          19,
+          "Order cancelled due to drop copy disconnect"
         ]
       ]
     },
