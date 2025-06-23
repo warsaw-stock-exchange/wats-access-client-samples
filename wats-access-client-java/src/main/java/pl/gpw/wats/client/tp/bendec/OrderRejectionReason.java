@@ -330,6 +330,10 @@ public enum OrderRejectionReason {
      */
     ONLYONESELLORDERISALLOWEDFORIPO(1401),
     /**
+     * Only one buy order is allowed for Tender instrument
+     */
+    ONLYONEBUYORDERISALLOWEDFORTENDER(1402),
+    /**
      * Request not allowed for BLOCK instrument
      */
     REQUESTNOTALLOWEDFORBLOCKINSTRUMENT(2026),

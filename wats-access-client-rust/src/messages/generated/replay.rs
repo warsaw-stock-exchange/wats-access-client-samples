@@ -8,7 +8,7 @@ use crate::messages::bytes_validator::BytesValidator;
 
 // primitive built-in: u32
 
-/// Sequence number of the message. Must fit into 28 bits, see OrderId for details.
+/// Sequence number of the message.
 pub type SeqNum = u32;
 
 

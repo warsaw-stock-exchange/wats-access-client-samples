@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
  * <p>MsgLength > int (u16) length - Total length of the message. | size 2</p>
  * <p>MsgType msgType - Type of the message (e.g. Login). | size 2</p>
  * <p>SeqNum > long (u32) seqNum - Sequence number of the message added by the sender. | size 4</p>
- * <p>Timestamp > BigInteger (u64) timestamp - Sending time. | size 8</p>
+ * <p>Timestamp > BigInteger (u64) timestamp - Processing time. | size 8</p>
  */
 public class Header implements ByteSerializable {
     private int length;
@@ -63,7 +63,7 @@ public class Header implements ByteSerializable {
     }
     
     /**
-     * @return Sending time.
+     * @return Processing time.
      */
     public BigInteger getTimestamp() {
         return this.timestamp;
@@ -91,7 +91,7 @@ public class Header implements ByteSerializable {
     }
     
     /**
-     * @param timestamp Sending time.
+     * @param timestamp Processing time.
      */
     public void setTimestamp(BigInteger timestamp) {
         this.timestamp = timestamp;

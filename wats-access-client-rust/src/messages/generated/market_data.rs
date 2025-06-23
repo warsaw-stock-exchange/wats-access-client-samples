@@ -46,7 +46,7 @@ pub type ElementId = u32;
 /// Lot size.
 pub type LotSize = u32;
 
-/// Sequence number of the message. Must fit into 28 bits, see OrderId for details.
+/// Sequence number of the message.
 pub type SeqNum = u32;
 
 /// ID of the trade (match between buy and sell orders).

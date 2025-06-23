@@ -1,5 +1,5 @@
 {
-  "version": 1117,
+  "version": 1119,
   "typeDefinitions": [
     {
       "kind": "Primitive",
@@ -872,6 +872,11 @@
           "Only one sell order is allowed for IPO instrument"
         ],
         [
+          "OnlyOneBuyOrderIsAllowedForTender",
+          1402,
+          "Only one buy order is allowed for Tender instrument"
+        ],
+        [
           "RequestNotAllowedForBlockInstrument",
           2026,
           "Request not allowed for BLOCK instrument"
@@ -1112,7 +1117,7 @@
         {
           "name": "timestamp",
           "type": "Timestamp",
-          "description": "Sending time."
+          "description": "Processing time."
         }
       ]
     },

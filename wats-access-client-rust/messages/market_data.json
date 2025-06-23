@@ -1,6 +1,6 @@
 {
   "$schema": "./schema.json",
-  "version": 2070,
+  "version": 2072,
   "typeDefinitions": {
     "marketData": [
       {
@@ -37,7 +37,7 @@
         "kind": "Primitive",
         "name": "i64",
         "size": 8,
-        "description": "Unsigned integer, 64-bit."
+        "description": "Signed integer, 64-bit."
       },
       {
         "kind": "Alias",
@@ -103,7 +103,7 @@
         "kind": "Alias",
         "name": "SeqNum",
         "alias": "u32",
-        "description": "Sequence number of the message. Must fit into 28 bits, see OrderId for details."
+        "description": "Sequence number of the message."
       },
       {
         "kind": "Alias",
@@ -7145,7 +7145,7 @@
         "kind": "Alias",
         "name": "SeqNum",
         "alias": "u32",
-        "description": "Sequence number of the message. Must fit into 28 bits, see OrderId for details."
+        "description": "Sequence number of the message."
       },
       {
         "kind": "Alias",
