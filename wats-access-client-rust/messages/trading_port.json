@@ -1,5 +1,5 @@
 {
-  "version": 1119,
+  "version": 1122,
   "typeDefinitions": [
     {
       "kind": "Primitive",
@@ -812,6 +812,11 @@
           "Invalid TimeInForce for sponsored connection"
         ],
         [
+          "OperationForbiddenDuringEarlyLateMonitoring",
+          1084,
+          "Entry/modification/cancellation of orders and quotes by members, as well as block and cross trades submission is not allowed when an instrument remains in Early / Late Monitoring market phases."
+        ],
+        [
           "MassQuoteNotAllowedForSelectedMarketModel",
           1201,
           "Mass Quote not allowed for selected Market Model."
@@ -1371,7 +1376,10 @@
         {
           "name": "stpId",
           "type": "STPId",
-          "description": "ID assigned by the client used in the Self Trade Prevention mechanism."
+          "description": "ID assigned by the client used in the Self Trade Prevention mechanism.",
+          "$metadata": {
+            "conditionallyRequired": "Never required, can be 0 to disable stp"
+          }
         },
         {
           "name": "instrumentId",
@@ -1401,7 +1409,10 @@
         {
           "name": "triggerPrice",
           "type": "Price",
-          "description": "Indicates the trigger price (Last Trade Price - LTP) after which the order should be added to the order book."
+          "description": "Indicates the trigger price (Last Trade Price - LTP) after which the order should be added to the order book.",
+          "$metadata": {
+            "conditionallyRequired": "Required for OrderType::StopLimit and OrderType::StopLoss, otherwise 0"
+          }
         },
         {
           "name": "quantity",
@@ -1411,7 +1422,10 @@
         {
           "name": "displayQty",
           "type": "Quantity",
-          "description": "Used only for iceberg order. The quantity to be displayed."
+          "description": "Used only for iceberg order. The quantity to be displayed.",
+          "$metadata": {
+            "conditionallyRequired": "Required for OrderType::Iceberg, otherwise 0"
+          }
         },
         {
           "name": "capacity",
@@ -1421,7 +1435,10 @@
         {
           "name": "account",
           "type": "Account",
-          "description": "Account number."
+          "description": "Account number.",
+          "$metadata": {
+            "conditionallyRequired": "Required for AccountType different than Missing, otherwise filled with 0x0"
+          }
         },
         {
           "name": "accountType",
@@ -1436,22 +1453,34 @@
         {
           "name": "expire",
           "type": "Timestamp",
-          "description": "Expiration time indicating the validity of the order - relevant only when TimeInForce is set to GTD (Good Till Date) or GTT (Good Till Time)."
+          "description": "Expiration time indicating the validity of the order - relevant only when TimeInForce is set to GTD (Good Till Date) or GTT (Good Till Time).",
+          "$metadata": {
+            "conditionallyRequired": "Required for TimeInForce::GTD or TimeInForce::GTT, otherwise 0"
+          }
         },
         {
           "name": "memo",
           "type": "Memo",
-          "description": "Free text."
+          "description": "Free text.",
+          "$metadata": {
+            "conditionallyRequired": "Never required, if unused filled with 0x0"
+          }
         },
         {
           "name": "clientOrderId",
           "type": "ClientOrderId",
-          "description": "Arbitrary user provided value associated with the order."
+          "description": "Arbitrary user provided value associated with the order.",
+          "$metadata": {
+            "conditionallyRequired": "Never required, if unused filled with 0x0"
+          }
         },
         {
           "name": "clearingMemberCode",
           "type": "ClearingCode",
-          "description": "Clearing member code."
+          "description": "Clearing member code.",
+          "$metadata": {
+            "conditionallyRequired": "Never required, if unused filled with 0x0"
+          }
         },
         {
           "name": "clearingMemberClearingIdentifier",
@@ -1466,12 +1495,18 @@
         {
           "name": "feeStructureId",
           "type": "u8",
-          "description": "Optional identifier of a fee scheme for billing purposes."
+          "description": "Optional identifier of a fee scheme for billing purposes.",
+          "$metadata": {
+            "conditionallyRequired": "Never required, if unused 0"
+          }
         },
         {
           "name": "interestedParty",
           "type": "InterestedParty",
-          "description": "3rd party interested in this order or trade."
+          "description": "3rd party interested in this order or trade.",
+          "$metadata": {
+            "conditionallyRequired": "Never required, if unused filled with 0x0"
+          }
         }
       ]
     },
@@ -1599,7 +1634,10 @@
         {
           "name": "triggerPrice",
           "type": "Price",
-          "description": "Indicates the trigger price (Last Trade Price - LTP) after which the order should be added to the order book."
+          "description": "Indicates the trigger price (Last Trade Price - LTP) after which the order should be added to the order book.",
+          "$metadata": {
+            "conditionallyRequired": "Required for OrderType::StopLimit and OrderType::StopLoss, otherwise 0"
+          }
         },
         {
           "name": "quantity",
@@ -1609,12 +1647,18 @@
         {
           "name": "displayQty",
           "type": "Quantity",
-          "description": "Used only for iceberg order. The quantity to be displayed."
+          "description": "Used only for iceberg order. The quantity to be displayed.",
+          "$metadata": {
+            "conditionallyRequired": "Required for OrderType::Iceberg, otherwise 0"
+          }
         },
         {
           "name": "expire",
           "type": "Timestamp",
-          "description": "Expiration time indicating the validity of the order - relevant only when TimeInForce is set to GTD (Good Till Date)."
+          "description": "Expiration time indicating the validity of the order - relevant only when TimeInForce is set to GTD (Good Till Date).",
+          "$metadata": {
+            "conditionallyRequired": "Required for TimeInForce::GTD, otherwise 0"
+          }
         },
         {
           "name": "mifidFields",
@@ -1741,17 +1785,26 @@
         {
           "name": "targetPartyId",
           "type": "u32",
-          "description": "Used to identify the party targeted for the action specified in the message."
+          "description": "Used to identify the party targeted for the action specified in the message.",
+          "$metadata": {
+            "conditionallyRequired": "Required for TargetPartyRole::SenderLocation/ClientID/ExecutingTrader/InvestmentDecisionMaker, otherwise 0"
+          }
         },
         {
           "name": "marketSegmentId",
           "type": "ElementId",
-          "description": "Identifies the market segment for request type CancelOrdersForMarketSegment."
+          "description": "Identifies the market segment for request type CancelOrdersForMarketSegment.",
+          "$metadata": {
+            "conditionallyRequired": "Required for MassCancelRequestType::CancelOrdersForMarketSegment, otherwise 0"
+          }
         },
         {
           "name": "instrumentId",
           "type": "ElementId",
-          "description:": "ID of the instrument to cancel, valid only for CancelForSecurity."
+          "description:": "ID of the instrument to cancel, valid only for CancelForSecurity.",
+          "$metadata": {
+            "conditionallyRequired": "Required for MassCancelRequestType::CancelForSecurity, otherwise 0"
+          }
         },
         {
           "name": "executingTrader",
@@ -2171,6 +2224,11 @@
           "MarketModelNotSupportedOnSponsoredConnection",
           1081,
           "Market Model not supported sponsored connection"
+        ],
+        [
+          "OperationForbiddenDuringEarlyLateMonitoring",
+          1084,
+          "Entry/modification/cancellation of orders and quotes by members, as well as block and cross trades submission is not allowed when an instrument remains in Early / Late Monitoring market phases."
         ],
         [
           "NotAuthorizedToQuoteInstrument",
@@ -3149,7 +3207,10 @@
         {
           "name": "stpId",
           "type": "STPId",
-          "description": "An ID assigned by the client used in Self Match Prevention mechanism."
+          "description": "An ID assigned by the client used in Self Match Prevention mechanism.",
+          "$metadata": {
+            "conditionallyRequired": "Never required, can be 0 to disable stp"
+          }
         },
         {
           "name": "capacity",
@@ -3159,7 +3220,10 @@
         {
           "name": "account",
           "type": "Account",
-          "description": "Account mnemonic as agreed between buy and sell sides."
+          "description": "Account mnemonic as agreed between buy and sell sides.",
+          "$metadata": {
+            "conditionallyRequired": "Required for AccountType different than Missing, otherwise filled with 0x0"
+          }
         },
         {
           "name": "accountType",
@@ -3172,12 +3236,18 @@
         },
         {
           "name": "memo",
-          "type": "Memo"
+          "type": "Memo",
+          "$metadata": {
+            "conditionallyRequired": "Never required, if unused filled with 0x0"
+          }
         },
         {
           "name": "clearingMemberCode",
           "type": "ClearingCode",
-          "description": "Clearing member code."
+          "description": "Clearing member code.",
+          "$metadata": {
+            "conditionallyRequired": "Never required, if unused filled with 0x0"
+          }
         },
         {
           "name": "clearingMemberClearingIdentifier",
@@ -3192,17 +3262,26 @@
         {
           "name": "feeStructureId",
           "type": "u8",
-          "description": "Optional identifier of a fee scheme for billing purposes."
+          "description": "Optional identifier of a fee scheme for billing purposes.",
+          "$metadata": {
+            "conditionallyRequired": "Never required, if unused 0"
+          }
         },
         {
           "name": "interestedParty",
           "type": "InterestedParty",
-          "description": "3rd party interested in this order or trade."
+          "description": "3rd party interested in this order or trade.",
+          "$metadata": {
+            "conditionallyRequired": "Never required, if unused filled with 0x0"
+          }
         },
         {
           "name": "quoteId",
           "type": "ClientOrderId",
-          "description": "Arbitrary user provided value associated with the mass quote."
+          "description": "Arbitrary user provided value associated with the mass quote.",
+          "$metadata": {
+            "conditionallyRequired": "Never required, if unused filled with 0x0"
+          }
         }
       ]
     },
@@ -3458,6 +3537,11 @@
         [
           "UnknownInstrument",
           1001
+        ],
+        [
+          "FirmNotAuthorizedForMmCommand",
+          1304,
+          "Market Maker Command may be submitted only by firm that is a Market Maker for the instrument."
         ],
         [
           "InstrumentAlreadyKnockedOut",

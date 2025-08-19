@@ -146,6 +146,10 @@ public enum TcrRejectionReason {
      */
     MARKETMODELNOTSUPPORTEDONSPONSOREDCONNECTION(1081),
     /**
+     * Entry/modification/cancellation of orders and quotes by members, as well as block and cross trades submission is not allowed when an instrument remains in Early / Late Monitoring market phases.
+     */
+    OPERATIONFORBIDDENDURINGEARLYLATEMONITORING(1084),
+    /**
      * Firm is not a Market Maker for this SecurityID (48).
      */
     NOTAUTHORIZEDTOQUOTEINSTRUMENT(1209),

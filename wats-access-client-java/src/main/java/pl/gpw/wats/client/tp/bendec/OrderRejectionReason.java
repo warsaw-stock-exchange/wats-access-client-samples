@@ -282,6 +282,10 @@ public enum OrderRejectionReason {
      */
     INVALIDTIMEINFORCEFORSPONSOREDCONNECTION(1083),
     /**
+     * Entry/modification/cancellation of orders and quotes by members, as well as block and cross trades submission is not allowed when an instrument remains in Early / Late Monitoring market phases.
+     */
+    OPERATIONFORBIDDENDURINGEARLYLATEMONITORING(1084),
+    /**
      * Mass Quote not allowed for selected Market Model.
      */
     MASSQUOTENOTALLOWEDFORSELECTEDMARKETMODEL(1201),

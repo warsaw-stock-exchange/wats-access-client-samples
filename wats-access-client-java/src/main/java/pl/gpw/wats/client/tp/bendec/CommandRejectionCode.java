@@ -12,6 +12,10 @@ public enum CommandRejectionCode {
     OTHER(99),
     UNKNOWNINSTRUMENT(1001),
     /**
+     * Market Maker Command may be submitted only by firm that is a Market Maker for the instrument.
+     */
+    FIRMNOTAUTHORIZEDFORMMCOMMAND(1304),
+    /**
      * Attempt to knock-out an instrument that is already in knocked-out state.
      */
     INSTRUMENTALREADYKNOCKEDOUT(1313),
