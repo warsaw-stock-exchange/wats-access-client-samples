@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
  * <p>The index summary message provides a summary of the data calculated in a stock index for a given day.</p>
  * <p>Byte length: 118</p>
  * <p>Header header - Message header. | size 42</p>
- * <p>ElementId > long (u32) instrumentId - ID of the instrument. | size 4</p>
+ * <p>ElementId > long (u32) instrumentId - InstrumentID of the redistributed index. | size 4</p>
  * <p>IndexValue > long (i64) openingIndexValue - Opening index value | size 8</p>
  * <p>IndexValue > long (i64) sessionLow - Lowest value of the day. | size 8</p>
  * <p>IndexValue > long (i64) sessionHigh - Highest value of the day. | size 8</p>
@@ -77,7 +77,7 @@ public class IndexSummary implements ByteSerializable, Message {
     }
     
     /**
-     * @return ID of the instrument.
+     * @return InstrumentID of the redistributed index.
      */
     public long getInstrumentId() {
         return this.instrumentId;
@@ -154,7 +154,7 @@ public class IndexSummary implements ByteSerializable, Message {
     }
     
     /**
-     * @param instrumentId ID of the instrument.
+     * @param instrumentId InstrumentID of the redistributed index.
      */
     public void setInstrumentId(long instrumentId) {
         this.instrumentId = instrumentId;

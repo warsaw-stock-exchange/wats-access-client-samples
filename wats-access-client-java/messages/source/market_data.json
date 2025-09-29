@@ -1,6 +1,6 @@
 {
   "$schema": "./schema.json",
-  "version": 2072,
+  "version": 2073,
   "typeDefinitions": {
     "marketData": [
       {
@@ -5473,7 +5473,7 @@
           {
             "name": "instrumentId",
             "type": "ElementId",
-            "description": "ID of the instrument."
+            "description": "InstrumentID of the redistributed index."
           },
           {
             "name": "indexLevelCode",
@@ -5550,7 +5550,7 @@
           {
             "name": "instrumentId",
             "type": "ElementId",
-            "description": "ID of the instrument."
+            "description": "InstrumentID of the redistributed index."
           },
           {
             "name": "openingIndexValue",
@@ -5617,7 +5617,7 @@
           {
             "name": "instrumentId",
             "type": "ElementId",
-            "description": "ID of the instrument."
+            "description": "InstrumentID of the redistributed index."
           },
           {
             "name": "publicProductIdentification",
@@ -5659,7 +5659,7 @@
           {
             "name": "instrumentId",
             "type": "ElementId",
-            "description": "ID of financial instrument."
+            "description": "InstrumentID of the redistributed index."
           },
           {
             "name": "indexBaseValue",

@@ -1,6 +1,11 @@
 # Changes history for WATS Access Clients and Documentation
 
-## 1.5.4
+## 1.6.14
+
+* **Change:** Access Clients (connectivity example code) repositories updated and adapted to version 1.6.14
+* **Change:** Outdated common subsection removed.
+
+* ## 1.5.4
 
 * **Change:** Access Clients (connectivity example code) repositories updated and adapted to version 1.5.4
 

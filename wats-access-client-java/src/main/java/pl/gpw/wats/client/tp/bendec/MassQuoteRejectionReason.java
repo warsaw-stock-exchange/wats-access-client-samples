@@ -90,6 +90,10 @@ public enum MassQuoteRejectionReason {
      */
     MARKETMODELNOTSUPPORTEDONSPONSOREDCONNECTION(1081),
     /**
+     * Clearing Member code must be 4-digit number in case of custom codes and 20-char string in case of LEI.
+     */
+    INVALIDCLEARINGMEMBERCODELENGTH(1085),
+    /**
      * Multiple quotes for the same instrument within Mass Quote message.
      */
     DUPLICATEINSTRUMENT(1202),

@@ -10,7 +10,7 @@ import java.nio.ByteBuffer;
  * <p>Byte length: 96</p>
  * <p>Header header - Message header. | size 42</p>
  * <p>ElementId > long (u32) id - The identifier of the entry within the given index. | size 4</p>
- * <p>ElementId > long (u32) instrumentId - ID of the instrument. | size 4</p>
+ * <p>ElementId > long (u32) instrumentId - InstrumentID of the redistributed index. | size 4</p>
  * <p>PublicProductIdentification publicProductIdentification - Product identification type and code. | size 31</p>
  * <p>MicCode > String (u8[]) mic - Market structure's Market Identifier Code (MIC) as specified in ISO 10383. | size 4</p>
  * <p>Currency currency - Currency (e.g. USD). | size 2</p>
@@ -72,7 +72,7 @@ public class IndexPortfolioEntry implements ByteSerializable, Message {
     }
     
     /**
-     * @return ID of the instrument.
+     * @return InstrumentID of the redistributed index.
      */
     public long getInstrumentId() {
         return this.instrumentId;
@@ -128,7 +128,7 @@ public class IndexPortfolioEntry implements ByteSerializable, Message {
     }
     
     /**
-     * @param instrumentId ID of the instrument.
+     * @param instrumentId InstrumentID of the redistributed index.
      */
     public void setInstrumentId(long instrumentId) {
         this.instrumentId = instrumentId;

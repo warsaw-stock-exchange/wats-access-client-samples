@@ -3695,7 +3695,7 @@ pub struct OrderBookEvent {
 pub struct RealTimeIndex {
   /// Message header.
   pub header: Header,
-  /// ID of the instrument.
+  /// InstrumentID of the redistributed index.
   pub instrument_id: ElementId,
   /// Level of the index.
   pub index_level_code: IndexLevelCode,
@@ -3731,7 +3731,7 @@ pub struct RealTimeIndex {
 pub struct IndexSummary {
   /// Message header.
   pub header: Header,
-  /// ID of the instrument.
+  /// InstrumentID of the redistributed index.
   pub instrument_id: ElementId,
   /// Opening index value
   pub opening_index_value: IndexValue,
@@ -3763,7 +3763,7 @@ pub struct IndexPortfolioEntry {
   pub header: Header,
   /// The identifier of the entry within the given index.
   pub id: ElementId,
-  /// ID of the instrument.
+  /// InstrumentID of the redistributed index.
   pub instrument_id: ElementId,
   /// Product identification type and code.
   pub public_product_identification: PublicProductIdentification,
@@ -3785,7 +3785,7 @@ pub struct IndexPortfolioEntry {
 pub struct IndexParams {
   /// Message header.
   pub header: Header,
-  /// ID of financial instrument.
+  /// InstrumentID of the redistributed index.
   pub instrument_id: ElementId,
   /// Index base value.
   pub index_base_value: IndexValue,

@@ -1,5 +1,5 @@
 {
-  "version": 1122,
+  "version": 1124,
   "typeDefinitions": [
     {
       "kind": "Primitive",
@@ -817,6 +817,11 @@
           "Entry/modification/cancellation of orders and quotes by members, as well as block and cross trades submission is not allowed when an instrument remains in Early / Late Monitoring market phases."
         ],
         [
+          "InvalidClearingMemberCodeLength",
+          1085,
+          "Clearing Member code must be 4-digit number in case of custom codes and 20-char string in case of LEI."
+        ],
+        [
           "MassQuoteNotAllowedForSelectedMarketModel",
           1201,
           "Mass Quote not allowed for selected Market Model."
@@ -977,9 +982,9 @@
           "Maximum order count has exceeded the risk limit."
         ],
         [
-          "KillSwitch",
+          "RejectedDueToKillSwitchActivation",
           7022,
-          "Rejected due to kill switch."
+          "Rejected due to kill switch activation."
         ]
       ]
     },
@@ -2231,6 +2236,11 @@
           "Entry/modification/cancellation of orders and quotes by members, as well as block and cross trades submission is not allowed when an instrument remains in Early / Late Monitoring market phases."
         ],
         [
+          "InvalidClearingMemberCodeLength",
+          1085,
+          "Clearing Member code must be 4-digit number in case of custom codes and 20-char string in case of LEI."
+        ],
+        [
           "NotAuthorizedToQuoteInstrument",
           1209,
           "Firm is not a Market Maker for this SecurityID (48)."
@@ -3440,6 +3450,11 @@
           "MarketModelNotSupportedOnSponsoredConnection",
           1081,
           "Market Model not supported sponsored connection"
+        ],
+        [
+          "InvalidClearingMemberCodeLength",
+          1085,
+          "Clearing Member code must be 4-digit number in case of custom codes and 20-char string in case of LEI."
         ],
         [
           "DuplicateInstrument",

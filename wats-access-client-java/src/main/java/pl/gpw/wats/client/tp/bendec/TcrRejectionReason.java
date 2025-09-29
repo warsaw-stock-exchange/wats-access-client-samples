@@ -150,6 +150,10 @@ public enum TcrRejectionReason {
      */
     OPERATIONFORBIDDENDURINGEARLYLATEMONITORING(1084),
     /**
+     * Clearing Member code must be 4-digit number in case of custom codes and 20-char string in case of LEI.
+     */
+    INVALIDCLEARINGMEMBERCODELENGTH(1085),
+    /**
      * Firm is not a Market Maker for this SecurityID (48).
      */
     NOTAUTHORIZEDTOQUOTEINSTRUMENT(1209),

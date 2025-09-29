@@ -286,6 +286,10 @@ public enum OrderRejectionReason {
      */
     OPERATIONFORBIDDENDURINGEARLYLATEMONITORING(1084),
     /**
+     * Clearing Member code must be 4-digit number in case of custom codes and 20-char string in case of LEI.
+     */
+    INVALIDCLEARINGMEMBERCODELENGTH(1085),
+    /**
      * Mass Quote not allowed for selected Market Model.
      */
     MASSQUOTENOTALLOWEDFORSELECTEDMARKETMODEL(1201),
@@ -414,9 +418,9 @@ public enum OrderRejectionReason {
      */
     MAXORDERCOUNTEXCEEDED(7021),
     /**
-     * Rejected due to kill switch.
+     * Rejected due to kill switch activation.
      */
-    KILLSWITCH(7022);
+    REJECTEDDUETOKILLSWITCHACTIVATION(7022);
     
     private final int value;
     private final int byteLength = 2;

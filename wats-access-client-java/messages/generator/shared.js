@@ -1,4 +1,3 @@
-const _ = require('lodash')
 const path = require('path')
 const fs = require('fs')
 const { Kind } = require('bendec/dist/types')

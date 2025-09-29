@@ -544,6 +544,7 @@ enum class OrderRejectionReason: uint16_t {
     MarketModelNotSupportedOnSponsoredConnection = 1081,
     InvalidTimeInForceForSponsoredConnection = 1083,
     OperationForbiddenDuringEarlyLateMonitoring = 1084,
+    InvalidClearingMemberCodeLength = 1085,
     MassQuoteNotAllowedForSelectedMarketModel = 1201,
     InstrumentClosed = 1203,
     InvalidBidAskSpread = 1208,
@@ -576,7 +577,7 @@ enum class OrderRejectionReason: uint16_t {
     TotalSellRiskValueExceeded = 7019,
     TotalNetRiskValueExceeded = 7020,
     MaxOrderCountExceeded = 7021,
-    KillSwitch = 7022
+    RejectedDueToKillSwitchActivation = 7022
 };
 
 static const std::map<std::string, OrderRejectionReason> Name2OrderRejectionReason {
@@ -649,6 +650,7 @@ static const std::map<std::string, OrderRejectionReason> Name2OrderRejectionReas
     { "MarketModelNotSupportedOnSponsoredConnection", OrderRejectionReason::MarketModelNotSupportedOnSponsoredConnection },
     { "InvalidTimeInForceForSponsoredConnection", OrderRejectionReason::InvalidTimeInForceForSponsoredConnection },
     { "OperationForbiddenDuringEarlyLateMonitoring", OrderRejectionReason::OperationForbiddenDuringEarlyLateMonitoring },
+    { "InvalidClearingMemberCodeLength", OrderRejectionReason::InvalidClearingMemberCodeLength },
     { "MassQuoteNotAllowedForSelectedMarketModel", OrderRejectionReason::MassQuoteNotAllowedForSelectedMarketModel },
     { "InstrumentClosed", OrderRejectionReason::InstrumentClosed },
     { "InvalidBidAskSpread", OrderRejectionReason::InvalidBidAskSpread },
@@ -681,7 +683,7 @@ static const std::map<std::string, OrderRejectionReason> Name2OrderRejectionReas
     { "TotalSellRiskValueExceeded", OrderRejectionReason::TotalSellRiskValueExceeded },
     { "TotalNetRiskValueExceeded", OrderRejectionReason::TotalNetRiskValueExceeded },
     { "MaxOrderCountExceeded", OrderRejectionReason::MaxOrderCountExceeded },
-    { "KillSwitch", OrderRejectionReason::KillSwitch }
+    { "RejectedDueToKillSwitchActivation", OrderRejectionReason::RejectedDueToKillSwitchActivation }
 };
 
 static const std::map<OrderRejectionReason, std::string> OrderRejectionReason2Name {
@@ -754,6 +756,7 @@ static const std::map<OrderRejectionReason, std::string> OrderRejectionReason2Na
     { OrderRejectionReason::MarketModelNotSupportedOnSponsoredConnection, "MarketModelNotSupportedOnSponsoredConnection" },
     { OrderRejectionReason::InvalidTimeInForceForSponsoredConnection, "InvalidTimeInForceForSponsoredConnection" },
     { OrderRejectionReason::OperationForbiddenDuringEarlyLateMonitoring, "OperationForbiddenDuringEarlyLateMonitoring" },
+    { OrderRejectionReason::InvalidClearingMemberCodeLength, "InvalidClearingMemberCodeLength" },
     { OrderRejectionReason::MassQuoteNotAllowedForSelectedMarketModel, "MassQuoteNotAllowedForSelectedMarketModel" },
     { OrderRejectionReason::InstrumentClosed, "InstrumentClosed" },
     { OrderRejectionReason::InvalidBidAskSpread, "InvalidBidAskSpread" },
@@ -786,7 +789,7 @@ static const std::map<OrderRejectionReason, std::string> OrderRejectionReason2Na
     { OrderRejectionReason::TotalSellRiskValueExceeded, "TotalSellRiskValueExceeded" },
     { OrderRejectionReason::TotalNetRiskValueExceeded, "TotalNetRiskValueExceeded" },
     { OrderRejectionReason::MaxOrderCountExceeded, "MaxOrderCountExceeded" },
-    { OrderRejectionReason::KillSwitch, "KillSwitch" }
+    { OrderRejectionReason::RejectedDueToKillSwitchActivation, "RejectedDueToKillSwitchActivation" }
 };
 
 
@@ -1291,6 +1294,7 @@ enum class TcrRejectionReason: uint16_t {
     ForbiddenClearingMemberCode = 1077,
     MarketModelNotSupportedOnSponsoredConnection = 1081,
     OperationForbiddenDuringEarlyLateMonitoring = 1084,
+    InvalidClearingMemberCodeLength = 1085,
     NotAuthorizedToQuoteInstrument = 1209,
     UnknownTradeReport = 2001,
     DuplicateTradeReportId = 2002,
@@ -1349,6 +1353,7 @@ static const std::map<std::string, TcrRejectionReason> Name2TcrRejectionReason {
     { "ForbiddenClearingMemberCode", TcrRejectionReason::ForbiddenClearingMemberCode },
     { "MarketModelNotSupportedOnSponsoredConnection", TcrRejectionReason::MarketModelNotSupportedOnSponsoredConnection },
     { "OperationForbiddenDuringEarlyLateMonitoring", TcrRejectionReason::OperationForbiddenDuringEarlyLateMonitoring },
+    { "InvalidClearingMemberCodeLength", TcrRejectionReason::InvalidClearingMemberCodeLength },
     { "NotAuthorizedToQuoteInstrument", TcrRejectionReason::NotAuthorizedToQuoteInstrument },
     { "UnknownTradeReport", TcrRejectionReason::UnknownTradeReport },
     { "DuplicateTradeReportId", TcrRejectionReason::DuplicateTradeReportId },
@@ -1407,6 +1412,7 @@ static const std::map<TcrRejectionReason, std::string> TcrRejectionReason2Name {
     { TcrRejectionReason::ForbiddenClearingMemberCode, "ForbiddenClearingMemberCode" },
     { TcrRejectionReason::MarketModelNotSupportedOnSponsoredConnection, "MarketModelNotSupportedOnSponsoredConnection" },
     { TcrRejectionReason::OperationForbiddenDuringEarlyLateMonitoring, "OperationForbiddenDuringEarlyLateMonitoring" },
+    { TcrRejectionReason::InvalidClearingMemberCodeLength, "InvalidClearingMemberCodeLength" },
     { TcrRejectionReason::NotAuthorizedToQuoteInstrument, "NotAuthorizedToQuoteInstrument" },
     { TcrRejectionReason::UnknownTradeReport, "UnknownTradeReport" },
     { TcrRejectionReason::DuplicateTradeReportId, "DuplicateTradeReportId" },
@@ -1538,6 +1544,7 @@ enum class MassQuoteRejectionReason: uint16_t {
     InvalidClientIdForSponsoredConnection = 1078,
     ForbiddenOrderCapacityValueForSponsoredConnection = 1080,
     MarketModelNotSupportedOnSponsoredConnection = 1081,
+    InvalidClearingMemberCodeLength = 1085,
     DuplicateInstrument = 1202,
     InvalidQuotesCount = 1204,
     ForbiddenOrderCapacityValue = 1210,
@@ -1565,6 +1572,7 @@ static const std::map<std::string, MassQuoteRejectionReason> Name2MassQuoteRejec
     { "InvalidClientIdForSponsoredConnection", MassQuoteRejectionReason::InvalidClientIdForSponsoredConnection },
     { "ForbiddenOrderCapacityValueForSponsoredConnection", MassQuoteRejectionReason::ForbiddenOrderCapacityValueForSponsoredConnection },
     { "MarketModelNotSupportedOnSponsoredConnection", MassQuoteRejectionReason::MarketModelNotSupportedOnSponsoredConnection },
+    { "InvalidClearingMemberCodeLength", MassQuoteRejectionReason::InvalidClearingMemberCodeLength },
     { "DuplicateInstrument", MassQuoteRejectionReason::DuplicateInstrument },
     { "InvalidQuotesCount", MassQuoteRejectionReason::InvalidQuotesCount },
     { "ForbiddenOrderCapacityValue", MassQuoteRejectionReason::ForbiddenOrderCapacityValue },
@@ -1592,6 +1600,7 @@ static const std::map<MassQuoteRejectionReason, std::string> MassQuoteRejectionR
     { MassQuoteRejectionReason::InvalidClientIdForSponsoredConnection, "InvalidClientIdForSponsoredConnection" },
     { MassQuoteRejectionReason::ForbiddenOrderCapacityValueForSponsoredConnection, "ForbiddenOrderCapacityValueForSponsoredConnection" },
     { MassQuoteRejectionReason::MarketModelNotSupportedOnSponsoredConnection, "MarketModelNotSupportedOnSponsoredConnection" },
+    { MassQuoteRejectionReason::InvalidClearingMemberCodeLength, "InvalidClearingMemberCodeLength" },
     { MassQuoteRejectionReason::DuplicateInstrument, "DuplicateInstrument" },
     { MassQuoteRejectionReason::InvalidQuotesCount, "InvalidQuotesCount" },
     { MassQuoteRejectionReason::ForbiddenOrderCapacityValue, "ForbiddenOrderCapacityValue" },

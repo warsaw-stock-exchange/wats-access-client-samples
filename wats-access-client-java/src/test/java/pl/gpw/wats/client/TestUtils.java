@@ -106,6 +106,7 @@ public class TestUtils {
                 ),
                 instrumentId,
                 tradeReportId,
+                BigInteger.ZERO,
                 0,
                 TradeReportTransType.NEW,
                 TradeReportType.SUBMIT,

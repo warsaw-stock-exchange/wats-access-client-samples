@@ -108,6 +108,7 @@ public class EncryptionUtils {
         Cipher cipher = EncryptionUtils.initCipher(key, nonce, header.getEncryptionOffset().intValue());
 
         orderExecute.setQuantity(BendecUtils.uInt64FromByteArray(cipher.update(BendecUtils.uInt64ToByteArray(orderExecute.getQuantity())), 0));
+        orderExecute.setInstrumentId(BendecUtils.uInt32FromByteArray(cipher.update(BendecUtils.uInt32ToByteArray(orderExecute.getInstrumentId())), 0));
         orderExecute.setExecutionId(BendecUtils.uInt32FromByteArray(cipher.update(BendecUtils.uInt32ToByteArray(orderExecute.getExecutionId())), 0));
         orderExecute.setExecutionPrice(BendecUtils.int64FromByteArray(cipher.update(BendecUtils.int64ToByteArray(orderExecute.getExecutionPrice())), 0));
         orderExecute.setExecutionQuantity(BendecUtils.uInt64FromByteArray(cipher.update(BendecUtils.uInt64ToByteArray(orderExecute.getExecutionQuantity())), 0));

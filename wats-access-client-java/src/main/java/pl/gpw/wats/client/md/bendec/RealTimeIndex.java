@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
  * <p>Message providing real-time index values for instruments.</p>
  * <p>Byte length: 129</p>
  * <p>Header header - Message header. | size 42</p>
- * <p>ElementId > long (u32) instrumentId - ID of the instrument. | size 4</p>
+ * <p>ElementId > long (u32) instrumentId - InstrumentID of the redistributed index. | size 4</p>
  * <p>IndexLevelCode indexLevelCode - Level of the index. | size 1</p>
  * <p>u16 > int numOfActiveInstruments - Number of instruments – participants of the index, for which the quotation was set during the session. | size 2</p>
  * <p>PercentageChange > long (i64) indIndexOpeningPortfolio - Indicator of the index opening portfolio W(t). Percentage share of instruments with at least one trade during the session. | size 8</p>
@@ -89,7 +89,7 @@ public class RealTimeIndex implements ByteSerializable, Message {
     }
     
     /**
-     * @return ID of the instrument.
+     * @return InstrumentID of the redistributed index.
      */
     public long getInstrumentId() {
         return this.instrumentId;
@@ -187,7 +187,7 @@ public class RealTimeIndex implements ByteSerializable, Message {
     }
     
     /**
-     * @param instrumentId ID of the instrument.
+     * @param instrumentId InstrumentID of the redistributed index.
      */
     public void setInstrumentId(long instrumentId) {
         this.instrumentId = instrumentId;

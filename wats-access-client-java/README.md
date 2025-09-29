@@ -8,6 +8,7 @@ Repository contains Java source code of a library which demonstrates interaction
 This implementation requires JDK 11. To build the samples you should issue the following commands:
 
 ```shell
+# Build everything except tests
 ./gradlew assemble
 ```
 

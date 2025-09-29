@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
  * <p>The metadata message for the given index.</p>
  * <p>Byte length: 186</p>
  * <p>Header header - Message header. | size 42</p>
- * <p>ElementId > long (u32) instrumentId - ID of financial instrument. | size 4</p>
+ * <p>ElementId > long (u32) instrumentId - InstrumentID of the redistributed index. | size 4</p>
  * <p>IndexValue > long (i64) indexBaseValue - Index base value. | size 8</p>
  * <p>Value > long (i64) indexBaseCapitalisation - Index base capitalisation | size 8</p>
  * <p>Date > long (u32) indexBaseDate - Index base date. | size 4</p>
@@ -93,7 +93,7 @@ public class IndexParams implements ByteSerializable, Message {
     }
     
     /**
-     * @return ID of financial instrument.
+     * @return InstrumentID of the redistributed index.
      */
     public long getInstrumentId() {
         return this.instrumentId;
@@ -198,7 +198,7 @@ public class IndexParams implements ByteSerializable, Message {
     }
     
     /**
-     * @param instrumentId ID of financial instrument.
+     * @param instrumentId InstrumentID of the redistributed index.
      */
     public void setInstrumentId(long instrumentId) {
         this.instrumentId = instrumentId;

@@ -1,5 +1,9 @@
 # Changes history for WATS Access Client Java sample code
 
+## 1.6.14
+
+* **Change:** Message definitions (contract) updated to version 1.6.14
+
 ## 1.6.8
 
 * **Change:** Message definitions (contract) updated to version 1.6.8
