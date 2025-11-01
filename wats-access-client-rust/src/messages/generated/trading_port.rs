@@ -433,17 +433,17 @@ impl BytesValidator for OrderSide {
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum OrderStatus {
-  /// New order.
+  /// New order( for Mass Quotes ->operation accepted).
   New = 0x0001,
-  /// Order canceled.
+  /// Order cancelled (Not applicable to mass quotes).
   Cancelled = 0x0002,
   /// Order rejected.
   Rejected = 0x0003,
-  /// Order filled.
+  /// Order filled (Not applicable to mass quotes).
   Filled = 0x0004,
-  /// Order partially filled.
+  /// Order partially filled (Not applicable to mass quotes).
   PartiallyFilled = 0x0005,
-  /// Order expired.
+  /// Order expired (Not applicable to mass quotes).
   Expired = 0x0006,
 }
 impl Default for OrderStatus {

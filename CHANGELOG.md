@@ -1,11 +1,15 @@
 # Changes history for WATS Access Clients and Documentation
 
+## 1.6.16
+
+* **Change:** Access Clients (connectivity example code) repositories updated and adapted to version 1.6.16
+
 ## 1.6.14
 
 * **Change:** Access Clients (connectivity example code) repositories updated and adapted to version 1.6.14
 * **Change:** Outdated common subsection removed.
 
-* ## 1.5.4
+## 1.5.4
 
 * **Change:** Access Clients (connectivity example code) repositories updated and adapted to version 1.5.4
 
@@ -38,15 +42,15 @@
 
 ## 0.62
 
-* **New:** Changelog documents added
-* **Change:** Access Clients (connectivity example code) repositiories updated and adapted to version 0.62
+* **New:** Change log documents added
+* **Change:** Access Clients (connectivity example code) repositories updated and adapted to version 0.62
 * **Change:** Documentation updated to version 0.62
 * **Change:** QuickFIX XML templates updated to 0.62
 
 ## 0.59
 
 * **New:** Licensing information added
-* **Change:** Access Clients (connectivity example code) repositiories updated and adapted to version 0.59
+* **Change:** Access Clients (connectivity example code) repositories updated and adapted to version 0.59
 * **Change:** Documentation updated to version 0.59
 * **Change:** QuickFIX XML templates updated to 0.59
 
@@ -59,7 +63,7 @@
 
 ## 0.56
 
-* **Change:** Access Clients (connectivity example code) repositiories updated and adapted to version 0.56
+* **Change:** Access Clients (connectivity example code) repositories updated and adapted to version 0.56
 * **Change:** Documentation updated to version 0.56
 * **Change:** QuickFIX XML templates updated to 0.56
 

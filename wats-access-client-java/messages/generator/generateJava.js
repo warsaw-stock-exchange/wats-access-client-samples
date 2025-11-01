@@ -12,6 +12,27 @@ const rootOutput = outDir !== undefined
 const [mdVersion, mdTypes] = readDefs('market_data.json');
 const [tpVersion, tpTypes] = readDefs('trading_port.json');
 
+const {Kind} = require("bendec/dist/types");
+const {indentBlock} = require("bendec/dist/tools/java/utils");
+
+function generateExtensions(genBase, typeDef) {
+  if (typeDef.kind !== Kind.Struct && typeDef.name == 'ExecInst') {
+    return indentBlock(
+        `@Override
+        public String toString() {
+            StringJoiner sj = new StringJoiner("|", "[", "]");
+            for (${typeDef.name}Options option: ${typeDef.name}Options.values()) {
+                if (isAdded(option))
+                    sj.add(option.name());
+            }
+            return sj.toString();
+        }`
+    )
+  } else {
+    return ''
+  }
+}
+
 function generateTypes() {
   let bendecPackageName = "pl.gpw.wats.client.md.bendec";
   generateFiles(convertJson([...mdTypes.marketData]),
@@ -32,6 +53,7 @@ function generateTypes() {
       interfaces: [
         binSerializableGenerator(bendecPackageName),
       ],
+      typeExtender: [generateExtensions],
     }
   );
 

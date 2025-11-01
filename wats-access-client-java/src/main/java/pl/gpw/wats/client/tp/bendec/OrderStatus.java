@@ -10,11 +10,11 @@ import java.nio.ByteBuffer;
  */
 public enum OrderStatus {
     /**
-     * New order.
+     * New order( for Mass Quotes ->operation accepted).
      */
     NEW(1),
     /**
-     * Order canceled.
+     * Order cancelled (Not applicable to mass quotes).
      */
     CANCELLED(2),
     /**
@@ -22,15 +22,15 @@ public enum OrderStatus {
      */
     REJECTED(3),
     /**
-     * Order filled.
+     * Order filled (Not applicable to mass quotes).
      */
     FILLED(4),
     /**
-     * Order partially filled.
+     * Order partially filled (Not applicable to mass quotes).
      */
     PARTIALLYFILLED(5),
     /**
-     * Order expired.
+     * Order expired (Not applicable to mass quotes).
      */
     EXPIRED(6);
     

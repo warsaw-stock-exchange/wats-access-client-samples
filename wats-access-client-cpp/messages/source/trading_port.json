@@ -1,5 +1,5 @@
 {
-  "version": 1124,
+  "version": 1126,
   "typeDefinitions": [
     {
       "kind": "Primitive",
@@ -380,12 +380,12 @@
         [
           "New",
           1,
-          "New order."
+          "New order( for Mass Quotes ->operation accepted)."
         ],
         [
           "Cancelled",
           2,
-          "Order canceled."
+          "Order cancelled (Not applicable to mass quotes)."
         ],
         [
           "Rejected",
@@ -395,17 +395,17 @@
         [
           "Filled",
           4,
-          "Order filled."
+          "Order filled (Not applicable to mass quotes)."
         ],
         [
           "PartiallyFilled",
           5,
-          "Order partially filled."
+          "Order partially filled (Not applicable to mass quotes)."
         ],
         [
           "Expired",
           6,
-          "Order expired."
+          "Order expired (Not applicable to mass quotes)."
         ]
       ]
     },

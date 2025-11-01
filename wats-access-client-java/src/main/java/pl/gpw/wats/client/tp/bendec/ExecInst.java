@@ -47,6 +47,16 @@ public class ExecInst {
         return value;
     }
     
+    @Override
+    public String toString() {
+        StringJoiner sj = new StringJoiner("|", "[", "]");
+        for (ExecInstOptions option: ExecInstOptions.values()) {
+            if (isAdded(option))
+                sj.add(option.name());
+        }
+        return sj.toString();
+    }
+    
     byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
