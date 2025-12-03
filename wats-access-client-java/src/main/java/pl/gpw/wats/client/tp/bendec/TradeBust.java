@@ -7,14 +7,14 @@ import java.nio.ByteBuffer;
 /**
  * <h2>TradeBust</h2>
  * <p>Message used to inform about cancellation of previously accepted Trade.</p>
- * <p>Byte length: 20</p>
- * <p>Header header - Header. | size 16</p>
+ * <p>Byte length: 28</p>
+ * <p>Header header - Header. | size 24</p>
  * <p>TradeId > long (u32) tradeId - The unique ID assigned to the trade entity once it is received or matched by the exchange or central counterparty. | size 4</p>
  */
 public class TradeBust implements ByteSerializable, Message {
     private Header header;
     private long tradeId;
-    public static final int byteLength = 20;
+    public static final int byteLength = 28;
     
     public TradeBust(Header header, long tradeId) {
         this.header = header;
@@ -23,7 +23,7 @@ public class TradeBust implements ByteSerializable, Message {
     
     public TradeBust(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
-        this.tradeId = BendecUtils.uInt32FromByteArray(bytes, offset + 16);
+        this.tradeId = BendecUtils.uInt32FromByteArray(bytes, offset + 24);
     }
     
     public TradeBust(byte[] bytes) {

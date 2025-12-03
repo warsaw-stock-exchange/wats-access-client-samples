@@ -7,8 +7,8 @@ import java.nio.ByteBuffer;
 /**
  * <h2>BidOfferUpdate</h2>
  * <p>Message send during the IPO to the sell side or during the Tender Offer to the buy side.</p>
- * <p>Byte length: 45</p>
- * <p>Header header - Message header. | size 16</p>
+ * <p>Byte length: 53</p>
+ * <p>Header header - Message header. | size 24</p>
  * <p>ElementId > long (u32) instrumentId - Instrument ID. | size 4</p>
  * <p>BidOfferUpdateType updateType - Indicates a type of the BidOfferUpdate message. | size 1</p>
  * <p>Quantity > BigInteger (u64) totalBidSize - Specifies the total bid size. | size 8</p>
@@ -24,7 +24,7 @@ public class BidOfferUpdate implements ByteSerializable, Message {
     private BigInteger totalOfferSize;
     private long bidOrders;
     private long offerOrders;
-    public static final int byteLength = 45;
+    public static final int byteLength = 53;
     
     public BidOfferUpdate(Header header, long instrumentId, BidOfferUpdateType updateType, BigInteger totalBidSize, BigInteger totalOfferSize, long bidOrders, long offerOrders) {
         this.header = header;
@@ -38,12 +38,12 @@ public class BidOfferUpdate implements ByteSerializable, Message {
     
     public BidOfferUpdate(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
-        this.instrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 16);
-        this.updateType = BidOfferUpdateType.getBidOfferUpdateType(bytes, offset + 20);
-        this.totalBidSize = BendecUtils.uInt64FromByteArray(bytes, offset + 21);
-        this.totalOfferSize = BendecUtils.uInt64FromByteArray(bytes, offset + 29);
-        this.bidOrders = BendecUtils.uInt32FromByteArray(bytes, offset + 37);
-        this.offerOrders = BendecUtils.uInt32FromByteArray(bytes, offset + 41);
+        this.instrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 24);
+        this.updateType = BidOfferUpdateType.getBidOfferUpdateType(bytes, offset + 28);
+        this.totalBidSize = BendecUtils.uInt64FromByteArray(bytes, offset + 29);
+        this.totalOfferSize = BendecUtils.uInt64FromByteArray(bytes, offset + 37);
+        this.bidOrders = BendecUtils.uInt32FromByteArray(bytes, offset + 45);
+        this.offerOrders = BendecUtils.uInt32FromByteArray(bytes, offset + 49);
     }
     
     public BidOfferUpdate(byte[] bytes) {

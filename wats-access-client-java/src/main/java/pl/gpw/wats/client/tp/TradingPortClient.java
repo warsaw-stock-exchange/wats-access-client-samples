@@ -165,14 +165,14 @@ public class TradingPortClient {
 
     private Login loginMessage() {
         pl.gpw.wats.client.tp.bendec.Header header = new pl.gpw.wats.client.tp.bendec.Header(
-                Login.byteLength, pl.gpw.wats.client.tp.bendec.MsgType.LOGIN, 0, BigInteger.ZERO);
+                Login.byteLength, pl.gpw.wats.client.tp.bendec.MsgType.LOGIN, 0, BigInteger.ZERO, BigInteger.ZERO);
         return new Login(header, config.version(), config.token(), config.connectionId(),
                 connectionStatus.getNextExpectedSeqNum(), 0);
     }
 
     private Logout logoutMessage() {
         pl.gpw.wats.client.tp.bendec.Header header = new pl.gpw.wats.client.tp.bendec.Header(
-                Logout.byteLength, MsgType.LOGOUT, 0, BigInteger.ZERO);
+                Logout.byteLength, MsgType.LOGOUT, 0, BigInteger.ZERO, BigInteger.ZERO);
         return new Logout(header);
     }
 

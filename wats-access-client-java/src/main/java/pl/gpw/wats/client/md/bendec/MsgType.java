@@ -24,7 +24,7 @@ public enum MsgType {
     /**
      * Order deleted.
      */
-    ORDERDELETE(11),
+    ORDERCANCEL(11),
     /**
      * Execution report.
      */

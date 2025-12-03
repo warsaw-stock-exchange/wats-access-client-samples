@@ -14,45 +14,41 @@ public enum AdjustedClosingPriceReason {
      */
     NOTAPPLICABLE(1),
     /**
-     * Regular
-     */
-    REGULAR(2),
-    /**
      * Dividend
      */
-    DIVIDEND(3),
+    DIVIDEND(2),
     /**
      * Issue Right
      */
-    ISSUERIGHT(4),
+    ISSUERIGHT(3),
     /**
      * Split
      */
-    SPLIT(5),
+    SPLIT(4),
     /**
      * Reverse Split
      */
-    REVERSESPLIT(6),
+    REVERSESPLIT(5),
     /**
      * Bonus
      */
-    BONUS(7),
+    BONUS(6),
     /**
      * Spin-Off
      */
-    SPINOFF(8),
+    SPINOFF(7),
     /**
      * Tick Size Change
      */
-    TICKSIZECHANGE(9),
+    TICKSIZECHANGE(8),
     /**
      * Order Purge
      */
-    ORDERPURGE(10),
+    ORDERPURGE(9),
     /**
      * Other reason
      */
-    OTHERREASON(11);
+    OTHERREASON(10);
     
     private final int value;
     private final int byteLength = 1;

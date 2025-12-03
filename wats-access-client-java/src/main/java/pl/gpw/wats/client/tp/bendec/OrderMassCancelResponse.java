@@ -7,8 +7,8 @@ import java.nio.ByteBuffer;
 /**
  * <h2>OrderMassCancelResponse</h2>
  * <p>Response to message used to cancel multiple existing orders.</p>
- * <p>Byte length: 44</p>
- * <p>Header header - Header. | size 16</p>
+ * <p>Byte length: 72</p>
+ * <p>Header header - Header. | size 24</p>
  * <p>u64 > BigInteger totalAffectedOrders - Total number of orders affected by the mass cancel request. | size 8</p>
  * <p>MassCancelRequestType massCancelRequestType - Mass cancel request type. | size 1</p>
  * <p>OrderId > BigInteger (u64) massCancelId - Mass cancel request ID. | size 8</p>
@@ -16,6 +16,7 @@ import java.nio.ByteBuffer;
  * <p>u32 > long targetPartyId - Used to identify the party targeted for the action specified in the message. | size 4</p>
  * <p>ElementId > long (u32) marketSegmentId - Identifies the market segment for request type CancelOrdersForMarketSegment. | size 4</p>
  * <p>MassCancelRejectionReason reason - Reason for rejecting the given mass order cancel request. | size 2</p>
+ * <p>ClientOrderId > String (u8[]) clientOrderId - Arbitrary user provided value associated with the mass cancel. | size 20</p>
  */
 public class OrderMassCancelResponse implements ByteSerializable, Message {
     private Header header;
@@ -26,9 +27,10 @@ public class OrderMassCancelResponse implements ByteSerializable, Message {
     private long targetPartyId;
     private long marketSegmentId;
     private MassCancelRejectionReason reason;
-    public static final int byteLength = 44;
+    private String clientOrderId;
+    public static final int byteLength = 72;
     
-    public OrderMassCancelResponse(Header header, BigInteger totalAffectedOrders, MassCancelRequestType massCancelRequestType, BigInteger massCancelId, TargetPartyRole targetPartyRole, long targetPartyId, long marketSegmentId, MassCancelRejectionReason reason) {
+    public OrderMassCancelResponse(Header header, BigInteger totalAffectedOrders, MassCancelRequestType massCancelRequestType, BigInteger massCancelId, TargetPartyRole targetPartyRole, long targetPartyId, long marketSegmentId, MassCancelRejectionReason reason, String clientOrderId) {
         this.header = header;
         this.totalAffectedOrders = totalAffectedOrders;
         this.massCancelRequestType = massCancelRequestType;
@@ -37,17 +39,19 @@ public class OrderMassCancelResponse implements ByteSerializable, Message {
         this.targetPartyId = targetPartyId;
         this.marketSegmentId = marketSegmentId;
         this.reason = reason;
+        this.clientOrderId = clientOrderId;
     }
     
     public OrderMassCancelResponse(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
-        this.totalAffectedOrders = BendecUtils.uInt64FromByteArray(bytes, offset + 16);
-        this.massCancelRequestType = MassCancelRequestType.getMassCancelRequestType(bytes, offset + 24);
-        this.massCancelId = BendecUtils.uInt64FromByteArray(bytes, offset + 25);
-        this.targetPartyRole = TargetPartyRole.getTargetPartyRole(bytes, offset + 33);
-        this.targetPartyId = BendecUtils.uInt32FromByteArray(bytes, offset + 34);
-        this.marketSegmentId = BendecUtils.uInt32FromByteArray(bytes, offset + 38);
-        this.reason = MassCancelRejectionReason.getMassCancelRejectionReason(bytes, offset + 42);
+        this.totalAffectedOrders = BendecUtils.uInt64FromByteArray(bytes, offset + 24);
+        this.massCancelRequestType = MassCancelRequestType.getMassCancelRequestType(bytes, offset + 32);
+        this.massCancelId = BendecUtils.uInt64FromByteArray(bytes, offset + 33);
+        this.targetPartyRole = TargetPartyRole.getTargetPartyRole(bytes, offset + 41);
+        this.targetPartyId = BendecUtils.uInt32FromByteArray(bytes, offset + 42);
+        this.marketSegmentId = BendecUtils.uInt32FromByteArray(bytes, offset + 46);
+        this.reason = MassCancelRejectionReason.getMassCancelRejectionReason(bytes, offset + 50);
+        this.clientOrderId = BendecUtils.stringFromByteArray(bytes, offset + 52, 20);
     }
     
     public OrderMassCancelResponse(byte[] bytes) {
@@ -114,6 +118,13 @@ public class OrderMassCancelResponse implements ByteSerializable, Message {
     }
     
     /**
+     * @return Arbitrary user provided value associated with the mass cancel.
+     */
+    public String getClientOrderId() {
+        return this.clientOrderId;
+    }
+    
+    /**
      * @param header Header.
      */
     public void setHeader(Header header) {
@@ -169,6 +180,13 @@ public class OrderMassCancelResponse implements ByteSerializable, Message {
         this.reason = reason;
     }
     
+    /**
+     * @param clientOrderId Arbitrary user provided value associated with the mass cancel.
+     */
+    public void setClientOrderId(String clientOrderId) {
+        this.clientOrderId = clientOrderId;
+    }
+    
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -180,6 +198,7 @@ public class OrderMassCancelResponse implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt32ToByteArray(this.targetPartyId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.marketSegmentId));
         reason.toBytes(buffer);
+        buffer.put(BendecUtils.stringToByteArray(this.clientOrderId, 20));
         return buffer.array();
     }
     
@@ -193,6 +212,7 @@ public class OrderMassCancelResponse implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt32ToByteArray(this.targetPartyId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.marketSegmentId));
         reason.toBytes(buffer);
+        buffer.put(BendecUtils.stringToByteArray(this.clientOrderId, 20));
     }
     
     @Override
@@ -204,7 +224,8 @@ public class OrderMassCancelResponse implements ByteSerializable, Message {
         targetPartyRole,
         targetPartyId,
         marketSegmentId,
-        reason);
+        reason,
+        clientOrderId);
     }
     
     @Override
@@ -218,6 +239,7 @@ public class OrderMassCancelResponse implements ByteSerializable, Message {
             ", targetPartyId=" + targetPartyId +
             ", marketSegmentId=" + marketSegmentId +
             ", reason=" + reason +
+            ", clientOrderId=" + clientOrderId +
             "}";
     }
 }

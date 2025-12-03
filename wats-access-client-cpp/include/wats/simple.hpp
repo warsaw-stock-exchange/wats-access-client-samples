@@ -23,7 +23,6 @@ inline btp::messages::OrderAdd simple_order_add(
         .capacity = btp::messages::Capacity::Agency,
         .accountType = btp::messages::AccountType::Missing,
         .mifidFields = {
-            .flags = btp::messages::MifidFlags::None,
             .client = {
                 .shortCode = 1,
                 .qualifier = btp::messages::PartyRoleQualifier::NA,
@@ -55,7 +54,6 @@ inline btp::messages::OrderModify simple_order_modify(
         .price = price,
         .quantity = quantity,
         .mifidFields = {
-            .flags = btp::messages::MifidFlags::None,
             .client = {
                 .shortCode = 1,
                 .qualifier = btp::messages::PartyRoleQualifier::NA,
@@ -78,7 +76,6 @@ inline btp::messages::OrderCancel simple_order_cancel(
     return btp::messages::OrderCancel {
         .orderId = order_id,
         .mifidFields = {
-            .flags = btp::messages::MifidFlags::None,
             .client = {
                 .shortCode = 1,
                 .qualifier = btp::messages::PartyRoleQualifier::NA,
@@ -121,7 +118,6 @@ inline btp::messages::TradeCaptureReportDual simple_trade_capture_report_dual(
         .settlementDate = settlement_date,
         .tcrPartyBuy = {
             .mifidFields = {
-                .flags = btp::messages::MifidFlags::None,
                 .client = {
                     .shortCode = 1,
                     .qualifier = btp::messages::PartyRoleQualifier::NA,
@@ -140,13 +136,10 @@ inline btp::messages::TradeCaptureReportDual simple_trade_capture_report_dual(
             .account = "",
             .accountType = btp::messages::AccountType::Customer,
             .orderCapacity = btp::messages::Capacity::Agency,
-            .orderRestrictions = 0,
-            .orderOrigination = 0,
             .memo = ""
         },
         .tcrPartySell = {
             .mifidFields = {
-                .flags = btp::messages::MifidFlags::None,
                 .client = {
                     .shortCode = 1,
                     .qualifier = btp::messages::PartyRoleQualifier::NA,
@@ -165,8 +158,6 @@ inline btp::messages::TradeCaptureReportDual simple_trade_capture_report_dual(
             .account = "",
             .accountType = btp::messages::AccountType::Customer,
             .orderCapacity = btp::messages::Capacity::Agency,
-            .orderRestrictions = 0,
-            .orderOrigination = 0,
             .memo = ""
         }
     };

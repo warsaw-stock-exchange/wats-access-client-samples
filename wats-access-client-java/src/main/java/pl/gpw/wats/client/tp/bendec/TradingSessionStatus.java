@@ -1,4 +1,4 @@
-package pl.gpw.wats.client.md.bendec;
+package pl.gpw.wats.client.tp.bendec;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -6,36 +6,32 @@ import java.nio.ByteBuffer;
 
 /**
  * <h2>TradingSessionStatus</h2>
- * <p>The Trading Session Status provides information on the status of a market and on a trading day events.</p>
- * <p>Byte length: 55</p>
- * <p>Header header - Message header. | size 42</p>
+ * <p>The Trading Session Status provides information on the status of a trading session.</p>
+ * <p>Byte length: 33</p>
+ * <p>Header header - Message header. | size 24</p>
  * <p>MicCode > String (u8[]) marketId - Market structure's Market Identifier Code (MIC) as specified in ISO 10383. | size 4</p>
- * <p>ElementId > long (u32) marketStructureId - ID of the financial instrument's market segment. | size 4</p>
+ * <p>Date > long (u32) date - The date for this event. | size 4</p>
  * <p>TradingSessionEvent tradingSessionEvent - Identifies an event related to the trading status of a trading session. | size 1</p>
- * <p>Date > long (u32) date - The date of this event. | size 4</p>
  */
 public class TradingSessionStatus implements ByteSerializable, Message {
     private Header header;
     private String marketId;
-    private long marketStructureId;
-    private TradingSessionEvent tradingSessionEvent;
     private long date;
-    public static final int byteLength = 55;
+    private TradingSessionEvent tradingSessionEvent;
+    public static final int byteLength = 33;
     
-    public TradingSessionStatus(Header header, String marketId, long marketStructureId, TradingSessionEvent tradingSessionEvent, long date) {
+    public TradingSessionStatus(Header header, String marketId, long date, TradingSessionEvent tradingSessionEvent) {
         this.header = header;
         this.marketId = marketId;
-        this.marketStructureId = marketStructureId;
-        this.tradingSessionEvent = tradingSessionEvent;
         this.date = date;
+        this.tradingSessionEvent = tradingSessionEvent;
     }
     
     public TradingSessionStatus(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
-        this.marketId = BendecUtils.stringFromByteArray(bytes, offset + 42, 4);
-        this.marketStructureId = BendecUtils.uInt32FromByteArray(bytes, offset + 46);
-        this.tradingSessionEvent = TradingSessionEvent.getTradingSessionEvent(bytes, offset + 50);
-        this.date = BendecUtils.uInt32FromByteArray(bytes, offset + 51);
+        this.marketId = BendecUtils.stringFromByteArray(bytes, offset + 24, 4);
+        this.date = BendecUtils.uInt32FromByteArray(bytes, offset + 28);
+        this.tradingSessionEvent = TradingSessionEvent.getTradingSessionEvent(bytes, offset + 32);
     }
     
     public TradingSessionStatus(byte[] bytes) {
@@ -60,10 +56,10 @@ public class TradingSessionStatus implements ByteSerializable, Message {
     }
     
     /**
-     * @return ID of the financial instrument's market segment.
+     * @return The date for this event.
      */
-    public long getMarketStructureId() {
-        return this.marketStructureId;
+    public long getDate() {
+        return this.date;
     }
     
     /**
@@ -71,13 +67,6 @@ public class TradingSessionStatus implements ByteSerializable, Message {
      */
     public TradingSessionEvent getTradingSessionEvent() {
         return this.tradingSessionEvent;
-    }
-    
-    /**
-     * @return The date of this event.
-     */
-    public long getDate() {
-        return this.date;
     }
     
     /**
@@ -95,10 +84,10 @@ public class TradingSessionStatus implements ByteSerializable, Message {
     }
     
     /**
-     * @param marketStructureId ID of the financial instrument's market segment.
+     * @param date The date for this event.
      */
-    public void setMarketStructureId(long marketStructureId) {
-        this.marketStructureId = marketStructureId;
+    public void setDate(long date) {
+        this.date = date;
     }
     
     /**
@@ -108,21 +97,13 @@ public class TradingSessionStatus implements ByteSerializable, Message {
         this.tradingSessionEvent = tradingSessionEvent;
     }
     
-    /**
-     * @param date The date of this event.
-     */
-    public void setDate(long date) {
-        this.date = date;
-    }
-    
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         header.toBytes(buffer);
         buffer.put(BendecUtils.stringToByteArray(this.marketId, 4));
-        buffer.put(BendecUtils.uInt32ToByteArray(this.marketStructureId));
-        tradingSessionEvent.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.date));
+        tradingSessionEvent.toBytes(buffer);
         return buffer.array();
     }
     
@@ -130,18 +111,16 @@ public class TradingSessionStatus implements ByteSerializable, Message {
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.stringToByteArray(this.marketId, 4));
-        buffer.put(BendecUtils.uInt32ToByteArray(this.marketStructureId));
-        tradingSessionEvent.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.date));
+        tradingSessionEvent.toBytes(buffer);
     }
     
     @Override
     public int hashCode() {
         return Objects.hash(header,
         marketId,
-        marketStructureId,
-        tradingSessionEvent,
-        date);
+        date,
+        tradingSessionEvent);
     }
     
     @Override
@@ -149,9 +128,8 @@ public class TradingSessionStatus implements ByteSerializable, Message {
         return "TradingSessionStatus {" +
             "header=" + header +
             ", marketId=" + marketId +
-            ", marketStructureId=" + marketStructureId +
-            ", tradingSessionEvent=" + tradingSessionEvent +
             ", date=" + date +
+            ", tradingSessionEvent=" + tradingSessionEvent +
             "}";
     }
 }

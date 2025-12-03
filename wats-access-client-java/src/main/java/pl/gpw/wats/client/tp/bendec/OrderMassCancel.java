@@ -7,14 +7,15 @@ import java.nio.ByteBuffer;
 /**
  * <h2>OrderMassCancel</h2>
  * <p>Message used to cancel multiple existing orders.</p>
- * <p>Byte length: 35</p>
- * <p>Header header - Header. | size 16</p>
+ * <p>Byte length: 63</p>
+ * <p>Header header - Header. | size 24</p>
  * <p>MassCancelRequestType massCancelRequestType - Mass cancel request type. | size 1</p>
  * <p>TargetPartyRole targetPartyRole - Target party role filter selection field. | size 1</p>
  * <p>u32 > long targetPartyId - Used to identify the party targeted for the action specified in the message. | size 4</p>
  * <p>ElementId > long (u32) marketSegmentId - Identifies the market segment for request type CancelOrdersForMarketSegment. | size 4</p>
  * <p>ElementId > long (u32) instrumentId | size 4</p>
  * <p>MifidField executingTrader - MifidField of Executing Trader. | size 5</p>
+ * <p>ClientOrderId > String (u8[]) clientOrderId - Arbitrary user provided value associated with the mass cancel. | size 20</p>
  */
 public class OrderMassCancel implements ByteSerializable, Message {
     private Header header;
@@ -24,9 +25,10 @@ public class OrderMassCancel implements ByteSerializable, Message {
     private long marketSegmentId;
     private long instrumentId;
     private MifidField executingTrader;
-    public static final int byteLength = 35;
+    private String clientOrderId;
+    public static final int byteLength = 63;
     
-    public OrderMassCancel(Header header, MassCancelRequestType massCancelRequestType, TargetPartyRole targetPartyRole, long targetPartyId, long marketSegmentId, long instrumentId, MifidField executingTrader) {
+    public OrderMassCancel(Header header, MassCancelRequestType massCancelRequestType, TargetPartyRole targetPartyRole, long targetPartyId, long marketSegmentId, long instrumentId, MifidField executingTrader, String clientOrderId) {
         this.header = header;
         this.massCancelRequestType = massCancelRequestType;
         this.targetPartyRole = targetPartyRole;
@@ -34,16 +36,18 @@ public class OrderMassCancel implements ByteSerializable, Message {
         this.marketSegmentId = marketSegmentId;
         this.instrumentId = instrumentId;
         this.executingTrader = executingTrader;
+        this.clientOrderId = clientOrderId;
     }
     
     public OrderMassCancel(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
-        this.massCancelRequestType = MassCancelRequestType.getMassCancelRequestType(bytes, offset + 16);
-        this.targetPartyRole = TargetPartyRole.getTargetPartyRole(bytes, offset + 17);
-        this.targetPartyId = BendecUtils.uInt32FromByteArray(bytes, offset + 18);
-        this.marketSegmentId = BendecUtils.uInt32FromByteArray(bytes, offset + 22);
-        this.instrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 26);
-        this.executingTrader = new MifidField(bytes, offset + 30);
+        this.massCancelRequestType = MassCancelRequestType.getMassCancelRequestType(bytes, offset + 24);
+        this.targetPartyRole = TargetPartyRole.getTargetPartyRole(bytes, offset + 25);
+        this.targetPartyId = BendecUtils.uInt32FromByteArray(bytes, offset + 26);
+        this.marketSegmentId = BendecUtils.uInt32FromByteArray(bytes, offset + 30);
+        this.instrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 34);
+        this.executingTrader = new MifidField(bytes, offset + 38);
+        this.clientOrderId = BendecUtils.stringFromByteArray(bytes, offset + 43, 20);
     }
     
     public OrderMassCancel(byte[] bytes) {
@@ -100,6 +104,13 @@ public class OrderMassCancel implements ByteSerializable, Message {
     }
     
     /**
+     * @return Arbitrary user provided value associated with the mass cancel.
+     */
+    public String getClientOrderId() {
+        return this.clientOrderId;
+    }
+    
+    /**
      * @param header Header.
      */
     public void setHeader(Header header) {
@@ -145,6 +156,13 @@ public class OrderMassCancel implements ByteSerializable, Message {
         this.executingTrader = executingTrader;
     }
     
+    /**
+     * @param clientOrderId Arbitrary user provided value associated with the mass cancel.
+     */
+    public void setClientOrderId(String clientOrderId) {
+        this.clientOrderId = clientOrderId;
+    }
+    
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -155,6 +173,7 @@ public class OrderMassCancel implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt32ToByteArray(this.marketSegmentId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
         executingTrader.toBytes(buffer);
+        buffer.put(BendecUtils.stringToByteArray(this.clientOrderId, 20));
         return buffer.array();
     }
     
@@ -167,6 +186,7 @@ public class OrderMassCancel implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt32ToByteArray(this.marketSegmentId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
         executingTrader.toBytes(buffer);
+        buffer.put(BendecUtils.stringToByteArray(this.clientOrderId, 20));
     }
     
     @Override
@@ -177,7 +197,8 @@ public class OrderMassCancel implements ByteSerializable, Message {
         targetPartyId,
         marketSegmentId,
         instrumentId,
-        executingTrader);
+        executingTrader,
+        clientOrderId);
     }
     
     @Override
@@ -190,6 +211,7 @@ public class OrderMassCancel implements ByteSerializable, Message {
             ", marketSegmentId=" + marketSegmentId +
             ", instrumentId=" + instrumentId +
             ", executingTrader=" + executingTrader +
+            ", clientOrderId=" + clientOrderId +
             "}";
     }
 }

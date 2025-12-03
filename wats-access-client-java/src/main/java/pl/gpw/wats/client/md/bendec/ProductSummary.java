@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 /**
  * <h2>ProductSummary</h2>
  * <p>Session day product summary.</p>
- * <p>Byte length: 679</p>
+ * <p>Byte length: 671</p>
  * <p>Header header - Message header. | size 42</p>
  * <p>SingleInstrumentSummary clobInstrument - Provides brief CLOB instrument summary. | size 119</p>
  * <p>SingleInstrumentSummary crossInstrument - Provides brief CROSS instrument summary. | size 119</p>
@@ -28,14 +28,13 @@ import java.nio.ByteBuffer;
  * <p>ChangeIndicator markerPriceChange - The field contains the market of the percentage change of the instrument closing price from the current session in relation to the reference price. | size 1</p>
  * <p>bool > boolean lowerLiquidity - The positive field value (true) informs if the company was qualified to Lower Liquidity Space. A negative value has the opposite meaning. | size 1</p>
  * <p>Number > long (i64) multiplier - Instrument multiplier. | size 8</p>
- * <p>Number > long (i64) impliedVolatility - Implied volatility. | size 8</p>
  * <p>Number > long (i64) dividendRate - Dividend rate for the company is given on the basis of dividends paid by companies being the base instrument for futures and options. | size 8</p>
  * <p>Number > long (i64) delta - Value of Delta indicator from the current session. | size 8</p>
  * <p>Number > long (i64) gamma - Value of Gamma indicator from the current session. | size 8</p>
  * <p>Number > long (i64) rho - Value of Rho indicator from the current session. | size 8</p>
  * <p>Number > long (i64) theta - Value of Theta indicator from the current session. | size 8</p>
  * <p>Number > long (i64) vega - Value of Vega indicator from the current session. | size 8</p>
- * <p>Number > long (i64) volatility - Volatility to be calculated is based on the implied volatility (provided in field ImpliedVolatility) according to algorithm worked out by the WSE, which is available on the website: www.opcje.gpw.pl. | size 8</p>
+ * <p>Number > long (i64) volatility - Volatility is calculated according to algorithm worked out by the WSE. | size 8</p>
  * <p>Price > long (i64) optionsStrikePrice - Option product strike price. | size 8</p>
  * <p>bool > boolean dividend - The positive field value (true) informs that the instruments are traded the first time after determining the right to dividend. A negative value has the opposite meaning. | size 1</p>
  * <p>bool > boolean subscriptionRight - The positive field value (true) informs that the instruments are traded the first time after determining the subscription right. A negative value has the opposite meaning. | size 1</p>
@@ -65,7 +64,6 @@ public class ProductSummary implements ByteSerializable, Message {
     private ChangeIndicator markerPriceChange;
     private boolean lowerLiquidity;
     private long multiplier;
-    private long impliedVolatility;
     private long dividendRate;
     private long delta;
     private long gamma;
@@ -80,9 +78,9 @@ public class ProductSummary implements ByteSerializable, Message {
     private boolean split;
     private QuotationSystem quotationSystem;
     private boolean liquiditySupportPge;
-    public static final int byteLength = 679;
+    public static final int byteLength = 671;
     
-    public ProductSummary(Header header, SingleInstrumentSummary clobInstrument, SingleInstrumentSummary crossInstrument, SingleInstrumentSummary blockInstrument, SingleInstrumentSummary hybridInstrument, ProductIdentificationType productIdentificationType, String productIdentification, long productId, String mic, long AccumulatedInterest, long interestRate, Currency currency, long sessionDate, long tradingValueCurrency, InstrumentStatus status, int sector, int market, ChangeIndicator markerPriceChange, boolean lowerLiquidity, long multiplier, long impliedVolatility, long dividendRate, long delta, long gamma, long rho, long theta, long vega, long volatility, long optionsStrikePrice, boolean dividend, boolean subscriptionRight, boolean interimDividendRight, boolean split, QuotationSystem quotationSystem, boolean liquiditySupportPge) {
+    public ProductSummary(Header header, SingleInstrumentSummary clobInstrument, SingleInstrumentSummary crossInstrument, SingleInstrumentSummary blockInstrument, SingleInstrumentSummary hybridInstrument, ProductIdentificationType productIdentificationType, String productIdentification, long productId, String mic, long AccumulatedInterest, long interestRate, Currency currency, long sessionDate, long tradingValueCurrency, InstrumentStatus status, int sector, int market, ChangeIndicator markerPriceChange, boolean lowerLiquidity, long multiplier, long dividendRate, long delta, long gamma, long rho, long theta, long vega, long volatility, long optionsStrikePrice, boolean dividend, boolean subscriptionRight, boolean interimDividendRight, boolean split, QuotationSystem quotationSystem, boolean liquiditySupportPge) {
         this.header = header;
         this.clobInstrument = clobInstrument;
         this.crossInstrument = crossInstrument;
@@ -103,7 +101,6 @@ public class ProductSummary implements ByteSerializable, Message {
         this.markerPriceChange = markerPriceChange;
         this.lowerLiquidity = lowerLiquidity;
         this.multiplier = multiplier;
-        this.impliedVolatility = impliedVolatility;
         this.dividendRate = dividendRate;
         this.delta = delta;
         this.gamma = gamma;
@@ -141,21 +138,20 @@ public class ProductSummary implements ByteSerializable, Message {
         this.markerPriceChange = ChangeIndicator.getChangeIndicator(bytes, offset + 591);
         this.lowerLiquidity = BendecUtils.booleanFromByteArray(bytes, offset + 592);
         this.multiplier = BendecUtils.int64FromByteArray(bytes, offset + 593);
-        this.impliedVolatility = BendecUtils.int64FromByteArray(bytes, offset + 601);
-        this.dividendRate = BendecUtils.int64FromByteArray(bytes, offset + 609);
-        this.delta = BendecUtils.int64FromByteArray(bytes, offset + 617);
-        this.gamma = BendecUtils.int64FromByteArray(bytes, offset + 625);
-        this.rho = BendecUtils.int64FromByteArray(bytes, offset + 633);
-        this.theta = BendecUtils.int64FromByteArray(bytes, offset + 641);
-        this.vega = BendecUtils.int64FromByteArray(bytes, offset + 649);
-        this.volatility = BendecUtils.int64FromByteArray(bytes, offset + 657);
-        this.optionsStrikePrice = BendecUtils.int64FromByteArray(bytes, offset + 665);
-        this.dividend = BendecUtils.booleanFromByteArray(bytes, offset + 673);
-        this.subscriptionRight = BendecUtils.booleanFromByteArray(bytes, offset + 674);
-        this.interimDividendRight = BendecUtils.booleanFromByteArray(bytes, offset + 675);
-        this.split = BendecUtils.booleanFromByteArray(bytes, offset + 676);
-        this.quotationSystem = QuotationSystem.getQuotationSystem(bytes, offset + 677);
-        this.liquiditySupportPge = BendecUtils.booleanFromByteArray(bytes, offset + 678);
+        this.dividendRate = BendecUtils.int64FromByteArray(bytes, offset + 601);
+        this.delta = BendecUtils.int64FromByteArray(bytes, offset + 609);
+        this.gamma = BendecUtils.int64FromByteArray(bytes, offset + 617);
+        this.rho = BendecUtils.int64FromByteArray(bytes, offset + 625);
+        this.theta = BendecUtils.int64FromByteArray(bytes, offset + 633);
+        this.vega = BendecUtils.int64FromByteArray(bytes, offset + 641);
+        this.volatility = BendecUtils.int64FromByteArray(bytes, offset + 649);
+        this.optionsStrikePrice = BendecUtils.int64FromByteArray(bytes, offset + 657);
+        this.dividend = BendecUtils.booleanFromByteArray(bytes, offset + 665);
+        this.subscriptionRight = BendecUtils.booleanFromByteArray(bytes, offset + 666);
+        this.interimDividendRight = BendecUtils.booleanFromByteArray(bytes, offset + 667);
+        this.split = BendecUtils.booleanFromByteArray(bytes, offset + 668);
+        this.quotationSystem = QuotationSystem.getQuotationSystem(bytes, offset + 669);
+        this.liquiditySupportPge = BendecUtils.booleanFromByteArray(bytes, offset + 670);
     }
     
     public ProductSummary(byte[] bytes) {
@@ -306,13 +302,6 @@ public class ProductSummary implements ByteSerializable, Message {
     }
     
     /**
-     * @return Implied volatility.
-     */
-    public long getImpliedVolatility() {
-        return this.impliedVolatility;
-    }
-    
-    /**
      * @return Dividend rate for the company is given on the basis of dividends paid by companies being the base instrument for futures and options.
      */
     public long getDividendRate() {
@@ -355,7 +344,7 @@ public class ProductSummary implements ByteSerializable, Message {
     }
     
     /**
-     * @return Volatility to be calculated is based on the implied volatility (provided in field ImpliedVolatility) according to algorithm worked out by the WSE, which is available on the website: www.opcje.gpw.pl.
+     * @return Volatility is calculated according to algorithm worked out by the WSE.
      */
     public long getVolatility() {
         return this.volatility;
@@ -551,13 +540,6 @@ public class ProductSummary implements ByteSerializable, Message {
     }
     
     /**
-     * @param impliedVolatility Implied volatility.
-     */
-    public void setImpliedVolatility(long impliedVolatility) {
-        this.impliedVolatility = impliedVolatility;
-    }
-    
-    /**
      * @param dividendRate Dividend rate for the company is given on the basis of dividends paid by companies being the base instrument for futures and options.
      */
     public void setDividendRate(long dividendRate) {
@@ -600,7 +582,7 @@ public class ProductSummary implements ByteSerializable, Message {
     }
     
     /**
-     * @param volatility Volatility to be calculated is based on the implied volatility (provided in field ImpliedVolatility) according to algorithm worked out by the WSE, which is available on the website: www.opcje.gpw.pl.
+     * @param volatility Volatility is calculated according to algorithm worked out by the WSE.
      */
     public void setVolatility(long volatility) {
         this.volatility = volatility;
@@ -678,7 +660,6 @@ public class ProductSummary implements ByteSerializable, Message {
         markerPriceChange.toBytes(buffer);
         buffer.put(BendecUtils.booleanToByteArray(this.lowerLiquidity));
         buffer.put(BendecUtils.int64ToByteArray(this.multiplier));
-        buffer.put(BendecUtils.int64ToByteArray(this.impliedVolatility));
         buffer.put(BendecUtils.int64ToByteArray(this.dividendRate));
         buffer.put(BendecUtils.int64ToByteArray(this.delta));
         buffer.put(BendecUtils.int64ToByteArray(this.gamma));
@@ -718,7 +699,6 @@ public class ProductSummary implements ByteSerializable, Message {
         markerPriceChange.toBytes(buffer);
         buffer.put(BendecUtils.booleanToByteArray(this.lowerLiquidity));
         buffer.put(BendecUtils.int64ToByteArray(this.multiplier));
-        buffer.put(BendecUtils.int64ToByteArray(this.impliedVolatility));
         buffer.put(BendecUtils.int64ToByteArray(this.dividendRate));
         buffer.put(BendecUtils.int64ToByteArray(this.delta));
         buffer.put(BendecUtils.int64ToByteArray(this.gamma));
@@ -757,7 +737,6 @@ public class ProductSummary implements ByteSerializable, Message {
         markerPriceChange,
         lowerLiquidity,
         multiplier,
-        impliedVolatility,
         dividendRate,
         delta,
         gamma,
@@ -797,7 +776,6 @@ public class ProductSummary implements ByteSerializable, Message {
             ", markerPriceChange=" + markerPriceChange +
             ", lowerLiquidity=" + lowerLiquidity +
             ", multiplier=" + multiplier +
-            ", impliedVolatility=" + impliedVolatility +
             ", dividendRate=" + dividendRate +
             ", delta=" + delta +
             ", gamma=" + gamma +

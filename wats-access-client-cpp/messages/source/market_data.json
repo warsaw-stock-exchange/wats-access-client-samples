@@ -1,6 +1,6 @@
 {
   "$schema": "./schema.json",
-  "version": 2073,
+  "version": 2084,
   "typeDefinitions": {
     "marketData": [
       {
@@ -196,8 +196,8 @@
         "kind": "Array",
         "name": "Code",
         "type": "AnsiChar",
-        "length": 16,
-        "description": "Type for standard, 16-character long code for market structure messages."
+        "length": 20,
+        "description": "Type for standard, 20-character long code for market structure messages."
       },
       {
         "kind": "Array",
@@ -279,36 +279,36 @@
             "NotApplicable."
           ],
           [
-            "OpeningAuction",
+            "AuctionOpening",
             2,
             "Opening auction."
           ],
           [
-            "ClosingAuction",
+            "AuctionClosing",
             3,
             "Closing auction."
           ],
           [
-            "IntradayAuction",
+            "AuctionIntraday",
             4,
             "Intraday auction."
           ],
           [
-            "VolatilityAuctionStatic",
+            "AuctionVolatilityStatic",
             5,
             "Volatility auction after static collars breach."
           ],
           [
-            "VolatilityAuctionDynamic",
+            "AuctionVolatilityDynamic",
             6,
             "Volatility auction after dynamic collars breach."
           ],
           [
-            "ExtendedVolatilityAuctionStatic",
+            "AuctionExtendedVolatilityStatic",
             7
           ],
           [
-            "ExtendedVolatilityAuctionDynamic",
+            "AuctionExtendedVolatilityDynamic",
             8
           ],
           [
@@ -1396,8 +1396,13 @@
         "underlying": "u8",
         "variants": [
           [
-            "ISIN",
+            "NotApplicable",
             1,
+            "Not applicable"
+          ],
+          [
+            "ISIN",
+            2,
             "Financial instrument's ISIN."
           ]
         ]
@@ -1786,6 +1791,16 @@
             "HybridKnockoutByIssuer",
             10,
             "Hybrid knockout by issuer."
+          ],
+          [
+            "DistributionStart",
+            12,
+            "Start of distribution from external source."
+          ],
+          [
+            "DistributionEnd",
+            13,
+            "End of distribution from external source."
           ]
         ]
       },
@@ -1904,6 +1919,94 @@
             "HybridPreTradeBuyOnly",
             22,
             "Hybrid pre trade BuyOnly phase"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "IndexParamsPresenceFlags",
+        "underlying": "u8",
+        "description": "Indicates presence of values within IndexParams fields.",
+        "bitflags": true,
+        "variants": [
+          [
+            "None",
+            "0b00000000"
+          ],
+          [
+            "HasDaysSinceLastPublication",
+            "0b00000001"
+          ],
+          [
+            "HasNumberOfDividends",
+            "0b00000010"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "RealTimeIndexPresenceFlags",
+        "underlying": "u8",
+        "description": "Indicates presence of values within RealTimeIndex fields.",
+        "bitflags": true,
+        "variants": [
+          [
+            "None",
+            "0b00000000"
+          ],
+          [
+            "HasTradingValue",
+            "0b00000001"
+          ],
+          [
+            "HasIndexValueBid",
+            "0b00000010"
+          ],
+          [
+            "HasIndexValueAsk",
+            "0b00000100"
+          ],
+          [
+            "HasMidSpreadIndex",
+            "0b00001000"
+          ],
+          [
+            "HasDifferenceCentralSpread",
+            "0b00010000"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "IndexPortfolioEntryPresenceFlags",
+        "underlying": "u8",
+        "description": "Indicates presence of values within IndexPortfolioEntry fields.",
+        "bitflags": true,
+        "variants": [
+          [
+            "None",
+            "0b00000000"
+          ],
+          [
+            "HasInstrumentId",
+            "0b00000001"
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "IndexSummaryPresenceFlags",
+        "underlying": "u8",
+        "description": "Indicates presence of values within IndexSummary fields.",
+        "bitflags": true,
+        "variants": [
+          [
+            "None",
+            "0b00000000"
+          ],
+          [
+            "HasSessionAvg",
+            "0b00000001"
           ]
         ]
       },
@@ -2066,53 +2169,48 @@
             "Not applicable."
           ],
           [
-            "Regular",
-            2,
-            "Regular"
-          ],
-          [
             "Dividend",
-            3,
+            2,
             "Dividend"
           ],
           [
             "IssueRight",
-            4,
+            3,
             "Issue Right"
           ],
           [
             "Split",
-            5,
+            4,
             "Split"
           ],
           [
             "ReverseSplit",
-            6,
+            5,
             "Reverse Split"
           ],
           [
             "Bonus",
-            7,
+            6,
             "Bonus"
           ],
           [
             "SpinOff",
-            8,
+            7,
             "Spin-Off"
           ],
           [
             "TickSizeChange",
-            9,
+            8,
             "Tick Size Change"
           ],
           [
             "OrderPurge",
-            10,
+            9,
             "Order Purge"
           ],
           [
             "OtherReason",
-            11,
+            10,
             "Other reason"
           ]
         ]
@@ -3542,13 +3640,18 @@
         "underlying": "u8",
         "variants": [
           [
-            "Index",
+            "NotApplicable",
             1,
+            "Not applicable"
+          ],
+          [
+            "Index",
+            2,
             "Index."
           ],
           [
             "ReferenceRate",
-            2,
+            3,
             "Reference Rate."
           ]
         ]
@@ -3622,12 +3725,12 @@
           {
             "name": "timestamp",
             "type": "Timestamp",
-            "description": "Timestamp indicating when the message was sequenced."
+            "description": "Time when message was sequenced on Market Data (Timestamp >= sourceTimestamp)."
           },
           {
             "name": "sourceTimestamp",
             "type": "Timestamp",
-            "description": "Timestamp added by the service which sent the message."
+            "description": "Time of the business event that triggered or generated the message."
           },
           {
             "name": "isEncrypted",
@@ -4011,7 +4114,7 @@
       },
       {
         "kind": "Struct",
-        "name": "OrderDelete",
+        "name": "OrderCancel",
         "description": "Order deleted.",
         "fields": [
           {
@@ -4028,6 +4131,11 @@
             "name": "publicOrderId",
             "type": "PublicOrderId",
             "description": "Order identifier (ID)."
+          },
+          {
+            "name": "side",
+            "type": "OrderSide",
+            "description": "Order side."
           }
         ]
       },
@@ -4063,7 +4171,7 @@
             "description": "Order identifier (ID)."
           },
           {
-            "name": "executionId",
+            "name": "tradeId",
             "type": "TradeId",
             "description": "ID of the underlying trade (equal to TradeID in Trade.)",
             "$metadata": {
@@ -4085,6 +4193,11 @@
             "$metadata": {
               "isEncrypted": true
             }
+          },
+          {
+            "name": "side",
+            "type": "OrderSide",
+            "description": "Order side."
           }
         ]
       },
@@ -4131,6 +4244,11 @@
             "name": "priorityFlag",
             "type": "PriorityFlag",
             "description": "Priority loss flag."
+          },
+          {
+            "name": "side",
+            "type": "OrderSide",
+            "description": "Order side."
           }
         ]
       },
@@ -4229,7 +4347,7 @@
         "kind": "Array",
         "name": "PriceLevels",
         "type": "PriceLevel",
-        "length": 10,
+        "length": 5,
         "description": "PriceLevel table. Array size refers to BBO levels."
       },
       {
@@ -4357,6 +4475,30 @@
             "YtmAskNoCalc",
             "0b000100000",
             "Ask YTM was not provided due to the absence of its calculation."
+          ]
+        ]
+      },
+      {
+        "kind": "Enum",
+        "name": "MessageFilter",
+        "underlying": "u8",
+        "description": "Bit flags indicating which message types filtered out in stream.",
+        "bitflags": true,
+        "variants": [
+          [
+            "None",
+            "0b0000",
+            "Disable trades and ref_data."
+          ],
+          [
+            "Trades",
+            "0b0001",
+            "Enable trades."
+          ],
+          [
+            "RefData",
+            "0b0010",
+            "Enable ref_data."
           ]
         ]
       },
@@ -4589,6 +4731,11 @@
             "name": "tradingSessionEvent",
             "type": "TradingSessionEvent",
             "description": "Identifies an event related to the trading status of a trading session."
+          },
+          {
+            "name": "date",
+            "type": "Date",
+            "description": "The date of this event."
           }
         ]
       },
@@ -5254,7 +5401,7 @@
             "description": "ID of Dynamic Collar Volatility Auction."
           },
           {
-            "name": "lastAuctionPhaseId",
+            "name": "clatId",
             "type": "ElementId",
             "description": "ID of last auction phase."
           }
@@ -5301,6 +5448,11 @@
             "name": "token",
             "type": "Token",
             "description": "Client token."
+          },
+          {
+            "name": "filter",
+            "type": "MessageFilter",
+            "description": "Indicates which message types should be sent in stream."
           }
         ]
       },
@@ -5501,11 +5653,6 @@
             "description": "Percentage change of the index value in relation to the value of the closing index from the previous session."
           },
           {
-            "name": "tradingValue",
-            "type": "Value",
-            "description": "Value of trading in the instruments from the given index."
-          },
-          {
             "name": "sessionLow",
             "type": "IndexValue",
             "description": "Lowest value of the day."
@@ -5514,6 +5661,16 @@
             "name": "sessionHigh",
             "type": "IndexValue",
             "description": "Highest value of the day."
+          },
+          {
+            "name": "presenceFlags",
+            "type": "RealTimeIndexPresenceFlags",
+            "description": "Indicates the filling of fields: tradingValue, indexValueBid, indexValueAsk, midSpreadIndex, differenceCentralSpread."
+          },
+          {
+            "name": "tradingValue",
+            "type": "Value",
+            "description": "Value of trading in the instruments from the given index."
           },
           {
             "name": "indexValueBid",
@@ -5573,6 +5730,11 @@
             "description": "Closing index value."
           },
           {
+            "name": "presenceFlags",
+            "type": "IndexSummaryPresenceFlags",
+            "description": "Indicates the filling of fields: sessionAvg."
+          },
+          {
             "name": "sessionAvg",
             "type": "IndexValue",
             "description": "Average value of the day."
@@ -5615,9 +5777,19 @@
             "description": "The identifier of the entry within the given index."
           },
           {
+            "name": "indexId",
+            "type": "ElementId",
+            "description": "ID of index."
+          },
+          {
+            "name": "presenceFlags",
+            "type": "IndexPortfolioEntryPresenceFlags",
+            "description": "Indicates the filling of fields: instrumentId."
+          },
+          {
             "name": "instrumentId",
             "type": "ElementId",
-            "description": "InstrumentID of the redistributed index."
+            "description": "ID of the financial instrument (index participant)."
           },
           {
             "name": "publicProductIdentification",
@@ -5695,6 +5867,11 @@
             "name": "indexType",
             "type": "IndexType",
             "description": "Index product classification"
+          },
+          {
+            "name": "presenceFlags",
+            "type": "IndexParamsPresenceFlags",
+            "description": "Indicates the filling of fields: daysSinceLastPublication, numberOfDividends."
           },
           {
             "name": "daysSinceLastPublication",
@@ -6074,14 +6251,6 @@
             "description": "Instrument multiplier."
           },
           {
-            "name": "impliedVolatility",
-            "type": "Number",
-            "description": "Implied volatility.",
-            "$metadata": {
-              "isEncrypted": true
-            }
-          },
-          {
             "name": "dividendRate",
             "type": "Number",
             "description": "Dividend rate for the company is given on the basis of dividends paid by companies being the base instrument for futures and options."
@@ -6129,7 +6298,7 @@
           {
             "name": "volatility",
             "type": "Number",
-            "description": "Volatility to be calculated is based on the implied volatility (provided in field ImpliedVolatility) according to algorithm worked out by the WSE, which is available on the website: www.opcje.gpw.pl.",
+            "description": "Volatility is calculated according to algorithm worked out by the WSE.",
             "$metadata": {
               "isEncrypted": true
             }
@@ -6672,7 +6841,7 @@
             "Order modified."
           ],
           [
-            "OrderDelete",
+            "OrderCancel",
             11,
             "Order deleted."
           ],
@@ -7077,7 +7246,7 @@
           "Heartbeat",
           "OrderAdd",
           "OrderModify",
-          "OrderDelete",
+          "OrderCancel",
           "OrderExecute",
           "TradingSessionStatus",
           "EncryptionKey",

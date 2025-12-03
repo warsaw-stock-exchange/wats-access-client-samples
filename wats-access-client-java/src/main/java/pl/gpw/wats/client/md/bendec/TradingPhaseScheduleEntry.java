@@ -20,7 +20,7 @@ import java.nio.ByteBuffer;
  * <p>bool > boolean uncrossing - True if the phase includes an uncrossing. | size 1</p>
  * <p>ElementId > long (u32) extStaticCollarVolatilityAuctionId - ID of Static Collar Volatility Auction. | size 4</p>
  * <p>ElementId > long (u32) extDynamicCollarVolatilityAuctionId - ID of Dynamic Collar Volatility Auction. | size 4</p>
- * <p>ElementId > long (u32) lastAuctionPhaseId - ID of last auction phase. | size 4</p>
+ * <p>ElementId > long (u32) clatId - ID of last auction phase. | size 4</p>
  */
 public class TradingPhaseScheduleEntry implements ByteSerializable, Message {
     private Header header;
@@ -35,10 +35,10 @@ public class TradingPhaseScheduleEntry implements ByteSerializable, Message {
     private boolean uncrossing;
     private long extStaticCollarVolatilityAuctionId;
     private long extDynamicCollarVolatilityAuctionId;
-    private long lastAuctionPhaseId;
+    private long clatId;
     public static final int byteLength = 82;
     
-    public TradingPhaseScheduleEntry(Header header, long tradingScheduleId, long tradingPhaseId, int tradingPhaseSettlementCycle, int tradingPhaseMaxBlockSettlementCycle, long staticCollarVolatilityAuctionId, long dynamicCollarVolatilityAuctionId, BigInteger tradingPhaseStartTime, TradingPhaseType tradingPhaseType, boolean uncrossing, long extStaticCollarVolatilityAuctionId, long extDynamicCollarVolatilityAuctionId, long lastAuctionPhaseId) {
+    public TradingPhaseScheduleEntry(Header header, long tradingScheduleId, long tradingPhaseId, int tradingPhaseSettlementCycle, int tradingPhaseMaxBlockSettlementCycle, long staticCollarVolatilityAuctionId, long dynamicCollarVolatilityAuctionId, BigInteger tradingPhaseStartTime, TradingPhaseType tradingPhaseType, boolean uncrossing, long extStaticCollarVolatilityAuctionId, long extDynamicCollarVolatilityAuctionId, long clatId) {
         this.header = header;
         this.tradingScheduleId = tradingScheduleId;
         this.tradingPhaseId = tradingPhaseId;
@@ -51,7 +51,7 @@ public class TradingPhaseScheduleEntry implements ByteSerializable, Message {
         this.uncrossing = uncrossing;
         this.extStaticCollarVolatilityAuctionId = extStaticCollarVolatilityAuctionId;
         this.extDynamicCollarVolatilityAuctionId = extDynamicCollarVolatilityAuctionId;
-        this.lastAuctionPhaseId = lastAuctionPhaseId;
+        this.clatId = clatId;
     }
     
     public TradingPhaseScheduleEntry(byte[] bytes, int offset) {
@@ -67,7 +67,7 @@ public class TradingPhaseScheduleEntry implements ByteSerializable, Message {
         this.uncrossing = BendecUtils.booleanFromByteArray(bytes, offset + 69);
         this.extStaticCollarVolatilityAuctionId = BendecUtils.uInt32FromByteArray(bytes, offset + 70);
         this.extDynamicCollarVolatilityAuctionId = BendecUtils.uInt32FromByteArray(bytes, offset + 74);
-        this.lastAuctionPhaseId = BendecUtils.uInt32FromByteArray(bytes, offset + 78);
+        this.clatId = BendecUtils.uInt32FromByteArray(bytes, offset + 78);
     }
     
     public TradingPhaseScheduleEntry(byte[] bytes) {
@@ -164,8 +164,8 @@ public class TradingPhaseScheduleEntry implements ByteSerializable, Message {
     /**
      * @return ID of last auction phase.
      */
-    public long getLastAuctionPhaseId() {
-        return this.lastAuctionPhaseId;
+    public long getClatId() {
+        return this.clatId;
     }
     
     /**
@@ -253,10 +253,10 @@ public class TradingPhaseScheduleEntry implements ByteSerializable, Message {
     }
     
     /**
-     * @param lastAuctionPhaseId ID of last auction phase.
+     * @param clatId ID of last auction phase.
      */
-    public void setLastAuctionPhaseId(long lastAuctionPhaseId) {
-        this.lastAuctionPhaseId = lastAuctionPhaseId;
+    public void setClatId(long clatId) {
+        this.clatId = clatId;
     }
     
     @Override
@@ -274,7 +274,7 @@ public class TradingPhaseScheduleEntry implements ByteSerializable, Message {
         buffer.put(BendecUtils.booleanToByteArray(this.uncrossing));
         buffer.put(BendecUtils.uInt32ToByteArray(this.extStaticCollarVolatilityAuctionId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.extDynamicCollarVolatilityAuctionId));
-        buffer.put(BendecUtils.uInt32ToByteArray(this.lastAuctionPhaseId));
+        buffer.put(BendecUtils.uInt32ToByteArray(this.clatId));
         return buffer.array();
     }
     
@@ -292,7 +292,7 @@ public class TradingPhaseScheduleEntry implements ByteSerializable, Message {
         buffer.put(BendecUtils.booleanToByteArray(this.uncrossing));
         buffer.put(BendecUtils.uInt32ToByteArray(this.extStaticCollarVolatilityAuctionId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.extDynamicCollarVolatilityAuctionId));
-        buffer.put(BendecUtils.uInt32ToByteArray(this.lastAuctionPhaseId));
+        buffer.put(BendecUtils.uInt32ToByteArray(this.clatId));
     }
     
     @Override
@@ -309,7 +309,7 @@ public class TradingPhaseScheduleEntry implements ByteSerializable, Message {
         uncrossing,
         extStaticCollarVolatilityAuctionId,
         extDynamicCollarVolatilityAuctionId,
-        lastAuctionPhaseId);
+        clatId);
     }
     
     @Override
@@ -327,7 +327,7 @@ public class TradingPhaseScheduleEntry implements ByteSerializable, Message {
             ", uncrossing=" + uncrossing +
             ", extStaticCollarVolatilityAuctionId=" + extStaticCollarVolatilityAuctionId +
             ", extDynamicCollarVolatilityAuctionId=" + extDynamicCollarVolatilityAuctionId +
-            ", lastAuctionPhaseId=" + lastAuctionPhaseId +
+            ", clatId=" + clatId +
             "}";
     }
 }

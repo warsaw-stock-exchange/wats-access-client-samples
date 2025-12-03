@@ -7,13 +7,14 @@ import java.nio.ByteBuffer;
 /**
  * <h2>IndexSummary</h2>
  * <p>The index summary message provides a summary of the data calculated in a stock index for a given day.</p>
- * <p>Byte length: 118</p>
+ * <p>Byte length: 119</p>
  * <p>Header header - Message header. | size 42</p>
  * <p>ElementId > long (u32) instrumentId - InstrumentID of the redistributed index. | size 4</p>
  * <p>IndexValue > long (i64) openingIndexValue - Opening index value | size 8</p>
  * <p>IndexValue > long (i64) sessionLow - Lowest value of the day. | size 8</p>
  * <p>IndexValue > long (i64) sessionHigh - Highest value of the day. | size 8</p>
  * <p>IndexValue > long (i64) closingIndexValue - Closing index value. | size 8</p>
+ * <p>IndexSummaryPresenceFlags presenceFlags - Indicates the filling of fields: sessionAvg. | size 1</p>
  * <p>IndexValue > long (i64) sessionAvg - Average value of the day. | size 8</p>
  * <p>PercentageChange > long (i64) pctChangeIndexValPrevSession - Percentage change of the index value in relation to the value of the closing index from the previous session. | size 8</p>
  * <p>PercentageChange > long (i64) pctChangeIndexValPrevYear - Percentage change of the index value in relation to its value at the end of the previous year | size 8</p>
@@ -27,20 +28,22 @@ public class IndexSummary implements ByteSerializable, Message {
     private long sessionLow;
     private long sessionHigh;
     private long closingIndexValue;
+    private IndexSummaryPresenceFlags presenceFlags;
     private long sessionAvg;
     private long pctChangeIndexValPrevSession;
     private long pctChangeIndexValPrevYear;
     private long closingCapitalisationPortfolio;
     private long indIndexOpeningPortfolio;
-    public static final int byteLength = 118;
+    public static final int byteLength = 119;
     
-    public IndexSummary(Header header, long instrumentId, long openingIndexValue, long sessionLow, long sessionHigh, long closingIndexValue, long sessionAvg, long pctChangeIndexValPrevSession, long pctChangeIndexValPrevYear, long closingCapitalisationPortfolio, long indIndexOpeningPortfolio) {
+    public IndexSummary(Header header, long instrumentId, long openingIndexValue, long sessionLow, long sessionHigh, long closingIndexValue, IndexSummaryPresenceFlags presenceFlags, long sessionAvg, long pctChangeIndexValPrevSession, long pctChangeIndexValPrevYear, long closingCapitalisationPortfolio, long indIndexOpeningPortfolio) {
         this.header = header;
         this.instrumentId = instrumentId;
         this.openingIndexValue = openingIndexValue;
         this.sessionLow = sessionLow;
         this.sessionHigh = sessionHigh;
         this.closingIndexValue = closingIndexValue;
+        this.presenceFlags = presenceFlags;
         this.sessionAvg = sessionAvg;
         this.pctChangeIndexValPrevSession = pctChangeIndexValPrevSession;
         this.pctChangeIndexValPrevYear = pctChangeIndexValPrevYear;
@@ -55,11 +58,12 @@ public class IndexSummary implements ByteSerializable, Message {
         this.sessionLow = BendecUtils.int64FromByteArray(bytes, offset + 54);
         this.sessionHigh = BendecUtils.int64FromByteArray(bytes, offset + 62);
         this.closingIndexValue = BendecUtils.int64FromByteArray(bytes, offset + 70);
-        this.sessionAvg = BendecUtils.int64FromByteArray(bytes, offset + 78);
-        this.pctChangeIndexValPrevSession = BendecUtils.int64FromByteArray(bytes, offset + 86);
-        this.pctChangeIndexValPrevYear = BendecUtils.int64FromByteArray(bytes, offset + 94);
-        this.closingCapitalisationPortfolio = BendecUtils.int64FromByteArray(bytes, offset + 102);
-        this.indIndexOpeningPortfolio = BendecUtils.int64FromByteArray(bytes, offset + 110);
+        this.presenceFlags = new IndexSummaryPresenceFlags(bytes, offset + 78);
+        this.sessionAvg = BendecUtils.int64FromByteArray(bytes, offset + 79);
+        this.pctChangeIndexValPrevSession = BendecUtils.int64FromByteArray(bytes, offset + 87);
+        this.pctChangeIndexValPrevYear = BendecUtils.int64FromByteArray(bytes, offset + 95);
+        this.closingCapitalisationPortfolio = BendecUtils.int64FromByteArray(bytes, offset + 103);
+        this.indIndexOpeningPortfolio = BendecUtils.int64FromByteArray(bytes, offset + 111);
     }
     
     public IndexSummary(byte[] bytes) {
@@ -109,6 +113,13 @@ public class IndexSummary implements ByteSerializable, Message {
      */
     public long getClosingIndexValue() {
         return this.closingIndexValue;
+    }
+    
+    /**
+     * @return Indicates the filling of fields: sessionAvg.
+     */
+    public IndexSummaryPresenceFlags getPresenceFlags() {
+        return this.presenceFlags;
     }
     
     /**
@@ -189,6 +200,13 @@ public class IndexSummary implements ByteSerializable, Message {
     }
     
     /**
+     * @param presenceFlags Indicates the filling of fields: sessionAvg.
+     */
+    public void setPresenceFlags(IndexSummaryPresenceFlags presenceFlags) {
+        this.presenceFlags = presenceFlags;
+    }
+    
+    /**
      * @param sessionAvg Average value of the day.
      */
     public void setSessionAvg(long sessionAvg) {
@@ -232,6 +250,7 @@ public class IndexSummary implements ByteSerializable, Message {
         buffer.put(BendecUtils.int64ToByteArray(this.sessionLow));
         buffer.put(BendecUtils.int64ToByteArray(this.sessionHigh));
         buffer.put(BendecUtils.int64ToByteArray(this.closingIndexValue));
+        presenceFlags.toBytes(buffer);
         buffer.put(BendecUtils.int64ToByteArray(this.sessionAvg));
         buffer.put(BendecUtils.int64ToByteArray(this.pctChangeIndexValPrevSession));
         buffer.put(BendecUtils.int64ToByteArray(this.pctChangeIndexValPrevYear));
@@ -248,6 +267,7 @@ public class IndexSummary implements ByteSerializable, Message {
         buffer.put(BendecUtils.int64ToByteArray(this.sessionLow));
         buffer.put(BendecUtils.int64ToByteArray(this.sessionHigh));
         buffer.put(BendecUtils.int64ToByteArray(this.closingIndexValue));
+        presenceFlags.toBytes(buffer);
         buffer.put(BendecUtils.int64ToByteArray(this.sessionAvg));
         buffer.put(BendecUtils.int64ToByteArray(this.pctChangeIndexValPrevSession));
         buffer.put(BendecUtils.int64ToByteArray(this.pctChangeIndexValPrevYear));
@@ -263,6 +283,7 @@ public class IndexSummary implements ByteSerializable, Message {
         sessionLow,
         sessionHigh,
         closingIndexValue,
+        presenceFlags,
         sessionAvg,
         pctChangeIndexValPrevSession,
         pctChangeIndexValPrevYear,
@@ -279,6 +300,7 @@ public class IndexSummary implements ByteSerializable, Message {
             ", sessionLow=" + sessionLow +
             ", sessionHigh=" + sessionHigh +
             ", closingIndexValue=" + closingIndexValue +
+            ", presenceFlags=" + presenceFlags +
             ", sessionAvg=" + sessionAvg +
             ", pctChangeIndexValPrevSession=" + pctChangeIndexValPrevSession +
             ", pctChangeIndexValPrevYear=" + pctChangeIndexValPrevYear +

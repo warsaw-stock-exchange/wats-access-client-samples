@@ -109,7 +109,7 @@ public class EncryptionUtils {
 
         orderExecute.setQuantity(BendecUtils.uInt64FromByteArray(cipher.update(BendecUtils.uInt64ToByteArray(orderExecute.getQuantity())), 0));
         orderExecute.setInstrumentId(BendecUtils.uInt32FromByteArray(cipher.update(BendecUtils.uInt32ToByteArray(orderExecute.getInstrumentId())), 0));
-        orderExecute.setExecutionId(BendecUtils.uInt32FromByteArray(cipher.update(BendecUtils.uInt32ToByteArray(orderExecute.getExecutionId())), 0));
+        orderExecute.setTradeId(BendecUtils.uInt32FromByteArray(cipher.update(BendecUtils.uInt32ToByteArray(orderExecute.getTradeId())), 0));
         orderExecute.setExecutionPrice(BendecUtils.int64FromByteArray(cipher.update(BendecUtils.int64ToByteArray(orderExecute.getExecutionPrice())), 0));
         orderExecute.setExecutionQuantity(BendecUtils.uInt64FromByteArray(cipher.update(BendecUtils.uInt64ToByteArray(orderExecute.getExecutionQuantity())), 0));
         System.arraycopy(orderExecute.toBytes(), 0, bytes, 0, bytes.length);
@@ -224,7 +224,6 @@ public class EncryptionUtils {
 
         productSummary.setTradingValueCurrency(BendecUtils.int64FromByteArray(cipher.update(BendecUtils.int64ToByteArray(productSummary.getTradingValueCurrency())), 0));
         productSummary.setMarkerPriceChange(ChangeIndicator.getChangeIndicator((int )BendecUtils.int64FromByteArray(cipher.update(BendecUtils.int64ToByteArray(productSummary.getMarkerPriceChange().getChangeIndicatorValue())), 0)));
-        productSummary.setImpliedVolatility(BendecUtils.int64FromByteArray(cipher.update(BendecUtils.int64ToByteArray(productSummary.getImpliedVolatility())), 0));
         productSummary.setDelta(BendecUtils.int64FromByteArray(cipher.update(BendecUtils.int64ToByteArray(productSummary.getDelta())), 0));
         productSummary.setGamma(BendecUtils.int64FromByteArray(cipher.update(BendecUtils.int64ToByteArray(productSummary.getGamma())), 0));
         productSummary.setRho(BendecUtils.int64FromByteArray(cipher.update(BendecUtils.int64ToByteArray(productSummary.getRho())), 0));

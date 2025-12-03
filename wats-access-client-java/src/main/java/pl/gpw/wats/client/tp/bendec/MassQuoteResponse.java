@@ -7,8 +7,8 @@ import java.nio.ByteBuffer;
 /**
  * <h2>MassQuoteResponse</h2>
  * <p>The response to a MassQuote message.</p>
- * <p>Byte length: 719</p>
- * <p>Header header - Message header. | size 16</p>
+ * <p>Byte length: 727</p>
+ * <p>Header header - Message header. | size 24</p>
  * <p>OrderId > BigInteger (u64) massQuoteId - Quote id | size 8</p>
  * <p>QuoteOrderResponses responses - The slice of responses. | size 691</p>
  * <p>MassQuoteStatus status - Status of the given mass quote order. | size 1</p>
@@ -22,7 +22,7 @@ public class MassQuoteResponse implements ByteSerializable, Message {
     private MassQuoteStatus status;
     private MassQuoteRejectionReason reason;
     private int feeStructureId;
-    public static final int byteLength = 719;
+    public static final int byteLength = 727;
     
     public MassQuoteResponse(Header header, BigInteger massQuoteId, QuoteOrderResponses responses, MassQuoteStatus status, MassQuoteRejectionReason reason, int feeStructureId) {
         this.header = header;
@@ -35,11 +35,11 @@ public class MassQuoteResponse implements ByteSerializable, Message {
     
     public MassQuoteResponse(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
-        this.massQuoteId = BendecUtils.uInt64FromByteArray(bytes, offset + 16);
-        this.responses = new QuoteOrderResponses(bytes, offset + 24);
-        this.status = MassQuoteStatus.getMassQuoteStatus(bytes, offset + 715);
-        this.reason = MassQuoteRejectionReason.getMassQuoteRejectionReason(bytes, offset + 716);
-        this.feeStructureId = BendecUtils.uInt8FromByteArray(bytes, offset + 718);
+        this.massQuoteId = BendecUtils.uInt64FromByteArray(bytes, offset + 24);
+        this.responses = new QuoteOrderResponses(bytes, offset + 32);
+        this.status = MassQuoteStatus.getMassQuoteStatus(bytes, offset + 723);
+        this.reason = MassQuoteRejectionReason.getMassQuoteRejectionReason(bytes, offset + 724);
+        this.feeStructureId = BendecUtils.uInt8FromByteArray(bytes, offset + 726);
     }
     
     public MassQuoteResponse(byte[] bytes) {

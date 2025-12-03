@@ -7,10 +7,12 @@ import java.nio.ByteBuffer;
 /**
  * <h2>IndexPortfolioEntry</h2>
  * <p>The message contains information about a product providing the index portfolio. The entire index portfolio is sent as successive IndexPortfolioEntry messages.</p>
- * <p>Byte length: 96</p>
+ * <p>Byte length: 101</p>
  * <p>Header header - Message header. | size 42</p>
  * <p>ElementId > long (u32) id - The identifier of the entry within the given index. | size 4</p>
- * <p>ElementId > long (u32) instrumentId - InstrumentID of the redistributed index. | size 4</p>
+ * <p>ElementId > long (u32) indexId - ID of index. | size 4</p>
+ * <p>IndexPortfolioEntryPresenceFlags presenceFlags - Indicates the filling of fields: instrumentId. | size 1</p>
+ * <p>ElementId > long (u32) instrumentId - ID of the financial instrument (index participant). | size 4</p>
  * <p>PublicProductIdentification publicProductIdentification - Product identification type and code. | size 31</p>
  * <p>MicCode > String (u8[]) mic - Market structure's Market Identifier Code (MIC) as specified in ISO 10383. | size 4</p>
  * <p>Currency currency - Currency (e.g. USD). | size 2</p>
@@ -20,17 +22,21 @@ import java.nio.ByteBuffer;
 public class IndexPortfolioEntry implements ByteSerializable, Message {
     private Header header;
     private long id;
+    private long indexId;
+    private IndexPortfolioEntryPresenceFlags presenceFlags;
     private long instrumentId;
     private PublicProductIdentification publicProductIdentification;
     private String mic;
     private Currency currency;
     private BigInteger instrumentPacket;
     private boolean suspended;
-    public static final int byteLength = 96;
+    public static final int byteLength = 101;
     
-    public IndexPortfolioEntry(Header header, long id, long instrumentId, PublicProductIdentification publicProductIdentification, String mic, Currency currency, BigInteger instrumentPacket, boolean suspended) {
+    public IndexPortfolioEntry(Header header, long id, long indexId, IndexPortfolioEntryPresenceFlags presenceFlags, long instrumentId, PublicProductIdentification publicProductIdentification, String mic, Currency currency, BigInteger instrumentPacket, boolean suspended) {
         this.header = header;
         this.id = id;
+        this.indexId = indexId;
+        this.presenceFlags = presenceFlags;
         this.instrumentId = instrumentId;
         this.publicProductIdentification = publicProductIdentification;
         this.mic = mic;
@@ -42,12 +48,14 @@ public class IndexPortfolioEntry implements ByteSerializable, Message {
     public IndexPortfolioEntry(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
         this.id = BendecUtils.uInt32FromByteArray(bytes, offset + 42);
-        this.instrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 46);
-        this.publicProductIdentification = new PublicProductIdentification(bytes, offset + 50);
-        this.mic = BendecUtils.stringFromByteArray(bytes, offset + 81, 4);
-        this.currency = Currency.getCurrency(bytes, offset + 85);
-        this.instrumentPacket = BendecUtils.uInt64FromByteArray(bytes, offset + 87);
-        this.suspended = BendecUtils.booleanFromByteArray(bytes, offset + 95);
+        this.indexId = BendecUtils.uInt32FromByteArray(bytes, offset + 46);
+        this.presenceFlags = new IndexPortfolioEntryPresenceFlags(bytes, offset + 50);
+        this.instrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 51);
+        this.publicProductIdentification = new PublicProductIdentification(bytes, offset + 55);
+        this.mic = BendecUtils.stringFromByteArray(bytes, offset + 86, 4);
+        this.currency = Currency.getCurrency(bytes, offset + 90);
+        this.instrumentPacket = BendecUtils.uInt64FromByteArray(bytes, offset + 92);
+        this.suspended = BendecUtils.booleanFromByteArray(bytes, offset + 100);
     }
     
     public IndexPortfolioEntry(byte[] bytes) {
@@ -72,7 +80,21 @@ public class IndexPortfolioEntry implements ByteSerializable, Message {
     }
     
     /**
-     * @return InstrumentID of the redistributed index.
+     * @return ID of index.
+     */
+    public long getIndexId() {
+        return this.indexId;
+    }
+    
+    /**
+     * @return Indicates the filling of fields: instrumentId.
+     */
+    public IndexPortfolioEntryPresenceFlags getPresenceFlags() {
+        return this.presenceFlags;
+    }
+    
+    /**
+     * @return ID of the financial instrument (index participant).
      */
     public long getInstrumentId() {
         return this.instrumentId;
@@ -128,7 +150,21 @@ public class IndexPortfolioEntry implements ByteSerializable, Message {
     }
     
     /**
-     * @param instrumentId InstrumentID of the redistributed index.
+     * @param indexId ID of index.
+     */
+    public void setIndexId(long indexId) {
+        this.indexId = indexId;
+    }
+    
+    /**
+     * @param presenceFlags Indicates the filling of fields: instrumentId.
+     */
+    public void setPresenceFlags(IndexPortfolioEntryPresenceFlags presenceFlags) {
+        this.presenceFlags = presenceFlags;
+    }
+    
+    /**
+     * @param instrumentId ID of the financial instrument (index participant).
      */
     public void setInstrumentId(long instrumentId) {
         this.instrumentId = instrumentId;
@@ -174,6 +210,8 @@ public class IndexPortfolioEntry implements ByteSerializable, Message {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.id));
+        buffer.put(BendecUtils.uInt32ToByteArray(this.indexId));
+        presenceFlags.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
         publicProductIdentification.toBytes(buffer);
         buffer.put(BendecUtils.stringToByteArray(this.mic, 4));
@@ -187,6 +225,8 @@ public class IndexPortfolioEntry implements ByteSerializable, Message {
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.id));
+        buffer.put(BendecUtils.uInt32ToByteArray(this.indexId));
+        presenceFlags.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
         publicProductIdentification.toBytes(buffer);
         buffer.put(BendecUtils.stringToByteArray(this.mic, 4));
@@ -199,6 +239,8 @@ public class IndexPortfolioEntry implements ByteSerializable, Message {
     public int hashCode() {
         return Objects.hash(header,
         id,
+        indexId,
+        presenceFlags,
         instrumentId,
         publicProductIdentification,
         mic,
@@ -212,6 +254,8 @@ public class IndexPortfolioEntry implements ByteSerializable, Message {
         return "IndexPortfolioEntry {" +
             "header=" + header +
             ", id=" + id +
+            ", indexId=" + indexId +
+            ", presenceFlags=" + presenceFlags +
             ", instrumentId=" + instrumentId +
             ", publicProductIdentification=" + publicProductIdentification +
             ", mic=" + mic +

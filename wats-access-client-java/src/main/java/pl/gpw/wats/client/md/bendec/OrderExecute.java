@@ -7,33 +7,36 @@ import java.nio.ByteBuffer;
 /**
  * <h2>OrderExecute</h2>
  * <p>Execution report.</p>
- * <p>Byte length: 82</p>
+ * <p>Byte length: 83</p>
  * <p>Header header - Message header. | size 42</p>
  * <p>Quantity > BigInteger (u64) quantity - Remaining un-executed order quantity. | size 8</p>
  * <p>ElementId > long (u32) instrumentId - ID of financial instrument. | size 4</p>
  * <p>PublicOrderId > BigInteger (u64) publicOrderId - Order identifier (ID). | size 8</p>
- * <p>TradeId > long (u32) executionId - ID of the underlying trade (equal to TradeID in Trade.) | size 4</p>
+ * <p>TradeId > long (u32) tradeId - ID of the underlying trade (equal to TradeID in Trade.) | size 4</p>
  * <p>Price > long (i64) executionPrice - Price at which the order was executed. | size 8</p>
  * <p>Quantity > BigInteger (u64) executionQuantity - The order’s executed quantity. | size 8</p>
+ * <p>OrderSide side - Order side. | size 1</p>
  */
 public class OrderExecute implements ByteSerializable, Message {
     private Header header;
     private BigInteger quantity;
     private long instrumentId;
     private BigInteger publicOrderId;
-    private long executionId;
+    private long tradeId;
     private long executionPrice;
     private BigInteger executionQuantity;
-    public static final int byteLength = 82;
+    private OrderSide side;
+    public static final int byteLength = 83;
     
-    public OrderExecute(Header header, BigInteger quantity, long instrumentId, BigInteger publicOrderId, long executionId, long executionPrice, BigInteger executionQuantity) {
+    public OrderExecute(Header header, BigInteger quantity, long instrumentId, BigInteger publicOrderId, long tradeId, long executionPrice, BigInteger executionQuantity, OrderSide side) {
         this.header = header;
         this.quantity = quantity;
         this.instrumentId = instrumentId;
         this.publicOrderId = publicOrderId;
-        this.executionId = executionId;
+        this.tradeId = tradeId;
         this.executionPrice = executionPrice;
         this.executionQuantity = executionQuantity;
+        this.side = side;
     }
     
     public OrderExecute(byte[] bytes, int offset) {
@@ -41,9 +44,10 @@ public class OrderExecute implements ByteSerializable, Message {
         this.quantity = BendecUtils.uInt64FromByteArray(bytes, offset + 42);
         this.instrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 50);
         this.publicOrderId = BendecUtils.uInt64FromByteArray(bytes, offset + 54);
-        this.executionId = BendecUtils.uInt32FromByteArray(bytes, offset + 62);
+        this.tradeId = BendecUtils.uInt32FromByteArray(bytes, offset + 62);
         this.executionPrice = BendecUtils.int64FromByteArray(bytes, offset + 66);
         this.executionQuantity = BendecUtils.uInt64FromByteArray(bytes, offset + 74);
+        this.side = OrderSide.getOrderSide(bytes, offset + 82);
     }
     
     public OrderExecute(byte[] bytes) {
@@ -84,8 +88,8 @@ public class OrderExecute implements ByteSerializable, Message {
     /**
      * @return ID of the underlying trade (equal to TradeID in Trade.)
      */
-    public long getExecutionId() {
-        return this.executionId;
+    public long getTradeId() {
+        return this.tradeId;
     }
     
     /**
@@ -100,6 +104,13 @@ public class OrderExecute implements ByteSerializable, Message {
      */
     public BigInteger getExecutionQuantity() {
         return this.executionQuantity;
+    }
+    
+    /**
+     * @return Order side.
+     */
+    public OrderSide getSide() {
+        return this.side;
     }
     
     /**
@@ -131,10 +142,10 @@ public class OrderExecute implements ByteSerializable, Message {
     }
     
     /**
-     * @param executionId ID of the underlying trade (equal to TradeID in Trade.)
+     * @param tradeId ID of the underlying trade (equal to TradeID in Trade.)
      */
-    public void setExecutionId(long executionId) {
-        this.executionId = executionId;
+    public void setTradeId(long tradeId) {
+        this.tradeId = tradeId;
     }
     
     /**
@@ -151,6 +162,13 @@ public class OrderExecute implements ByteSerializable, Message {
         this.executionQuantity = executionQuantity;
     }
     
+    /**
+     * @param side Order side.
+     */
+    public void setSide(OrderSide side) {
+        this.side = side;
+    }
+    
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -158,9 +176,10 @@ public class OrderExecute implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt64ToByteArray(this.quantity));
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
         buffer.put(BendecUtils.uInt64ToByteArray(this.publicOrderId));
-        buffer.put(BendecUtils.uInt32ToByteArray(this.executionId));
+        buffer.put(BendecUtils.uInt32ToByteArray(this.tradeId));
         buffer.put(BendecUtils.int64ToByteArray(this.executionPrice));
         buffer.put(BendecUtils.uInt64ToByteArray(this.executionQuantity));
+        side.toBytes(buffer);
         return buffer.array();
     }
     
@@ -170,9 +189,10 @@ public class OrderExecute implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt64ToByteArray(this.quantity));
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
         buffer.put(BendecUtils.uInt64ToByteArray(this.publicOrderId));
-        buffer.put(BendecUtils.uInt32ToByteArray(this.executionId));
+        buffer.put(BendecUtils.uInt32ToByteArray(this.tradeId));
         buffer.put(BendecUtils.int64ToByteArray(this.executionPrice));
         buffer.put(BendecUtils.uInt64ToByteArray(this.executionQuantity));
+        side.toBytes(buffer);
     }
     
     @Override
@@ -181,9 +201,10 @@ public class OrderExecute implements ByteSerializable, Message {
         quantity,
         instrumentId,
         publicOrderId,
-        executionId,
+        tradeId,
         executionPrice,
-        executionQuantity);
+        executionQuantity,
+        side);
     }
     
     @Override
@@ -193,9 +214,10 @@ public class OrderExecute implements ByteSerializable, Message {
             ", quantity=" + quantity +
             ", instrumentId=" + instrumentId +
             ", publicOrderId=" + publicOrderId +
-            ", executionId=" + executionId +
+            ", tradeId=" + tradeId +
             ", executionPrice=" + executionPrice +
             ", executionQuantity=" + executionQuantity +
+            ", side=" + side +
             "}";
     }
 }

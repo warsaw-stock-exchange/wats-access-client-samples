@@ -15,7 +15,7 @@ enum class MsgType: uint16_t {
     Heartbeat = 1,
     OrderAdd = 9,
     OrderModify = 10,
-    OrderDelete = 11,
+    OrderCancel = 11,
     OrderExecute = 12,
     TradingSessionStatus = 23,
     EncryptionKey = 24,
@@ -59,7 +59,7 @@ static const std::map<std::string, MsgType> Name2MsgType {
     { "Heartbeat", MsgType::Heartbeat },
     { "OrderAdd", MsgType::OrderAdd },
     { "OrderModify", MsgType::OrderModify },
-    { "OrderDelete", MsgType::OrderDelete },
+    { "OrderCancel", MsgType::OrderCancel },
     { "OrderExecute", MsgType::OrderExecute },
     { "TradingSessionStatus", MsgType::TradingSessionStatus },
     { "EncryptionKey", MsgType::EncryptionKey },
@@ -103,7 +103,7 @@ static const std::map<MsgType, std::string> MsgType2Name {
     { MsgType::Heartbeat, "Heartbeat" },
     { MsgType::OrderAdd, "OrderAdd" },
     { MsgType::OrderModify, "OrderModify" },
-    { MsgType::OrderDelete, "OrderDelete" },
+    { MsgType::OrderCancel, "OrderCancel" },
     { MsgType::OrderExecute, "OrderExecute" },
     { MsgType::TradingSessionStatus, "TradingSessionStatus" },
     { MsgType::EncryptionKey, "EncryptionKey" },
@@ -232,16 +232,18 @@ struct OrderModify {
     Price price;
     Quantity quantity;
     PriorityFlag priorityFlag;
+    OrderSide side;
 
     friend std::ostream &operator << (std::ostream &, const OrderModify &);
 };
 
-struct OrderDelete {
+struct OrderCancel {
     Header header;
     ElementId instrumentId;
     PublicOrderId publicOrderId;
+    OrderSide side;
 
-    friend std::ostream &operator << (std::ostream &, const OrderDelete &);
+    friend std::ostream &operator << (std::ostream &, const OrderCancel &);
 };
 using TradeId = uint32_t;
 
@@ -250,9 +252,10 @@ struct OrderExecute {
     Quantity quantity;
     ElementId instrumentId;
     PublicOrderId publicOrderId;
-    TradeId executionId;
+    TradeId tradeId;
     Price executionPrice;
     Quantity executionQuantity;
+    OrderSide side;
 
     friend std::ostream &operator << (std::ostream &, const OrderExecute &);
 };
@@ -301,12 +304,14 @@ static const std::map<TradingSessionEvent, std::string> TradingSessionEvent2Name
     { TradingSessionEvent::EndOfTradingSessionMIC, "EndOfTradingSessionMIC" }
 };
 
+using Date = uint32_t;
 
 struct TradingSessionStatus {
     Header header;
     MicCode marketId;
     ElementId marketStructureId;
     TradingSessionEvent tradingSessionEvent;
+    Date date;
 
     friend std::ostream &operator << (std::ostream &, const TradingSessionStatus &);
 };
@@ -405,7 +410,9 @@ enum class InstrumentStatus: uint8_t {
     RegulatorySuspension = 6,
     HybridNoQuotes = 8,
     HybridKnockout = 9,
-    HybridKnockoutByIssuer = 10
+    HybridKnockoutByIssuer = 10,
+    DistributionStart = 12,
+    DistributionEnd = 13
 };
 
 static const std::map<std::string, InstrumentStatus> Name2InstrumentStatus {
@@ -417,7 +424,9 @@ static const std::map<std::string, InstrumentStatus> Name2InstrumentStatus {
     { "RegulatorySuspension", InstrumentStatus::RegulatorySuspension },
     { "HybridNoQuotes", InstrumentStatus::HybridNoQuotes },
     { "HybridKnockout", InstrumentStatus::HybridKnockout },
-    { "HybridKnockoutByIssuer", InstrumentStatus::HybridKnockoutByIssuer }
+    { "HybridKnockoutByIssuer", InstrumentStatus::HybridKnockoutByIssuer },
+    { "DistributionStart", InstrumentStatus::DistributionStart },
+    { "DistributionEnd", InstrumentStatus::DistributionEnd }
 };
 
 static const std::map<InstrumentStatus, std::string> InstrumentStatus2Name {
@@ -429,7 +438,9 @@ static const std::map<InstrumentStatus, std::string> InstrumentStatus2Name {
     { InstrumentStatus::RegulatorySuspension, "RegulatorySuspension" },
     { InstrumentStatus::HybridNoQuotes, "HybridNoQuotes" },
     { InstrumentStatus::HybridKnockout, "HybridKnockout" },
-    { InstrumentStatus::HybridKnockoutByIssuer, "HybridKnockoutByIssuer" }
+    { InstrumentStatus::HybridKnockoutByIssuer, "HybridKnockoutByIssuer" },
+    { InstrumentStatus::DistributionStart, "DistributionStart" },
+    { InstrumentStatus::DistributionEnd, "DistributionEnd" }
 };
 
 
@@ -457,7 +468,7 @@ struct TradingPhaseScheduleEntry {
     bool uncrossing;
     ElementId extStaticCollarVolatilityAuctionId;
     ElementId extDynamicCollarVolatilityAuctionId;
-    ElementId lastAuctionPhaseId;
+    ElementId clatId;
 
     friend std::ostream &operator << (std::ostream &, const TradingPhaseScheduleEntry &);
 };
@@ -481,7 +492,6 @@ struct WeekPlan {
 
     friend std::ostream &operator << (std::ostream &, const WeekPlan &);
 };
-using Date = uint32_t;
 
 enum class CalendarExceptionType: uint8_t {
     Closed = 1,
@@ -529,14 +539,17 @@ using Value = int64_t;
 using ProductIdentification = AnsiChar[30];
 
 enum class ProductIdentificationType: uint8_t {
-    ISIN = 1
+    NotApplicable = 1,
+    ISIN = 2
 };
 
 static const std::map<std::string, ProductIdentificationType> Name2ProductIdentificationType {
+    { "NotApplicable", ProductIdentificationType::NotApplicable },
     { "ISIN", ProductIdentificationType::ISIN }
 };
 
 static const std::map<ProductIdentificationType, std::string> ProductIdentificationType2Name {
+    { ProductIdentificationType::NotApplicable, "NotApplicable" },
     { ProductIdentificationType::ISIN, "ISIN" }
 };
 
@@ -1552,7 +1565,7 @@ struct PriceLevel {
 
     friend std::ostream &operator << (std::ostream &, const PriceLevel &);
 };
-using PriceLevels = PriceLevel[10];
+using PriceLevels = PriceLevel[5];
 
 struct PriceLevelSnapshot {
     Header header;
@@ -1694,37 +1707,37 @@ struct OrderCollars {
 
 enum class AuctionType: uint8_t {
     NotApplicable = 1,
-    OpeningAuction = 2,
-    ClosingAuction = 3,
-    IntradayAuction = 4,
-    VolatilityAuctionStatic = 5,
-    VolatilityAuctionDynamic = 6,
-    ExtendedVolatilityAuctionStatic = 7,
-    ExtendedVolatilityAuctionDynamic = 8,
+    AuctionOpening = 2,
+    AuctionClosing = 3,
+    AuctionIntraday = 4,
+    AuctionVolatilityStatic = 5,
+    AuctionVolatilityDynamic = 6,
+    AuctionExtendedVolatilityStatic = 7,
+    AuctionExtendedVolatilityDynamic = 8,
     UnsuspensionAuction = 9
 };
 
 static const std::map<std::string, AuctionType> Name2AuctionType {
     { "NotApplicable", AuctionType::NotApplicable },
-    { "OpeningAuction", AuctionType::OpeningAuction },
-    { "ClosingAuction", AuctionType::ClosingAuction },
-    { "IntradayAuction", AuctionType::IntradayAuction },
-    { "VolatilityAuctionStatic", AuctionType::VolatilityAuctionStatic },
-    { "VolatilityAuctionDynamic", AuctionType::VolatilityAuctionDynamic },
-    { "ExtendedVolatilityAuctionStatic", AuctionType::ExtendedVolatilityAuctionStatic },
-    { "ExtendedVolatilityAuctionDynamic", AuctionType::ExtendedVolatilityAuctionDynamic },
+    { "AuctionOpening", AuctionType::AuctionOpening },
+    { "AuctionClosing", AuctionType::AuctionClosing },
+    { "AuctionIntraday", AuctionType::AuctionIntraday },
+    { "AuctionVolatilityStatic", AuctionType::AuctionVolatilityStatic },
+    { "AuctionVolatilityDynamic", AuctionType::AuctionVolatilityDynamic },
+    { "AuctionExtendedVolatilityStatic", AuctionType::AuctionExtendedVolatilityStatic },
+    { "AuctionExtendedVolatilityDynamic", AuctionType::AuctionExtendedVolatilityDynamic },
     { "UnsuspensionAuction", AuctionType::UnsuspensionAuction }
 };
 
 static const std::map<AuctionType, std::string> AuctionType2Name {
     { AuctionType::NotApplicable, "NotApplicable" },
-    { AuctionType::OpeningAuction, "OpeningAuction" },
-    { AuctionType::ClosingAuction, "ClosingAuction" },
-    { AuctionType::IntradayAuction, "IntradayAuction" },
-    { AuctionType::VolatilityAuctionStatic, "VolatilityAuctionStatic" },
-    { AuctionType::VolatilityAuctionDynamic, "VolatilityAuctionDynamic" },
-    { AuctionType::ExtendedVolatilityAuctionStatic, "ExtendedVolatilityAuctionStatic" },
-    { AuctionType::ExtendedVolatilityAuctionDynamic, "ExtendedVolatilityAuctionDynamic" },
+    { AuctionType::AuctionOpening, "AuctionOpening" },
+    { AuctionType::AuctionClosing, "AuctionClosing" },
+    { AuctionType::AuctionIntraday, "AuctionIntraday" },
+    { AuctionType::AuctionVolatilityStatic, "AuctionVolatilityStatic" },
+    { AuctionType::AuctionVolatilityDynamic, "AuctionVolatilityDynamic" },
+    { AuctionType::AuctionExtendedVolatilityStatic, "AuctionExtendedVolatilityStatic" },
+    { AuctionType::AuctionExtendedVolatilityDynamic, "AuctionExtendedVolatilityDynamic" },
     { AuctionType::UnsuspensionAuction, "UnsuspensionAuction" }
 };
 
@@ -2798,7 +2811,7 @@ static const std::map<Country, std::string> Country2Name {
     { Country::ZMB, "ZMB" }
 };
 
-using Code = AnsiChar[16];
+using Code = AnsiChar[20];
 using CfiCode = AnsiChar[6];
 using FisnCode = AnsiChar[35];
 
@@ -2978,10 +2991,30 @@ struct CollarGroup {
 using ConnectionId = uint16_t;
 using Token = AnsiChar[8];
 
+enum class MessageFilter: uint8_t {
+    None = 0,
+    Trades = 1,
+    RefData = 2
+};
+
+static const std::map<std::string, MessageFilter> Name2MessageFilter {
+    { "None", MessageFilter::None },
+    { "Trades", MessageFilter::Trades },
+    { "RefData", MessageFilter::RefData }
+};
+
+static const std::map<MessageFilter, std::string> MessageFilter2Name {
+    { MessageFilter::None, "None" },
+    { MessageFilter::Trades, "Trades" },
+    { MessageFilter::RefData, "RefData" }
+};
+
+
 struct Login {
     Header header;
     ConnectionId connectionId;
     Token token;
+    MessageFilter filter;
 
     friend std::ostream &operator << (std::ostream &, const Login &);
 };
@@ -3093,6 +3126,34 @@ static const std::map<IndexLevelCode, std::string> IndexLevelCode2Name {
 
 using IndexValue = Price;
 
+enum class RealTimeIndexPresenceFlags: uint8_t {
+    None = 0,
+    HasTradingValue = 1,
+    HasIndexValueBid = 2,
+    HasIndexValueAsk = 4,
+    HasMidSpreadIndex = 8,
+    HasDifferenceCentralSpread = 16
+};
+
+static const std::map<std::string, RealTimeIndexPresenceFlags> Name2RealTimeIndexPresenceFlags {
+    { "None", RealTimeIndexPresenceFlags::None },
+    { "HasTradingValue", RealTimeIndexPresenceFlags::HasTradingValue },
+    { "HasIndexValueBid", RealTimeIndexPresenceFlags::HasIndexValueBid },
+    { "HasIndexValueAsk", RealTimeIndexPresenceFlags::HasIndexValueAsk },
+    { "HasMidSpreadIndex", RealTimeIndexPresenceFlags::HasMidSpreadIndex },
+    { "HasDifferenceCentralSpread", RealTimeIndexPresenceFlags::HasDifferenceCentralSpread }
+};
+
+static const std::map<RealTimeIndexPresenceFlags, std::string> RealTimeIndexPresenceFlags2Name {
+    { RealTimeIndexPresenceFlags::None, "None" },
+    { RealTimeIndexPresenceFlags::HasTradingValue, "HasTradingValue" },
+    { RealTimeIndexPresenceFlags::HasIndexValueBid, "HasIndexValueBid" },
+    { RealTimeIndexPresenceFlags::HasIndexValueAsk, "HasIndexValueAsk" },
+    { RealTimeIndexPresenceFlags::HasMidSpreadIndex, "HasMidSpreadIndex" },
+    { RealTimeIndexPresenceFlags::HasDifferenceCentralSpread, "HasDifferenceCentralSpread" }
+};
+
+
 struct RealTimeIndex {
     Header header;
     ElementId instrumentId;
@@ -3101,9 +3162,10 @@ struct RealTimeIndex {
     PercentageChange indIndexOpeningPortfolio;
     IndexValue indexValue;
     PercentageChange pctChangeIndexValPrevSession;
-    Value tradingValue;
     IndexValue sessionLow;
     IndexValue sessionHigh;
+    RealTimeIndexPresenceFlags presenceFlags;
+    Value tradingValue;
     IndexValue indexValueBid;
     IndexValue indexValueAsk;
     IndexValue midSpreadIndex;
@@ -3112,6 +3174,22 @@ struct RealTimeIndex {
     friend std::ostream &operator << (std::ostream &, const RealTimeIndex &);
 };
 
+enum class IndexSummaryPresenceFlags: uint8_t {
+    None = 0,
+    HasSessionAvg = 1
+};
+
+static const std::map<std::string, IndexSummaryPresenceFlags> Name2IndexSummaryPresenceFlags {
+    { "None", IndexSummaryPresenceFlags::None },
+    { "HasSessionAvg", IndexSummaryPresenceFlags::HasSessionAvg }
+};
+
+static const std::map<IndexSummaryPresenceFlags, std::string> IndexSummaryPresenceFlags2Name {
+    { IndexSummaryPresenceFlags::None, "None" },
+    { IndexSummaryPresenceFlags::HasSessionAvg, "HasSessionAvg" }
+};
+
+
 struct IndexSummary {
     Header header;
     ElementId instrumentId;
@@ -3119,6 +3197,7 @@ struct IndexSummary {
     IndexValue sessionLow;
     IndexValue sessionHigh;
     IndexValue closingIndexValue;
+    IndexSummaryPresenceFlags presenceFlags;
     IndexValue sessionAvg;
     PercentageChange pctChangeIndexValPrevSession;
     PercentageChange pctChangeIndexValPrevYear;
@@ -3128,9 +3207,27 @@ struct IndexSummary {
     friend std::ostream &operator << (std::ostream &, const IndexSummary &);
 };
 
+enum class IndexPortfolioEntryPresenceFlags: uint8_t {
+    None = 0,
+    HasInstrumentId = 1
+};
+
+static const std::map<std::string, IndexPortfolioEntryPresenceFlags> Name2IndexPortfolioEntryPresenceFlags {
+    { "None", IndexPortfolioEntryPresenceFlags::None },
+    { "HasInstrumentId", IndexPortfolioEntryPresenceFlags::HasInstrumentId }
+};
+
+static const std::map<IndexPortfolioEntryPresenceFlags, std::string> IndexPortfolioEntryPresenceFlags2Name {
+    { IndexPortfolioEntryPresenceFlags::None, "None" },
+    { IndexPortfolioEntryPresenceFlags::HasInstrumentId, "HasInstrumentId" }
+};
+
+
 struct IndexPortfolioEntry {
     Header header;
     ElementId id;
+    ElementId indexId;
+    IndexPortfolioEntryPresenceFlags presenceFlags;
     ElementId instrumentId;
     PublicProductIdentification publicProductIdentification;
     MicCode mic;
@@ -3188,17 +3285,39 @@ static const std::map<IndexType, std::string> IndexType2Name {
 };
 
 
+enum class IndexParamsPresenceFlags: uint8_t {
+    None = 0,
+    HasDaysSinceLastPublication = 1,
+    HasNumberOfDividends = 2
+};
+
+static const std::map<std::string, IndexParamsPresenceFlags> Name2IndexParamsPresenceFlags {
+    { "None", IndexParamsPresenceFlags::None },
+    { "HasDaysSinceLastPublication", IndexParamsPresenceFlags::HasDaysSinceLastPublication },
+    { "HasNumberOfDividends", IndexParamsPresenceFlags::HasNumberOfDividends }
+};
+
+static const std::map<IndexParamsPresenceFlags, std::string> IndexParamsPresenceFlags2Name {
+    { IndexParamsPresenceFlags::None, "None" },
+    { IndexParamsPresenceFlags::HasDaysSinceLastPublication, "HasDaysSinceLastPublication" },
+    { IndexParamsPresenceFlags::HasNumberOfDividends, "HasNumberOfDividends" }
+};
+
+
 enum class IndexUnderlyingType: uint8_t {
-    Index = 1,
-    ReferenceRate = 2
+    NotApplicable = 1,
+    Index = 2,
+    ReferenceRate = 3
 };
 
 static const std::map<std::string, IndexUnderlyingType> Name2IndexUnderlyingType {
+    { "NotApplicable", IndexUnderlyingType::NotApplicable },
     { "Index", IndexUnderlyingType::Index },
     { "ReferenceRate", IndexUnderlyingType::ReferenceRate }
 };
 
 static const std::map<IndexUnderlyingType, std::string> IndexUnderlyingType2Name {
+    { IndexUnderlyingType::NotApplicable, "NotApplicable" },
     { IndexUnderlyingType::Index, "Index" },
     { IndexUnderlyingType::ReferenceRate, "ReferenceRate" }
 };
@@ -3229,6 +3348,7 @@ struct IndexParams {
     uint16_t numOfComponents;
     IndexPublicationSchedule indexPublicationSchedule;
     IndexType indexType;
+    IndexParamsPresenceFlags presenceFlags;
     uint8_t daysSinceLastPublication;
     uint16_t numberOfDividends;
     IndexUnderlyings indexUnderlyings;
@@ -3269,21 +3389,19 @@ static const std::map<ClosingPriceType, std::string> ClosingPriceType2Name {
 
 enum class AdjustedClosingPriceReason: uint8_t {
     NotApplicable = 1,
-    Regular = 2,
-    Dividend = 3,
-    IssueRight = 4,
-    Split = 5,
-    ReverseSplit = 6,
-    Bonus = 7,
-    SpinOff = 8,
-    TickSizeChange = 9,
-    OrderPurge = 10,
-    OtherReason = 11
+    Dividend = 2,
+    IssueRight = 3,
+    Split = 4,
+    ReverseSplit = 5,
+    Bonus = 6,
+    SpinOff = 7,
+    TickSizeChange = 8,
+    OrderPurge = 9,
+    OtherReason = 10
 };
 
 static const std::map<std::string, AdjustedClosingPriceReason> Name2AdjustedClosingPriceReason {
     { "NotApplicable", AdjustedClosingPriceReason::NotApplicable },
-    { "Regular", AdjustedClosingPriceReason::Regular },
     { "Dividend", AdjustedClosingPriceReason::Dividend },
     { "IssueRight", AdjustedClosingPriceReason::IssueRight },
     { "Split", AdjustedClosingPriceReason::Split },
@@ -3297,7 +3415,6 @@ static const std::map<std::string, AdjustedClosingPriceReason> Name2AdjustedClos
 
 static const std::map<AdjustedClosingPriceReason, std::string> AdjustedClosingPriceReason2Name {
     { AdjustedClosingPriceReason::NotApplicable, "NotApplicable" },
-    { AdjustedClosingPriceReason::Regular, "Regular" },
     { AdjustedClosingPriceReason::Dividend, "Dividend" },
     { AdjustedClosingPriceReason::IssueRight, "IssueRight" },
     { AdjustedClosingPriceReason::Split, "Split" },
@@ -3420,7 +3537,6 @@ struct ProductSummary {
     ChangeIndicator markerPriceChange;
     bool lowerLiquidity;
     Number multiplier;
-    Number impliedVolatility;
     Number dividendRate;
     Number delta;
     Number gamma;
@@ -3528,7 +3644,7 @@ union Message {
     Heartbeat uHeartbeat;
     OrderAdd uOrderAdd;
     OrderModify uOrderModify;
-    OrderDelete uOrderDelete;
+    OrderCancel uOrderCancel;
     OrderExecute uOrderExecute;
     TradingSessionStatus uTradingSessionStatus;
     EncryptionKey uEncryptionKey;

@@ -5,41 +5,41 @@ import java.util.*;
 import java.nio.ByteBuffer;
 
 /**
- * MifidFlags
- * Mifid related flags.
+ * OrderFlags
+ * Order related flags.
  */
-public class MifidFlags {
+public class OrderFlags {
     private int value;
     private final int byteLength = 1;
     
-    public MifidFlags(int value) {
+    public OrderFlags(int value) {
         this.value = value;
     }
 
-    public MifidFlags(byte[] bytes, int offset) {
+    public OrderFlags(byte[] bytes, int offset) {
         this(BendecUtils.uInt8FromByteArray(bytes, offset));
     }
 
-    public void add(MifidFlagsOptions flag) {
+    public void add(OrderFlagsOptions flag) {
         this.value = this.value | flag.getOptionValue();
     }
     
-    public void remove(MifidFlagsOptions flag) {
+    public void remove(OrderFlagsOptions flag) {
         this.value = this.value ^ flag.getOptionValue();
     }
 
-    public Set<MifidFlagsOptions> getFlags() {
-        HashSet<MifidFlagsOptions> options = new HashSet<>();
-        for (MifidFlagsOptions option : MifidFlagsOptions.values()) {
+    public Set<OrderFlagsOptions> getFlags() {
+        HashSet<OrderFlagsOptions> options = new HashSet<>();
+        for (OrderFlagsOptions option : OrderFlagsOptions.values()) {
             if (isAdded(option))
                 options.add(option);
         }
         if (options.size() > 1)
-            options.remove(MifidFlagsOptions.TYPES.get(0));
+            options.remove(OrderFlagsOptions.TYPES.get(0));
         return options;
     }
 
-    public boolean isAdded(MifidFlagsOptions flag) {
+    public boolean isAdded(OrderFlagsOptions flag) {
         return (this.value | flag.getOptionValue()) == this.value;
     }
 
@@ -57,30 +57,30 @@ public class MifidFlags {
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
     }
     
-    public enum MifidFlagsOptions {
+    public enum OrderFlagsOptions {
         NONE(0),
         LIQUIDITYPROVISIONACTIVITY(1),
         DIRECTORSPONSOREDACCESS(2),
         MARKETMAKERORSPECIALIST(4);
         
         private final int optionValue;
-        private static final Map<Integer, MifidFlagsOptions> TYPES = new HashMap<>();
+        private static final Map<Integer, OrderFlagsOptions> TYPES = new HashMap<>();
         static {
-            for (MifidFlagsOptions type : MifidFlagsOptions.values()) {
+            for (OrderFlagsOptions type : OrderFlagsOptions.values()) {
                 TYPES.put(type.optionValue, type);
             }
         }
         
         /**
-         * Get MifidFlagsOptions by attribute
+         * Get OrderFlagsOptions by attribute
          * @param val
-         * @return MifidFlagsOptions enum or null if variant is undefined
+         * @return OrderFlagsOptions enum or null if variant is undefined
          */
-        public static MifidFlagsOptions getMifidFlags(int val) {
+        public static OrderFlagsOptions getOrderFlags(int val) {
             return TYPES.get(val);
         }
         
-        MifidFlagsOptions(int newValue) {
+        OrderFlagsOptions(int newValue) {
             this.optionValue = newValue;
         }
         

@@ -7,31 +7,27 @@ import java.nio.ByteBuffer;
 /**
  * <h2>MifidFields</h2>
  * <p>Fields related to the MiFID directive.</p>
- * <p>Byte length: 16</p>
- * <p>MifidFlags flags - Flags raised on an order in compliance with the MiFID directive. | size 1</p>
+ * <p>Byte length: 15</p>
  * <p>MifidField client - MifidField of Client. | size 5</p>
  * <p>MifidField executingTrader - MifidField of Executing Trader. | size 5</p>
  * <p>MifidField investmentDecisionMaker - MifidField of Investment decision maker. | size 5</p>
  */
 public class MifidFields implements ByteSerializable {
-    private MifidFlags flags;
     private MifidField client;
     private MifidField executingTrader;
     private MifidField investmentDecisionMaker;
-    public static final int byteLength = 16;
+    public static final int byteLength = 15;
     
-    public MifidFields(MifidFlags flags, MifidField client, MifidField executingTrader, MifidField investmentDecisionMaker) {
-        this.flags = flags;
+    public MifidFields(MifidField client, MifidField executingTrader, MifidField investmentDecisionMaker) {
         this.client = client;
         this.executingTrader = executingTrader;
         this.investmentDecisionMaker = investmentDecisionMaker;
     }
     
     public MifidFields(byte[] bytes, int offset) {
-        this.flags = new MifidFlags(bytes, offset);
-        this.client = new MifidField(bytes, offset + 1);
-        this.executingTrader = new MifidField(bytes, offset + 6);
-        this.investmentDecisionMaker = new MifidField(bytes, offset + 11);
+        this.client = new MifidField(bytes, offset);
+        this.executingTrader = new MifidField(bytes, offset + 5);
+        this.investmentDecisionMaker = new MifidField(bytes, offset + 10);
     }
     
     public MifidFields(byte[] bytes) {
@@ -39,13 +35,6 @@ public class MifidFields implements ByteSerializable {
     }
     
     public MifidFields() {
-    }
-    
-    /**
-     * @return Flags raised on an order in compliance with the MiFID directive.
-     */
-    public MifidFlags getFlags() {
-        return this.flags;
     }
     
     /**
@@ -67,13 +56,6 @@ public class MifidFields implements ByteSerializable {
      */
     public MifidField getInvestmentDecisionMaker() {
         return this.investmentDecisionMaker;
-    }
-    
-    /**
-     * @param flags Flags raised on an order in compliance with the MiFID directive.
-     */
-    public void setFlags(MifidFlags flags) {
-        this.flags = flags;
     }
     
     /**
@@ -100,7 +82,6 @@ public class MifidFields implements ByteSerializable {
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
-        flags.toBytes(buffer);
         client.toBytes(buffer);
         executingTrader.toBytes(buffer);
         investmentDecisionMaker.toBytes(buffer);
@@ -109,7 +90,6 @@ public class MifidFields implements ByteSerializable {
     
     @Override  
     public void toBytes(ByteBuffer buffer) {
-        flags.toBytes(buffer);
         client.toBytes(buffer);
         executingTrader.toBytes(buffer);
         investmentDecisionMaker.toBytes(buffer);
@@ -117,8 +97,7 @@ public class MifidFields implements ByteSerializable {
     
     @Override
     public int hashCode() {
-        return Objects.hash(flags,
-        client,
+        return Objects.hash(client,
         executingTrader,
         investmentDecisionMaker);
     }
@@ -126,8 +105,7 @@ public class MifidFields implements ByteSerializable {
     @Override
     public String toString() {
         return "MifidFields {" +
-            "flags=" + flags +
-            ", client=" + client +
+            "client=" + client +
             ", executingTrader=" + executingTrader +
             ", investmentDecisionMaker=" + investmentDecisionMaker +
             "}";

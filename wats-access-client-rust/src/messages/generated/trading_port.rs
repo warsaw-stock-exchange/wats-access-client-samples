@@ -33,23 +33,23 @@ pub type ElementId = u32;
 
 
 bitflags::bitflags! {
-  /// Mifid related flags.
+  /// Order related flags.
   #[derive(Serialize, Deserialize, Default)]
   #[serde(transparent)]
   #[repr(transparent)]
-  pub struct MifidFlags: u8 {
+  pub struct OrderFlags: u8 {
     const NONE                         = 0b00000000;
     const LIQUIDITY_PROVISION_ACTIVITY = 0b00000001;
     const DIRECT_OR_SPONSORED_ACCESS   = 0b00000010;
     const MARKET_MAKER_OR_SPECIALIST   = 0b00000100;
   }
 }
-impl BytesValidator for MifidFlags {
+impl BytesValidator for OrderFlags {
     #[inline]
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u8::from_le_bytes).unwrap_unchecked();
-  MifidFlags::from_bits(disc).is_some()
+  OrderFlags::from_bits(disc).is_some()
     }
   }
 
@@ -151,6 +151,11 @@ pub type InterestedParty = [AnsiChar; 8];
 
 /// Arbitrary user provided value associated with the order.
 pub type ClientOrderId = [AnsiChar; 20];
+
+
+
+/// Market Identifier Code (MIC) as specified in ISO 10383.
+pub type MicCode = [AnsiChar; 4];
 
 
 
@@ -1104,6 +1109,812 @@ impl BytesValidator for TimeInForce {
     }
   }
 
+/// Liquidity indicator
+#[repr(u8)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum LiquidityIndicator {
+  /// Buy order execution
+  BuyOrderExecution = 0x0001,
+  /// Sell order execution
+  SellOrderExecution = 0x0002,
+  /// Auction execution
+  AuctionExecution = 0x0003,
+  /// Not applicable
+  NotApplicable = 0x0004,
+}
+impl Default for LiquidityIndicator {
+  fn default() -> Self {
+    Self::BuyOrderExecution
+  }
+}
+impl std::convert::TryFrom<u8> for LiquidityIndicator {
+  type Error = InvalidVariant;
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      0x0001 => Ok(Self::BuyOrderExecution),
+      0x0002 => Ok(Self::SellOrderExecution),
+      0x0003 => Ok(Self::AuctionExecution),
+      0x0004 => Ok(Self::NotApplicable),
+      other => Err(InvalidVariant::new(other as u32, "LiquidityIndicator")),
+    }
+  }
+}
+pub struct LiquidityIndicatorInt;
+#[allow(non_upper_case_globals, dead_code)]
+impl LiquidityIndicatorInt {
+  pub const BuyOrderExecution: u8 = 0x0001;
+  pub const SellOrderExecution: u8 = 0x0002;
+  pub const AuctionExecution: u8 = 0x0003;
+  pub const NotApplicable: u8 = 0x0004;
+}
+
+#[allow(dead_code)]
+type LiquidityIndicatorIntType = u8;
+
+impl BytesValidator for LiquidityIndicator {
+    #[inline]
+    unsafe fn is_valid(bytes: &[u8]) -> bool {
+      debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
+      let disc = std::convert::TryInto::try_into(bytes).map(u8::from_le_bytes).unwrap_unchecked();
+  matches!(disc, LiquidityIndicatorInt::BuyOrderExecution | LiquidityIndicatorInt::SellOrderExecution | LiquidityIndicatorInt::AuctionExecution | LiquidityIndicatorInt::NotApplicable)
+    }
+  }
+
+/// Currency - ISO 4217 code (e.g. PLN)
+#[repr(u16)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum Currency {
+  /// Lek
+  ALL = 0x0008,
+  /// Algerian Dinar
+  DZD = 0x000c,
+  /// Argentine Peso
+  ARS = 0x0020,
+  /// Australian Dollar
+  AUD = 0x0024,
+  /// Bahamian Dollar
+  BSD = 0x002c,
+  /// Bahraini Dinar
+  BHD = 0x0030,
+  /// Taka
+  BDT = 0x0032,
+  /// Armenian Dram
+  AMD = 0x0033,
+  /// Barbados Dollar
+  BBD = 0x0034,
+  /// Bermudian Dollar
+  BMD = 0x003c,
+  /// Ngultrum
+  BTN = 0x0040,
+  /// Boliviano
+  BOB = 0x0044,
+  /// Pula
+  BWP = 0x0048,
+  /// Belize Dollar
+  BZD = 0x0054,
+  /// Solomon Islands Dollar
+  SBD = 0x005a,
+  /// Brunei Dollar
+  BND = 0x0060,
+  /// Kyat
+  MMK = 0x0068,
+  /// Burundi Franc
+  BIF = 0x006c,
+  /// Riel
+  KHR = 0x0074,
+  /// Canadian Dollar
+  CAD = 0x007c,
+  /// Cabo Verde Escudo
+  CVE = 0x0084,
+  /// Cayman Islands Dollar
+  KYD = 0x0088,
+  /// Sri Lanka Rupee
+  LKR = 0x0090,
+  /// Chilean Peso
+  CLP = 0x0098,
+  /// Yuan Renminbi
+  CNY = 0x009c,
+  /// Colombian Peso
+  COP = 0x00aa,
+  /// Comorian Franc 
+  KMF = 0x00ae,
+  /// Costa Rican Colon
+  CRC = 0x00bc,
+  /// Kuna
+  HRK = 0x00bf,
+  /// Cuban Peso
+  CUP = 0x00c0,
+  /// Czech Koruna
+  CZK = 0x00cb,
+  /// Danish Krone
+  DKK = 0x00d0,
+  /// Dominican Peso
+  DOP = 0x00d6,
+  /// El Salvador Colon
+  SVC = 0x00de,
+  /// Ethiopian Birr
+  ETB = 0x00e6,
+  /// Nakfa
+  ERN = 0x00e8,
+  /// Falkland Islands Pound
+  FKP = 0x00ee,
+  /// Fiji Dollar
+  FJD = 0x00f2,
+  /// Djibouti Franc
+  DJF = 0x0106,
+  /// Dalasi
+  GMD = 0x010e,
+  /// Gibraltar Pound
+  GIP = 0x0124,
+  /// Quetzal
+  GTQ = 0x0140,
+  /// Guinean Franc
+  GNF = 0x0144,
+  /// Guyana Dollar
+  GYD = 0x0148,
+  /// Gourde
+  HTG = 0x014c,
+  /// Lempira
+  HNL = 0x0154,
+  /// Hong Kong Dollar
+  HKD = 0x0158,
+  /// Forint
+  HUF = 0x015c,
+  /// Iceland Krona
+  ISK = 0x0160,
+  /// Indian Rupee
+  INR = 0x0164,
+  /// Rupiah
+  IDR = 0x0168,
+  /// Iranian Rial
+  IRR = 0x016c,
+  /// Iraqi Dinar
+  IQD = 0x0170,
+  /// New Israeli Sheqel
+  ILS = 0x0178,
+  /// Jamaican Dollar
+  JMD = 0x0184,
+  /// Yen
+  JPY = 0x0188,
+  /// Tenge
+  KZT = 0x018e,
+  /// Jordanian Dinar
+  JOD = 0x0190,
+  /// Kenyan Shilling
+  KES = 0x0194,
+  /// North Korean Won
+  KPW = 0x0198,
+  /// Won
+  KRW = 0x019a,
+  /// Kuwaiti Dinar
+  KWD = 0x019e,
+  /// Som
+  KGS = 0x01a1,
+  /// Lao Kip
+  LAK = 0x01a2,
+  /// Lebanese Pound
+  LBP = 0x01a6,
+  /// Loti
+  LSL = 0x01aa,
+  /// Liberian Dollar
+  LRD = 0x01ae,
+  /// Libyan Dinar
+  LYD = 0x01b2,
+  /// Pataca
+  MOP = 0x01be,
+  /// Malawi Kwacha
+  MWK = 0x01c6,
+  /// Malaysian Ringgit
+  MYR = 0x01ca,
+  /// Rufiyaa
+  MVR = 0x01ce,
+  /// Mauritius Rupee
+  MUR = 0x01e0,
+  /// Mexican Peso
+  MXN = 0x01e4,
+  /// Tugrik
+  MNT = 0x01f0,
+  /// Moldovan Leu
+  MDL = 0x01f2,
+  /// Moroccan Dirham
+  MAD = 0x01f8,
+  /// Rial Omani
+  OMR = 0x0200,
+  /// Namibia Dollar
+  NAD = 0x0204,
+  /// Nepalese Rupee
+  NPR = 0x020c,
+  /// Netherlands Antillean Guilder
+  ANG = 0x0214,
+  /// Aruban Florin
+  AWG = 0x0215,
+  /// Vatu
+  VUV = 0x0224,
+  /// New Zealand Dollar
+  NZD = 0x022a,
+  /// Cordoba Oro
+  NIO = 0x022e,
+  /// Naira
+  NGN = 0x0236,
+  /// Norwegian Krone
+  NOK = 0x0242,
+  /// Pakistan Rupee
+  PKR = 0x024a,
+  /// Balboa
+  PAB = 0x024e,
+  /// Kina
+  PGK = 0x0256,
+  /// Guarani
+  PYG = 0x0258,
+  /// Sol
+  PEN = 0x025c,
+  /// Philippine Peso
+  PHP = 0x0260,
+  /// Qatari Rial
+  QAR = 0x027a,
+  /// Russian Ruble
+  RUB = 0x0283,
+  /// Rwanda Franc
+  RWF = 0x0286,
+  /// Saint Helena Pound
+  SHP = 0x028e,
+  /// Saudi Riyal
+  SAR = 0x02aa,
+  /// Seychelles Rupee
+  SCR = 0x02b2,
+  /// Singapore Dollar
+  SGD = 0x02be,
+  /// Dong
+  VND = 0x02c0,
+  /// Somali Shilling
+  SOS = 0x02c2,
+  /// Rand
+  ZAR = 0x02c6,
+  /// South Sudanese Pound
+  SSP = 0x02d8,
+  /// Lilangeni
+  SZL = 0x02ec,
+  /// Swedish Krona
+  SEK = 0x02f0,
+  /// Swiss Franc
+  CHF = 0x02f4,
+  /// Syrian Pound
+  SYP = 0x02f8,
+  /// Baht
+  THB = 0x02fc,
+  /// Pa’anga
+  TOP = 0x0308,
+  /// Trinidad and Tobago Dollar
+  TTD = 0x030c,
+  /// UAE Dirham
+  AED = 0x0310,
+  /// Tunisian Dinar
+  TND = 0x0314,
+  /// Uganda Shilling
+  UGX = 0x0320,
+  /// Denar
+  MKD = 0x0327,
+  /// Egyptian Pound
+  EGP = 0x0332,
+  /// Pound Sterling
+  GBP = 0x033a,
+  /// Tanzanian Shilling
+  TZS = 0x0342,
+  /// US Dollar
+  USD = 0x0348,
+  /// Peso Uruguayo
+  UYU = 0x035a,
+  /// Uzbekistan Sum
+  UZS = 0x035c,
+  /// Tala
+  WST = 0x0372,
+  /// Yemeni Rial
+  YER = 0x0376,
+  /// New Taiwan Dollar
+  TWD = 0x0385,
+  /// Leone
+  SLE = 0x039d,
+  /// Bolívar Soberano
+  VED = 0x039e,
+  /// Unidad Previsional
+  UYW = 0x039f,
+  /// Bolívar Soberano
+  VES = 0x03a0,
+  /// Ouguiya
+  MRU = 0x03a1,
+  /// Dobra
+  STN = 0x03a2,
+  /// Peso Convertible
+  CUC = 0x03a3,
+  /// Zimbabwe Dollar
+  ZWL = 0x03a4,
+  /// Belarusian Ruble
+  BYN = 0x03a5,
+  /// Turkmenistan New Manat
+  TMT = 0x03a6,
+  /// Ghana Cedi
+  GHS = 0x03a8,
+  /// Sudanese Pound
+  SDG = 0x03aa,
+  /// Uruguay Peso en Unidades Indexadas (URUIURUI)
+  UYI = 0x03ac,
+  /// Serbian Dinar
+  RSD = 0x03ad,
+  /// Mozambique Metical
+  MZN = 0x03af,
+  /// Azerbaijan Manat
+  AZN = 0x03b0,
+  /// Romanian Leu
+  RON = 0x03b2,
+  /// WIR Euro
+  CHE = 0x03b3,
+  /// WIR Franc
+  CHW = 0x03b4,
+  /// Turkish Lira
+  TRY = 0x03b5,
+  /// CFA Franc BEAC
+  XAF = 0x03b6,
+  /// East Caribbean Dollar
+  XCD = 0x03b7,
+  /// CFA Franc BCEAO
+  XOF = 0x03b8,
+  /// CFP Franc
+  XPF = 0x03b9,
+  /// Bond Markets Unit European Composite Unit (EURCO)
+  XBA = 0x03bb,
+  /// Bond Markets Unit European Monetary Unit (E.M.U.-6)
+  XBB = 0x03bc,
+  /// Bond Markets Unit European Unit of Account 9 (E.U.A.-9)
+  XBC = 0x03bd,
+  /// Bond Markets Unit European Unit of Account 17 (E.U.A.-17)
+  XBD = 0x03be,
+  /// Gold
+  XAU = 0x03bf,
+  /// SDR (Special Drawing Right)
+  XDR = 0x03c0,
+  /// Silver
+  XAG = 0x03c1,
+  /// Platinum
+  XPT = 0x03c2,
+  /// Codes specifically reserved for testing purposes
+  XTS = 0x03c3,
+  /// Palladium
+  XPD = 0x03c4,
+  /// ADB Unit of Account
+  XUA = 0x03c5,
+  /// Zambian Kwacha
+  ZMW = 0x03c7,
+  /// Surinam Dollar
+  SRD = 0x03c8,
+  /// Malagasy Ariary
+  MGA = 0x03c9,
+  /// Unidad de Valor Real
+  COU = 0x03ca,
+  /// Afghani
+  AFN = 0x03cb,
+  /// Somoni
+  TJS = 0x03cc,
+  /// Kwanza
+  AOA = 0x03cd,
+  /// Bulgarian Lev
+  BGN = 0x03cf,
+  /// Congolese Franc
+  CDF = 0x03d0,
+  /// Convertible Mark
+  BAM = 0x03d1,
+  /// Euro
+  EUR = 0x03d2,
+  /// Unidad de inversion (UDI)
+  MXV = 0x03d3,
+  /// Hryvnia
+  UAH = 0x03d4,
+  /// Lari
+  GEL = 0x03d5,
+  /// Mvdol
+  BOV = 0x03d8,
+  /// Zloty
+  PLN = 0x03d9,
+  /// Brazilian Real
+  BRL = 0x03da,
+  /// Unidad de Fomento
+  CLF = 0x03de,
+  /// Sucre
+  XSU = 0x03e2,
+  /// US Dollar (next day)
+  USN = 0x03e5,
+  /// The codes assigned for transactions where no currency is involved
+  XXX = 0x03e7,
+}
+impl Default for Currency {
+  fn default() -> Self {
+    Self::ALL
+  }
+}
+impl std::convert::TryFrom<u16> for Currency {
+  type Error = InvalidVariant;
+  fn try_from(value: u16) -> Result<Self, Self::Error> {
+    match value {
+      0x0008 => Ok(Self::ALL),
+      0x000c => Ok(Self::DZD),
+      0x0020 => Ok(Self::ARS),
+      0x0024 => Ok(Self::AUD),
+      0x002c => Ok(Self::BSD),
+      0x0030 => Ok(Self::BHD),
+      0x0032 => Ok(Self::BDT),
+      0x0033 => Ok(Self::AMD),
+      0x0034 => Ok(Self::BBD),
+      0x003c => Ok(Self::BMD),
+      0x0040 => Ok(Self::BTN),
+      0x0044 => Ok(Self::BOB),
+      0x0048 => Ok(Self::BWP),
+      0x0054 => Ok(Self::BZD),
+      0x005a => Ok(Self::SBD),
+      0x0060 => Ok(Self::BND),
+      0x0068 => Ok(Self::MMK),
+      0x006c => Ok(Self::BIF),
+      0x0074 => Ok(Self::KHR),
+      0x007c => Ok(Self::CAD),
+      0x0084 => Ok(Self::CVE),
+      0x0088 => Ok(Self::KYD),
+      0x0090 => Ok(Self::LKR),
+      0x0098 => Ok(Self::CLP),
+      0x009c => Ok(Self::CNY),
+      0x00aa => Ok(Self::COP),
+      0x00ae => Ok(Self::KMF),
+      0x00bc => Ok(Self::CRC),
+      0x00bf => Ok(Self::HRK),
+      0x00c0 => Ok(Self::CUP),
+      0x00cb => Ok(Self::CZK),
+      0x00d0 => Ok(Self::DKK),
+      0x00d6 => Ok(Self::DOP),
+      0x00de => Ok(Self::SVC),
+      0x00e6 => Ok(Self::ETB),
+      0x00e8 => Ok(Self::ERN),
+      0x00ee => Ok(Self::FKP),
+      0x00f2 => Ok(Self::FJD),
+      0x0106 => Ok(Self::DJF),
+      0x010e => Ok(Self::GMD),
+      0x0124 => Ok(Self::GIP),
+      0x0140 => Ok(Self::GTQ),
+      0x0144 => Ok(Self::GNF),
+      0x0148 => Ok(Self::GYD),
+      0x014c => Ok(Self::HTG),
+      0x0154 => Ok(Self::HNL),
+      0x0158 => Ok(Self::HKD),
+      0x015c => Ok(Self::HUF),
+      0x0160 => Ok(Self::ISK),
+      0x0164 => Ok(Self::INR),
+      0x0168 => Ok(Self::IDR),
+      0x016c => Ok(Self::IRR),
+      0x0170 => Ok(Self::IQD),
+      0x0178 => Ok(Self::ILS),
+      0x0184 => Ok(Self::JMD),
+      0x0188 => Ok(Self::JPY),
+      0x018e => Ok(Self::KZT),
+      0x0190 => Ok(Self::JOD),
+      0x0194 => Ok(Self::KES),
+      0x0198 => Ok(Self::KPW),
+      0x019a => Ok(Self::KRW),
+      0x019e => Ok(Self::KWD),
+      0x01a1 => Ok(Self::KGS),
+      0x01a2 => Ok(Self::LAK),
+      0x01a6 => Ok(Self::LBP),
+      0x01aa => Ok(Self::LSL),
+      0x01ae => Ok(Self::LRD),
+      0x01b2 => Ok(Self::LYD),
+      0x01be => Ok(Self::MOP),
+      0x01c6 => Ok(Self::MWK),
+      0x01ca => Ok(Self::MYR),
+      0x01ce => Ok(Self::MVR),
+      0x01e0 => Ok(Self::MUR),
+      0x01e4 => Ok(Self::MXN),
+      0x01f0 => Ok(Self::MNT),
+      0x01f2 => Ok(Self::MDL),
+      0x01f8 => Ok(Self::MAD),
+      0x0200 => Ok(Self::OMR),
+      0x0204 => Ok(Self::NAD),
+      0x020c => Ok(Self::NPR),
+      0x0214 => Ok(Self::ANG),
+      0x0215 => Ok(Self::AWG),
+      0x0224 => Ok(Self::VUV),
+      0x022a => Ok(Self::NZD),
+      0x022e => Ok(Self::NIO),
+      0x0236 => Ok(Self::NGN),
+      0x0242 => Ok(Self::NOK),
+      0x024a => Ok(Self::PKR),
+      0x024e => Ok(Self::PAB),
+      0x0256 => Ok(Self::PGK),
+      0x0258 => Ok(Self::PYG),
+      0x025c => Ok(Self::PEN),
+      0x0260 => Ok(Self::PHP),
+      0x027a => Ok(Self::QAR),
+      0x0283 => Ok(Self::RUB),
+      0x0286 => Ok(Self::RWF),
+      0x028e => Ok(Self::SHP),
+      0x02aa => Ok(Self::SAR),
+      0x02b2 => Ok(Self::SCR),
+      0x02be => Ok(Self::SGD),
+      0x02c0 => Ok(Self::VND),
+      0x02c2 => Ok(Self::SOS),
+      0x02c6 => Ok(Self::ZAR),
+      0x02d8 => Ok(Self::SSP),
+      0x02ec => Ok(Self::SZL),
+      0x02f0 => Ok(Self::SEK),
+      0x02f4 => Ok(Self::CHF),
+      0x02f8 => Ok(Self::SYP),
+      0x02fc => Ok(Self::THB),
+      0x0308 => Ok(Self::TOP),
+      0x030c => Ok(Self::TTD),
+      0x0310 => Ok(Self::AED),
+      0x0314 => Ok(Self::TND),
+      0x0320 => Ok(Self::UGX),
+      0x0327 => Ok(Self::MKD),
+      0x0332 => Ok(Self::EGP),
+      0x033a => Ok(Self::GBP),
+      0x0342 => Ok(Self::TZS),
+      0x0348 => Ok(Self::USD),
+      0x035a => Ok(Self::UYU),
+      0x035c => Ok(Self::UZS),
+      0x0372 => Ok(Self::WST),
+      0x0376 => Ok(Self::YER),
+      0x0385 => Ok(Self::TWD),
+      0x039d => Ok(Self::SLE),
+      0x039e => Ok(Self::VED),
+      0x039f => Ok(Self::UYW),
+      0x03a0 => Ok(Self::VES),
+      0x03a1 => Ok(Self::MRU),
+      0x03a2 => Ok(Self::STN),
+      0x03a3 => Ok(Self::CUC),
+      0x03a4 => Ok(Self::ZWL),
+      0x03a5 => Ok(Self::BYN),
+      0x03a6 => Ok(Self::TMT),
+      0x03a8 => Ok(Self::GHS),
+      0x03aa => Ok(Self::SDG),
+      0x03ac => Ok(Self::UYI),
+      0x03ad => Ok(Self::RSD),
+      0x03af => Ok(Self::MZN),
+      0x03b0 => Ok(Self::AZN),
+      0x03b2 => Ok(Self::RON),
+      0x03b3 => Ok(Self::CHE),
+      0x03b4 => Ok(Self::CHW),
+      0x03b5 => Ok(Self::TRY),
+      0x03b6 => Ok(Self::XAF),
+      0x03b7 => Ok(Self::XCD),
+      0x03b8 => Ok(Self::XOF),
+      0x03b9 => Ok(Self::XPF),
+      0x03bb => Ok(Self::XBA),
+      0x03bc => Ok(Self::XBB),
+      0x03bd => Ok(Self::XBC),
+      0x03be => Ok(Self::XBD),
+      0x03bf => Ok(Self::XAU),
+      0x03c0 => Ok(Self::XDR),
+      0x03c1 => Ok(Self::XAG),
+      0x03c2 => Ok(Self::XPT),
+      0x03c3 => Ok(Self::XTS),
+      0x03c4 => Ok(Self::XPD),
+      0x03c5 => Ok(Self::XUA),
+      0x03c7 => Ok(Self::ZMW),
+      0x03c8 => Ok(Self::SRD),
+      0x03c9 => Ok(Self::MGA),
+      0x03ca => Ok(Self::COU),
+      0x03cb => Ok(Self::AFN),
+      0x03cc => Ok(Self::TJS),
+      0x03cd => Ok(Self::AOA),
+      0x03cf => Ok(Self::BGN),
+      0x03d0 => Ok(Self::CDF),
+      0x03d1 => Ok(Self::BAM),
+      0x03d2 => Ok(Self::EUR),
+      0x03d3 => Ok(Self::MXV),
+      0x03d4 => Ok(Self::UAH),
+      0x03d5 => Ok(Self::GEL),
+      0x03d8 => Ok(Self::BOV),
+      0x03d9 => Ok(Self::PLN),
+      0x03da => Ok(Self::BRL),
+      0x03de => Ok(Self::CLF),
+      0x03e2 => Ok(Self::XSU),
+      0x03e5 => Ok(Self::USN),
+      0x03e7 => Ok(Self::XXX),
+      other => Err(InvalidVariant::new(other as u32, "Currency")),
+    }
+  }
+}
+pub struct CurrencyInt;
+#[allow(non_upper_case_globals, dead_code)]
+impl CurrencyInt {
+  pub const ALL: u16 = 0x0008;
+  pub const DZD: u16 = 0x000c;
+  pub const ARS: u16 = 0x0020;
+  pub const AUD: u16 = 0x0024;
+  pub const BSD: u16 = 0x002c;
+  pub const BHD: u16 = 0x0030;
+  pub const BDT: u16 = 0x0032;
+  pub const AMD: u16 = 0x0033;
+  pub const BBD: u16 = 0x0034;
+  pub const BMD: u16 = 0x003c;
+  pub const BTN: u16 = 0x0040;
+  pub const BOB: u16 = 0x0044;
+  pub const BWP: u16 = 0x0048;
+  pub const BZD: u16 = 0x0054;
+  pub const SBD: u16 = 0x005a;
+  pub const BND: u16 = 0x0060;
+  pub const MMK: u16 = 0x0068;
+  pub const BIF: u16 = 0x006c;
+  pub const KHR: u16 = 0x0074;
+  pub const CAD: u16 = 0x007c;
+  pub const CVE: u16 = 0x0084;
+  pub const KYD: u16 = 0x0088;
+  pub const LKR: u16 = 0x0090;
+  pub const CLP: u16 = 0x0098;
+  pub const CNY: u16 = 0x009c;
+  pub const COP: u16 = 0x00aa;
+  pub const KMF: u16 = 0x00ae;
+  pub const CRC: u16 = 0x00bc;
+  pub const HRK: u16 = 0x00bf;
+  pub const CUP: u16 = 0x00c0;
+  pub const CZK: u16 = 0x00cb;
+  pub const DKK: u16 = 0x00d0;
+  pub const DOP: u16 = 0x00d6;
+  pub const SVC: u16 = 0x00de;
+  pub const ETB: u16 = 0x00e6;
+  pub const ERN: u16 = 0x00e8;
+  pub const FKP: u16 = 0x00ee;
+  pub const FJD: u16 = 0x00f2;
+  pub const DJF: u16 = 0x0106;
+  pub const GMD: u16 = 0x010e;
+  pub const GIP: u16 = 0x0124;
+  pub const GTQ: u16 = 0x0140;
+  pub const GNF: u16 = 0x0144;
+  pub const GYD: u16 = 0x0148;
+  pub const HTG: u16 = 0x014c;
+  pub const HNL: u16 = 0x0154;
+  pub const HKD: u16 = 0x0158;
+  pub const HUF: u16 = 0x015c;
+  pub const ISK: u16 = 0x0160;
+  pub const INR: u16 = 0x0164;
+  pub const IDR: u16 = 0x0168;
+  pub const IRR: u16 = 0x016c;
+  pub const IQD: u16 = 0x0170;
+  pub const ILS: u16 = 0x0178;
+  pub const JMD: u16 = 0x0184;
+  pub const JPY: u16 = 0x0188;
+  pub const KZT: u16 = 0x018e;
+  pub const JOD: u16 = 0x0190;
+  pub const KES: u16 = 0x0194;
+  pub const KPW: u16 = 0x0198;
+  pub const KRW: u16 = 0x019a;
+  pub const KWD: u16 = 0x019e;
+  pub const KGS: u16 = 0x01a1;
+  pub const LAK: u16 = 0x01a2;
+  pub const LBP: u16 = 0x01a6;
+  pub const LSL: u16 = 0x01aa;
+  pub const LRD: u16 = 0x01ae;
+  pub const LYD: u16 = 0x01b2;
+  pub const MOP: u16 = 0x01be;
+  pub const MWK: u16 = 0x01c6;
+  pub const MYR: u16 = 0x01ca;
+  pub const MVR: u16 = 0x01ce;
+  pub const MUR: u16 = 0x01e0;
+  pub const MXN: u16 = 0x01e4;
+  pub const MNT: u16 = 0x01f0;
+  pub const MDL: u16 = 0x01f2;
+  pub const MAD: u16 = 0x01f8;
+  pub const OMR: u16 = 0x0200;
+  pub const NAD: u16 = 0x0204;
+  pub const NPR: u16 = 0x020c;
+  pub const ANG: u16 = 0x0214;
+  pub const AWG: u16 = 0x0215;
+  pub const VUV: u16 = 0x0224;
+  pub const NZD: u16 = 0x022a;
+  pub const NIO: u16 = 0x022e;
+  pub const NGN: u16 = 0x0236;
+  pub const NOK: u16 = 0x0242;
+  pub const PKR: u16 = 0x024a;
+  pub const PAB: u16 = 0x024e;
+  pub const PGK: u16 = 0x0256;
+  pub const PYG: u16 = 0x0258;
+  pub const PEN: u16 = 0x025c;
+  pub const PHP: u16 = 0x0260;
+  pub const QAR: u16 = 0x027a;
+  pub const RUB: u16 = 0x0283;
+  pub const RWF: u16 = 0x0286;
+  pub const SHP: u16 = 0x028e;
+  pub const SAR: u16 = 0x02aa;
+  pub const SCR: u16 = 0x02b2;
+  pub const SGD: u16 = 0x02be;
+  pub const VND: u16 = 0x02c0;
+  pub const SOS: u16 = 0x02c2;
+  pub const ZAR: u16 = 0x02c6;
+  pub const SSP: u16 = 0x02d8;
+  pub const SZL: u16 = 0x02ec;
+  pub const SEK: u16 = 0x02f0;
+  pub const CHF: u16 = 0x02f4;
+  pub const SYP: u16 = 0x02f8;
+  pub const THB: u16 = 0x02fc;
+  pub const TOP: u16 = 0x0308;
+  pub const TTD: u16 = 0x030c;
+  pub const AED: u16 = 0x0310;
+  pub const TND: u16 = 0x0314;
+  pub const UGX: u16 = 0x0320;
+  pub const MKD: u16 = 0x0327;
+  pub const EGP: u16 = 0x0332;
+  pub const GBP: u16 = 0x033a;
+  pub const TZS: u16 = 0x0342;
+  pub const USD: u16 = 0x0348;
+  pub const UYU: u16 = 0x035a;
+  pub const UZS: u16 = 0x035c;
+  pub const WST: u16 = 0x0372;
+  pub const YER: u16 = 0x0376;
+  pub const TWD: u16 = 0x0385;
+  pub const SLE: u16 = 0x039d;
+  pub const VED: u16 = 0x039e;
+  pub const UYW: u16 = 0x039f;
+  pub const VES: u16 = 0x03a0;
+  pub const MRU: u16 = 0x03a1;
+  pub const STN: u16 = 0x03a2;
+  pub const CUC: u16 = 0x03a3;
+  pub const ZWL: u16 = 0x03a4;
+  pub const BYN: u16 = 0x03a5;
+  pub const TMT: u16 = 0x03a6;
+  pub const GHS: u16 = 0x03a8;
+  pub const SDG: u16 = 0x03aa;
+  pub const UYI: u16 = 0x03ac;
+  pub const RSD: u16 = 0x03ad;
+  pub const MZN: u16 = 0x03af;
+  pub const AZN: u16 = 0x03b0;
+  pub const RON: u16 = 0x03b2;
+  pub const CHE: u16 = 0x03b3;
+  pub const CHW: u16 = 0x03b4;
+  pub const TRY: u16 = 0x03b5;
+  pub const XAF: u16 = 0x03b6;
+  pub const XCD: u16 = 0x03b7;
+  pub const XOF: u16 = 0x03b8;
+  pub const XPF: u16 = 0x03b9;
+  pub const XBA: u16 = 0x03bb;
+  pub const XBB: u16 = 0x03bc;
+  pub const XBC: u16 = 0x03bd;
+  pub const XBD: u16 = 0x03be;
+  pub const XAU: u16 = 0x03bf;
+  pub const XDR: u16 = 0x03c0;
+  pub const XAG: u16 = 0x03c1;
+  pub const XPT: u16 = 0x03c2;
+  pub const XTS: u16 = 0x03c3;
+  pub const XPD: u16 = 0x03c4;
+  pub const XUA: u16 = 0x03c5;
+  pub const ZMW: u16 = 0x03c7;
+  pub const SRD: u16 = 0x03c8;
+  pub const MGA: u16 = 0x03c9;
+  pub const COU: u16 = 0x03ca;
+  pub const AFN: u16 = 0x03cb;
+  pub const TJS: u16 = 0x03cc;
+  pub const AOA: u16 = 0x03cd;
+  pub const BGN: u16 = 0x03cf;
+  pub const CDF: u16 = 0x03d0;
+  pub const BAM: u16 = 0x03d1;
+  pub const EUR: u16 = 0x03d2;
+  pub const MXV: u16 = 0x03d3;
+  pub const UAH: u16 = 0x03d4;
+  pub const GEL: u16 = 0x03d5;
+  pub const BOV: u16 = 0x03d8;
+  pub const PLN: u16 = 0x03d9;
+  pub const BRL: u16 = 0x03da;
+  pub const CLF: u16 = 0x03de;
+  pub const XSU: u16 = 0x03e2;
+  pub const USN: u16 = 0x03e5;
+  pub const XXX: u16 = 0x03e7;
+}
+
+#[allow(dead_code)]
+type CurrencyIntType = u16;
+
+impl BytesValidator for Currency {
+    #[inline]
+    unsafe fn is_valid(bytes: &[u8]) -> bool {
+      debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
+      let disc = std::convert::TryInto::try_into(bytes).map(u16::from_le_bytes).unwrap_unchecked();
+  matches!(disc, CurrencyInt::ALL | CurrencyInt::DZD | CurrencyInt::ARS | CurrencyInt::AUD | CurrencyInt::BSD | CurrencyInt::BHD | CurrencyInt::BDT | CurrencyInt::AMD | CurrencyInt::BBD | CurrencyInt::BMD | CurrencyInt::BTN | CurrencyInt::BOB | CurrencyInt::BWP | CurrencyInt::BZD | CurrencyInt::SBD | CurrencyInt::BND | CurrencyInt::MMK | CurrencyInt::BIF | CurrencyInt::KHR | CurrencyInt::CAD | CurrencyInt::CVE | CurrencyInt::KYD | CurrencyInt::LKR | CurrencyInt::CLP | CurrencyInt::CNY | CurrencyInt::COP | CurrencyInt::KMF | CurrencyInt::CRC | CurrencyInt::HRK | CurrencyInt::CUP | CurrencyInt::CZK | CurrencyInt::DKK | CurrencyInt::DOP | CurrencyInt::SVC | CurrencyInt::ETB | CurrencyInt::ERN | CurrencyInt::FKP | CurrencyInt::FJD | CurrencyInt::DJF | CurrencyInt::GMD | CurrencyInt::GIP | CurrencyInt::GTQ | CurrencyInt::GNF | CurrencyInt::GYD | CurrencyInt::HTG | CurrencyInt::HNL | CurrencyInt::HKD | CurrencyInt::HUF | CurrencyInt::ISK | CurrencyInt::INR | CurrencyInt::IDR | CurrencyInt::IRR | CurrencyInt::IQD | CurrencyInt::ILS | CurrencyInt::JMD | CurrencyInt::JPY | CurrencyInt::KZT | CurrencyInt::JOD | CurrencyInt::KES | CurrencyInt::KPW | CurrencyInt::KRW | CurrencyInt::KWD | CurrencyInt::KGS | CurrencyInt::LAK | CurrencyInt::LBP | CurrencyInt::LSL | CurrencyInt::LRD | CurrencyInt::LYD | CurrencyInt::MOP | CurrencyInt::MWK | CurrencyInt::MYR | CurrencyInt::MVR | CurrencyInt::MUR | CurrencyInt::MXN | CurrencyInt::MNT | CurrencyInt::MDL | CurrencyInt::MAD | CurrencyInt::OMR | CurrencyInt::NAD | CurrencyInt::NPR | CurrencyInt::ANG | CurrencyInt::AWG | CurrencyInt::VUV | CurrencyInt::NZD | CurrencyInt::NIO | CurrencyInt::NGN | CurrencyInt::NOK | CurrencyInt::PKR | CurrencyInt::PAB | CurrencyInt::PGK | CurrencyInt::PYG | CurrencyInt::PEN | CurrencyInt::PHP | CurrencyInt::QAR | CurrencyInt::RUB | CurrencyInt::RWF | CurrencyInt::SHP | CurrencyInt::SAR | CurrencyInt::SCR | CurrencyInt::SGD | CurrencyInt::VND | CurrencyInt::SOS | CurrencyInt::ZAR | CurrencyInt::SSP | CurrencyInt::SZL | CurrencyInt::SEK | CurrencyInt::CHF | CurrencyInt::SYP | CurrencyInt::THB | CurrencyInt::TOP | CurrencyInt::TTD | CurrencyInt::AED | CurrencyInt::TND | CurrencyInt::UGX | CurrencyInt::MKD | CurrencyInt::EGP | CurrencyInt::GBP | CurrencyInt::TZS | CurrencyInt::USD | CurrencyInt::UYU | CurrencyInt::UZS | CurrencyInt::WST | CurrencyInt::YER | CurrencyInt::TWD | CurrencyInt::SLE | CurrencyInt::VED | CurrencyInt::UYW | CurrencyInt::VES | CurrencyInt::MRU | CurrencyInt::STN | CurrencyInt::CUC | CurrencyInt::ZWL | CurrencyInt::BYN | CurrencyInt::TMT | CurrencyInt::GHS | CurrencyInt::SDG | CurrencyInt::UYI | CurrencyInt::RSD | CurrencyInt::MZN | CurrencyInt::AZN | CurrencyInt::RON | CurrencyInt::CHE | CurrencyInt::CHW | CurrencyInt::TRY | CurrencyInt::XAF | CurrencyInt::XCD | CurrencyInt::XOF | CurrencyInt::XPF | CurrencyInt::XBA | CurrencyInt::XBB | CurrencyInt::XBC | CurrencyInt::XBD | CurrencyInt::XAU | CurrencyInt::XDR | CurrencyInt::XAG | CurrencyInt::XPT | CurrencyInt::XTS | CurrencyInt::XPD | CurrencyInt::XUA | CurrencyInt::ZMW | CurrencyInt::SRD | CurrencyInt::MGA | CurrencyInt::COU | CurrencyInt::AFN | CurrencyInt::TJS | CurrencyInt::AOA | CurrencyInt::BGN | CurrencyInt::CDF | CurrencyInt::BAM | CurrencyInt::EUR | CurrencyInt::MXV | CurrencyInt::UAH | CurrencyInt::GEL | CurrencyInt::BOV | CurrencyInt::PLN | CurrencyInt::BRL | CurrencyInt::CLF | CurrencyInt::XSU | CurrencyInt::USN | CurrencyInt::XXX)
+    }
+  }
+
 /// Code to identify reason for a Reject message.
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
@@ -1199,14 +2010,16 @@ pub struct Header {
   pub msg_type: MsgType,
   /// Sequence number of the message added by the sender.
   pub seq_num: SeqNum,
-  /// Processing time.
+  /// Sending time.
   pub timestamp: Timestamp,
+  /// Processing time.
+  pub source_timestamp: Timestamp,
 }
 impl BytesValidator for Header {
     #[inline]
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      MsgLength::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, length))) && MsgType::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, msg_type))) && SeqNum::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, seq_num))) && Timestamp::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, timestamp)))
+      MsgLength::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, length))) && MsgType::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, msg_type))) && SeqNum::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, seq_num))) && Timestamp::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, timestamp))) && Timestamp::is_valid(bytes.get_unchecked(memoffset::span_of!(Header, source_timestamp)))
     }
   }
 
@@ -1282,8 +2095,6 @@ impl BytesValidator for MifidField {
 #[serde(deny_unknown_fields, default)]
 #[serde(rename_all = "camelCase")]
 pub struct MifidFields {
-  /// Flags raised on an order in compliance with the MiFID directive.
-  pub flags: MifidFlags,
   /// MifidField of Client.
   pub client: MifidField,
   /// MifidField of Executing Trader.
@@ -1295,7 +2106,7 @@ impl BytesValidator for MifidFields {
     #[inline]
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      MifidFlags::is_valid(bytes.get_unchecked(memoffset::span_of!(MifidFields, flags))) && MifidField::is_valid(bytes.get_unchecked(memoffset::span_of!(MifidFields, client))) && MifidField::is_valid(bytes.get_unchecked(memoffset::span_of!(MifidFields, executing_trader))) && MifidField::is_valid(bytes.get_unchecked(memoffset::span_of!(MifidFields, investment_decision_maker)))
+      MifidField::is_valid(bytes.get_unchecked(memoffset::span_of!(MifidFields, client))) && MifidField::is_valid(bytes.get_unchecked(memoffset::span_of!(MifidFields, executing_trader))) && MifidField::is_valid(bytes.get_unchecked(memoffset::span_of!(MifidFields, investment_decision_maker)))
     }
   }
 
@@ -1524,6 +2335,8 @@ pub struct OrderAdd {
   pub account: Account,
   /// Type of account associated with the order.
   pub account_type: AccountType,
+  /// Flags raised on an order.
+  pub flags: OrderFlags,
   /// Fields related to the MiFID directive.
   pub mifid_fields: MifidFields,
   /// Expiration time indicating the validity of the order - relevant only when TimeInForce is set to GTD (Good Till Date) or GTT (Good Till Time).
@@ -1547,7 +2360,7 @@ impl BytesValidator for OrderAdd {
     #[inline]
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, header))) && STPId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, stp_id))) && ElementId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, instrument_id))) && OrderType::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, order_type))) && TimeInForce::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, time_in_force))) && OrderSide::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, side))) && Price::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, price))) && Price::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, trigger_price))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, quantity))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, display_qty))) && Capacity::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, capacity))) && Account::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, account))) && AccountType::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, account_type))) && MifidFields::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, mifid_fields))) && Timestamp::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, expire))) && Memo::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, memo))) && ClientOrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, client_order_id))) && ClearingCode::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, clearing_member_code))) && ClearingIdentifier::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, clearing_member_clearing_identifier))) && ExecInst::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, exec_inst))) && u8::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, fee_structure_id))) && InterestedParty::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, interested_party)))
+      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, header))) && STPId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, stp_id))) && ElementId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, instrument_id))) && OrderType::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, order_type))) && TimeInForce::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, time_in_force))) && OrderSide::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, side))) && Price::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, price))) && Price::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, trigger_price))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, quantity))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, display_qty))) && Capacity::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, capacity))) && Account::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, account))) && AccountType::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, account_type))) && OrderFlags::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, flags))) && MifidFields::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, mifid_fields))) && Timestamp::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, expire))) && Memo::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, memo))) && ClientOrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, client_order_id))) && ClearingCode::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, clearing_member_code))) && ClearingIdentifier::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, clearing_member_clearing_identifier))) && ExecInst::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, exec_inst))) && u8::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, fee_structure_id))) && InterestedParty::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAdd, interested_party)))
     }
   }
 
@@ -1573,12 +2386,14 @@ pub struct OrderAddResponse {
   pub reason: OrderRejectionReason,
   /// Describes why an order was executed and the events related to its lifecycle.
   pub exec_type_reason: ExecTypeReason,
+  /// Arbitrary user provided value associated with the order.
+  pub client_order_id: ClientOrderId,
 }
 impl BytesValidator for OrderAddResponse {
     #[inline]
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAddResponse, header))) && OrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAddResponse, order_id))) && PublicOrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAddResponse, public_order_id))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAddResponse, display_qty))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAddResponse, filled))) && OrderStatus::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAddResponse, status))) && OrderRejectionReason::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAddResponse, reason))) && ExecTypeReason::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAddResponse, exec_type_reason)))
+      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAddResponse, header))) && OrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAddResponse, order_id))) && PublicOrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAddResponse, public_order_id))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAddResponse, display_qty))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAddResponse, filled))) && OrderStatus::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAddResponse, status))) && OrderRejectionReason::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAddResponse, reason))) && ExecTypeReason::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAddResponse, exec_type_reason))) && ClientOrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderAddResponse, client_order_id)))
     }
   }
 
@@ -1594,12 +2409,14 @@ pub struct OrderCancel {
   pub order_id: OrderId,
   /// MifidFields structure.
   pub mifid_fields: MifidFields,
+  /// Arbitrary user provided value associated with the order.
+  pub client_order_id: ClientOrderId,
 }
 impl BytesValidator for OrderCancel {
     #[inline]
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderCancel, header))) && OrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderCancel, order_id))) && MifidFields::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderCancel, mifid_fields)))
+      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderCancel, header))) && OrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderCancel, order_id))) && MifidFields::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderCancel, mifid_fields))) && ClientOrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderCancel, client_order_id)))
     }
   }
 
@@ -1619,12 +2436,14 @@ pub struct OrderCancelResponse {
   pub reason: OrderRejectionReason,
   /// Describes why an order was executed and the events related to its lifecycle.
   pub exec_type_reason: ExecTypeReason,
+  /// Arbitrary user provided value associated with the order.
+  pub client_order_id: ClientOrderId,
 }
 impl BytesValidator for OrderCancelResponse {
     #[inline]
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderCancelResponse, header))) && OrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderCancelResponse, order_id))) && OrderStatus::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderCancelResponse, status))) && OrderRejectionReason::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderCancelResponse, reason))) && ExecTypeReason::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderCancelResponse, exec_type_reason)))
+      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderCancelResponse, header))) && OrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderCancelResponse, order_id))) && OrderStatus::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderCancelResponse, status))) && OrderRejectionReason::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderCancelResponse, reason))) && ExecTypeReason::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderCancelResponse, exec_type_reason))) && ClientOrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderCancelResponse, client_order_id)))
     }
   }
 
@@ -1650,12 +2469,14 @@ pub struct OrderModify {
   pub expire: Timestamp,
   /// MifidFields structure.
   pub mifid_fields: MifidFields,
+  /// Arbitrary user provided value associated with the order.
+  pub client_order_id: ClientOrderId,
 }
 impl BytesValidator for OrderModify {
     #[inline]
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, header))) && OrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, order_id))) && Price::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, price))) && Price::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, trigger_price))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, quantity))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, display_qty))) && Timestamp::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, expire))) && MifidFields::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, mifid_fields)))
+      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, header))) && OrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, order_id))) && Price::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, price))) && Price::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, trigger_price))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, quantity))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, display_qty))) && Timestamp::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, expire))) && MifidFields::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, mifid_fields))) && ClientOrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModify, client_order_id)))
     }
   }
 
@@ -1677,12 +2498,14 @@ pub struct OrderModifyResponse {
   pub priority_flag: PriorityFlag,
   /// Reason for rejecting the given order.
   pub reason: OrderRejectionReason,
+  /// Arbitrary user provided value associated with the order.
+  pub client_order_id: ClientOrderId,
 }
 impl BytesValidator for OrderModifyResponse {
     #[inline]
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModifyResponse, header))) && OrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModifyResponse, order_id))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModifyResponse, filled))) && OrderStatus::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModifyResponse, status))) && PriorityFlag::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModifyResponse, priority_flag))) && OrderRejectionReason::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModifyResponse, reason)))
+      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModifyResponse, header))) && OrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModifyResponse, order_id))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModifyResponse, filled))) && OrderStatus::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModifyResponse, status))) && PriorityFlag::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModifyResponse, priority_flag))) && OrderRejectionReason::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModifyResponse, reason))) && ClientOrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderModifyResponse, client_order_id)))
     }
   }
 
@@ -1780,12 +2603,14 @@ pub struct OrderMassCancel {
   pub instrument_id: ElementId,
   /// MifidField of Executing Trader.
   pub executing_trader: MifidField,
+  /// Arbitrary user provided value associated with the mass cancel.
+  pub client_order_id: ClientOrderId,
 }
 impl BytesValidator for OrderMassCancel {
     #[inline]
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancel, header))) && MassCancelRequestType::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancel, mass_cancel_request_type))) && TargetPartyRole::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancel, target_party_role))) && u32::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancel, target_party_id))) && ElementId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancel, market_segment_id))) && ElementId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancel, instrument_id))) && MifidField::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancel, executing_trader)))
+      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancel, header))) && MassCancelRequestType::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancel, mass_cancel_request_type))) && TargetPartyRole::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancel, target_party_role))) && u32::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancel, target_party_id))) && ElementId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancel, market_segment_id))) && ElementId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancel, instrument_id))) && MifidField::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancel, executing_trader))) && ClientOrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancel, client_order_id)))
     }
   }
 
@@ -1811,12 +2636,14 @@ pub struct OrderMassCancelResponse {
   pub market_segment_id: ElementId,
   /// Reason for rejecting the given mass order cancel request.
   pub reason: MassCancelRejectionReason,
+  /// Arbitrary user provided value associated with the mass cancel.
+  pub client_order_id: ClientOrderId,
 }
 impl BytesValidator for OrderMassCancelResponse {
     #[inline]
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, header))) && u64::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, total_affected_orders))) && MassCancelRequestType::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, mass_cancel_request_type))) && OrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, mass_cancel_id))) && TargetPartyRole::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, target_party_role))) && u32::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, target_party_id))) && ElementId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, market_segment_id))) && MassCancelRejectionReason::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, reason)))
+      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, header))) && u64::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, total_affected_orders))) && MassCancelRequestType::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, mass_cancel_request_type))) && OrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, mass_cancel_id))) && TargetPartyRole::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, target_party_role))) && u32::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, target_party_id))) && ElementId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, market_segment_id))) && MassCancelRejectionReason::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, reason))) && ClientOrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderMassCancelResponse, client_order_id)))
     }
   }
 
@@ -1844,25 +2671,35 @@ impl BytesValidator for Test {
 #[derive(Serialize, Deserialize, Clone, Copy)]
 #[serde(deny_unknown_fields)]
 #[serde(rename_all = "camelCase")]
-pub struct Trade {
+pub struct OrderExecute {
   /// Header.
   pub header: Header,
+  /// ID of the instrument being traded.
+  pub instrument_id: ElementId,
   /// Unique for each trading day order identifier based on the sequence number of order message, bulk sequence number, session ID and connection ID.
   pub order_id: OrderId,
   /// ID of the trade.
-  pub id: TradeId,
+  pub trade_id: TradeId,
   /// Price of the given trade.
   pub price: Price,
   /// Quantity of the instrument involved in the given trade.
   pub quantity: Quantity,
   /// How much of the given security is left on the market after the trade is concluded.
   pub leaves_qty: Quantity,
+  /// Liquidity indicator
+  pub liquidity_indicator: LiquidityIndicator,
+  /// Currency (e.g. USD).
+  pub currency: Currency,
+  /// Indicates the order's side (buy or sell).
+  pub side: OrderSide,
+  /// Arbitrary user provided value associated with the order.
+  pub client_order_id: ClientOrderId,
 }
-impl BytesValidator for Trade {
+impl BytesValidator for OrderExecute {
     #[inline]
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(Trade, header))) && OrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(Trade, order_id))) && TradeId::is_valid(bytes.get_unchecked(memoffset::span_of!(Trade, id))) && Price::is_valid(bytes.get_unchecked(memoffset::span_of!(Trade, price))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(Trade, quantity))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(Trade, leaves_qty)))
+      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderExecute, header))) && ElementId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderExecute, instrument_id))) && OrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderExecute, order_id))) && TradeId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderExecute, trade_id))) && Price::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderExecute, price))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderExecute, quantity))) && Quantity::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderExecute, leaves_qty))) && LiquidityIndicator::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderExecute, liquidity_indicator))) && Currency::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderExecute, currency))) && OrderSide::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderExecute, side))) && ClientOrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(OrderExecute, client_order_id)))
     }
   }
 
@@ -2356,6 +3193,8 @@ impl BytesValidator for TcrRejectionReason {
 #[serde(deny_unknown_fields, default)]
 #[serde(rename_all = "camelCase")]
 pub struct TcrParty {
+  /// Flags raised on an order.
+  pub flags: OrderFlags,
   /// Fields related to the MiFID directive.
   pub mifid_fields: MifidFields,
   /// Clearing member code.
@@ -2368,10 +3207,6 @@ pub struct TcrParty {
   pub account_type: AccountType,
   /// Designates the capacity of the firm placing the order.
   pub order_capacity: Capacity,
-  /// Restrictions associated with an order.
-  pub order_restrictions: ElementId,
-  /// Identifies the origin of the order.
-  pub order_origination: ElementId,
   /// Optional identifier of a fee scheme for billing purposes.
   pub fee_structure_id: u8,
   /// 3rd party interested in this order or trade.
@@ -2383,7 +3218,7 @@ impl BytesValidator for TcrParty {
     #[inline]
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      MifidFields::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, mifid_fields))) && ClearingCode::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, clearing_member_code))) && ClearingIdentifier::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, clearing_member_clearing_identifier))) && Account::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, account))) && AccountType::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, account_type))) && Capacity::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, order_capacity))) && ElementId::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, order_restrictions))) && ElementId::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, order_origination))) && u8::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, fee_structure_id))) && InterestedParty::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, interested_party))) && Memo::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, memo)))
+      OrderFlags::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, flags))) && MifidFields::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, mifid_fields))) && ClearingCode::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, clearing_member_code))) && ClearingIdentifier::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, clearing_member_clearing_identifier))) && Account::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, account))) && AccountType::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, account_type))) && Capacity::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, order_capacity))) && u8::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, fee_structure_id))) && InterestedParty::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, interested_party))) && Memo::is_valid(bytes.get_unchecked(memoffset::span_of!(TcrParty, memo)))
     }
   }
 
@@ -2779,7 +3614,7 @@ pub enum MsgType {
   /// The response message for an OrderModify.
   OrderModifyResponse = 0x0009,
   /// The message used to report trades between counterparties (i.e. generated when two or more orders are matched).
-  Trade = 0x000a,
+  OrderExecute = 0x000a,
   /// The logout message is sent from the client application to terminate the communication session with the trading port.
   Logout = 0x000b,
   /// The ConnectionClose message confirms the termination of a session through the trading port service.
@@ -2816,6 +3651,8 @@ pub enum MsgType {
   MarketMakerCommandResponse = 0x0021,
   /// Create a SeqNum gap bettwen current SeqNum and header::seqNum
   GapFill = 0x0022,
+  /// The Trading Session Status provides information on the status of a trading session.
+  TradingSessionStatus = 0x0023,
   /// A message to relay test scenario information
   TestEvent = 0x00ff,
 }
@@ -2837,7 +3674,7 @@ impl std::convert::TryFrom<u16> for MsgType {
       0x0007 => Ok(Self::OrderCancelResponse),
       0x0008 => Ok(Self::OrderModify),
       0x0009 => Ok(Self::OrderModifyResponse),
-      0x000a => Ok(Self::Trade),
+      0x000a => Ok(Self::OrderExecute),
       0x000b => Ok(Self::Logout),
       0x000c => Ok(Self::ConnectionClose),
       0x000d => Ok(Self::Heartbeat),
@@ -2856,6 +3693,7 @@ impl std::convert::TryFrom<u16> for MsgType {
       0x0020 => Ok(Self::MarketMakerCommand),
       0x0021 => Ok(Self::MarketMakerCommandResponse),
       0x0022 => Ok(Self::GapFill),
+      0x0023 => Ok(Self::TradingSessionStatus),
       0x00ff => Ok(Self::TestEvent),
       other => Err(InvalidVariant::new(other as u32, "MsgType")),
     }
@@ -2873,7 +3711,7 @@ impl MsgTypeInt {
   pub const OrderCancelResponse: u16 = 0x0007;
   pub const OrderModify: u16 = 0x0008;
   pub const OrderModifyResponse: u16 = 0x0009;
-  pub const Trade: u16 = 0x000a;
+  pub const OrderExecute: u16 = 0x000a;
   pub const Logout: u16 = 0x000b;
   pub const ConnectionClose: u16 = 0x000c;
   pub const Heartbeat: u16 = 0x000d;
@@ -2892,6 +3730,7 @@ impl MsgTypeInt {
   pub const MarketMakerCommand: u16 = 0x0020;
   pub const MarketMakerCommandResponse: u16 = 0x0021;
   pub const GapFill: u16 = 0x0022;
+  pub const TradingSessionStatus: u16 = 0x0023;
   pub const TestEvent: u16 = 0x00ff;
 }
 
@@ -2903,7 +3742,7 @@ impl BytesValidator for MsgType {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u16::from_le_bytes).unwrap_unchecked();
-  matches!(disc, MsgTypeInt::Test | MsgTypeInt::Login | MsgTypeInt::LoginResponse | MsgTypeInt::OrderAdd | MsgTypeInt::OrderAddResponse | MsgTypeInt::OrderCancel | MsgTypeInt::OrderCancelResponse | MsgTypeInt::OrderModify | MsgTypeInt::OrderModifyResponse | MsgTypeInt::Trade | MsgTypeInt::Logout | MsgTypeInt::ConnectionClose | MsgTypeInt::Heartbeat | MsgTypeInt::LogoutResponse | MsgTypeInt::Reject | MsgTypeInt::TradeCaptureReportSingle | MsgTypeInt::TradeCaptureReportDual | MsgTypeInt::TradeCaptureReportResponse | MsgTypeInt::TradeBust | MsgTypeInt::MassQuote | MsgTypeInt::MassQuoteResponse | MsgTypeInt::RequestForExecution | MsgTypeInt::OrderMassCancel | MsgTypeInt::OrderMassCancelResponse | MsgTypeInt::BidOfferUpdate | MsgTypeInt::MarketMakerCommand | MsgTypeInt::MarketMakerCommandResponse | MsgTypeInt::GapFill | MsgTypeInt::TestEvent)
+  matches!(disc, MsgTypeInt::Test | MsgTypeInt::Login | MsgTypeInt::LoginResponse | MsgTypeInt::OrderAdd | MsgTypeInt::OrderAddResponse | MsgTypeInt::OrderCancel | MsgTypeInt::OrderCancelResponse | MsgTypeInt::OrderModify | MsgTypeInt::OrderModifyResponse | MsgTypeInt::OrderExecute | MsgTypeInt::Logout | MsgTypeInt::ConnectionClose | MsgTypeInt::Heartbeat | MsgTypeInt::LogoutResponse | MsgTypeInt::Reject | MsgTypeInt::TradeCaptureReportSingle | MsgTypeInt::TradeCaptureReportDual | MsgTypeInt::TradeCaptureReportResponse | MsgTypeInt::TradeBust | MsgTypeInt::MassQuote | MsgTypeInt::MassQuoteResponse | MsgTypeInt::RequestForExecution | MsgTypeInt::OrderMassCancel | MsgTypeInt::OrderMassCancelResponse | MsgTypeInt::BidOfferUpdate | MsgTypeInt::MarketMakerCommand | MsgTypeInt::MarketMakerCommandResponse | MsgTypeInt::GapFill | MsgTypeInt::TradingSessionStatus | MsgTypeInt::TestEvent)
     }
   }
 
@@ -3009,7 +3848,7 @@ pub union Message {
   pub order_cancel_response: OrderCancelResponse,
   pub order_modify: OrderModify,
   pub order_modify_response: OrderModifyResponse,
-  pub trade: Trade,
+  pub order_execute: OrderExecute,
   pub logout: Logout,
   pub connection_close: ConnectionClose,
   pub heartbeat: Heartbeat,
@@ -3028,6 +3867,7 @@ pub union Message {
   pub order_mass_cancel_response: OrderMassCancelResponse,
   pub bid_offer_update: BidOfferUpdate,
   pub gap_fill: GapFill,
+  pub trading_session_status: TradingSessionStatus,
   pub test_event: TestEvent,
 }
 
@@ -3047,7 +3887,7 @@ impl Serialize for Message {
         MsgType::OrderCancelResponse => self.order_cancel_response.serialize(serializer),
         MsgType::OrderModify => self.order_modify.serialize(serializer),
         MsgType::OrderModifyResponse => self.order_modify_response.serialize(serializer),
-        MsgType::Trade => self.trade.serialize(serializer),
+        MsgType::OrderExecute => self.order_execute.serialize(serializer),
         MsgType::Logout => self.logout.serialize(serializer),
         MsgType::ConnectionClose => self.connection_close.serialize(serializer),
         MsgType::Heartbeat => self.heartbeat.serialize(serializer),
@@ -3066,6 +3906,7 @@ impl Serialize for Message {
         MsgType::OrderMassCancelResponse => self.order_mass_cancel_response.serialize(serializer),
         MsgType::BidOfferUpdate => self.bid_offer_update.serialize(serializer),
         MsgType::GapFill => self.gap_fill.serialize(serializer),
+        MsgType::TradingSessionStatus => self.trading_session_status.serialize(serializer),
         MsgType::TestEvent => self.test_event.serialize(serializer), 
       }
     }
@@ -3087,7 +3928,7 @@ impl Message {
       MsgType::OrderCancelResponse => OrderCancelResponse::deserialize(de).map(|v| Message { order_cancel_response: v }),
       MsgType::OrderModify => OrderModify::deserialize(de).map(|v| Message { order_modify: v }),
       MsgType::OrderModifyResponse => OrderModifyResponse::deserialize(de).map(|v| Message { order_modify_response: v }),
-      MsgType::Trade => Trade::deserialize(de).map(|v| Message { trade: v }),
+      MsgType::OrderExecute => OrderExecute::deserialize(de).map(|v| Message { order_execute: v }),
       MsgType::Logout => Logout::deserialize(de).map(|v| Message { logout: v }),
       MsgType::ConnectionClose => ConnectionClose::deserialize(de).map(|v| Message { connection_close: v }),
       MsgType::Heartbeat => Heartbeat::deserialize(de).map(|v| Message { heartbeat: v }),
@@ -3106,6 +3947,7 @@ impl Message {
       MsgType::OrderMassCancelResponse => OrderMassCancelResponse::deserialize(de).map(|v| Message { order_mass_cancel_response: v }),
       MsgType::BidOfferUpdate => BidOfferUpdate::deserialize(de).map(|v| Message { bid_offer_update: v }),
       MsgType::GapFill => GapFill::deserialize(de).map(|v| Message { gap_fill: v }),
+      MsgType::TradingSessionStatus => TradingSessionStatus::deserialize(de).map(|v| Message { trading_session_status: v }),
       MsgType::TestEvent => TestEvent::deserialize(de).map(|v| Message { test_event: v }),
     }
   }
@@ -3123,7 +3965,7 @@ impl Message {
       MsgType::OrderCancelResponse => std::mem::size_of::<OrderCancelResponse>(),
       MsgType::OrderModify => std::mem::size_of::<OrderModify>(),
       MsgType::OrderModifyResponse => std::mem::size_of::<OrderModifyResponse>(),
-      MsgType::Trade => std::mem::size_of::<Trade>(),
+      MsgType::OrderExecute => std::mem::size_of::<OrderExecute>(),
       MsgType::Logout => std::mem::size_of::<Logout>(),
       MsgType::ConnectionClose => std::mem::size_of::<ConnectionClose>(),
       MsgType::Heartbeat => std::mem::size_of::<Heartbeat>(),
@@ -3142,6 +3984,7 @@ impl Message {
       MsgType::OrderMassCancelResponse => std::mem::size_of::<OrderMassCancelResponse>(),
       MsgType::BidOfferUpdate => std::mem::size_of::<BidOfferUpdate>(),
       MsgType::GapFill => std::mem::size_of::<GapFill>(),
+      MsgType::TradingSessionStatus => std::mem::size_of::<TradingSessionStatus>(),
       MsgType::TestEvent => std::mem::size_of::<TestEvent>(),
     }
   }
@@ -3159,7 +4002,7 @@ MsgTypeInt::OrderCancel => std::mem::size_of::<OrderCancel>() == length && unsaf
 MsgTypeInt::OrderCancelResponse => std::mem::size_of::<OrderCancelResponse>() == length && unsafe { OrderCancelResponse::is_valid(bytes) },
 MsgTypeInt::OrderModify => std::mem::size_of::<OrderModify>() == length && unsafe { OrderModify::is_valid(bytes) },
 MsgTypeInt::OrderModifyResponse => std::mem::size_of::<OrderModifyResponse>() == length && unsafe { OrderModifyResponse::is_valid(bytes) },
-MsgTypeInt::Trade => std::mem::size_of::<Trade>() == length && unsafe { Trade::is_valid(bytes) },
+MsgTypeInt::OrderExecute => std::mem::size_of::<OrderExecute>() == length && unsafe { OrderExecute::is_valid(bytes) },
 MsgTypeInt::Logout => std::mem::size_of::<Logout>() == length && unsafe { Logout::is_valid(bytes) },
 MsgTypeInt::ConnectionClose => std::mem::size_of::<ConnectionClose>() == length && unsafe { ConnectionClose::is_valid(bytes) },
 MsgTypeInt::Heartbeat => std::mem::size_of::<Heartbeat>() == length && unsafe { Heartbeat::is_valid(bytes) },
@@ -3178,6 +4021,7 @@ MsgTypeInt::OrderMassCancel => std::mem::size_of::<OrderMassCancel>() == length 
 MsgTypeInt::OrderMassCancelResponse => std::mem::size_of::<OrderMassCancelResponse>() == length && unsafe { OrderMassCancelResponse::is_valid(bytes) },
 MsgTypeInt::BidOfferUpdate => std::mem::size_of::<BidOfferUpdate>() == length && unsafe { BidOfferUpdate::is_valid(bytes) },
 MsgTypeInt::GapFill => std::mem::size_of::<GapFill>() == length && unsafe { GapFill::is_valid(bytes) },
+MsgTypeInt::TradingSessionStatus => std::mem::size_of::<TradingSessionStatus>() == length && unsafe { TradingSessionStatus::is_valid(bytes) },
 MsgTypeInt::TestEvent => std::mem::size_of::<TestEvent>() == length && unsafe { TestEvent::is_valid(bytes) },
         _ => false,
       }
@@ -3194,7 +4038,7 @@ pub enum ExecTypeReason {
   CancelOnDisconnect = 0x0002,
   /// Order cancelled by the canceller due to expiration.
   Expired = 0x0003,
-  /// Notification of Stop or VFA/VFC order activation.
+  /// Notification of Stop order activation.
   Triggered = 0x0004,
   /// Order cancelled by canceller due to instrument suspension.
   CancelOnSuspension = 0x0005,
@@ -3226,6 +4070,10 @@ pub enum ExecTypeReason {
   CancelByRiskManagement = 0x0012,
   /// Order cancelled due to drop copy disconnect
   CancelOnDcDisconnect = 0x0013,
+  /// Notification of VFA/VFC order activation.
+  VfaActivated = 0x0014,
+  /// Notification of Hybrid order activation.
+  HybridActivated = 0x0015,
 }
 impl Default for ExecTypeReason {
   fn default() -> Self {
@@ -3255,6 +4103,8 @@ impl std::convert::TryFrom<u8> for ExecTypeReason {
       0x0011 => Ok(Self::CancelonKnockedOutStateEntry),
       0x0012 => Ok(Self::CancelByRiskManagement),
       0x0013 => Ok(Self::CancelOnDcDisconnect),
+      0x0014 => Ok(Self::VfaActivated),
+      0x0015 => Ok(Self::HybridActivated),
       other => Err(InvalidVariant::new(other as u32, "ExecTypeReason")),
     }
   }
@@ -3281,6 +4131,8 @@ impl ExecTypeReasonInt {
   pub const CancelonKnockedOutStateEntry: u8 = 0x0011;
   pub const CancelByRiskManagement: u8 = 0x0012;
   pub const CancelOnDcDisconnect: u8 = 0x0013;
+  pub const VfaActivated: u8 = 0x0014;
+  pub const HybridActivated: u8 = 0x0015;
 }
 
 #[allow(dead_code)]
@@ -3291,7 +4143,7 @@ impl BytesValidator for ExecTypeReason {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u8::from_le_bytes).unwrap_unchecked();
-  matches!(disc, ExecTypeReasonInt::NA | ExecTypeReasonInt::CancelOnDisconnect | ExecTypeReasonInt::Expired | ExecTypeReasonInt::Triggered | ExecTypeReasonInt::CancelOnSuspension | ExecTypeReasonInt::OrderRestatement | ExecTypeReasonInt::IcebergOrderRefill | ExecTypeReasonInt::CancelByStp | ExecTypeReasonInt::CancelByCorporateAction | ExecTypeReasonInt::CancelByMassCancel | ExecTypeReasonInt::CancelIocFokOrder | ExecTypeReasonInt::CancelByMarketOperations | ExecTypeReasonInt::Replaced | ExecTypeReasonInt::FirstTradeOnAggressiveOrder | ExecTypeReasonInt::Rejected | ExecTypeReasonInt::CancelonBuyOnlyStateEntry | ExecTypeReasonInt::CancelonKnockedOutStateEntry | ExecTypeReasonInt::CancelByRiskManagement | ExecTypeReasonInt::CancelOnDcDisconnect)
+  matches!(disc, ExecTypeReasonInt::NA | ExecTypeReasonInt::CancelOnDisconnect | ExecTypeReasonInt::Expired | ExecTypeReasonInt::Triggered | ExecTypeReasonInt::CancelOnSuspension | ExecTypeReasonInt::OrderRestatement | ExecTypeReasonInt::IcebergOrderRefill | ExecTypeReasonInt::CancelByStp | ExecTypeReasonInt::CancelByCorporateAction | ExecTypeReasonInt::CancelByMassCancel | ExecTypeReasonInt::CancelIocFokOrder | ExecTypeReasonInt::CancelByMarketOperations | ExecTypeReasonInt::Replaced | ExecTypeReasonInt::FirstTradeOnAggressiveOrder | ExecTypeReasonInt::Rejected | ExecTypeReasonInt::CancelonBuyOnlyStateEntry | ExecTypeReasonInt::CancelonKnockedOutStateEntry | ExecTypeReasonInt::CancelByRiskManagement | ExecTypeReasonInt::CancelOnDcDisconnect | ExecTypeReasonInt::VfaActivated | ExecTypeReasonInt::HybridActivated)
     }
   }
 
@@ -3368,6 +4220,8 @@ pub struct MassQuote {
   pub account: Account,
   /// Type of account associated with the order.
   pub account_type: AccountType,
+  /// Flags raised on an order.
+  pub flags: OrderFlags,
   pub mifid_fields: MifidFields,
   pub memo: Memo,
   /// Clearing member code.
@@ -3387,7 +4241,7 @@ impl BytesValidator for MassQuote {
     #[inline]
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, header))) && STPId::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, stp_id))) && Capacity::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, capacity))) && Account::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, account))) && AccountType::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, account_type))) && MifidFields::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, mifid_fields))) && Memo::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, memo))) && ClearingCode::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, clearing_member_code))) && ClearingIdentifier::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, clearing_member_clearing_identifier))) && Quotes::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, quotes))) && u8::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, fee_structure_id))) && InterestedParty::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, interested_party))) && ClientOrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, quote_id)))
+      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, header))) && STPId::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, stp_id))) && Capacity::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, capacity))) && Account::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, account))) && AccountType::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, account_type))) && OrderFlags::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, flags))) && MifidFields::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, mifid_fields))) && Memo::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, memo))) && ClearingCode::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, clearing_member_code))) && ClearingIdentifier::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, clearing_member_clearing_identifier))) && Quotes::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, quotes))) && u8::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, fee_structure_id))) && InterestedParty::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, interested_party))) && ClientOrderId::is_valid(bytes.get_unchecked(memoffset::span_of!(MassQuote, quote_id)))
     }
   }
 
@@ -3960,5 +4814,79 @@ impl BytesValidator for BidOfferUpdateType {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u8::from_le_bytes).unwrap_unchecked();
   matches!(disc, BidOfferUpdateTypeInt::Ipo | BidOfferUpdateTypeInt::TenderOffer)
+    }
+  }
+
+/// The Trading Session Status provides information on the status of a trading session.
+#[repr(C, packed)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
+#[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
+pub struct TradingSessionStatus {
+  /// Message header.
+  pub header: Header,
+  /// Market structure's Market Identifier Code (MIC) as specified in ISO 10383.
+  pub market_id: MicCode,
+  /// The date for this event.
+  pub date: Date,
+  /// Identifies an event related to the trading status of a trading session.
+  pub trading_session_event: TradingSessionEvent,
+}
+impl BytesValidator for TradingSessionStatus {
+    #[inline]
+    unsafe fn is_valid(bytes: &[u8]) -> bool {
+      debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
+      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(TradingSessionStatus, header))) && MicCode::is_valid(bytes.get_unchecked(memoffset::span_of!(TradingSessionStatus, market_id))) && Date::is_valid(bytes.get_unchecked(memoffset::span_of!(TradingSessionStatus, date))) && TradingSessionEvent::is_valid(bytes.get_unchecked(memoffset::span_of!(TradingSessionStatus, trading_session_event)))
+    }
+  }
+
+/// Identifies an event related to the status of a trading session.
+#[repr(u8)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum TradingSessionEvent {
+  /// Previous day restate start.
+  PreviousDayRestateStart = 0x0001,
+  /// Previous day restate end.
+  PreviousDayRestateEnd = 0x0002,
+  /// Start of trading session MIC.
+  StartOfTradingSessionMIC = 0x0003,
+  /// End of trading session MIC.
+  EndOfTradingSessionMIC = 0x0004,
+}
+impl Default for TradingSessionEvent {
+  fn default() -> Self {
+    Self::PreviousDayRestateStart
+  }
+}
+impl std::convert::TryFrom<u8> for TradingSessionEvent {
+  type Error = InvalidVariant;
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      0x0001 => Ok(Self::PreviousDayRestateStart),
+      0x0002 => Ok(Self::PreviousDayRestateEnd),
+      0x0003 => Ok(Self::StartOfTradingSessionMIC),
+      0x0004 => Ok(Self::EndOfTradingSessionMIC),
+      other => Err(InvalidVariant::new(other as u32, "TradingSessionEvent")),
+    }
+  }
+}
+pub struct TradingSessionEventInt;
+#[allow(non_upper_case_globals, dead_code)]
+impl TradingSessionEventInt {
+  pub const PreviousDayRestateStart: u8 = 0x0001;
+  pub const PreviousDayRestateEnd: u8 = 0x0002;
+  pub const StartOfTradingSessionMIC: u8 = 0x0003;
+  pub const EndOfTradingSessionMIC: u8 = 0x0004;
+}
+
+#[allow(dead_code)]
+type TradingSessionEventIntType = u8;
+
+impl BytesValidator for TradingSessionEvent {
+    #[inline]
+    unsafe fn is_valid(bytes: &[u8]) -> bool {
+      debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
+      let disc = std::convert::TryInto::try_into(bytes).map(u8::from_le_bytes).unwrap_unchecked();
+  matches!(disc, TradingSessionEventInt::PreviousDayRestateStart | TradingSessionEventInt::PreviousDayRestateEnd | TradingSessionEventInt::StartOfTradingSessionMIC | TradingSessionEventInt::EndOfTradingSessionMIC)
     }
   }

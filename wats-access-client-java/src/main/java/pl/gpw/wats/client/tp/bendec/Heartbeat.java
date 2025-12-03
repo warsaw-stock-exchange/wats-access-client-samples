@@ -7,12 +7,12 @@ import java.nio.ByteBuffer;
 /**
  * <h2>Heartbeat</h2>
  * <p>Heartbeat message</p>
- * <p>Byte length: 16</p>
- * <p>Header header - Header. | size 16</p>
+ * <p>Byte length: 24</p>
+ * <p>Header header - Header. | size 24</p>
  */
 public class Heartbeat implements ByteSerializable, Message {
     private Header header;
-    public static final int byteLength = 16;
+    public static final int byteLength = 24;
     
     public Heartbeat(Header header) {
         this.header = header;

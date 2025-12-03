@@ -7,8 +7,8 @@ import java.nio.ByteBuffer;
 /**
  * <h2>MarketMakerCommand</h2>
  * <p>Market Maker command request.</p>
- * <p>Byte length: 21</p>
- * <p>Header header - Message header. | size 16</p>
+ * <p>Byte length: 29</p>
+ * <p>Header header - Message header. | size 24</p>
  * <p>ElementId > long (u32) instrumentId - Instrument ID. | size 4</p>
  * <p>CommandAction action - The action for the Market Maker command request. | size 1</p>
  */
@@ -16,7 +16,7 @@ public class MarketMakerCommand implements ByteSerializable, Message {
     private Header header;
     private long instrumentId;
     private CommandAction action;
-    public static final int byteLength = 21;
+    public static final int byteLength = 29;
     
     public MarketMakerCommand(Header header, long instrumentId, CommandAction action) {
         this.header = header;
@@ -26,8 +26,8 @@ public class MarketMakerCommand implements ByteSerializable, Message {
     
     public MarketMakerCommand(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
-        this.instrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 16);
-        this.action = CommandAction.getCommandAction(bytes, offset + 20);
+        this.instrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 24);
+        this.action = CommandAction.getCommandAction(bytes, offset + 28);
     }
     
     public MarketMakerCommand(byte[] bytes) {

@@ -58,6 +58,7 @@ impl tp::Header {
       msg_type,
       seq_num: 0,
       timestamp: tp::Timestamp::new(0),
+      source_timestamp: tp::Timestamp::new(0),
     }
   }
 }

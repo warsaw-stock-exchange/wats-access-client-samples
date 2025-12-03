@@ -1,15 +1,24 @@
 package pl.gpw.wats.client.md;
 
-import pl.gpw.wats.client.EncryptionUtils;
-import pl.gpw.wats.client.md.bendec.*;
-
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.function.Consumer;
+
+import pl.gpw.wats.client.EncryptionUtils;
+import pl.gpw.wats.client.md.bendec.BendecUtils;
+import pl.gpw.wats.client.md.bendec.ByteSerializable;
+import pl.gpw.wats.client.md.bendec.EncryptionKey;
+import pl.gpw.wats.client.md.bendec.Header;
+import pl.gpw.wats.client.md.bendec.Login;
+import pl.gpw.wats.client.md.bendec.MessageFilter;
+import pl.gpw.wats.client.md.bendec.MessageFilter.MessageFilterOptions;
+import pl.gpw.wats.client.md.bendec.MsgType;
 
 public class OnlineMarketDataSnapshotClient {
     private final MdSnapshotConnectionConfig config;
@@ -110,7 +119,7 @@ public class OnlineMarketDataSnapshotClient {
     private Login loginMessage() {
         pl.gpw.wats.client.md.bendec.Header header = new pl.gpw.wats.client.md.bendec.Header(
                 Login.byteLength, MsgType.LOGIN, config.version(), 0, BigInteger.ZERO, BigInteger.ZERO, false, BigInteger.ONE, 0L, 0, 0);
-        return new Login(header, config.connectionId(), config.token());
+        return new Login(header, config.connectionId(), config.token(), new MessageFilter(MessageFilterOptions.TRADES.getOptionValue() | MessageFilterOptions.TRADES.getOptionValue()));
     }
 
     private Consumer<byte[]> encryptionKeyHandler = (bytes) -> {

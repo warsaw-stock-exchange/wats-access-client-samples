@@ -10,13 +10,17 @@ import java.nio.ByteBuffer;
  */
 public enum IndexUnderlyingType {
     /**
+     * Not applicable
+     */
+    NOTAPPLICABLE(1),
+    /**
      * Index.
      */
-    INDEX(1),
+    INDEX(2),
     /**
      * Reference Rate.
      */
-    REFERENCERATE(2);
+    REFERENCERATE(3);
     
     private final int value;
     private final int byteLength = 1;

@@ -7,12 +7,12 @@ import java.nio.ByteBuffer;
 /**
  * <h2>Logout</h2>
  * <p>The logout message is sent from the client application to terminate the communication session with the trading port.</p>
- * <p>Byte length: 16</p>
- * <p>Header header - Header. | size 16</p>
+ * <p>Byte length: 24</p>
+ * <p>Header header - Header. | size 24</p>
  */
 public class Logout implements ByteSerializable, Message {
     private Header header;
-    public static final int byteLength = 16;
+    public static final int byteLength = 24;
     
     public Logout(Header header) {
         this.header = header;

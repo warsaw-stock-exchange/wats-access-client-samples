@@ -7,15 +7,16 @@ import java.nio.ByteBuffer;
 /**
  * <h2>OrderModify</h2>
  * <p>Message used to modify the submitted order.</p>
- * <p>Byte length: 80</p>
- * <p>Header header - Header. | size 16</p>
+ * <p>Byte length: 107</p>
+ * <p>Header header - Header. | size 24</p>
  * <p>OrderId > BigInteger (u64) orderId - Unique for each trading day order identifier based on the sequence number of order message, bulk sequence number, session ID and connection ID. | size 8</p>
  * <p>Price > long (i64) price - Indicates the price of the given order. | size 8</p>
  * <p>Price > long (i64) triggerPrice - Indicates the trigger price (Last Trade Price - LTP) after which the order should be added to the order book. | size 8</p>
  * <p>Quantity > BigInteger (u64) quantity - Indicates the quantity of the instrument included in the order. | size 8</p>
  * <p>Quantity > BigInteger (u64) displayQty - Used only for iceberg order. The quantity to be displayed. | size 8</p>
  * <p>Timestamp > BigInteger (u64) expire - Expiration time indicating the validity of the order - relevant only when TimeInForce is set to GTD (Good Till Date). | size 8</p>
- * <p>MifidFields mifidFields - MifidFields structure. | size 16</p>
+ * <p>MifidFields mifidFields - MifidFields structure. | size 15</p>
+ * <p>ClientOrderId > String (u8[]) clientOrderId - Arbitrary user provided value associated with the order. | size 20</p>
  */
 public class OrderModify implements ByteSerializable, Message {
     private Header header;
@@ -26,9 +27,10 @@ public class OrderModify implements ByteSerializable, Message {
     private BigInteger displayQty;
     private BigInteger expire;
     private MifidFields mifidFields;
-    public static final int byteLength = 80;
+    private String clientOrderId;
+    public static final int byteLength = 107;
     
-    public OrderModify(Header header, BigInteger orderId, long price, long triggerPrice, BigInteger quantity, BigInteger displayQty, BigInteger expire, MifidFields mifidFields) {
+    public OrderModify(Header header, BigInteger orderId, long price, long triggerPrice, BigInteger quantity, BigInteger displayQty, BigInteger expire, MifidFields mifidFields, String clientOrderId) {
         this.header = header;
         this.orderId = orderId;
         this.price = price;
@@ -37,17 +39,19 @@ public class OrderModify implements ByteSerializable, Message {
         this.displayQty = displayQty;
         this.expire = expire;
         this.mifidFields = mifidFields;
+        this.clientOrderId = clientOrderId;
     }
     
     public OrderModify(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
-        this.orderId = BendecUtils.uInt64FromByteArray(bytes, offset + 16);
-        this.price = BendecUtils.int64FromByteArray(bytes, offset + 24);
-        this.triggerPrice = BendecUtils.int64FromByteArray(bytes, offset + 32);
-        this.quantity = BendecUtils.uInt64FromByteArray(bytes, offset + 40);
-        this.displayQty = BendecUtils.uInt64FromByteArray(bytes, offset + 48);
-        this.expire = BendecUtils.uInt64FromByteArray(bytes, offset + 56);
-        this.mifidFields = new MifidFields(bytes, offset + 64);
+        this.orderId = BendecUtils.uInt64FromByteArray(bytes, offset + 24);
+        this.price = BendecUtils.int64FromByteArray(bytes, offset + 32);
+        this.triggerPrice = BendecUtils.int64FromByteArray(bytes, offset + 40);
+        this.quantity = BendecUtils.uInt64FromByteArray(bytes, offset + 48);
+        this.displayQty = BendecUtils.uInt64FromByteArray(bytes, offset + 56);
+        this.expire = BendecUtils.uInt64FromByteArray(bytes, offset + 64);
+        this.mifidFields = new MifidFields(bytes, offset + 72);
+        this.clientOrderId = BendecUtils.stringFromByteArray(bytes, offset + 87, 20);
     }
     
     public OrderModify(byte[] bytes) {
@@ -114,6 +118,13 @@ public class OrderModify implements ByteSerializable, Message {
     }
     
     /**
+     * @return Arbitrary user provided value associated with the order.
+     */
+    public String getClientOrderId() {
+        return this.clientOrderId;
+    }
+    
+    /**
      * @param header Header.
      */
     public void setHeader(Header header) {
@@ -169,6 +180,13 @@ public class OrderModify implements ByteSerializable, Message {
         this.mifidFields = mifidFields;
     }
     
+    /**
+     * @param clientOrderId Arbitrary user provided value associated with the order.
+     */
+    public void setClientOrderId(String clientOrderId) {
+        this.clientOrderId = clientOrderId;
+    }
+    
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -180,6 +198,7 @@ public class OrderModify implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt64ToByteArray(this.displayQty));
         buffer.put(BendecUtils.uInt64ToByteArray(this.expire));
         mifidFields.toBytes(buffer);
+        buffer.put(BendecUtils.stringToByteArray(this.clientOrderId, 20));
         return buffer.array();
     }
     
@@ -193,6 +212,7 @@ public class OrderModify implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt64ToByteArray(this.displayQty));
         buffer.put(BendecUtils.uInt64ToByteArray(this.expire));
         mifidFields.toBytes(buffer);
+        buffer.put(BendecUtils.stringToByteArray(this.clientOrderId, 20));
     }
     
     @Override
@@ -204,7 +224,8 @@ public class OrderModify implements ByteSerializable, Message {
         quantity,
         displayQty,
         expire,
-        mifidFields);
+        mifidFields,
+        clientOrderId);
     }
     
     @Override
@@ -218,6 +239,7 @@ public class OrderModify implements ByteSerializable, Message {
             ", displayQty=" + displayQty +
             ", expire=" + expire +
             ", mifidFields=" + mifidFields +
+            ", clientOrderId=" + clientOrderId +
             "}";
     }
 }

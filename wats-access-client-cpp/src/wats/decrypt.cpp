@@ -75,8 +75,8 @@ void Decryption::decrypt(omd::messages::OrderExecute* message) {
         (CryptoPP::byte* )&message->instrumentId,
         sizeof(message->instrumentId));
     decrypt_chunk(message->header.encryptionKeyId,
-        (CryptoPP::byte* )&message->executionId,
-        sizeof(message->executionId));
+        (CryptoPP::byte* )&message->tradeId,
+        sizeof(message->tradeId));
     decrypt_chunk(message->header.encryptionKeyId,
         (CryptoPP::byte* )&message->executionPrice,
         sizeof(message->executionPrice));
@@ -315,9 +315,6 @@ void Decryption::decrypt(omd::messages::ProductSummary* message) {
     decrypt_chunk(message->header.encryptionKeyId,
         (CryptoPP::byte* )&message->markerPriceChange,
         sizeof(message->markerPriceChange));
-    decrypt_chunk(message->header.encryptionKeyId,
-        (CryptoPP::byte* )&message->impliedVolatility,
-        sizeof(message->impliedVolatility));
     decrypt_chunk(message->header.encryptionKeyId,
         (CryptoPP::byte* )&message->delta,
         sizeof(message->delta));

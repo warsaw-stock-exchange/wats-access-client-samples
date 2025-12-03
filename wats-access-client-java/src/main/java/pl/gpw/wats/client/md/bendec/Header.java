@@ -12,8 +12,8 @@ import java.nio.ByteBuffer;
  * <p>MsgType msgType - Type of message (e.g. OrderExecute). | size 2</p>
  * <p>MsgVersion > int (u16) version - Version of the Market Data protocol. | size 2</p>
  * <p>SeqNum > long (u32) seqNum - Sequence number of the message added by the Market Data Sequencer. | size 4</p>
- * <p>Timestamp > BigInteger (u64) timestamp - Timestamp indicating when the message was sequenced. | size 8</p>
- * <p>Timestamp > BigInteger (u64) sourceTimestamp - Timestamp added by the service which sent the message. | size 8</p>
+ * <p>Timestamp > BigInteger (u64) timestamp - Time when message was sequenced on Market Data (Timestamp >= sourceTimestamp). | size 8</p>
+ * <p>Timestamp > BigInteger (u64) sourceTimestamp - Time of the business event that triggered or generated the message. | size 8</p>
  * <p>bool > boolean isEncrypted - True if message is encrypted. | size 1</p>
  * <p>u64 > BigInteger encryptionOffset - Encryption byte offset. | size 8</p>
  * <p>ElementId > long (u32) encryptionKeyId - Reference to an EncryptionKey message. | size 4</p>
@@ -98,14 +98,14 @@ public class Header implements ByteSerializable {
     }
     
     /**
-     * @return Timestamp indicating when the message was sequenced.
+     * @return Time when message was sequenced on Market Data (Timestamp >= sourceTimestamp).
      */
     public BigInteger getTimestamp() {
         return this.timestamp;
     }
     
     /**
-     * @return Timestamp added by the service which sent the message.
+     * @return Time of the business event that triggered or generated the message.
      */
     public BigInteger getSourceTimestamp() {
         return this.sourceTimestamp;
@@ -175,14 +175,14 @@ public class Header implements ByteSerializable {
     }
     
     /**
-     * @param timestamp Timestamp indicating when the message was sequenced.
+     * @param timestamp Time when message was sequenced on Market Data (Timestamp >= sourceTimestamp).
      */
     public void setTimestamp(BigInteger timestamp) {
         this.timestamp = timestamp;
     }
     
     /**
-     * @param sourceTimestamp Timestamp added by the service which sent the message.
+     * @param sourceTimestamp Time of the business event that triggered or generated the message.
      */
     public void setSourceTimestamp(BigInteger sourceTimestamp) {
         this.sourceTimestamp = sourceTimestamp;

@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 /**
  * <h2>RealTimeIndex</h2>
  * <p>Message providing real-time index values for instruments.</p>
- * <p>Byte length: 129</p>
+ * <p>Byte length: 130</p>
  * <p>Header header - Message header. | size 42</p>
  * <p>ElementId > long (u32) instrumentId - InstrumentID of the redistributed index. | size 4</p>
  * <p>IndexLevelCode indexLevelCode - Level of the index. | size 1</p>
@@ -15,9 +15,10 @@ import java.nio.ByteBuffer;
  * <p>PercentageChange > long (i64) indIndexOpeningPortfolio - Indicator of the index opening portfolio W(t). Percentage share of instruments with at least one trade during the session. | size 8</p>
  * <p>IndexValue > long (i64) indexValue - The value of the last level for the index according to the definition provided in the indexLevelCode. | size 8</p>
  * <p>PercentageChange > long (i64) pctChangeIndexValPrevSession - Percentage change of the index value in relation to the value of the closing index from the previous session. | size 8</p>
- * <p>Value > long (i64) tradingValue - Value of trading in the instruments from the given index. | size 8</p>
  * <p>IndexValue > long (i64) sessionLow - Lowest value of the day. | size 8</p>
  * <p>IndexValue > long (i64) sessionHigh - Highest value of the day. | size 8</p>
+ * <p>RealTimeIndexPresenceFlags presenceFlags - Indicates the filling of fields: tradingValue, indexValueBid, indexValueAsk, midSpreadIndex, differenceCentralSpread. | size 1</p>
+ * <p>Value > long (i64) tradingValue - Value of trading in the instruments from the given index. | size 8</p>
  * <p>IndexValue > long (i64) indexValueBid - Value of the buy index based on the best sell offers of instruments. | size 8</p>
  * <p>IndexValue > long (i64) indexValueAsk - Value of the sell index based on the best sell offers of instruments. | size 8</p>
  * <p>IndexValue > long (i64) midSpreadIndex - Mean of indexValueBid and indexValueAsk. | size 8</p>
@@ -31,16 +32,17 @@ public class RealTimeIndex implements ByteSerializable, Message {
     private long indIndexOpeningPortfolio;
     private long indexValue;
     private long pctChangeIndexValPrevSession;
-    private long tradingValue;
     private long sessionLow;
     private long sessionHigh;
+    private RealTimeIndexPresenceFlags presenceFlags;
+    private long tradingValue;
     private long indexValueBid;
     private long indexValueAsk;
     private long midSpreadIndex;
     private long differenceCentralSpread;
-    public static final int byteLength = 129;
+    public static final int byteLength = 130;
     
-    public RealTimeIndex(Header header, long instrumentId, IndexLevelCode indexLevelCode, int numOfActiveInstruments, long indIndexOpeningPortfolio, long indexValue, long pctChangeIndexValPrevSession, long tradingValue, long sessionLow, long sessionHigh, long indexValueBid, long indexValueAsk, long midSpreadIndex, long differenceCentralSpread) {
+    public RealTimeIndex(Header header, long instrumentId, IndexLevelCode indexLevelCode, int numOfActiveInstruments, long indIndexOpeningPortfolio, long indexValue, long pctChangeIndexValPrevSession, long sessionLow, long sessionHigh, RealTimeIndexPresenceFlags presenceFlags, long tradingValue, long indexValueBid, long indexValueAsk, long midSpreadIndex, long differenceCentralSpread) {
         this.header = header;
         this.instrumentId = instrumentId;
         this.indexLevelCode = indexLevelCode;
@@ -48,9 +50,10 @@ public class RealTimeIndex implements ByteSerializable, Message {
         this.indIndexOpeningPortfolio = indIndexOpeningPortfolio;
         this.indexValue = indexValue;
         this.pctChangeIndexValPrevSession = pctChangeIndexValPrevSession;
-        this.tradingValue = tradingValue;
         this.sessionLow = sessionLow;
         this.sessionHigh = sessionHigh;
+        this.presenceFlags = presenceFlags;
+        this.tradingValue = tradingValue;
         this.indexValueBid = indexValueBid;
         this.indexValueAsk = indexValueAsk;
         this.midSpreadIndex = midSpreadIndex;
@@ -65,13 +68,14 @@ public class RealTimeIndex implements ByteSerializable, Message {
         this.indIndexOpeningPortfolio = BendecUtils.int64FromByteArray(bytes, offset + 49);
         this.indexValue = BendecUtils.int64FromByteArray(bytes, offset + 57);
         this.pctChangeIndexValPrevSession = BendecUtils.int64FromByteArray(bytes, offset + 65);
-        this.tradingValue = BendecUtils.int64FromByteArray(bytes, offset + 73);
-        this.sessionLow = BendecUtils.int64FromByteArray(bytes, offset + 81);
-        this.sessionHigh = BendecUtils.int64FromByteArray(bytes, offset + 89);
-        this.indexValueBid = BendecUtils.int64FromByteArray(bytes, offset + 97);
-        this.indexValueAsk = BendecUtils.int64FromByteArray(bytes, offset + 105);
-        this.midSpreadIndex = BendecUtils.int64FromByteArray(bytes, offset + 113);
-        this.differenceCentralSpread = BendecUtils.int64FromByteArray(bytes, offset + 121);
+        this.sessionLow = BendecUtils.int64FromByteArray(bytes, offset + 73);
+        this.sessionHigh = BendecUtils.int64FromByteArray(bytes, offset + 81);
+        this.presenceFlags = new RealTimeIndexPresenceFlags(bytes, offset + 89);
+        this.tradingValue = BendecUtils.int64FromByteArray(bytes, offset + 90);
+        this.indexValueBid = BendecUtils.int64FromByteArray(bytes, offset + 98);
+        this.indexValueAsk = BendecUtils.int64FromByteArray(bytes, offset + 106);
+        this.midSpreadIndex = BendecUtils.int64FromByteArray(bytes, offset + 114);
+        this.differenceCentralSpread = BendecUtils.int64FromByteArray(bytes, offset + 122);
     }
     
     public RealTimeIndex(byte[] bytes) {
@@ -131,13 +135,6 @@ public class RealTimeIndex implements ByteSerializable, Message {
     }
     
     /**
-     * @return Value of trading in the instruments from the given index.
-     */
-    public long getTradingValue() {
-        return this.tradingValue;
-    }
-    
-    /**
      * @return Lowest value of the day.
      */
     public long getSessionLow() {
@@ -149,6 +146,20 @@ public class RealTimeIndex implements ByteSerializable, Message {
      */
     public long getSessionHigh() {
         return this.sessionHigh;
+    }
+    
+    /**
+     * @return Indicates the filling of fields: tradingValue, indexValueBid, indexValueAsk, midSpreadIndex, differenceCentralSpread.
+     */
+    public RealTimeIndexPresenceFlags getPresenceFlags() {
+        return this.presenceFlags;
+    }
+    
+    /**
+     * @return Value of trading in the instruments from the given index.
+     */
+    public long getTradingValue() {
+        return this.tradingValue;
     }
     
     /**
@@ -229,13 +240,6 @@ public class RealTimeIndex implements ByteSerializable, Message {
     }
     
     /**
-     * @param tradingValue Value of trading in the instruments from the given index.
-     */
-    public void setTradingValue(long tradingValue) {
-        this.tradingValue = tradingValue;
-    }
-    
-    /**
      * @param sessionLow Lowest value of the day.
      */
     public void setSessionLow(long sessionLow) {
@@ -247,6 +251,20 @@ public class RealTimeIndex implements ByteSerializable, Message {
      */
     public void setSessionHigh(long sessionHigh) {
         this.sessionHigh = sessionHigh;
+    }
+    
+    /**
+     * @param presenceFlags Indicates the filling of fields: tradingValue, indexValueBid, indexValueAsk, midSpreadIndex, differenceCentralSpread.
+     */
+    public void setPresenceFlags(RealTimeIndexPresenceFlags presenceFlags) {
+        this.presenceFlags = presenceFlags;
+    }
+    
+    /**
+     * @param tradingValue Value of trading in the instruments from the given index.
+     */
+    public void setTradingValue(long tradingValue) {
+        this.tradingValue = tradingValue;
     }
     
     /**
@@ -287,9 +305,10 @@ public class RealTimeIndex implements ByteSerializable, Message {
         buffer.put(BendecUtils.int64ToByteArray(this.indIndexOpeningPortfolio));
         buffer.put(BendecUtils.int64ToByteArray(this.indexValue));
         buffer.put(BendecUtils.int64ToByteArray(this.pctChangeIndexValPrevSession));
-        buffer.put(BendecUtils.int64ToByteArray(this.tradingValue));
         buffer.put(BendecUtils.int64ToByteArray(this.sessionLow));
         buffer.put(BendecUtils.int64ToByteArray(this.sessionHigh));
+        presenceFlags.toBytes(buffer);
+        buffer.put(BendecUtils.int64ToByteArray(this.tradingValue));
         buffer.put(BendecUtils.int64ToByteArray(this.indexValueBid));
         buffer.put(BendecUtils.int64ToByteArray(this.indexValueAsk));
         buffer.put(BendecUtils.int64ToByteArray(this.midSpreadIndex));
@@ -306,9 +325,10 @@ public class RealTimeIndex implements ByteSerializable, Message {
         buffer.put(BendecUtils.int64ToByteArray(this.indIndexOpeningPortfolio));
         buffer.put(BendecUtils.int64ToByteArray(this.indexValue));
         buffer.put(BendecUtils.int64ToByteArray(this.pctChangeIndexValPrevSession));
-        buffer.put(BendecUtils.int64ToByteArray(this.tradingValue));
         buffer.put(BendecUtils.int64ToByteArray(this.sessionLow));
         buffer.put(BendecUtils.int64ToByteArray(this.sessionHigh));
+        presenceFlags.toBytes(buffer);
+        buffer.put(BendecUtils.int64ToByteArray(this.tradingValue));
         buffer.put(BendecUtils.int64ToByteArray(this.indexValueBid));
         buffer.put(BendecUtils.int64ToByteArray(this.indexValueAsk));
         buffer.put(BendecUtils.int64ToByteArray(this.midSpreadIndex));
@@ -324,9 +344,10 @@ public class RealTimeIndex implements ByteSerializable, Message {
         indIndexOpeningPortfolio,
         indexValue,
         pctChangeIndexValPrevSession,
-        tradingValue,
         sessionLow,
         sessionHigh,
+        presenceFlags,
+        tradingValue,
         indexValueBid,
         indexValueAsk,
         midSpreadIndex,
@@ -343,9 +364,10 @@ public class RealTimeIndex implements ByteSerializable, Message {
             ", indIndexOpeningPortfolio=" + indIndexOpeningPortfolio +
             ", indexValue=" + indexValue +
             ", pctChangeIndexValPrevSession=" + pctChangeIndexValPrevSession +
-            ", tradingValue=" + tradingValue +
             ", sessionLow=" + sessionLow +
             ", sessionHigh=" + sessionHigh +
+            ", presenceFlags=" + presenceFlags +
+            ", tradingValue=" + tradingValue +
             ", indexValueBid=" + indexValueBid +
             ", indexValueAsk=" + indexValueAsk +
             ", midSpreadIndex=" + midSpreadIndex +

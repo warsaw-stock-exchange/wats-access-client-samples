@@ -4,7 +4,7 @@ import pl.gpw.wats.client.md.MdSnapshotConnectionConfig;
 import pl.gpw.wats.client.md.OnlineMarketDataSnapshotClient;
 import pl.gpw.wats.client.tp.bendec.*;
 import pl.gpw.wats.client.tp.bendec.ExecInst.ExecInstOptions;
-import pl.gpw.wats.client.tp.bendec.MifidFlags.MifidFlagsOptions;
+import pl.gpw.wats.client.tp.bendec.OrderFlags.OrderFlagsOptions;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -19,6 +19,7 @@ public class TestUtils {
                     OrderAdd.byteLength,
                     MsgType.ORDERADD,
                     0,
+                    BigInteger.ZERO,
                     BigInteger.ZERO
                 ),
                 0,
@@ -33,8 +34,8 @@ public class TestUtils {
                 Capacity.AGENCY,
                 "TEST",
                 AccountType.MISSING,
+                new OrderFlags(OrderFlagsOptions.NONE.getOptionValue()),
                 new MifidFields(
-                    new MifidFlags(MifidFlagsOptions.NONE.getOptionValue()),
                     new MifidField(1, PartyRoleQualifier.NA),
                     new MifidField(4, PartyRoleQualifier.ALGORITHM),
                     new MifidField(17, PartyRoleQualifier.NATURALPERSON)
@@ -56,6 +57,7 @@ public class TestUtils {
                     OrderModify.byteLength,
                     MsgType.ORDERMODIFY,
                     0,
+                    BigInteger.ZERO,
                     BigInteger.ZERO
                 ),
                 orderId,
@@ -65,11 +67,11 @@ public class TestUtils {
                 BigInteger.ZERO,
                 BigInteger.ZERO,
                 new MifidFields(
-                    new MifidFlags(MifidFlagsOptions.NONE.getOptionValue()),
                     new MifidField(1, PartyRoleQualifier.NA),
                     new MifidField(4, PartyRoleQualifier.ALGORITHM),
                     new MifidField(17, PartyRoleQualifier.NATURALPERSON)
-                )
+                ),
+                ""
             );
     }
 
@@ -79,15 +81,17 @@ public class TestUtils {
                     OrderCancel.byteLength,
                     MsgType.ORDERCANCEL,
                     0,
+                    BigInteger.ZERO,
                     BigInteger.ZERO
                 ),
                 orderId,
                 new MifidFields(
-                    new MifidFlags(MifidFlagsOptions.NONE.getOptionValue()),
                     new MifidField(1, PartyRoleQualifier.NA),
                     new MifidField(4, PartyRoleQualifier.ALGORITHM),
                     new MifidField(17, PartyRoleQualifier.NATURALPERSON)
-                ));
+                ),
+                ""
+            );
     }
 
     public static TradeCaptureReportDual tradeCaptureReportDual(
@@ -102,6 +106,7 @@ public class TestUtils {
                    TradeCaptureReportDual.byteLength,
                    MsgType.TRADECAPTUREREPORTDUAL,
             0,
+                   BigInteger.ZERO,
                    BigInteger.ZERO
                 ),
                 instrumentId,
@@ -118,8 +123,8 @@ public class TestUtils {
                 lastPx,
                 settlement_date,
                 new TcrParty(
+                    new OrderFlags(OrderFlagsOptions.NONE.getOptionValue()),
                     new MifidFields(
-                        new MifidFlags(MifidFlagsOptions.NONE.getOptionValue()),
                         new MifidField(1, PartyRoleQualifier.NA),
                         new MifidField(4, PartyRoleQualifier.ALGORITHM),
                         new MifidField(17, PartyRoleQualifier.NATURALPERSON)
@@ -129,15 +134,13 @@ public class TestUtils {
                     "",
                     AccountType.CUSTOMER,
                     Capacity.AGENCY,
-                    0,
-                    0,
                     0,
                     "",
                     ""
                 ),
                 new TcrParty(
+                    new OrderFlags(OrderFlagsOptions.NONE.getOptionValue()),
                     new MifidFields(
-                        new MifidFlags(MifidFlagsOptions.NONE.getOptionValue()),
                         new MifidField(1, PartyRoleQualifier.NA),
                         new MifidField(4, PartyRoleQualifier.ALGORITHM),
                         new MifidField(17, PartyRoleQualifier.NATURALPERSON)
@@ -147,8 +150,6 @@ public class TestUtils {
                     "",
                     AccountType.CUSTOMER,
                     Capacity.AGENCY,
-                    0,
-                    0,
                     0,
                     "",
                     ""

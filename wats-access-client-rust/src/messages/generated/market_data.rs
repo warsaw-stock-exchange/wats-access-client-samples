@@ -124,20 +124,20 @@ impl Name {
 crate::char_array!(50, Name);
 
 
-/// Type for standard, 16-character long code for market structure messages.
+/// Type for standard, 20-character long code for market structure messages.
 #[derive(Clone, Copy)]
-pub struct Code(pub(crate) [AnsiChar; 16]);
+pub struct Code(pub(crate) [AnsiChar; 20]);
 impl Code {
-  pub fn new(v: [AnsiChar; 16]) -> Self {
+  pub fn new(v: [AnsiChar; 20]) -> Self {
     Self(v)
   }
 }
 impl Code {
-  pub fn as_inner(&self) -> [AnsiChar; 16] {
+  pub fn as_inner(&self) -> [AnsiChar; 20] {
     self.0
   }
 }
-crate::char_array!(16, Code);
+crate::char_array!(20, Code);
 
 
 /// Unique token.
@@ -257,17 +257,17 @@ pub enum AuctionType {
   /// NotApplicable.
   NotApplicable = 0x0001,
   /// Opening auction.
-  OpeningAuction = 0x0002,
+  AuctionOpening = 0x0002,
   /// Closing auction.
-  ClosingAuction = 0x0003,
+  AuctionClosing = 0x0003,
   /// Intraday auction.
-  IntradayAuction = 0x0004,
+  AuctionIntraday = 0x0004,
   /// Volatility auction after static collars breach.
-  VolatilityAuctionStatic = 0x0005,
+  AuctionVolatilityStatic = 0x0005,
   /// Volatility auction after dynamic collars breach.
-  VolatilityAuctionDynamic = 0x0006,
-  ExtendedVolatilityAuctionStatic = 0x0007,
-  ExtendedVolatilityAuctionDynamic = 0x0008,
+  AuctionVolatilityDynamic = 0x0006,
+  AuctionExtendedVolatilityStatic = 0x0007,
+  AuctionExtendedVolatilityDynamic = 0x0008,
   UnsuspensionAuction = 0x0009,
 }
 impl Default for AuctionType {
@@ -280,13 +280,13 @@ impl std::convert::TryFrom<u8> for AuctionType {
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
       0x0001 => Ok(Self::NotApplicable),
-      0x0002 => Ok(Self::OpeningAuction),
-      0x0003 => Ok(Self::ClosingAuction),
-      0x0004 => Ok(Self::IntradayAuction),
-      0x0005 => Ok(Self::VolatilityAuctionStatic),
-      0x0006 => Ok(Self::VolatilityAuctionDynamic),
-      0x0007 => Ok(Self::ExtendedVolatilityAuctionStatic),
-      0x0008 => Ok(Self::ExtendedVolatilityAuctionDynamic),
+      0x0002 => Ok(Self::AuctionOpening),
+      0x0003 => Ok(Self::AuctionClosing),
+      0x0004 => Ok(Self::AuctionIntraday),
+      0x0005 => Ok(Self::AuctionVolatilityStatic),
+      0x0006 => Ok(Self::AuctionVolatilityDynamic),
+      0x0007 => Ok(Self::AuctionExtendedVolatilityStatic),
+      0x0008 => Ok(Self::AuctionExtendedVolatilityDynamic),
       0x0009 => Ok(Self::UnsuspensionAuction),
       other => Err(InvalidVariant::new(other as u32, "AuctionType")),
     }
@@ -1068,19 +1068,22 @@ impl std::convert::TryFrom<u8> for PriorityFlag {
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum ProductIdentificationType {
+  /// Not applicable
+  NotApplicable = 0x0001,
   /// Financial instrument's ISIN.
-  ISIN = 0x0001,
+  ISIN = 0x0002,
 }
 impl Default for ProductIdentificationType {
   fn default() -> Self {
-    Self::ISIN
+    Self::NotApplicable
   }
 }
 impl std::convert::TryFrom<u8> for ProductIdentificationType {
   type Error = InvalidVariant;
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
-      0x0001 => Ok(Self::ISIN),
+      0x0001 => Ok(Self::NotApplicable),
+      0x0002 => Ok(Self::ISIN),
       other => Err(InvalidVariant::new(other as u32, "ProductIdentificationType")),
     }
   }
@@ -1336,6 +1339,10 @@ pub enum InstrumentStatus {
   HybridKnockout = 0x0009,
   /// Hybrid knockout by issuer.
   HybridKnockoutByIssuer = 0x000a,
+  /// Start of distribution from external source.
+  DistributionStart = 0x000c,
+  /// End of distribution from external source.
+  DistributionEnd = 0x000d,
 }
 impl Default for InstrumentStatus {
   fn default() -> Self {
@@ -1355,6 +1362,8 @@ impl std::convert::TryFrom<u8> for InstrumentStatus {
       0x0008 => Ok(Self::HybridNoQuotes),
       0x0009 => Ok(Self::HybridKnockout),
       0x000a => Ok(Self::HybridKnockoutByIssuer),
+      0x000c => Ok(Self::DistributionStart),
+      0x000d => Ok(Self::DistributionEnd),
       other => Err(InvalidVariant::new(other as u32, "InstrumentStatus")),
     }
   }
@@ -1442,6 +1451,55 @@ impl std::convert::TryFrom<u8> for TradingPhaseType {
       0x0016 => Ok(Self::HybridPreTradeBuyOnly),
       other => Err(InvalidVariant::new(other as u32, "TradingPhaseType")),
     }
+  }
+}
+
+bitflags::bitflags! {
+  /// Indicates presence of values within IndexParams fields.
+  #[derive(Serialize, Deserialize)]
+  #[serde(transparent)]
+  #[repr(transparent)]
+  pub struct IndexParamsPresenceFlags: u8 {
+    const NONE                            = 0b00000000;
+    const HAS_DAYS_SINCE_LAST_PUBLICATION = 0b00000001;
+    const HAS_NUMBER_OF_DIVIDENDS         = 0b00000010;
+  }
+}
+
+bitflags::bitflags! {
+  /// Indicates presence of values within RealTimeIndex fields.
+  #[derive(Serialize, Deserialize)]
+  #[serde(transparent)]
+  #[repr(transparent)]
+  pub struct RealTimeIndexPresenceFlags: u8 {
+    const NONE                          = 0b00000000;
+    const HAS_TRADING_VALUE             = 0b00000001;
+    const HAS_INDEX_VALUE_BID           = 0b00000010;
+    const HAS_INDEX_VALUE_ASK           = 0b00000100;
+    const HAS_MID_SPREAD_INDEX          = 0b00001000;
+    const HAS_DIFFERENCE_CENTRAL_SPREAD = 0b00010000;
+  }
+}
+
+bitflags::bitflags! {
+  /// Indicates presence of values within IndexPortfolioEntry fields.
+  #[derive(Serialize, Deserialize)]
+  #[serde(transparent)]
+  #[repr(transparent)]
+  pub struct IndexPortfolioEntryPresenceFlags: u8 {
+    const NONE              = 0b00000000;
+    const HAS_INSTRUMENT_ID = 0b00000001;
+  }
+}
+
+bitflags::bitflags! {
+  /// Indicates presence of values within IndexSummary fields.
+  #[derive(Serialize, Deserialize)]
+  #[serde(transparent)]
+  #[repr(transparent)]
+  pub struct IndexSummaryPresenceFlags: u8 {
+    const NONE            = 0b00000000;
+    const HAS_SESSION_AVG = 0b00000001;
   }
 }
 
@@ -1596,26 +1654,24 @@ impl std::convert::TryFrom<u8> for ClosingPriceType {
 pub enum AdjustedClosingPriceReason {
   /// Not applicable.
   NotApplicable = 0x0001,
-  /// Regular
-  Regular = 0x0002,
   /// Dividend
-  Dividend = 0x0003,
+  Dividend = 0x0002,
   /// Issue Right
-  IssueRight = 0x0004,
+  IssueRight = 0x0003,
   /// Split
-  Split = 0x0005,
+  Split = 0x0004,
   /// Reverse Split
-  ReverseSplit = 0x0006,
+  ReverseSplit = 0x0005,
   /// Bonus
-  Bonus = 0x0007,
+  Bonus = 0x0006,
   /// Spin-Off
-  SpinOff = 0x0008,
+  SpinOff = 0x0007,
   /// Tick Size Change
-  TickSizeChange = 0x0009,
+  TickSizeChange = 0x0008,
   /// Order Purge
-  OrderPurge = 0x000a,
+  OrderPurge = 0x0009,
   /// Other reason
-  OtherReason = 0x000b,
+  OtherReason = 0x000a,
 }
 impl Default for AdjustedClosingPriceReason {
   fn default() -> Self {
@@ -1627,16 +1683,15 @@ impl std::convert::TryFrom<u8> for AdjustedClosingPriceReason {
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
       0x0001 => Ok(Self::NotApplicable),
-      0x0002 => Ok(Self::Regular),
-      0x0003 => Ok(Self::Dividend),
-      0x0004 => Ok(Self::IssueRight),
-      0x0005 => Ok(Self::Split),
-      0x0006 => Ok(Self::ReverseSplit),
-      0x0007 => Ok(Self::Bonus),
-      0x0008 => Ok(Self::SpinOff),
-      0x0009 => Ok(Self::TickSizeChange),
-      0x000a => Ok(Self::OrderPurge),
-      0x000b => Ok(Self::OtherReason),
+      0x0002 => Ok(Self::Dividend),
+      0x0003 => Ok(Self::IssueRight),
+      0x0004 => Ok(Self::Split),
+      0x0005 => Ok(Self::ReverseSplit),
+      0x0006 => Ok(Self::Bonus),
+      0x0007 => Ok(Self::SpinOff),
+      0x0008 => Ok(Self::TickSizeChange),
+      0x0009 => Ok(Self::OrderPurge),
+      0x000a => Ok(Self::OtherReason),
       other => Err(InvalidVariant::new(other as u32, "AdjustedClosingPriceReason")),
     }
   }
@@ -2598,22 +2653,25 @@ pub struct PublicProductIdentification {
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum IndexUnderlyingType {
+  /// Not applicable
+  NotApplicable = 0x0001,
   /// Index.
-  Index = 0x0001,
+  Index = 0x0002,
   /// Reference Rate.
-  ReferenceRate = 0x0002,
+  ReferenceRate = 0x0003,
 }
 impl Default for IndexUnderlyingType {
   fn default() -> Self {
-    Self::Index
+    Self::NotApplicable
   }
 }
 impl std::convert::TryFrom<u8> for IndexUnderlyingType {
   type Error = InvalidVariant;
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
-      0x0001 => Ok(Self::Index),
-      0x0002 => Ok(Self::ReferenceRate),
+      0x0001 => Ok(Self::NotApplicable),
+      0x0002 => Ok(Self::Index),
+      0x0003 => Ok(Self::ReferenceRate),
       other => Err(InvalidVariant::new(other as u32, "IndexUnderlyingType")),
     }
   }
@@ -2661,9 +2719,9 @@ pub struct Header {
   pub version: MsgVersion,
   /// Sequence number of the message added by the Market Data Sequencer.
   pub seq_num: SeqNum,
-  /// Timestamp indicating when the message was sequenced.
+  /// Time when message was sequenced on Market Data (Timestamp >= sourceTimestamp).
   pub timestamp: Timestamp,
-  /// Timestamp added by the service which sent the message.
+  /// Time of the business event that triggered or generated the message.
   pub source_timestamp: Timestamp,
   /// True if message is encrypted.
   pub is_encrypted: bool,
@@ -2875,16 +2933,18 @@ pub struct OrderAdd {
 
 /// Order deleted.
 #[repr(C, packed)]
-#[derive(Serialize, Deserialize, Clone, Copy, Default)]
-#[serde(deny_unknown_fields, default)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
+#[serde(deny_unknown_fields)]
 #[serde(rename_all = "camelCase")]
-pub struct OrderDelete {
+pub struct OrderCancel {
   /// Message header.
   pub header: Header,
   /// ID of financial instrument.
   pub instrument_id: ElementId,
   /// Order identifier (ID).
   pub public_order_id: PublicOrderId,
+  /// Order side.
+  pub side: OrderSide,
 }
 
 /// Execution report.
@@ -2902,11 +2962,13 @@ pub struct OrderExecute {
   /// Order identifier (ID).
   pub public_order_id: PublicOrderId,
   /// ID of the underlying trade (equal to TradeID in Trade.)
-  pub execution_id: TradeId,
+  pub trade_id: TradeId,
   /// Price at which the order was executed.
   pub execution_price: Price,
   /// The order’s executed quantity.
   pub execution_quantity: Quantity,
+  /// Order side.
+  pub side: OrderSide,
 }
 
 /// Order modified.
@@ -2927,6 +2989,8 @@ pub struct OrderModify {
   pub quantity: Quantity,
   /// Priority loss flag.
   pub priority_flag: PriorityFlag,
+  /// Order side.
+  pub side: OrderSide,
 }
 
 /// BBO Level 1.
@@ -2972,7 +3036,7 @@ pub struct PriceLevelSnapshot {
 }
 
 /// PriceLevel table. Array size refers to BBO levels.
-pub type PriceLevels = [PriceLevel; 10];
+pub type PriceLevels = [PriceLevel; 5];
 
 
 /// Data type for storing snapshot price level.
@@ -3054,6 +3118,29 @@ bitflags::bitflags! {
     const YTM_ASK_NO_CALC = 0b0000000000100000;
   }
 }
+
+bitflags::bitflags! {
+  /// Bit flags indicating which message types filtered out in stream.
+  #[derive(Serialize, Deserialize)]
+  #[serde(transparent)]
+  #[repr(transparent)]
+  pub struct MessageFilter: u8 {
+/// Disable trades and ref_data.
+    const NONE     = 0b00000000;
+/// Enable trades.
+    const TRADES   = 0b00000001;
+/// Enable ref_data.
+    const REF_DATA = 0b00000010;
+  }
+}
+impl BytesValidator for MessageFilter {
+    #[inline]
+    unsafe fn is_valid(bytes: &[u8]) -> bool {
+      debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
+      let disc = std::convert::TryInto::try_into(bytes).map(u8::from_le_bytes).unwrap_unchecked();
+  MessageFilter::from_bits(disc).is_some()
+    }
+  }
 
 /// Message indicating a price or YTM update
 #[repr(C, packed)]
@@ -3210,6 +3297,8 @@ pub struct TradingSessionStatus {
   pub market_structure_id: ElementId,
   /// Identifies an event related to the trading status of a trading session.
   pub trading_session_event: TradingSessionEvent,
+  /// The date of this event.
+  pub date: Date,
 }
 
 /// Tick size definition.
@@ -3521,7 +3610,7 @@ pub struct TradingPhaseScheduleEntry {
   /// ID of Dynamic Collar Volatility Auction.
   pub ext_dynamic_collar_volatility_auction_id: ElementId,
   /// ID of last auction phase.
-  pub last_auction_phase_id: ElementId,
+  pub clat_id: ElementId,
 }
 
 /// Trading week plan.
@@ -3550,12 +3639,14 @@ pub struct Login {
   pub connection_id: ConnectionId,
   /// Client token.
   pub token: Token,
+  /// Indicates which message types should be sent in stream.
+  pub filter: MessageFilter,
 }
 impl BytesValidator for Login {
     #[inline]
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
-      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(Login, header))) && ConnectionId::is_valid(bytes.get_unchecked(memoffset::span_of!(Login, connection_id))) && Token::is_valid(bytes.get_unchecked(memoffset::span_of!(Login, token)))
+      Header::is_valid(bytes.get_unchecked(memoffset::span_of!(Login, header))) && ConnectionId::is_valid(bytes.get_unchecked(memoffset::span_of!(Login, connection_id))) && Token::is_valid(bytes.get_unchecked(memoffset::span_of!(Login, token))) && MessageFilter::is_valid(bytes.get_unchecked(memoffset::span_of!(Login, filter)))
     }
   }
 
@@ -3707,12 +3798,14 @@ pub struct RealTimeIndex {
   pub index_value: IndexValue,
   /// Percentage change of the index value in relation to the value of the closing index from the previous session.
   pub pct_change_index_val_prev_session: PercentageChange,
-  /// Value of trading in the instruments from the given index.
-  pub trading_value: Value,
   /// Lowest value of the day.
   pub session_low: IndexValue,
   /// Highest value of the day.
   pub session_high: IndexValue,
+  /// Indicates the filling of fields: tradingValue, indexValueBid, indexValueAsk, midSpreadIndex, differenceCentralSpread.
+  pub presence_flags: RealTimeIndexPresenceFlags,
+  /// Value of trading in the instruments from the given index.
+  pub trading_value: Value,
   /// Value of the buy index based on the best sell offers of instruments.
   pub index_value_bid: IndexValue,
   /// Value of the sell index based on the best sell offers of instruments.
@@ -3741,6 +3834,8 @@ pub struct IndexSummary {
   pub session_high: IndexValue,
   /// Closing index value.
   pub closing_index_value: IndexValue,
+  /// Indicates the filling of fields: sessionAvg.
+  pub presence_flags: IndexSummaryPresenceFlags,
   /// Average value of the day.
   pub session_avg: IndexValue,
   /// Percentage change of the index value in relation to the value of the closing index from the previous session.
@@ -3763,7 +3858,11 @@ pub struct IndexPortfolioEntry {
   pub header: Header,
   /// The identifier of the entry within the given index.
   pub id: ElementId,
-  /// InstrumentID of the redistributed index.
+  /// ID of index.
+  pub index_id: ElementId,
+  /// Indicates the filling of fields: instrumentId.
+  pub presence_flags: IndexPortfolioEntryPresenceFlags,
+  /// ID of the financial instrument (index participant).
   pub instrument_id: ElementId,
   /// Product identification type and code.
   pub public_product_identification: PublicProductIdentification,
@@ -3801,6 +3900,8 @@ pub struct IndexParams {
   pub index_publication_schedule: IndexPublicationSchedule,
   /// Index product classification
   pub index_type: IndexType,
+  /// Indicates the filling of fields: daysSinceLastPublication, numberOfDividends.
+  pub presence_flags: IndexParamsPresenceFlags,
   /// Number of calendar days between current session and the previous session day.
   pub days_since_last_publication: u8,
   /// Number of dividends included in the index calculation.
@@ -3947,8 +4048,6 @@ pub struct ProductSummary {
   pub lower_liquidity: bool,
   /// Instrument multiplier.
   pub multiplier: Number,
-  /// Implied volatility.
-  pub implied_volatility: Number,
   /// Dividend rate for the company is given on the basis of dividends paid by companies being the base instrument for futures and options.
   pub dividend_rate: Number,
   /// Value of Delta indicator from the current session.
@@ -3961,7 +4060,7 @@ pub struct ProductSummary {
   pub theta: Number,
   /// Value of Vega indicator from the current session.
   pub vega: Number,
-  /// Volatility to be calculated is based on the implied volatility (provided in field ImpliedVolatility) according to algorithm worked out by the WSE, which is available on the website: www.opcje.gpw.pl.
+  /// Volatility is calculated according to algorithm worked out by the WSE.
   pub volatility: Number,
   /// Option product strike price.
   pub options_strike_price: Price,
@@ -4460,7 +4559,7 @@ pub enum MsgType {
   /// Order modified.
   OrderModify = 0x000a,
   /// Order deleted.
-  OrderDelete = 0x000b,
+  OrderCancel = 0x000b,
   /// Execution report.
   OrderExecute = 0x000c,
   /// The Trading Session Status provides information on the status of a market and on a trading day events.
@@ -4548,7 +4647,7 @@ impl std::convert::TryFrom<u16> for MsgType {
       0x0001 => Ok(Self::Heartbeat),
       0x0009 => Ok(Self::OrderAdd),
       0x000a => Ok(Self::OrderModify),
-      0x000b => Ok(Self::OrderDelete),
+      0x000b => Ok(Self::OrderCancel),
       0x000c => Ok(Self::OrderExecute),
       0x0017 => Ok(Self::TradingSessionStatus),
       0x0018 => Ok(Self::EncryptionKey),
@@ -4596,7 +4695,7 @@ impl MsgTypeInt {
   pub const Heartbeat: u16 = 0x0001;
   pub const OrderAdd: u16 = 0x0009;
   pub const OrderModify: u16 = 0x000a;
-  pub const OrderDelete: u16 = 0x000b;
+  pub const OrderCancel: u16 = 0x000b;
   pub const OrderExecute: u16 = 0x000c;
   pub const TradingSessionStatus: u16 = 0x0017;
   pub const EncryptionKey: u16 = 0x0018;
@@ -4644,7 +4743,7 @@ impl BytesValidator for MsgType {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u16::from_le_bytes).unwrap_unchecked();
-  matches!(disc, MsgTypeInt::Heartbeat | MsgTypeInt::OrderAdd | MsgTypeInt::OrderModify | MsgTypeInt::OrderDelete | MsgTypeInt::OrderExecute | MsgTypeInt::TradingSessionStatus | MsgTypeInt::EncryptionKey | MsgTypeInt::InstrumentStatusChange | MsgTypeInt::TradingPhaseScheduleEntry | MsgTypeInt::TickTableEntry | MsgTypeInt::WeekPlan | MsgTypeInt::CalendarException | MsgTypeInt::AccruedInterestTableEntry | MsgTypeInt::IndexationTableEntry | MsgTypeInt::Trade | MsgTypeInt::CollarTableEntry | MsgTypeInt::TopPriceLevelUpdate | MsgTypeInt::PriceLevelSnapshot | MsgTypeInt::AuctionUpdate | MsgTypeInt::AuctionSummary | MsgTypeInt::PriceUpdate | MsgTypeInt::OrderCollars | MsgTypeInt::TradeCollars | MsgTypeInt::MarketStructure | MsgTypeInt::Instrument | MsgTypeInt::CollarGroup | MsgTypeInt::OrderBookEvent | MsgTypeInt::RealTimeIndex | MsgTypeInt::IndexSummary | MsgTypeInt::IndexPortfolioEntry | MsgTypeInt::IndexParams | MsgTypeInt::News | MsgTypeInt::Login | MsgTypeInt::LoginResponse | MsgTypeInt::Logout | MsgTypeInt::EndOfSnapshot | MsgTypeInt::InstrumentSummary | MsgTypeInt::ProductSummary | MsgTypeInt::PositionReport | MsgTypeInt::ExternalUnderlying | MsgTypeInt::TestEvent)
+  matches!(disc, MsgTypeInt::Heartbeat | MsgTypeInt::OrderAdd | MsgTypeInt::OrderModify | MsgTypeInt::OrderCancel | MsgTypeInt::OrderExecute | MsgTypeInt::TradingSessionStatus | MsgTypeInt::EncryptionKey | MsgTypeInt::InstrumentStatusChange | MsgTypeInt::TradingPhaseScheduleEntry | MsgTypeInt::TickTableEntry | MsgTypeInt::WeekPlan | MsgTypeInt::CalendarException | MsgTypeInt::AccruedInterestTableEntry | MsgTypeInt::IndexationTableEntry | MsgTypeInt::Trade | MsgTypeInt::CollarTableEntry | MsgTypeInt::TopPriceLevelUpdate | MsgTypeInt::PriceLevelSnapshot | MsgTypeInt::AuctionUpdate | MsgTypeInt::AuctionSummary | MsgTypeInt::PriceUpdate | MsgTypeInt::OrderCollars | MsgTypeInt::TradeCollars | MsgTypeInt::MarketStructure | MsgTypeInt::Instrument | MsgTypeInt::CollarGroup | MsgTypeInt::OrderBookEvent | MsgTypeInt::RealTimeIndex | MsgTypeInt::IndexSummary | MsgTypeInt::IndexPortfolioEntry | MsgTypeInt::IndexParams | MsgTypeInt::News | MsgTypeInt::Login | MsgTypeInt::LoginResponse | MsgTypeInt::Logout | MsgTypeInt::EndOfSnapshot | MsgTypeInt::InstrumentSummary | MsgTypeInt::ProductSummary | MsgTypeInt::PositionReport | MsgTypeInt::ExternalUnderlying | MsgTypeInt::TestEvent)
     }
   }
 
@@ -4815,7 +4914,7 @@ pub union Message {
   pub heartbeat: Heartbeat,
   pub order_add: OrderAdd,
   pub order_modify: OrderModify,
-  pub order_delete: OrderDelete,
+  pub order_cancel: OrderCancel,
   pub order_execute: OrderExecute,
   pub trading_session_status: TradingSessionStatus,
   pub encryption_key: EncryptionKey,
@@ -4865,7 +4964,7 @@ impl Serialize for Message {
         MsgType::Heartbeat => self.heartbeat.serialize(serializer),
         MsgType::OrderAdd => self.order_add.serialize(serializer),
         MsgType::OrderModify => self.order_modify.serialize(serializer),
-        MsgType::OrderDelete => self.order_delete.serialize(serializer),
+        MsgType::OrderCancel => self.order_cancel.serialize(serializer),
         MsgType::OrderExecute => self.order_execute.serialize(serializer),
         MsgType::TradingSessionStatus => self.trading_session_status.serialize(serializer),
         MsgType::EncryptionKey => self.encryption_key.serialize(serializer),
@@ -4917,7 +5016,7 @@ impl Message {
       MsgType::Heartbeat => Heartbeat::deserialize(de).map(|v| Message { heartbeat: v }),
       MsgType::OrderAdd => OrderAdd::deserialize(de).map(|v| Message { order_add: v }),
       MsgType::OrderModify => OrderModify::deserialize(de).map(|v| Message { order_modify: v }),
-      MsgType::OrderDelete => OrderDelete::deserialize(de).map(|v| Message { order_delete: v }),
+      MsgType::OrderCancel => OrderCancel::deserialize(de).map(|v| Message { order_cancel: v }),
       MsgType::OrderExecute => OrderExecute::deserialize(de).map(|v| Message { order_execute: v }),
       MsgType::TradingSessionStatus => TradingSessionStatus::deserialize(de).map(|v| Message { trading_session_status: v }),
       MsgType::EncryptionKey => EncryptionKey::deserialize(de).map(|v| Message { encryption_key: v }),
@@ -4965,7 +5064,7 @@ impl Message {
       MsgType::Heartbeat => std::mem::size_of::<Heartbeat>(),
       MsgType::OrderAdd => std::mem::size_of::<OrderAdd>(),
       MsgType::OrderModify => std::mem::size_of::<OrderModify>(),
-      MsgType::OrderDelete => std::mem::size_of::<OrderDelete>(),
+      MsgType::OrderCancel => std::mem::size_of::<OrderCancel>(),
       MsgType::OrderExecute => std::mem::size_of::<OrderExecute>(),
       MsgType::TradingSessionStatus => std::mem::size_of::<TradingSessionStatus>(),
       MsgType::EncryptionKey => std::mem::size_of::<EncryptionKey>(),

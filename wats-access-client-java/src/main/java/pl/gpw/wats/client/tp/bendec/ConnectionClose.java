@@ -7,14 +7,14 @@ import java.nio.ByteBuffer;
 /**
  * <h2>ConnectionClose</h2>
  * <p>The ConnectionClose message confirms the termination of a session through the trading port service.</p>
- * <p>Byte length: 17</p>
- * <p>Header header - Header. | size 16</p>
+ * <p>Byte length: 25</p>
+ * <p>Header header - Header. | size 24</p>
  * <p>ConnectionCloseReason reason - Connection close reason. | size 1</p>
  */
 public class ConnectionClose implements ByteSerializable, Message {
     private Header header;
     private ConnectionCloseReason reason;
-    public static final int byteLength = 17;
+    public static final int byteLength = 25;
     
     public ConnectionClose(Header header, ConnectionCloseReason reason) {
         this.header = header;
@@ -23,7 +23,7 @@ public class ConnectionClose implements ByteSerializable, Message {
     
     public ConnectionClose(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
-        this.reason = ConnectionCloseReason.getConnectionCloseReason(bytes, offset + 16);
+        this.reason = ConnectionCloseReason.getConnectionCloseReason(bytes, offset + 24);
     }
     
     public ConnectionClose(byte[] bytes) {

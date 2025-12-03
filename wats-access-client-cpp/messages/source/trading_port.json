@@ -1,5 +1,5 @@
 {
-  "version": 1126,
+  "version": 1135,
   "typeDefinitions": [
     {
       "kind": "Primitive",
@@ -63,9 +63,9 @@
     },
     {
       "kind": "Enum",
-      "name": "MifidFlags",
+      "name": "OrderFlags",
       "underlying": "u8",
-      "description": "Mifid related flags.",
+      "description": "Order related flags.",
       "bitflags": true,
       "variants": [
         [
@@ -205,6 +205,13 @@
       "type": "AnsiChar",
       "length": 20,
       "description": "Arbitrary user provided value associated with the order."
+    },
+    {
+      "kind": "Array",
+      "name": "MicCode",
+      "type": "AnsiChar",
+      "length": 4,
+      "description": "Market Identifier Code (MIC) as specified in ISO 10383."
     },
     {
       "kind": "Enum",
@@ -1038,6 +1045,942 @@
     },
     {
       "kind": "Enum",
+      "name": "LiquidityIndicator",
+      "description": "Liquidity indicator",
+      "underlying": "u8",
+      "variants": [
+        [
+          "BuyOrderExecution",
+          1,
+          "Buy order execution"
+        ],
+        [
+          "SellOrderExecution",
+          2,
+          "Sell order execution"
+        ],
+        [
+          "AuctionExecution",
+          3,
+          "Auction execution"
+        ],
+        [
+          "NotApplicable",
+          4,
+          "Not applicable"
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "Currency",
+      "description": "Currency - ISO 4217 code (e.g. PLN)",
+      "underlying": "u16",
+      "variants": [
+        [
+          "ALL",
+          8,
+          "Lek"
+        ],
+        [
+          "DZD",
+          12,
+          "Algerian Dinar"
+        ],
+        [
+          "ARS",
+          32,
+          "Argentine Peso"
+        ],
+        [
+          "AUD",
+          36,
+          "Australian Dollar"
+        ],
+        [
+          "BSD",
+          44,
+          "Bahamian Dollar"
+        ],
+        [
+          "BHD",
+          48,
+          "Bahraini Dinar"
+        ],
+        [
+          "BDT",
+          50,
+          "Taka"
+        ],
+        [
+          "AMD",
+          51,
+          "Armenian Dram"
+        ],
+        [
+          "BBD",
+          52,
+          "Barbados Dollar"
+        ],
+        [
+          "BMD",
+          60,
+          "Bermudian Dollar"
+        ],
+        [
+          "BTN",
+          64,
+          "Ngultrum"
+        ],
+        [
+          "BOB",
+          68,
+          "Boliviano"
+        ],
+        [
+          "BWP",
+          72,
+          "Pula"
+        ],
+        [
+          "BZD",
+          84,
+          "Belize Dollar"
+        ],
+        [
+          "SBD",
+          90,
+          "Solomon Islands Dollar"
+        ],
+        [
+          "BND",
+          96,
+          "Brunei Dollar"
+        ],
+        [
+          "MMK",
+          104,
+          "Kyat"
+        ],
+        [
+          "BIF",
+          108,
+          "Burundi Franc"
+        ],
+        [
+          "KHR",
+          116,
+          "Riel"
+        ],
+        [
+          "CAD",
+          124,
+          "Canadian Dollar"
+        ],
+        [
+          "CVE",
+          132,
+          "Cabo Verde Escudo"
+        ],
+        [
+          "KYD",
+          136,
+          "Cayman Islands Dollar"
+        ],
+        [
+          "LKR",
+          144,
+          "Sri Lanka Rupee"
+        ],
+        [
+          "CLP",
+          152,
+          "Chilean Peso"
+        ],
+        [
+          "CNY",
+          156,
+          "Yuan Renminbi"
+        ],
+        [
+          "COP",
+          170,
+          "Colombian Peso"
+        ],
+        [
+          "KMF",
+          174,
+          "Comorian Franc "
+        ],
+        [
+          "CRC",
+          188,
+          "Costa Rican Colon"
+        ],
+        [
+          "HRK",
+          191,
+          "Kuna"
+        ],
+        [
+          "CUP",
+          192,
+          "Cuban Peso"
+        ],
+        [
+          "CZK",
+          203,
+          "Czech Koruna"
+        ],
+        [
+          "DKK",
+          208,
+          "Danish Krone"
+        ],
+        [
+          "DOP",
+          214,
+          "Dominican Peso"
+        ],
+        [
+          "SVC",
+          222,
+          "El Salvador Colon"
+        ],
+        [
+          "ETB",
+          230,
+          "Ethiopian Birr"
+        ],
+        [
+          "ERN",
+          232,
+          "Nakfa"
+        ],
+        [
+          "FKP",
+          238,
+          "Falkland Islands Pound"
+        ],
+        [
+          "FJD",
+          242,
+          "Fiji Dollar"
+        ],
+        [
+          "DJF",
+          262,
+          "Djibouti Franc"
+        ],
+        [
+          "GMD",
+          270,
+          "Dalasi"
+        ],
+        [
+          "GIP",
+          292,
+          "Gibraltar Pound"
+        ],
+        [
+          "GTQ",
+          320,
+          "Quetzal"
+        ],
+        [
+          "GNF",
+          324,
+          "Guinean Franc"
+        ],
+        [
+          "GYD",
+          328,
+          "Guyana Dollar"
+        ],
+        [
+          "HTG",
+          332,
+          "Gourde"
+        ],
+        [
+          "HNL",
+          340,
+          "Lempira"
+        ],
+        [
+          "HKD",
+          344,
+          "Hong Kong Dollar"
+        ],
+        [
+          "HUF",
+          348,
+          "Forint"
+        ],
+        [
+          "ISK",
+          352,
+          "Iceland Krona"
+        ],
+        [
+          "INR",
+          356,
+          "Indian Rupee"
+        ],
+        [
+          "IDR",
+          360,
+          "Rupiah"
+        ],
+        [
+          "IRR",
+          364,
+          "Iranian Rial"
+        ],
+        [
+          "IQD",
+          368,
+          "Iraqi Dinar"
+        ],
+        [
+          "ILS",
+          376,
+          "New Israeli Sheqel"
+        ],
+        [
+          "JMD",
+          388,
+          "Jamaican Dollar"
+        ],
+        [
+          "JPY",
+          392,
+          "Yen"
+        ],
+        [
+          "KZT",
+          398,
+          "Tenge"
+        ],
+        [
+          "JOD",
+          400,
+          "Jordanian Dinar"
+        ],
+        [
+          "KES",
+          404,
+          "Kenyan Shilling"
+        ],
+        [
+          "KPW",
+          408,
+          "North Korean Won"
+        ],
+        [
+          "KRW",
+          410,
+          "Won"
+        ],
+        [
+          "KWD",
+          414,
+          "Kuwaiti Dinar"
+        ],
+        [
+          "KGS",
+          417,
+          "Som"
+        ],
+        [
+          "LAK",
+          418,
+          "Lao Kip"
+        ],
+        [
+          "LBP",
+          422,
+          "Lebanese Pound"
+        ],
+        [
+          "LSL",
+          426,
+          "Loti"
+        ],
+        [
+          "LRD",
+          430,
+          "Liberian Dollar"
+        ],
+        [
+          "LYD",
+          434,
+          "Libyan Dinar"
+        ],
+        [
+          "MOP",
+          446,
+          "Pataca"
+        ],
+        [
+          "MWK",
+          454,
+          "Malawi Kwacha"
+        ],
+        [
+          "MYR",
+          458,
+          "Malaysian Ringgit"
+        ],
+        [
+          "MVR",
+          462,
+          "Rufiyaa"
+        ],
+        [
+          "MUR",
+          480,
+          "Mauritius Rupee"
+        ],
+        [
+          "MXN",
+          484,
+          "Mexican Peso"
+        ],
+        [
+          "MNT",
+          496,
+          "Tugrik"
+        ],
+        [
+          "MDL",
+          498,
+          "Moldovan Leu"
+        ],
+        [
+          "MAD",
+          504,
+          "Moroccan Dirham"
+        ],
+        [
+          "OMR",
+          512,
+          "Rial Omani"
+        ],
+        [
+          "NAD",
+          516,
+          "Namibia Dollar"
+        ],
+        [
+          "NPR",
+          524,
+          "Nepalese Rupee"
+        ],
+        [
+          "ANG",
+          532,
+          "Netherlands Antillean Guilder"
+        ],
+        [
+          "AWG",
+          533,
+          "Aruban Florin"
+        ],
+        [
+          "VUV",
+          548,
+          "Vatu"
+        ],
+        [
+          "NZD",
+          554,
+          "New Zealand Dollar"
+        ],
+        [
+          "NIO",
+          558,
+          "Cordoba Oro"
+        ],
+        [
+          "NGN",
+          566,
+          "Naira"
+        ],
+        [
+          "NOK",
+          578,
+          "Norwegian Krone"
+        ],
+        [
+          "PKR",
+          586,
+          "Pakistan Rupee"
+        ],
+        [
+          "PAB",
+          590,
+          "Balboa"
+        ],
+        [
+          "PGK",
+          598,
+          "Kina"
+        ],
+        [
+          "PYG",
+          600,
+          "Guarani"
+        ],
+        [
+          "PEN",
+          604,
+          "Sol"
+        ],
+        [
+          "PHP",
+          608,
+          "Philippine Peso"
+        ],
+        [
+          "QAR",
+          634,
+          "Qatari Rial"
+        ],
+        [
+          "RUB",
+          643,
+          "Russian Ruble"
+        ],
+        [
+          "RWF",
+          646,
+          "Rwanda Franc"
+        ],
+        [
+          "SHP",
+          654,
+          "Saint Helena Pound"
+        ],
+        [
+          "SAR",
+          682,
+          "Saudi Riyal"
+        ],
+        [
+          "SCR",
+          690,
+          "Seychelles Rupee"
+        ],
+        [
+          "SGD",
+          702,
+          "Singapore Dollar"
+        ],
+        [
+          "VND",
+          704,
+          "Dong"
+        ],
+        [
+          "SOS",
+          706,
+          "Somali Shilling"
+        ],
+        [
+          "ZAR",
+          710,
+          "Rand"
+        ],
+        [
+          "SSP",
+          728,
+          "South Sudanese Pound"
+        ],
+        [
+          "SZL",
+          748,
+          "Lilangeni"
+        ],
+        [
+          "SEK",
+          752,
+          "Swedish Krona"
+        ],
+        [
+          "CHF",
+          756,
+          "Swiss Franc"
+        ],
+        [
+          "SYP",
+          760,
+          "Syrian Pound"
+        ],
+        [
+          "THB",
+          764,
+          "Baht"
+        ],
+        [
+          "TOP",
+          776,
+          "Pa’anga"
+        ],
+        [
+          "TTD",
+          780,
+          "Trinidad and Tobago Dollar"
+        ],
+        [
+          "AED",
+          784,
+          "UAE Dirham"
+        ],
+        [
+          "TND",
+          788,
+          "Tunisian Dinar"
+        ],
+        [
+          "UGX",
+          800,
+          "Uganda Shilling"
+        ],
+        [
+          "MKD",
+          807,
+          "Denar"
+        ],
+        [
+          "EGP",
+          818,
+          "Egyptian Pound"
+        ],
+        [
+          "GBP",
+          826,
+          "Pound Sterling"
+        ],
+        [
+          "TZS",
+          834,
+          "Tanzanian Shilling"
+        ],
+        [
+          "USD",
+          840,
+          "US Dollar"
+        ],
+        [
+          "UYU",
+          858,
+          "Peso Uruguayo"
+        ],
+        [
+          "UZS",
+          860,
+          "Uzbekistan Sum"
+        ],
+        [
+          "WST",
+          882,
+          "Tala"
+        ],
+        [
+          "YER",
+          886,
+          "Yemeni Rial"
+        ],
+        [
+          "TWD",
+          901,
+          "New Taiwan Dollar"
+        ],
+        [
+          "SLE",
+          925,
+          "Leone"
+        ],
+        [
+          "VED",
+          926,
+          "Bolívar Soberano"
+        ],
+        [
+          "UYW",
+          927,
+          "Unidad Previsional"
+        ],
+        [
+          "VES",
+          928,
+          "Bolívar Soberano"
+        ],
+        [
+          "MRU",
+          929,
+          "Ouguiya"
+        ],
+        [
+          "STN",
+          930,
+          "Dobra"
+        ],
+        [
+          "CUC",
+          931,
+          "Peso Convertible"
+        ],
+        [
+          "ZWL",
+          932,
+          "Zimbabwe Dollar"
+        ],
+        [
+          "BYN",
+          933,
+          "Belarusian Ruble"
+        ],
+        [
+          "TMT",
+          934,
+          "Turkmenistan New Manat"
+        ],
+        [
+          "GHS",
+          936,
+          "Ghana Cedi"
+        ],
+        [
+          "SDG",
+          938,
+          "Sudanese Pound"
+        ],
+        [
+          "UYI",
+          940,
+          "Uruguay Peso en Unidades Indexadas (URUIURUI)"
+        ],
+        [
+          "RSD",
+          941,
+          "Serbian Dinar"
+        ],
+        [
+          "MZN",
+          943,
+          "Mozambique Metical"
+        ],
+        [
+          "AZN",
+          944,
+          "Azerbaijan Manat"
+        ],
+        [
+          "RON",
+          946,
+          "Romanian Leu"
+        ],
+        [
+          "CHE",
+          947,
+          "WIR Euro"
+        ],
+        [
+          "CHW",
+          948,
+          "WIR Franc"
+        ],
+        [
+          "TRY",
+          949,
+          "Turkish Lira"
+        ],
+        [
+          "XAF",
+          950,
+          "CFA Franc BEAC"
+        ],
+        [
+          "XCD",
+          951,
+          "East Caribbean Dollar"
+        ],
+        [
+          "XOF",
+          952,
+          "CFA Franc BCEAO"
+        ],
+        [
+          "XPF",
+          953,
+          "CFP Franc"
+        ],
+        [
+          "XBA",
+          955,
+          "Bond Markets Unit European Composite Unit (EURCO)"
+        ],
+        [
+          "XBB",
+          956,
+          "Bond Markets Unit European Monetary Unit (E.M.U.-6)"
+        ],
+        [
+          "XBC",
+          957,
+          "Bond Markets Unit European Unit of Account 9 (E.U.A.-9)"
+        ],
+        [
+          "XBD",
+          958,
+          "Bond Markets Unit European Unit of Account 17 (E.U.A.-17)"
+        ],
+        [
+          "XAU",
+          959,
+          "Gold"
+        ],
+        [
+          "XDR",
+          960,
+          "SDR (Special Drawing Right)"
+        ],
+        [
+          "XAG",
+          961,
+          "Silver"
+        ],
+        [
+          "XPT",
+          962,
+          "Platinum"
+        ],
+        [
+          "XTS",
+          963,
+          "Codes specifically reserved for testing purposes"
+        ],
+        [
+          "XPD",
+          964,
+          "Palladium"
+        ],
+        [
+          "XUA",
+          965,
+          "ADB Unit of Account"
+        ],
+        [
+          "ZMW",
+          967,
+          "Zambian Kwacha"
+        ],
+        [
+          "SRD",
+          968,
+          "Surinam Dollar"
+        ],
+        [
+          "MGA",
+          969,
+          "Malagasy Ariary"
+        ],
+        [
+          "COU",
+          970,
+          "Unidad de Valor Real"
+        ],
+        [
+          "AFN",
+          971,
+          "Afghani"
+        ],
+        [
+          "TJS",
+          972,
+          "Somoni"
+        ],
+        [
+          "AOA",
+          973,
+          "Kwanza"
+        ],
+        [
+          "BGN",
+          975,
+          "Bulgarian Lev"
+        ],
+        [
+          "CDF",
+          976,
+          "Congolese Franc"
+        ],
+        [
+          "BAM",
+          977,
+          "Convertible Mark"
+        ],
+        [
+          "EUR",
+          978,
+          "Euro"
+        ],
+        [
+          "MXV",
+          979,
+          "Unidad de inversion (UDI)"
+        ],
+        [
+          "UAH",
+          980,
+          "Hryvnia"
+        ],
+        [
+          "GEL",
+          981,
+          "Lari"
+        ],
+        [
+          "BOV",
+          984,
+          "Mvdol"
+        ],
+        [
+          "PLN",
+          985,
+          "Zloty"
+        ],
+        [
+          "BRL",
+          986,
+          "Brazilian Real"
+        ],
+        [
+          "CLF",
+          990,
+          "Unidad de Fomento"
+        ],
+        [
+          "XSU",
+          994,
+          "Sucre"
+        ],
+        [
+          "USN",
+          997,
+          "US Dollar (next day)"
+        ],
+        [
+          "XXX",
+          999,
+          "The codes assigned for transactions where no currency is involved"
+        ]
+      ]
+    },
+    {
+      "kind": "Enum",
       "name": "RejectReason",
       "description": "Code to identify reason for a Reject message.",
       "underlying": "u8",
@@ -1127,6 +2070,11 @@
         {
           "name": "timestamp",
           "type": "Timestamp",
+          "description": "Sending time."
+        },
+        {
+          "name": "sourceTimestamp",
+          "type": "Timestamp",
           "description": "Processing time."
         }
       ]
@@ -1177,11 +2125,6 @@
       "name": "MifidFields",
       "description": "Fields related to the MiFID directive.",
       "fields": [
-        {
-          "name": "flags",
-          "type": "MifidFlags",
-          "description": "Flags raised on an order in compliance with the MiFID directive."
-        },
         {
           "name": "client",
           "type": "MifidField",
@@ -1451,6 +2394,11 @@
           "description": "Type of account associated with the order."
         },
         {
+          "name": "flags",
+          "type": "OrderFlags",
+          "description": "Flags raised on an order."
+        },
+        {
           "name": "mifidFields",
           "type": "MifidFields",
           "description": "Fields related to the MiFID directive."
@@ -1559,6 +2507,11 @@
           "name": "execTypeReason",
           "type": "ExecTypeReason",
           "description": "Describes why an order was executed and the events related to its lifecycle."
+        },
+        {
+          "name": "clientOrderId",
+          "type": "ClientOrderId",
+          "description": "Arbitrary user provided value associated with the order."
         }
       ]
     },
@@ -1581,6 +2534,11 @@
           "name": "mifidFields",
           "type": "MifidFields",
           "description": "MifidFields structure."
+        },
+        {
+          "name": "clientOrderId",
+          "type": "ClientOrderId",
+          "description": "Arbitrary user provided value associated with the order."
         }
       ]
     },
@@ -1613,6 +2571,11 @@
           "name": "execTypeReason",
           "type": "ExecTypeReason",
           "description": "Describes why an order was executed and the events related to its lifecycle."
+        },
+        {
+          "name": "clientOrderId",
+          "type": "ClientOrderId",
+          "description": "Arbitrary user provided value associated with the order."
         }
       ]
     },
@@ -1669,6 +2632,11 @@
           "name": "mifidFields",
           "type": "MifidFields",
           "description": "MifidFields structure."
+        },
+        {
+          "name": "clientOrderId",
+          "type": "ClientOrderId",
+          "description": "Arbitrary user provided value associated with the order."
         }
       ]
     },
@@ -1706,6 +2674,11 @@
           "name": "reason",
           "type": "OrderRejectionReason",
           "description": "Reason for rejecting the given order."
+        },
+        {
+          "name": "clientOrderId",
+          "type": "ClientOrderId",
+          "description": "Arbitrary user provided value associated with the order."
         }
       ]
     },
@@ -1815,6 +2788,14 @@
           "name": "executingTrader",
           "type": "MifidField",
           "description": "MifidField of Executing Trader."
+        },
+        {
+          "name": "clientOrderId",
+          "type": "ClientOrderId",
+          "description": "Arbitrary user provided value associated with the mass cancel.",
+          "$metadata": {
+            "conditionallyRequired": "Never required, if unused filled with 0x0"
+          }
         }
       ]
     },
@@ -1862,6 +2843,11 @@
           "name": "reason",
           "type": "MassCancelRejectionReason",
           "description": "Reason for rejecting the given mass order cancel request."
+        },
+        {
+          "name": "clientOrderId",
+          "type": "ClientOrderId",
+          "description": "Arbitrary user provided value associated with the mass cancel."
         }
       ]
     },
@@ -1884,7 +2870,7 @@
     },
     {
       "kind": "Struct",
-      "name": "Trade",
+      "name": "OrderExecute",
       "description": "The message used to report trades between counterparties (i.e. generated when two or more orders are matched).",
       "fields": [
         {
@@ -1893,12 +2879,17 @@
           "description": "Header."
         },
         {
+          "name": "instrumentId",
+          "type": "ElementId",
+          "description": "ID of the instrument being traded."
+        },
+        {
           "name": "orderId",
           "type": "OrderId",
           "description": "Unique for each trading day order identifier based on the sequence number of order message, bulk sequence number, session ID and connection ID."
         },
         {
-          "name": "id",
+          "name": "tradeId",
           "type": "TradeId",
           "description": "ID of the trade."
         },
@@ -1916,6 +2907,26 @@
           "name": "leavesQty",
           "type": "Quantity",
           "description": "How much of the given security is left on the market after the trade is concluded."
+        },
+        {
+          "name": "liquidityIndicator",
+          "type": "LiquidityIndicator",
+          "description": "Liquidity indicator"
+        },
+        {
+          "name": "currency",
+          "type": "Currency",
+          "description": "Currency (e.g. USD)."
+        },
+        {
+          "name": "side",
+          "type": "OrderSide",
+          "description": "Indicates the order's side (buy or sell)."
+        },
+        {
+          "name": "clientOrderId",
+          "type": "ClientOrderId",
+          "description": "Arbitrary user provided value associated with the order."
         }
       ]
     },
@@ -2348,6 +3359,11 @@
       "description": "Information about Trade Capture Report party.",
       "fields": [
         {
+          "name": "flags",
+          "type": "OrderFlags",
+          "description": "Flags raised on an order."
+        },
+        {
           "name": "mifidFields",
           "type": "MifidFields",
           "description": "Fields related to the MiFID directive."
@@ -2376,16 +3392,6 @@
           "name": "orderCapacity",
           "type": "Capacity",
           "description": "Designates the capacity of the firm placing the order."
-        },
-        {
-          "name": "orderRestrictions",
-          "type": "ElementId",
-          "description": "Restrictions associated with an order."
-        },
-        {
-          "name": "orderOrigination",
-          "type": "ElementId",
-          "description": "Identifies the origin of the order."
         },
         {
           "name": "feeStructureId",
@@ -2834,7 +3840,7 @@
           "The response message for an OrderModify."
         ],
         [
-          "Trade",
+          "OrderExecute",
           10,
           "The message used to report trades between counterparties (i.e. generated when two or more orders are matched)."
         ],
@@ -2929,6 +3935,11 @@
           "Create a SeqNum gap bettwen current SeqNum and header::seqNum"
         ],
         [
+          "TradingSessionStatus",
+          35,
+          "The Trading Session Status provides information on the status of a trading session."
+        ],
+        [
           "TestEvent",
           255,
           "A message to relay test scenario information"
@@ -3012,7 +4023,7 @@
         "OrderCancelResponse",
         "OrderModify",
         "OrderModifyResponse",
-        "Trade",
+        "OrderExecute",
         "Logout",
         "ConnectionClose",
         "Heartbeat",
@@ -3031,6 +4042,7 @@
         "OrderMassCancelResponse",
         "BidOfferUpdate",
         "GapFill",
+        "TradingSessionStatus",
         "TestEvent"
       ],
       "discriminator": [
@@ -3062,7 +4074,7 @@
         [
           "Triggered",
           4,
-          "Notification of Stop or VFA/VFC order activation."
+          "Notification of Stop order activation."
         ],
         [
           "CancelOnSuspension",
@@ -3138,6 +4150,16 @@
           "CancelOnDcDisconnect",
           19,
           "Order cancelled due to drop copy disconnect"
+        ],
+        [
+          "VfaActivated",
+          20,
+          "Notification of VFA/VFC order activation."
+        ],
+        [
+          "HybridActivated",
+          21,
+          "Notification of Hybrid order activation."
         ]
       ]
     },
@@ -3239,6 +4261,11 @@
           "name": "accountType",
           "type": "AccountType",
           "description": "Type of account associated with the order."
+        },
+        {
+          "name": "flags",
+          "type": "OrderFlags",
+          "description": "Flags raised on an order."
         },
         {
           "name": "mifidFields",
@@ -3762,6 +4789,61 @@
           "TenderOffer",
           2,
           "Tender Offer."
+        ]
+      ]
+    },
+    {
+      "kind": "Struct",
+      "name": "TradingSessionStatus",
+      "description": "The Trading Session Status provides information on the status of a trading session.",
+      "fields": [
+        {
+          "name": "header",
+          "type": "Header",
+          "description": "Message header."
+        },
+        {
+          "name": "marketId",
+          "type": "MicCode",
+          "description": "Market structure's Market Identifier Code (MIC) as specified in ISO 10383."
+        },
+        {
+          "name": "date",
+          "type": "Date",
+          "description": "The date for this event."
+        },
+        {
+          "name": "tradingSessionEvent",
+          "type": "TradingSessionEvent",
+          "description": "Identifies an event related to the trading status of a trading session."
+        }
+      ]
+    },
+    {
+      "kind": "Enum",
+      "name": "TradingSessionEvent",
+      "description": "Identifies an event related to the status of a trading session.",
+      "underlying": "u8",
+      "variants": [
+        [
+          "PreviousDayRestateStart",
+          1,
+          "Previous day restate start."
+        ],
+        [
+          "PreviousDayRestateEnd",
+          2,
+          "Previous day restate end."
+        ],
+        [
+          "StartOfTradingSessionMIC",
+          3,
+          "Start of trading session MIC."
+        ],
+        [
+          "EndOfTradingSessionMIC",
+          4,
+          "End of trading session MIC."
         ]
       ]
     }

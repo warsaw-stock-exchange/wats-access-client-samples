@@ -48,7 +48,7 @@ public enum MsgType {
     /**
      * The message used to report trades between counterparties (i.e. generated when two or more orders are matched).
      */
-    TRADE(10),
+    ORDEREXECUTE(10),
     /**
      * The logout message is sent from the client application to terminate the communication session with the trading port.
      */
@@ -121,6 +121,10 @@ public enum MsgType {
      * Create a SeqNum gap bettwen current SeqNum and header::seqNum
      */
     GAPFILL(34),
+    /**
+     * The Trading Session Status provides information on the status of a trading session.
+     */
+    TRADINGSESSIONSTATUS(35),
     /**
      * A message to relay test scenario information
      */

@@ -32,6 +32,7 @@ const tradingPortTypes = {
     extraDerives: {
       'Header': ['Default'],
       'Heartbeat': ['Default'],
+      'OrderFlags': ['Default'],
       'MifidFlags': ['Default'],
       'MifidField': ['Default'],
       'MifidFields': ['Default'],

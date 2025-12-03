@@ -27,8 +27,8 @@ public interface Message {
                 return Optional.of(new OrderAdd(bytes));
             case ORDERMODIFY:
                 return Optional.of(new OrderModify(bytes));
-            case ORDERDELETE:
-                return Optional.of(new OrderDelete(bytes));
+            case ORDERCANCEL:
+                return Optional.of(new OrderCancel(bytes));
             case ORDEREXECUTE:
                 return Optional.of(new OrderExecute(bytes));
             case TRADINGSESSIONSTATUS:
@@ -120,7 +120,7 @@ public interface Message {
         put(Heartbeat.class, MsgType.HEARTBEAT);
         put(OrderAdd.class, MsgType.ORDERADD);
         put(OrderModify.class, MsgType.ORDERMODIFY);
-        put(OrderDelete.class, MsgType.ORDERDELETE);
+        put(OrderCancel.class, MsgType.ORDERCANCEL);
         put(OrderExecute.class, MsgType.ORDEREXECUTE);
         put(TradingSessionStatus.class, MsgType.TRADINGSESSIONSTATUS);
         put(EncryptionKey.class, MsgType.ENCRYPTIONKEY);
@@ -164,7 +164,7 @@ public interface Message {
         put(MsgType.HEARTBEAT, Heartbeat.class);
         put(MsgType.ORDERADD, OrderAdd.class);
         put(MsgType.ORDERMODIFY, OrderModify.class);
-        put(MsgType.ORDERDELETE, OrderDelete.class);
+        put(MsgType.ORDERCANCEL, OrderCancel.class);
         put(MsgType.ORDEREXECUTE, OrderExecute.class);
         put(MsgType.TRADINGSESSIONSTATUS, TradingSessionStatus.class);
         put(MsgType.ENCRYPTIONKEY, EncryptionKey.class);

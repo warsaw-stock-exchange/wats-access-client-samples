@@ -7,12 +7,12 @@ import java.nio.ByteBuffer;
 /**
  * <h2>ExternalUnderlying</h2>
  * <p>The message contains a list of underlyings not traded in WATS. It concerns underlyings for derivatives and structured products.</p>
- * <p>Byte length: 151</p>
+ * <p>Byte length: 155</p>
  * <p>Header header - Message header. | size 42</p>
  * <p>ElementId > long (u32) externalUnderlyingId - External underlying ID. | size 4</p>
  * <p>ProductIdentification > String (u8[]) productIdentification - Product identification. | size 30</p>
  * <p>ProductIdentificationType productIdentificationType - Product identification type. | size 1</p>
- * <p>Code > String (u8[]) productCode - Product code. | size 16</p>
+ * <p>Code > String (u8[]) productCode - Product code. | size 20</p>
  * <p>Name > String (u8[]) productName - Product name. | size 50</p>
  * <p>MicCode > String (u8[]) mic - Market Identifier Code. | size 4</p>
  * <p>Currency nominalCurrency - Nominal currency. | size 2</p>
@@ -28,7 +28,7 @@ public class ExternalUnderlying implements ByteSerializable, Message {
     private String mic;
     private Currency nominalCurrency;
     private Currency tradingCurrency;
-    public static final int byteLength = 151;
+    public static final int byteLength = 155;
     
     public ExternalUnderlying(Header header, long externalUnderlyingId, String productIdentification, ProductIdentificationType productIdentificationType, String productCode, String productName, String mic, Currency nominalCurrency, Currency tradingCurrency) {
         this.header = header;
@@ -47,11 +47,11 @@ public class ExternalUnderlying implements ByteSerializable, Message {
         this.externalUnderlyingId = BendecUtils.uInt32FromByteArray(bytes, offset + 42);
         this.productIdentification = BendecUtils.stringFromByteArray(bytes, offset + 46, 30);
         this.productIdentificationType = ProductIdentificationType.getProductIdentificationType(bytes, offset + 76);
-        this.productCode = BendecUtils.stringFromByteArray(bytes, offset + 77, 16);
-        this.productName = BendecUtils.stringFromByteArray(bytes, offset + 93, 50);
-        this.mic = BendecUtils.stringFromByteArray(bytes, offset + 143, 4);
-        this.nominalCurrency = Currency.getCurrency(bytes, offset + 147);
-        this.tradingCurrency = Currency.getCurrency(bytes, offset + 149);
+        this.productCode = BendecUtils.stringFromByteArray(bytes, offset + 77, 20);
+        this.productName = BendecUtils.stringFromByteArray(bytes, offset + 97, 50);
+        this.mic = BendecUtils.stringFromByteArray(bytes, offset + 147, 4);
+        this.nominalCurrency = Currency.getCurrency(bytes, offset + 151);
+        this.tradingCurrency = Currency.getCurrency(bytes, offset + 153);
     }
     
     public ExternalUnderlying(byte[] bytes) {
@@ -194,7 +194,7 @@ public class ExternalUnderlying implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt32ToByteArray(this.externalUnderlyingId));
         buffer.put(BendecUtils.stringToByteArray(this.productIdentification, 30));
         productIdentificationType.toBytes(buffer);
-        buffer.put(BendecUtils.stringToByteArray(this.productCode, 16));
+        buffer.put(BendecUtils.stringToByteArray(this.productCode, 20));
         buffer.put(BendecUtils.stringToByteArray(this.productName, 50));
         buffer.put(BendecUtils.stringToByteArray(this.mic, 4));
         nominalCurrency.toBytes(buffer);
@@ -208,7 +208,7 @@ public class ExternalUnderlying implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt32ToByteArray(this.externalUnderlyingId));
         buffer.put(BendecUtils.stringToByteArray(this.productIdentification, 30));
         productIdentificationType.toBytes(buffer);
-        buffer.put(BendecUtils.stringToByteArray(this.productCode, 16));
+        buffer.put(BendecUtils.stringToByteArray(this.productCode, 20));
         buffer.put(BendecUtils.stringToByteArray(this.productName, 50));
         buffer.put(BendecUtils.stringToByteArray(this.mic, 4));
         nominalCurrency.toBytes(buffer);

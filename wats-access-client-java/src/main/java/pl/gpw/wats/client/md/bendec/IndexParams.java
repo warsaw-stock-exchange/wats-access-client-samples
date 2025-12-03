@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 /**
  * <h2>IndexParams</h2>
  * <p>The metadata message for the given index.</p>
- * <p>Byte length: 186</p>
+ * <p>Byte length: 187</p>
  * <p>Header header - Message header. | size 42</p>
  * <p>ElementId > long (u32) instrumentId - InstrumentID of the redistributed index. | size 4</p>
  * <p>IndexValue > long (i64) indexBaseValue - Index base value. | size 8</p>
@@ -17,6 +17,7 @@ import java.nio.ByteBuffer;
  * <p>u16 > int numOfComponents - Total number of instruments in the portfolio. | size 2</p>
  * <p>IndexPublicationSchedule indexPublicationSchedule - Mode of index dissemination. | size 1</p>
  * <p>IndexType indexType - Index product classification | size 1</p>
+ * <p>IndexParamsPresenceFlags presenceFlags - Indicates the filling of fields: daysSinceLastPublication, numberOfDividends. | size 1</p>
  * <p>u8 > int daysSinceLastPublication - Number of calendar days between current session and the previous session day. | size 1</p>
  * <p>u16 > int numberOfDividends - Number of dividends included in the index calculation. | size 2</p>
  * <p>IndexUnderlyings indexUnderlyings - List of underlying instruments for index. | size 97</p>
@@ -34,15 +35,16 @@ public class IndexParams implements ByteSerializable, Message {
     private int numOfComponents;
     private IndexPublicationSchedule indexPublicationSchedule;
     private IndexType indexType;
+    private IndexParamsPresenceFlags presenceFlags;
     private int daysSinceLastPublication;
     private int numberOfDividends;
     private IndexUnderlyings indexUnderlyings;
     private int publicationOrder;
     private Currency currency;
     private long dateValidity;
-    public static final int byteLength = 186;
+    public static final int byteLength = 187;
     
-    public IndexParams(Header header, long instrumentId, long indexBaseValue, long indexBaseCapitalisation, long indexBaseDate, long correctionCoefficient, int numOfComponents, IndexPublicationSchedule indexPublicationSchedule, IndexType indexType, int daysSinceLastPublication, int numberOfDividends, IndexUnderlyings indexUnderlyings, int publicationOrder, Currency currency, long dateValidity) {
+    public IndexParams(Header header, long instrumentId, long indexBaseValue, long indexBaseCapitalisation, long indexBaseDate, long correctionCoefficient, int numOfComponents, IndexPublicationSchedule indexPublicationSchedule, IndexType indexType, IndexParamsPresenceFlags presenceFlags, int daysSinceLastPublication, int numberOfDividends, IndexUnderlyings indexUnderlyings, int publicationOrder, Currency currency, long dateValidity) {
         this.header = header;
         this.instrumentId = instrumentId;
         this.indexBaseValue = indexBaseValue;
@@ -52,6 +54,7 @@ public class IndexParams implements ByteSerializable, Message {
         this.numOfComponents = numOfComponents;
         this.indexPublicationSchedule = indexPublicationSchedule;
         this.indexType = indexType;
+        this.presenceFlags = presenceFlags;
         this.daysSinceLastPublication = daysSinceLastPublication;
         this.numberOfDividends = numberOfDividends;
         this.indexUnderlyings = indexUnderlyings;
@@ -70,12 +73,13 @@ public class IndexParams implements ByteSerializable, Message {
         this.numOfComponents = BendecUtils.uInt16FromByteArray(bytes, offset + 74);
         this.indexPublicationSchedule = IndexPublicationSchedule.getIndexPublicationSchedule(bytes, offset + 76);
         this.indexType = IndexType.getIndexType(bytes, offset + 77);
-        this.daysSinceLastPublication = BendecUtils.uInt8FromByteArray(bytes, offset + 78);
-        this.numberOfDividends = BendecUtils.uInt16FromByteArray(bytes, offset + 79);
-        this.indexUnderlyings = new IndexUnderlyings(bytes, offset + 81);
-        this.publicationOrder = BendecUtils.uInt16FromByteArray(bytes, offset + 178);
-        this.currency = Currency.getCurrency(bytes, offset + 180);
-        this.dateValidity = BendecUtils.uInt32FromByteArray(bytes, offset + 182);
+        this.presenceFlags = new IndexParamsPresenceFlags(bytes, offset + 78);
+        this.daysSinceLastPublication = BendecUtils.uInt8FromByteArray(bytes, offset + 79);
+        this.numberOfDividends = BendecUtils.uInt16FromByteArray(bytes, offset + 80);
+        this.indexUnderlyings = new IndexUnderlyings(bytes, offset + 82);
+        this.publicationOrder = BendecUtils.uInt16FromByteArray(bytes, offset + 179);
+        this.currency = Currency.getCurrency(bytes, offset + 181);
+        this.dateValidity = BendecUtils.uInt32FromByteArray(bytes, offset + 183);
     }
     
     public IndexParams(byte[] bytes) {
@@ -146,6 +150,13 @@ public class IndexParams implements ByteSerializable, Message {
      */
     public IndexType getIndexType() {
         return this.indexType;
+    }
+    
+    /**
+     * @return Indicates the filling of fields: daysSinceLastPublication, numberOfDividends.
+     */
+    public IndexParamsPresenceFlags getPresenceFlags() {
+        return this.presenceFlags;
     }
     
     /**
@@ -254,6 +265,13 @@ public class IndexParams implements ByteSerializable, Message {
     }
     
     /**
+     * @param presenceFlags Indicates the filling of fields: daysSinceLastPublication, numberOfDividends.
+     */
+    public void setPresenceFlags(IndexParamsPresenceFlags presenceFlags) {
+        this.presenceFlags = presenceFlags;
+    }
+    
+    /**
      * @param daysSinceLastPublication Number of calendar days between current session and the previous session day.
      */
     public void setDaysSinceLastPublication(int daysSinceLastPublication) {
@@ -307,6 +325,7 @@ public class IndexParams implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt16ToByteArray(this.numOfComponents));
         indexPublicationSchedule.toBytes(buffer);
         indexType.toBytes(buffer);
+        presenceFlags.toBytes(buffer);
         buffer.put(BendecUtils.uInt8ToByteArray(this.daysSinceLastPublication));
         buffer.put(BendecUtils.uInt16ToByteArray(this.numberOfDividends));
         indexUnderlyings.toBytes(buffer);
@@ -327,6 +346,7 @@ public class IndexParams implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt16ToByteArray(this.numOfComponents));
         indexPublicationSchedule.toBytes(buffer);
         indexType.toBytes(buffer);
+        presenceFlags.toBytes(buffer);
         buffer.put(BendecUtils.uInt8ToByteArray(this.daysSinceLastPublication));
         buffer.put(BendecUtils.uInt16ToByteArray(this.numberOfDividends));
         indexUnderlyings.toBytes(buffer);
@@ -346,6 +366,7 @@ public class IndexParams implements ByteSerializable, Message {
         numOfComponents,
         indexPublicationSchedule,
         indexType,
+        presenceFlags,
         daysSinceLastPublication,
         numberOfDividends,
         indexUnderlyings,
@@ -366,6 +387,7 @@ public class IndexParams implements ByteSerializable, Message {
             ", numOfComponents=" + numOfComponents +
             ", indexPublicationSchedule=" + indexPublicationSchedule +
             ", indexType=" + indexType +
+            ", presenceFlags=" + presenceFlags +
             ", daysSinceLastPublication=" + daysSinceLastPublication +
             ", numberOfDividends=" + numberOfDividends +
             ", indexUnderlyings=" + indexUnderlyings +

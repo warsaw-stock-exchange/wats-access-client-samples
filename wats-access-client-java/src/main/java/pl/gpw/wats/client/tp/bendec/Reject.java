@@ -7,8 +7,8 @@ import java.nio.ByteBuffer;
 /**
  * <h2>Reject</h2>
  * <p>The reject message is sent by the trading port service when receiving an erroneous message that cannot be further processed.</p>
- * <p>Byte length: 21</p>
- * <p>Header header - Header. | size 16</p>
+ * <p>Byte length: 29</p>
+ * <p>Header header - Header. | size 24</p>
  * <p>SeqNum > long (u32) refSeqNum - Sequence number of the rejected message. | size 4</p>
  * <p>RejectReason rejectReason - Reject reason. | size 1</p>
  */
@@ -16,7 +16,7 @@ public class Reject implements ByteSerializable, Message {
     private Header header;
     private long refSeqNum;
     private RejectReason rejectReason;
-    public static final int byteLength = 21;
+    public static final int byteLength = 29;
     
     public Reject(Header header, long refSeqNum, RejectReason rejectReason) {
         this.header = header;
@@ -26,8 +26,8 @@ public class Reject implements ByteSerializable, Message {
     
     public Reject(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
-        this.refSeqNum = BendecUtils.uInt32FromByteArray(bytes, offset + 16);
-        this.rejectReason = RejectReason.getRejectReason(bytes, offset + 20);
+        this.refSeqNum = BendecUtils.uInt32FromByteArray(bytes, offset + 24);
+        this.rejectReason = RejectReason.getRejectReason(bytes, offset + 28);
     }
     
     public Reject(byte[] bytes) {

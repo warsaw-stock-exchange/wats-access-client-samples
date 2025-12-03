@@ -6,11 +6,12 @@ import pl.gpw.wats.client.Config;
 import pl.gpw.wats.client.md.bendec.*;
 import pl.gpw.wats.client.md.bendec.MsgType;
 import pl.gpw.wats.client.md.bendec.OrderAdd;
+import pl.gpw.wats.client.md.bendec.OrderCancel;
 import pl.gpw.wats.client.tp.ConnectionConfig;
 import pl.gpw.wats.client.tp.TradingPortClient;
 import pl.gpw.wats.client.tp.bendec.*;
 import pl.gpw.wats.client.tp.bendec.OrderSide;
-import pl.gpw.wats.client.tp.bendec.Trade;
+import pl.gpw.wats.client.tp.bendec.OrderExecute;
 
 import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -31,11 +32,11 @@ public class OnlineMarketDataClientTest {
         AtomicReference<pl.gpw.wats.client.tp.bendec.OrderAddResponse> tpB_sellOrderResponse = new AtomicReference<>();
         AtomicReference<pl.gpw.wats.client.tp.bendec.OrderModifyResponse> tpA_modifyBuyOrderResponse = new AtomicReference<>();
         AtomicReference<pl.gpw.wats.client.tp.bendec.OrderCancelResponse> tpA_cancelBuyOrderResponse = new AtomicReference<>();
-        AtomicReference<pl.gpw.wats.client.tp.bendec.Trade> tpA_tradeResponse = new AtomicReference<>();
-        AtomicReference<pl.gpw.wats.client.tp.bendec.Trade> tpB_tradeResponse = new AtomicReference<>();
+        AtomicReference<pl.gpw.wats.client.tp.bendec.OrderExecute> tpA_orderExecuteResponse = new AtomicReference<>();
+        AtomicReference<pl.gpw.wats.client.tp.bendec.OrderExecute> tpB_orderExecuteResponse = new AtomicReference<>();
         AtomicReference<pl.gpw.wats.client.md.bendec.OrderAdd> md_buyOrder = new AtomicReference<>();
         AtomicReference<pl.gpw.wats.client.md.bendec.OrderModify> md_modifyBuyOrder = new AtomicReference<>();
-        AtomicReference<pl.gpw.wats.client.md.bendec.OrderDelete> md_orderDelete = new AtomicReference<>();
+        AtomicReference<pl.gpw.wats.client.md.bendec.OrderCancel> md_orderCancel = new AtomicReference<>();
         AtomicReference<pl.gpw.wats.client.md.bendec.OrderExecute> md_buyOrderExecute = new AtomicReference<>();
         AtomicReference<pl.gpw.wats.client.md.bendec.OrderExecute> md_sellOrderExecute = new AtomicReference<>();
         AtomicBoolean waitForHeartbeatA = new AtomicBoolean(true);
@@ -48,9 +49,9 @@ public class OnlineMarketDataClientTest {
         OnlineMarketDataClient omdc = new OnlineMarketDataClient(connectionConfig, getEncryptionUtils(), 16777216, 8500);
         omdc.addHandler(MsgType.ORDERADD, x -> md_buyOrder.set(new OrderAdd((byte[]) x)));
         omdc.addHandler(MsgType.ORDERMODIFY, x -> md_modifyBuyOrder.set(new pl.gpw.wats.client.md.bendec.OrderModify((byte[]) x)));
-        omdc.addHandler(MsgType.ORDERDELETE, x -> md_orderDelete.set(new OrderDelete((byte[]) x)));
+        omdc.addHandler(MsgType.ORDERCANCEL, x -> md_orderCancel.set(new OrderCancel((byte[]) x)));
         omdc.addHandler(MsgType.ORDEREXECUTE, x -> {
-            OrderExecute oe = new OrderExecute((byte[]) x);
+            pl.gpw.wats.client.md.bendec.OrderExecute oe = new pl.gpw.wats.client.md.bendec.OrderExecute((byte[]) x);
             if (md_buyOrderExecute.get() == null) {
                 md_buyOrderExecute.set(oe);
             } else {
@@ -71,8 +72,8 @@ public class OnlineMarketDataClientTest {
                 x -> tpA_modifyBuyOrderResponse.set(new OrderModifyResponse((byte[]) x)));
         tpcA.addHandler(pl.gpw.wats.client.tp.bendec.MsgType.ORDERCANCELRESPONSE,
                 x -> tpA_cancelBuyOrderResponse.set(new OrderCancelResponse((byte[]) x)));
-        tpcA.addHandler(pl.gpw.wats.client.tp.bendec.MsgType.TRADE,
-                x -> tpA_tradeResponse.set(new Trade((byte[]) x)));
+        tpcA.addHandler(pl.gpw.wats.client.tp.bendec.MsgType.ORDEREXECUTE,
+                x -> tpA_orderExecuteResponse.set(new OrderExecute((byte[]) x)));
         tpcA.addHandler(pl.gpw.wats.client.tp.bendec.MsgType.LOGOUTRESPONSE,
                 x -> waitForLogoutResponseA.set(false));
         tpcA.login();
@@ -86,8 +87,8 @@ public class OnlineMarketDataClientTest {
                 x -> waitForHeartbeatB.set(false));
         tpcB.addHandler(pl.gpw.wats.client.tp.bendec.MsgType.ORDERADDRESPONSE,
                 x -> tpB_sellOrderResponse.set(new OrderAddResponse((byte[]) x)));
-        tpcB.addHandler(pl.gpw.wats.client.tp.bendec.MsgType.TRADE,
-                x -> tpB_tradeResponse.set(new Trade((byte[]) x)));
+        tpcB.addHandler(pl.gpw.wats.client.tp.bendec.MsgType.ORDEREXECUTE,
+                x -> tpB_orderExecuteResponse.set(new OrderExecute((byte[]) x)));
         tpcB.addHandler(pl.gpw.wats.client.tp.bendec.MsgType.LOGOUTRESPONSE,
                 x -> waitForLogoutResponseB.set(false));
         tpcB.login();
@@ -160,27 +161,27 @@ public class OnlineMarketDataClientTest {
         }
         assertEquals(tpB_sellOrderResponse.get().getStatus(), OrderStatus.FILLED);
 
-        tpA_tradeResponse.set(null);
+        tpA_orderExecuteResponse.set(null);
 
         // Get Trade for Client A
-        while (tpA_tradeResponse.get() == null) {
+        while (tpA_orderExecuteResponse.get() == null) {
             tpcA.read();
         }
-        assertEquals(tpA_buyOrderResponse.get().getOrderId(), tpA_tradeResponse.get().getOrderId());
-        assertEquals(100 * 100_000_000L, tpA_tradeResponse.get().getPrice());
-        assertEquals(BigInteger.valueOf(5000), tpA_tradeResponse.get().getQuantity());
-        assertEquals(BigInteger.valueOf(8000), tpA_tradeResponse.get().getLeavesQty());
+        assertEquals(tpA_buyOrderResponse.get().getOrderId(), tpA_orderExecuteResponse.get().getOrderId());
+        assertEquals(100 * 100_000_000L, tpA_orderExecuteResponse.get().getPrice());
+        assertEquals(BigInteger.valueOf(5000), tpA_orderExecuteResponse.get().getQuantity());
+        assertEquals(BigInteger.valueOf(8000), tpA_orderExecuteResponse.get().getLeavesQty());
 
-        tpB_tradeResponse.set(null);
+        tpB_orderExecuteResponse.set(null);
 
         // Get Trade for Client B
-        while (tpB_tradeResponse.get() == null) {
+        while (tpB_orderExecuteResponse.get() == null) {
             tpcB.read();
         }
-        assertEquals(tpB_sellOrderResponse.get().getOrderId(), tpB_tradeResponse.get().getOrderId());
-        assertEquals(100 * 100_000_000L, tpB_tradeResponse.get().getPrice());
-        assertEquals(BigInteger.valueOf(5000), tpB_tradeResponse.get().getQuantity());
-        assertEquals(BigInteger.ZERO, tpB_tradeResponse.get().getLeavesQty());
+        assertEquals(tpB_sellOrderResponse.get().getOrderId(), tpB_orderExecuteResponse.get().getOrderId());
+        assertEquals(100 * 100_000_000L, tpB_orderExecuteResponse.get().getPrice());
+        assertEquals(BigInteger.valueOf(5000), tpB_orderExecuteResponse.get().getQuantity());
+        assertEquals(BigInteger.ZERO, tpB_orderExecuteResponse.get().getLeavesQty());
 
         // Pull last OrderExecute messages from Online Market Data
         while (md_buyOrderExecute.get() == null || md_sellOrderExecute.get() == null) {
@@ -202,11 +203,11 @@ public class OnlineMarketDataClientTest {
         assertEquals(tpA_buyOrderResponse.get().getOrderId(), tpA_cancelBuyOrderResponse.get().getOrderId());
 
         // Get OrderDelete from OMD after cancelling order
-        while (md_orderDelete.get() == null) {
+        while (md_orderCancel.get() == null) {
             omdc.receive();
             omdc.read();
         }
-        assertEquals(tpA_buyOrderResponse.get().getPublicOrderId(), md_orderDelete.get().getPublicOrderId());
+        assertEquals(tpA_buyOrderResponse.get().getPublicOrderId(), md_orderCancel.get().getPublicOrderId());
 
         tpcA.logout();
         tpcB.logout();

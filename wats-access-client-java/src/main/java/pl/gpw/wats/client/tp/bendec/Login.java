@@ -7,8 +7,8 @@ import java.nio.ByteBuffer;
 /**
  * <h2>Login</h2>
  * <p>The login message authenticates a user establishing a connection to the trading port service. The login message must be the first message sent by the client application to request the initiation of a trading port session.</p>
- * <p>Byte length: 36</p>
- * <p>Header header - Header. | size 16</p>
+ * <p>Byte length: 44</p>
+ * <p>Header header - Header. | size 24</p>
  * <p>MsgVersion > int (u16) version - Indicates the version of the protocol in which the message is defined. | size 2</p>
  * <p>Token > String (u8[]) token - The security data required for authentication, which is a token received by the exchange member during the registration process. | size 8</p>
  * <p>ConnectionId > int (u16) connectionId - ID of the connection. | size 2</p>
@@ -22,7 +22,7 @@ public class Login implements ByteSerializable, Message {
     private int connectionId;
     private long nextExpectedSeqNum;
     private long lastSentSeqNum;
-    public static final int byteLength = 36;
+    public static final int byteLength = 44;
     
     public Login(Header header, int version, String token, int connectionId, long nextExpectedSeqNum, long lastSentSeqNum) {
         this.header = header;
@@ -35,11 +35,11 @@ public class Login implements ByteSerializable, Message {
     
     public Login(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
-        this.version = BendecUtils.uInt16FromByteArray(bytes, offset + 16);
-        this.token = BendecUtils.stringFromByteArray(bytes, offset + 18, 8);
-        this.connectionId = BendecUtils.uInt16FromByteArray(bytes, offset + 26);
-        this.nextExpectedSeqNum = BendecUtils.uInt32FromByteArray(bytes, offset + 28);
-        this.lastSentSeqNum = BendecUtils.uInt32FromByteArray(bytes, offset + 32);
+        this.version = BendecUtils.uInt16FromByteArray(bytes, offset + 24);
+        this.token = BendecUtils.stringFromByteArray(bytes, offset + 26, 8);
+        this.connectionId = BendecUtils.uInt16FromByteArray(bytes, offset + 34);
+        this.nextExpectedSeqNum = BendecUtils.uInt32FromByteArray(bytes, offset + 36);
+        this.lastSentSeqNum = BendecUtils.uInt32FromByteArray(bytes, offset + 40);
     }
     
     public Login(byte[] bytes) {

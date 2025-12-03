@@ -22,7 +22,7 @@ public enum ExecTypeReason {
      */
     EXPIRED(3),
     /**
-     * Notification of Stop or VFA/VFC order activation.
+     * Notification of Stop order activation.
      */
     TRIGGERED(4),
     /**
@@ -84,7 +84,15 @@ public enum ExecTypeReason {
     /**
      * Order cancelled due to drop copy disconnect
      */
-    CANCELONDCDISCONNECT(19);
+    CANCELONDCDISCONNECT(19),
+    /**
+     * Notification of VFA/VFC order activation.
+     */
+    VFAACTIVATED(20),
+    /**
+     * Notification of Hybrid order activation.
+     */
+    HYBRIDACTIVATED(21);
     
     private final int value;
     private final int byteLength = 1;

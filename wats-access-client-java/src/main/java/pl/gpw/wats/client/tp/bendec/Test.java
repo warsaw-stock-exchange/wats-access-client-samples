@@ -7,14 +7,14 @@ import java.nio.ByteBuffer;
 /**
  * <h2>Test</h2>
  * <p>The internal message for a test purpose.</p>
- * <p>Byte length: 24</p>
- * <p>Header header - Header. | size 16</p>
+ * <p>Byte length: 32</p>
+ * <p>Header header - Header. | size 24</p>
  * <p>Timestamp > BigInteger (u64) targetTimestamp - Test timestamp (e.g. the send time of a message). | size 8</p>
  */
 public class Test implements ByteSerializable, Message {
     private Header header;
     private BigInteger targetTimestamp;
-    public static final int byteLength = 24;
+    public static final int byteLength = 32;
     
     public Test(Header header, BigInteger targetTimestamp) {
         this.header = header;
@@ -23,7 +23,7 @@ public class Test implements ByteSerializable, Message {
     
     public Test(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
-        this.targetTimestamp = BendecUtils.uInt64FromByteArray(bytes, offset + 16);
+        this.targetTimestamp = BendecUtils.uInt64FromByteArray(bytes, offset + 24);
     }
     
     public Test(byte[] bytes) {

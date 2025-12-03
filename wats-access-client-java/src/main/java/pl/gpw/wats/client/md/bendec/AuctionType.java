@@ -16,25 +16,25 @@ public enum AuctionType {
     /**
      * Opening auction.
      */
-    OPENINGAUCTION(2),
+    AUCTIONOPENING(2),
     /**
      * Closing auction.
      */
-    CLOSINGAUCTION(3),
+    AUCTIONCLOSING(3),
     /**
      * Intraday auction.
      */
-    INTRADAYAUCTION(4),
+    AUCTIONINTRADAY(4),
     /**
      * Volatility auction after static collars breach.
      */
-    VOLATILITYAUCTIONSTATIC(5),
+    AUCTIONVOLATILITYSTATIC(5),
     /**
      * Volatility auction after dynamic collars breach.
      */
-    VOLATILITYAUCTIONDYNAMIC(6),
-    EXTENDEDVOLATILITYAUCTIONSTATIC(7),
-    EXTENDEDVOLATILITYAUCTIONDYNAMIC(8),
+    AUCTIONVOLATILITYDYNAMIC(6),
+    AUCTIONEXTENDEDVOLATILITYSTATIC(7),
+    AUCTIONEXTENDEDVOLATILITYDYNAMIC(8),
     UNSUSPENSIONAUCTION(9);
     
     private final int value;

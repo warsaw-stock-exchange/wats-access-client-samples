@@ -7,12 +7,12 @@ import java.nio.ByteBuffer;
 /**
  * <h2>GapFill</h2>
  * <p>Create a SeqNum gap bettwen current SeqNum and header::seqNum</p>
- * <p>Byte length: 16</p>
- * <p>Header header - Message header. | size 16</p>
+ * <p>Byte length: 24</p>
+ * <p>Header header - Message header. | size 24</p>
  */
 public class GapFill implements ByteSerializable, Message {
     private Header header;
-    public static final int byteLength = 16;
+    public static final int byteLength = 24;
     
     public GapFill(Header header) {
         this.header = header;

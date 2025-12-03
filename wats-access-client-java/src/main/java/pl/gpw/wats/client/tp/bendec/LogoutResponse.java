@@ -7,12 +7,12 @@ import java.nio.ByteBuffer;
 /**
  * <h2>LogoutResponse</h2>
  * <p>The logout response message confirms the client logout message.</p>
- * <p>Byte length: 16</p>
- * <p>Header header - Header. | size 16</p>
+ * <p>Byte length: 24</p>
+ * <p>Header header - Header. | size 24</p>
  */
 public class LogoutResponse implements ByteSerializable, Message {
     private Header header;
-    public static final int byteLength = 16;
+    public static final int byteLength = 24;
     
     public LogoutResponse(Header header) {
         this.header = header;

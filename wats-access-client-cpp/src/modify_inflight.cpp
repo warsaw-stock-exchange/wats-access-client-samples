@@ -174,7 +174,7 @@ int main() {
             trading_port.logout();
     });
 
-    trading_port.handle([&](btp::messages::Trade message) {
+    trading_port.handle([&](btp::messages::OrderExecute message) {
 
         if (message.orderId == buyOrderId) {
             trading_port.logout();

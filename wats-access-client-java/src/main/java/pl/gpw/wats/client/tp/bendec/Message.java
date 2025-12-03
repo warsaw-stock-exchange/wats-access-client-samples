@@ -39,8 +39,8 @@ public interface Message {
                 return Optional.of(new OrderModify(bytes));
             case ORDERMODIFYRESPONSE:
                 return Optional.of(new OrderModifyResponse(bytes));
-            case TRADE:
-                return Optional.of(new Trade(bytes));
+            case ORDEREXECUTE:
+                return Optional.of(new OrderExecute(bytes));
             case LOGOUT:
                 return Optional.of(new Logout(bytes));
             case CONNECTIONCLOSE:
@@ -77,6 +77,8 @@ public interface Message {
                 return Optional.of(new BidOfferUpdate(bytes));
             case GAPFILL:
                 return Optional.of(new GapFill(bytes));
+            case TRADINGSESSIONSTATUS:
+                return Optional.of(new TradingSessionStatus(bytes));
             case TESTEVENT:
                 return Optional.of(new TestEvent(bytes));
             default:
@@ -102,7 +104,7 @@ public interface Message {
         put(OrderCancelResponse.class, MsgType.ORDERCANCELRESPONSE);
         put(OrderModify.class, MsgType.ORDERMODIFY);
         put(OrderModifyResponse.class, MsgType.ORDERMODIFYRESPONSE);
-        put(Trade.class, MsgType.TRADE);
+        put(OrderExecute.class, MsgType.ORDEREXECUTE);
         put(Logout.class, MsgType.LOGOUT);
         put(ConnectionClose.class, MsgType.CONNECTIONCLOSE);
         put(Heartbeat.class, MsgType.HEARTBEAT);
@@ -121,6 +123,7 @@ public interface Message {
         put(OrderMassCancelResponse.class, MsgType.ORDERMASSCANCELRESPONSE);
         put(BidOfferUpdate.class, MsgType.BIDOFFERUPDATE);
         put(GapFill.class, MsgType.GAPFILL);
+        put(TradingSessionStatus.class, MsgType.TRADINGSESSIONSTATUS);
         put(TestEvent.class, MsgType.TESTEVENT);
     }};
     
@@ -134,7 +137,7 @@ public interface Message {
         put(MsgType.ORDERCANCELRESPONSE, OrderCancelResponse.class);
         put(MsgType.ORDERMODIFY, OrderModify.class);
         put(MsgType.ORDERMODIFYRESPONSE, OrderModifyResponse.class);
-        put(MsgType.TRADE, Trade.class);
+        put(MsgType.ORDEREXECUTE, OrderExecute.class);
         put(MsgType.LOGOUT, Logout.class);
         put(MsgType.CONNECTIONCLOSE, ConnectionClose.class);
         put(MsgType.HEARTBEAT, Heartbeat.class);
@@ -153,6 +156,7 @@ public interface Message {
         put(MsgType.ORDERMASSCANCELRESPONSE, OrderMassCancelResponse.class);
         put(MsgType.BIDOFFERUPDATE, BidOfferUpdate.class);
         put(MsgType.GAPFILL, GapFill.class);
+        put(MsgType.TRADINGSESSIONSTATUS, TradingSessionStatus.class);
         put(MsgType.TESTEVENT, TestEvent.class);
     }};
 }

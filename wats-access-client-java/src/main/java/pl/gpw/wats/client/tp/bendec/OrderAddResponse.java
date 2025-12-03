@@ -7,8 +7,8 @@ import java.nio.ByteBuffer;
 /**
  * <h2>OrderAddResponse</h2>
  * <p>The message is a response to an OrderAdd message and includes the order execution status.</p>
- * <p>Byte length: 52</p>
- * <p>Header header - Header. | size 16</p>
+ * <p>Byte length: 80</p>
+ * <p>Header header - Header. | size 24</p>
  * <p>OrderId > BigInteger (u64) orderId - Unique for each trading day order identifier based on the sequence number of order message, bulk sequence number, session ID and connection ID. | size 8</p>
  * <p>PublicOrderId > BigInteger (u64) publicOrderId - Unique for single trading day order identifier assigned by the trading system and shared publicly in market data (public information). | size 8</p>
  * <p>Quantity > BigInteger (u64) displayQty - Used only for iceberg order. The quantity to be displayed. | size 8</p>
@@ -16,6 +16,7 @@ import java.nio.ByteBuffer;
  * <p>OrderStatus status - Status of the given order. | size 1</p>
  * <p>OrderRejectionReason reason - Reason for rejecting the given order. | size 2</p>
  * <p>ExecTypeReason execTypeReason - Describes why an order was executed and the events related to its lifecycle. | size 1</p>
+ * <p>ClientOrderId > String (u8[]) clientOrderId - Arbitrary user provided value associated with the order. | size 20</p>
  */
 public class OrderAddResponse implements ByteSerializable, Message {
     private Header header;
@@ -26,9 +27,10 @@ public class OrderAddResponse implements ByteSerializable, Message {
     private OrderStatus status;
     private OrderRejectionReason reason;
     private ExecTypeReason execTypeReason;
-    public static final int byteLength = 52;
+    private String clientOrderId;
+    public static final int byteLength = 80;
     
-    public OrderAddResponse(Header header, BigInteger orderId, BigInteger publicOrderId, BigInteger displayQty, BigInteger filled, OrderStatus status, OrderRejectionReason reason, ExecTypeReason execTypeReason) {
+    public OrderAddResponse(Header header, BigInteger orderId, BigInteger publicOrderId, BigInteger displayQty, BigInteger filled, OrderStatus status, OrderRejectionReason reason, ExecTypeReason execTypeReason, String clientOrderId) {
         this.header = header;
         this.orderId = orderId;
         this.publicOrderId = publicOrderId;
@@ -37,17 +39,19 @@ public class OrderAddResponse implements ByteSerializable, Message {
         this.status = status;
         this.reason = reason;
         this.execTypeReason = execTypeReason;
+        this.clientOrderId = clientOrderId;
     }
     
     public OrderAddResponse(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
-        this.orderId = BendecUtils.uInt64FromByteArray(bytes, offset + 16);
-        this.publicOrderId = BendecUtils.uInt64FromByteArray(bytes, offset + 24);
-        this.displayQty = BendecUtils.uInt64FromByteArray(bytes, offset + 32);
-        this.filled = BendecUtils.uInt64FromByteArray(bytes, offset + 40);
-        this.status = OrderStatus.getOrderStatus(bytes, offset + 48);
-        this.reason = OrderRejectionReason.getOrderRejectionReason(bytes, offset + 49);
-        this.execTypeReason = ExecTypeReason.getExecTypeReason(bytes, offset + 51);
+        this.orderId = BendecUtils.uInt64FromByteArray(bytes, offset + 24);
+        this.publicOrderId = BendecUtils.uInt64FromByteArray(bytes, offset + 32);
+        this.displayQty = BendecUtils.uInt64FromByteArray(bytes, offset + 40);
+        this.filled = BendecUtils.uInt64FromByteArray(bytes, offset + 48);
+        this.status = OrderStatus.getOrderStatus(bytes, offset + 56);
+        this.reason = OrderRejectionReason.getOrderRejectionReason(bytes, offset + 57);
+        this.execTypeReason = ExecTypeReason.getExecTypeReason(bytes, offset + 59);
+        this.clientOrderId = BendecUtils.stringFromByteArray(bytes, offset + 60, 20);
     }
     
     public OrderAddResponse(byte[] bytes) {
@@ -114,6 +118,13 @@ public class OrderAddResponse implements ByteSerializable, Message {
     }
     
     /**
+     * @return Arbitrary user provided value associated with the order.
+     */
+    public String getClientOrderId() {
+        return this.clientOrderId;
+    }
+    
+    /**
      * @param header Header.
      */
     public void setHeader(Header header) {
@@ -169,6 +180,13 @@ public class OrderAddResponse implements ByteSerializable, Message {
         this.execTypeReason = execTypeReason;
     }
     
+    /**
+     * @param clientOrderId Arbitrary user provided value associated with the order.
+     */
+    public void setClientOrderId(String clientOrderId) {
+        this.clientOrderId = clientOrderId;
+    }
+    
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -180,6 +198,7 @@ public class OrderAddResponse implements ByteSerializable, Message {
         status.toBytes(buffer);
         reason.toBytes(buffer);
         execTypeReason.toBytes(buffer);
+        buffer.put(BendecUtils.stringToByteArray(this.clientOrderId, 20));
         return buffer.array();
     }
     
@@ -193,6 +212,7 @@ public class OrderAddResponse implements ByteSerializable, Message {
         status.toBytes(buffer);
         reason.toBytes(buffer);
         execTypeReason.toBytes(buffer);
+        buffer.put(BendecUtils.stringToByteArray(this.clientOrderId, 20));
     }
     
     @Override
@@ -204,7 +224,8 @@ public class OrderAddResponse implements ByteSerializable, Message {
         filled,
         status,
         reason,
-        execTypeReason);
+        execTypeReason,
+        clientOrderId);
     }
     
     @Override
@@ -218,6 +239,7 @@ public class OrderAddResponse implements ByteSerializable, Message {
             ", status=" + status +
             ", reason=" + reason +
             ", execTypeReason=" + execTypeReason +
+            ", clientOrderId=" + clientOrderId +
             "}";
     }
 }

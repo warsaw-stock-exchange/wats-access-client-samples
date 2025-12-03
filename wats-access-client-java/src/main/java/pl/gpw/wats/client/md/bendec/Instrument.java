@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 /**
  * <h2>Instrument</h2>
  * <p>Definition of a financial instrument.</p>
- * <p>Byte length: 737</p>
+ * <p>Byte length: 741</p>
  * <p>Header header - Message header. | size 42</p>
  * <p>ElementId > long (u32) instrumentId - ID of financial instrument. | size 4</p>
  * <p>ProductType productType - Type of the product. | size 1</p>
@@ -47,7 +47,7 @@ import java.nio.ByteBuffer;
  * <p>Issuer > String (u8[]) issuer - Name of the issuer. | size 150</p>
  * <p>Country issuerRegCountry - Identifier of the country of the registration. | size 2</p>
  * <p>ElementId > long (u32) underlyingInstrumentId - Identifier of the underlying instrument. | size 4</p>
- * <p>Code > String (u8[]) productCode - Unique code of the product. | size 16</p>
+ * <p>Code > String (u8[]) productCode - Unique code of the product. | size 20</p>
  * <p>CfiCode > String (u8[]) cfi - CFI (Classification of Financial Instrument) code. | size 6</p>
  * <p>FisnCode > String (u8[]) fisn - Product FISN (Financial Instrument Short Name) code. | size 35</p>
  * <p>u64 > BigInteger issueSize - Size of the issue (depends on the issue size type) | size 8</p>
@@ -134,7 +134,7 @@ public class Instrument implements ByteSerializable, Message {
     private long kidIssueDate;
     private int valueAtRisk;
     private long externalUnderlyingId;
-    public static final int byteLength = 737;
+    public static final int byteLength = 741;
     
     public Instrument(Header header, long instrumentId, ProductType productType, ProductSubtype productSubtype, long firstTradingDate, long lastTradingDate, long productId, Currency currency, long icebergMinValue, long lotSize, PriceExpressionType priceExpressionType, long calendarId, long marketStructureId, long tickTableId, long referenceInstrumentId, long collarGroupId, long tradingScheduleId, String description, String mic, long nominalValue, NominalValueType nominalValueType, long multiplier, long strikePrice, Currency strikePriceCurrency, String productIdentification, ProductIdentificationType productIdentificationType, long settlementCalendarId, CouponType bondCouponType, long preTradeCheckMinPrice, long preTradeCheckMaxPrice, BigInteger preTradeCheckMinQuantity, BigInteger preTradeCheckMaxQuantity, long preTradeCheckMaxValue, long preTradeCheckMinValue, boolean liquidity, MarketModelType marketModelType, String issuer, Country issuerRegCountry, long underlyingInstrumentId, String productCode, String cfi, String fisn, BigInteger issueSize, Currency nominalCurrency, UsIndicator usIndicator, long expiryDate, int versionNumber, SettlementType settlementType, OptionType optionType, ExerciseType exerciseType, String productName, long referencePrice, InstrumentStatus status, long initialPhaseId, long thresholdMax, long thresholdMin, LeverageFlag isLeverage, long accruedInterestValue, String kid, long kidIssueDate, int valueAtRisk, long externalUnderlyingId) {
         this.header = header;
@@ -241,29 +241,29 @@ public class Instrument implements ByteSerializable, Message {
         this.issuer = BendecUtils.stringFromByteArray(bytes, offset + 280, 150);
         this.issuerRegCountry = Country.getCountry(bytes, offset + 430);
         this.underlyingInstrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 432);
-        this.productCode = BendecUtils.stringFromByteArray(bytes, offset + 436, 16);
-        this.cfi = BendecUtils.stringFromByteArray(bytes, offset + 452, 6);
-        this.fisn = BendecUtils.stringFromByteArray(bytes, offset + 458, 35);
-        this.issueSize = BendecUtils.uInt64FromByteArray(bytes, offset + 493);
-        this.nominalCurrency = Currency.getCurrency(bytes, offset + 501);
-        this.usIndicator = UsIndicator.getUsIndicator(bytes, offset + 503);
-        this.expiryDate = BendecUtils.uInt32FromByteArray(bytes, offset + 504);
-        this.versionNumber = BendecUtils.uInt8FromByteArray(bytes, offset + 508);
-        this.settlementType = SettlementType.getSettlementType(bytes, offset + 509);
-        this.optionType = OptionType.getOptionType(bytes, offset + 510);
-        this.exerciseType = ExerciseType.getExerciseType(bytes, offset + 511);
-        this.productName = BendecUtils.stringFromByteArray(bytes, offset + 512, 50);
-        this.referencePrice = BendecUtils.int64FromByteArray(bytes, offset + 562);
-        this.status = InstrumentStatus.getInstrumentStatus(bytes, offset + 570);
-        this.initialPhaseId = BendecUtils.uInt32FromByteArray(bytes, offset + 571);
-        this.thresholdMax = BendecUtils.int64FromByteArray(bytes, offset + 575);
-        this.thresholdMin = BendecUtils.int64FromByteArray(bytes, offset + 583);
-        this.isLeverage = LeverageFlag.getLeverageFlag(bytes, offset + 591);
-        this.accruedInterestValue = BendecUtils.int64FromByteArray(bytes, offset + 592);
-        this.kid = BendecUtils.stringFromByteArray(bytes, offset + 600, 128);
-        this.kidIssueDate = BendecUtils.uInt32FromByteArray(bytes, offset + 728);
-        this.valueAtRisk = BendecUtils.uInt8FromByteArray(bytes, offset + 732);
-        this.externalUnderlyingId = BendecUtils.uInt32FromByteArray(bytes, offset + 733);
+        this.productCode = BendecUtils.stringFromByteArray(bytes, offset + 436, 20);
+        this.cfi = BendecUtils.stringFromByteArray(bytes, offset + 456, 6);
+        this.fisn = BendecUtils.stringFromByteArray(bytes, offset + 462, 35);
+        this.issueSize = BendecUtils.uInt64FromByteArray(bytes, offset + 497);
+        this.nominalCurrency = Currency.getCurrency(bytes, offset + 505);
+        this.usIndicator = UsIndicator.getUsIndicator(bytes, offset + 507);
+        this.expiryDate = BendecUtils.uInt32FromByteArray(bytes, offset + 508);
+        this.versionNumber = BendecUtils.uInt8FromByteArray(bytes, offset + 512);
+        this.settlementType = SettlementType.getSettlementType(bytes, offset + 513);
+        this.optionType = OptionType.getOptionType(bytes, offset + 514);
+        this.exerciseType = ExerciseType.getExerciseType(bytes, offset + 515);
+        this.productName = BendecUtils.stringFromByteArray(bytes, offset + 516, 50);
+        this.referencePrice = BendecUtils.int64FromByteArray(bytes, offset + 566);
+        this.status = InstrumentStatus.getInstrumentStatus(bytes, offset + 574);
+        this.initialPhaseId = BendecUtils.uInt32FromByteArray(bytes, offset + 575);
+        this.thresholdMax = BendecUtils.int64FromByteArray(bytes, offset + 579);
+        this.thresholdMin = BendecUtils.int64FromByteArray(bytes, offset + 587);
+        this.isLeverage = LeverageFlag.getLeverageFlag(bytes, offset + 595);
+        this.accruedInterestValue = BendecUtils.int64FromByteArray(bytes, offset + 596);
+        this.kid = BendecUtils.stringFromByteArray(bytes, offset + 604, 128);
+        this.kidIssueDate = BendecUtils.uInt32FromByteArray(bytes, offset + 732);
+        this.valueAtRisk = BendecUtils.uInt8FromByteArray(bytes, offset + 736);
+        this.externalUnderlyingId = BendecUtils.uInt32FromByteArray(bytes, offset + 737);
     }
     
     public Instrument(byte[] bytes) {
@@ -1183,7 +1183,7 @@ public class Instrument implements ByteSerializable, Message {
         buffer.put(BendecUtils.stringToByteArray(this.issuer, 150));
         issuerRegCountry.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.underlyingInstrumentId));
-        buffer.put(BendecUtils.stringToByteArray(this.productCode, 16));
+        buffer.put(BendecUtils.stringToByteArray(this.productCode, 20));
         buffer.put(BendecUtils.stringToByteArray(this.cfi, 6));
         buffer.put(BendecUtils.stringToByteArray(this.fisn, 35));
         buffer.put(BendecUtils.uInt64ToByteArray(this.issueSize));
@@ -1250,7 +1250,7 @@ public class Instrument implements ByteSerializable, Message {
         buffer.put(BendecUtils.stringToByteArray(this.issuer, 150));
         issuerRegCountry.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.underlyingInstrumentId));
-        buffer.put(BendecUtils.stringToByteArray(this.productCode, 16));
+        buffer.put(BendecUtils.stringToByteArray(this.productCode, 20));
         buffer.put(BendecUtils.stringToByteArray(this.cfi, 6));
         buffer.put(BendecUtils.stringToByteArray(this.fisn, 35));
         buffer.put(BendecUtils.uInt64ToByteArray(this.issueSize));

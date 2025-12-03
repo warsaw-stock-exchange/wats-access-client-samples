@@ -111,8 +111,8 @@ public class TradingPortClientTest {
         });
 
         // Catch Trade message
-        tpcA.addHandler(MsgType.TRADE, x -> waitForTradeA.set(false));
-        tpcB.addHandler(MsgType.TRADE, x -> waitForTradeB.set(false));
+        tpcA.addHandler(MsgType.ORDEREXECUTE, x -> waitForTradeA.set(false));
+        tpcB.addHandler(MsgType.ORDEREXECUTE, x -> waitForTradeB.set(false));
 
         // Catch LogoutResponse
         tpcA.addHandler(MsgType.LOGOUTRESPONSE, x -> waitForLogoutResponseA.set(false));

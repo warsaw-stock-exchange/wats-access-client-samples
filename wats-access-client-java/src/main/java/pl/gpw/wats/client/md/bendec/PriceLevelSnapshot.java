@@ -7,14 +7,14 @@ import java.nio.ByteBuffer;
 /**
  * <h2>PriceLevelSnapshot</h2>
  * <p>BBO price levels and volumes.</p>
- * <p>Byte length: 669</p>
+ * <p>Byte length: 359</p>
  * <p>Header header - Message header. | size 42</p>
  * <p>ElementId > long (u32) instrumentId - ID of financial instrument. | size 4</p>
  * <p>u8 > int maxDepth - The number of BBO levels contained in the message. | size 1</p>
  * <p>u8 > int mmBuyQuoteLevel - Id of an level on which mm quote rests (0 means no mm). | size 1</p>
  * <p>u8 > int mmSellQuoteLevel - Id of an level on which mm quote rests (0 means no mm). | size 1</p>
- * <p>PriceLevels > PriceLevel[] (PriceLevel[]) buy - Price levels for buy side. | size 310</p>
- * <p>PriceLevels > PriceLevel[] (PriceLevel[]) sell - Price levels for sell side. | size 310</p>
+ * <p>PriceLevels > PriceLevel[] (PriceLevel[]) buy - Price levels for buy side. | size 155</p>
+ * <p>PriceLevels > PriceLevel[] (PriceLevel[]) sell - Price levels for sell side. | size 155</p>
  */
 public class PriceLevelSnapshot implements ByteSerializable, Message {
     private Header header;
@@ -24,7 +24,7 @@ public class PriceLevelSnapshot implements ByteSerializable, Message {
     private int mmSellQuoteLevel;
     private PriceLevel[] buy;
     private PriceLevel[] sell;
-    public static final int byteLength = 669;
+    public static final int byteLength = 359;
     
     public PriceLevelSnapshot(Header header, long instrumentId, int maxDepth, int mmBuyQuoteLevel, int mmSellQuoteLevel, PriceLevel[] buy, PriceLevel[] sell) {
         this.header = header;
@@ -42,13 +42,13 @@ public class PriceLevelSnapshot implements ByteSerializable, Message {
         this.maxDepth = BendecUtils.uInt8FromByteArray(bytes, offset + 46);
         this.mmBuyQuoteLevel = BendecUtils.uInt8FromByteArray(bytes, offset + 47);
         this.mmSellQuoteLevel = BendecUtils.uInt8FromByteArray(bytes, offset + 48);
-        this.buy = new PriceLevel[10];
+        this.buy = new PriceLevel[5];
         for(int i = 0; i < buy.length; i++) {
             this.buy[i] = new PriceLevel(bytes, offset + 49 + i * 31);
         }
-        this.sell = new PriceLevel[10];
+        this.sell = new PriceLevel[5];
         for(int i = 0; i < sell.length; i++) {
-            this.sell[i] = new PriceLevel(bytes, offset + 359 + i * 31);
+            this.sell[i] = new PriceLevel(bytes, offset + 204 + i * 31);
         }
     }
     

@@ -234,7 +234,7 @@ impl Client {
                 },
                 tp::MsgType::TradeCaptureReportDual => continue,
                 tp::MsgType::Heartbeat => continue,
-                tp::MsgType::Trade => continue,
+                tp::MsgType::OrderExecute => continue,
                 _ => continue,
             }
         }
@@ -450,13 +450,13 @@ impl Client {
     /// Get expected `tp::Trade` from WATS. Skip any heartbeat message
     /// and return error if there is anything else than `tp::Trade`.
     #[instrument(skip_all, fields(connection_id = self.tp_connection_id()))]
-    pub async fn get_trade(&mut self) -> Result<tp::Trade> {
+    pub async fn get_trade(&mut self) -> Result<tp::OrderExecute> {
         loop {
             let bytes = self.get_tp_msg_from_wats().await?;
             let msg = unsafe { from_bytes::<tp::Message>(&bytes) };
             match msg.msg_type() {
-                tp::MsgType::Trade => {
-                    let msg = unsafe { msg.trade };
+                tp::MsgType::OrderExecute => {
+                    let msg = unsafe { msg.order_execute };
                     debug!("Got Trade: {}", serde_json::to_string(&msg).unwrap());
                     return Ok(msg);
                 }
@@ -553,6 +553,7 @@ impl ClientBuilder {
             header: md::Header::new(md::MsgType::Login),
             connection_id,
             token,
+            filter: md::MessageFilter::all(),
         };
 
         self.snap_tx
@@ -934,7 +935,7 @@ impl Snapshot {
                 if let Some(mut cipher) = cipher {
                     apply_on_field!(msg.quantity, &mut cipher);
                     apply_on_field!(msg.instrument_id, &mut cipher);
-                    apply_on_field!(msg.execution_id, &mut cipher);
+                    apply_on_field!(msg.trade_id, &mut cipher);
                     apply_on_field!(msg.execution_price, &mut cipher);
                     apply_on_field!(msg.execution_quantity, &mut cipher);
                 }
@@ -1077,7 +1078,6 @@ impl Snapshot {
 
                     apply_on_field!(msg.trading_value_currency, &mut cipher);
                     apply_on_field!(msg.marker_price_change, &mut cipher);
-                    apply_on_field!(msg.implied_volatility, &mut cipher);
                     apply_on_field!(msg.delta, &mut cipher);
                     apply_on_field!(msg.gamma, &mut cipher);
                     apply_on_field!(msg.rho, &mut cipher);
@@ -1096,14 +1096,14 @@ impl Snapshot {
 
                 self.md_message.push(md::Message { product_summary });
             }
-            md::MsgType::OrderDelete => {
-                let order_delete = unsafe { msg.order_delete };
+            md::MsgType::OrderCancel => {
+                let order_cancel = unsafe { msg.order_cancel };
                 debug!(
                     "MD OrderDelete: {}",
-                    serde_json::to_string(&order_delete).unwrap()
+                    serde_json::to_string(&order_cancel).unwrap()
                 );
 
-                self.md_message.push(md::Message { order_delete });
+                self.md_message.push(md::Message { order_cancel });
             }
             md::MsgType::PriceUpdate => {
                 let price_update = unsafe { msg.price_update };

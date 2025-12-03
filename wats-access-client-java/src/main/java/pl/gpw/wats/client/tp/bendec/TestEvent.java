@@ -7,8 +7,8 @@ import java.nio.ByteBuffer;
 /**
  * <h2>TestEvent</h2>
  * <p>Test event</p>
- * <p>Byte length: 217</p>
- * <p>Header header - Message header. | size 16</p>
+ * <p>Byte length: 225</p>
+ * <p>Header header - Message header. | size 24</p>
  * <p>ScenarioName > String (u8[]) scenarioName - Test scenario name | size 200</p>
  * <p>EventType eventType - Test event type | size 1</p>
  */
@@ -16,7 +16,7 @@ public class TestEvent implements ByteSerializable, Message {
     private Header header;
     private String scenarioName;
     private EventType eventType;
-    public static final int byteLength = 217;
+    public static final int byteLength = 225;
     
     public TestEvent(Header header, String scenarioName, EventType eventType) {
         this.header = header;
@@ -26,8 +26,8 @@ public class TestEvent implements ByteSerializable, Message {
     
     public TestEvent(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
-        this.scenarioName = BendecUtils.stringFromByteArray(bytes, offset + 16, 200);
-        this.eventType = EventType.getEventType(bytes, offset + 216);
+        this.scenarioName = BendecUtils.stringFromByteArray(bytes, offset + 24, 200);
+        this.eventType = EventType.getEventType(bytes, offset + 224);
     }
     
     public TestEvent(byte[] bytes) {

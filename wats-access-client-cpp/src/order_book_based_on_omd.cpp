@@ -76,7 +76,7 @@ int main() {
         }
     });
 
-    market_data.handle([&](omd::messages::OrderDelete message, wats::EventSource source) {
+    market_data.handle([&](omd::messages::OrderCancel message, wats::EventSource source) {
 
         if (message.publicOrderId == orderRespId_0) {
 
@@ -141,7 +141,7 @@ int main() {
         }
     });
 
-    trading_port_0.handle([&](btp::messages::Trade message) {
+    trading_port_0.handle([&](btp::messages::OrderExecute message) {
 
         if (message.orderId == orderId_0) {
             if (message.price != 100 * 100'000'000ll ||
@@ -178,7 +178,7 @@ int main() {
         }
     });
 
-    trading_port_1.handle([&](btp::messages::Trade message) {
+    trading_port_1.handle([&](btp::messages::OrderExecute message) {
 
         if (message.orderId == orderId_1) {
             if (message.price != 100 * 100'000'000ll ||

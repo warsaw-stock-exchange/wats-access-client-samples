@@ -7,8 +7,8 @@ import java.nio.ByteBuffer;
 /**
  * <h2>MarketMakerCommandResponse</h2>
  * <p>The response to the Market Maker command.</p>
- * <p>Byte length: 23</p>
- * <p>Header header - Message header. | size 16</p>
+ * <p>Byte length: 31</p>
+ * <p>Header header - Message header. | size 24</p>
  * <p>u32 > long refId - A reference id to the Market Maker command request message. | size 4</p>
  * <p>CommandResult result - Confirmation of achieving the intended action. If the action (e.g., Buy Only state) has already been achieved before the command, the result will be positive. | size 1</p>
  * <p>CommandRejectionCode rejectionCode - Reason for rejecting the Market Maker command. | size 2</p>
@@ -18,7 +18,7 @@ public class MarketMakerCommandResponse implements ByteSerializable, Message {
     private long refId;
     private CommandResult result;
     private CommandRejectionCode rejectionCode;
-    public static final int byteLength = 23;
+    public static final int byteLength = 31;
     
     public MarketMakerCommandResponse(Header header, long refId, CommandResult result, CommandRejectionCode rejectionCode) {
         this.header = header;
@@ -29,9 +29,9 @@ public class MarketMakerCommandResponse implements ByteSerializable, Message {
     
     public MarketMakerCommandResponse(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
-        this.refId = BendecUtils.uInt32FromByteArray(bytes, offset + 16);
-        this.result = CommandResult.getCommandResult(bytes, offset + 20);
-        this.rejectionCode = CommandRejectionCode.getCommandRejectionCode(bytes, offset + 21);
+        this.refId = BendecUtils.uInt32FromByteArray(bytes, offset + 24);
+        this.result = CommandResult.getCommandResult(bytes, offset + 28);
+        this.rejectionCode = CommandRejectionCode.getCommandRejectionCode(bytes, offset + 29);
     }
     
     public MarketMakerCommandResponse(byte[] bytes) {

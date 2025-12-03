@@ -7,8 +7,8 @@ import java.nio.ByteBuffer;
 /**
  * <h2>LoginResponse</h2>
  * <p>The login response message. The result field describes the login status, indicating whether the login was successful or not (i.e. successful login).</p>
- * <p>Byte length: 27</p>
- * <p>Header header - Header. | size 16</p>
+ * <p>Byte length: 35</p>
+ * <p>Header header - Header. | size 24</p>
  * <p>LoginResult result - Login response status code. | size 1</p>
  * <p>SeqNum > long (u32) nextExpectedSeqNum - Next expected message sequence number value to be received. | size 4</p>
  * <p>SeqNum > long (u32) lastReplaySeqNum - Last replay sequence number. | size 4</p>
@@ -20,7 +20,7 @@ public class LoginResponse implements ByteSerializable, Message {
     private long nextExpectedSeqNum;
     private long lastReplaySeqNum;
     private int sessionId;
-    public static final int byteLength = 27;
+    public static final int byteLength = 35;
     
     public LoginResponse(Header header, LoginResult result, long nextExpectedSeqNum, long lastReplaySeqNum, int sessionId) {
         this.header = header;
@@ -32,10 +32,10 @@ public class LoginResponse implements ByteSerializable, Message {
     
     public LoginResponse(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
-        this.result = LoginResult.getLoginResult(bytes, offset + 16);
-        this.nextExpectedSeqNum = BendecUtils.uInt32FromByteArray(bytes, offset + 17);
-        this.lastReplaySeqNum = BendecUtils.uInt32FromByteArray(bytes, offset + 21);
-        this.sessionId = BendecUtils.uInt16FromByteArray(bytes, offset + 25);
+        this.result = LoginResult.getLoginResult(bytes, offset + 24);
+        this.nextExpectedSeqNum = BendecUtils.uInt32FromByteArray(bytes, offset + 25);
+        this.lastReplaySeqNum = BendecUtils.uInt32FromByteArray(bytes, offset + 29);
+        this.sessionId = BendecUtils.uInt16FromByteArray(bytes, offset + 33);
     }
     
     public LoginResponse(byte[] bytes) {

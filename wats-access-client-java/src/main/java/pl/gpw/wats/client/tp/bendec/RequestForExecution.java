@@ -7,8 +7,8 @@ import java.nio.ByteBuffer;
 /**
  * <h2>RequestForExecution</h2>
  * <p>The information for the MM that one of the quotes has been crossed.</p>
- * <p>Byte length: 21</p>
- * <p>Header header - Message header. | size 16</p>
+ * <p>Byte length: 29</p>
+ * <p>Header header - Message header. | size 24</p>
  * <p>ElementId > long (u32) instrumentId - Instrument ID | size 4</p>
  * <p>RequestForExecutionReason reason - The reason for this RFE. | size 1</p>
  */
@@ -16,7 +16,7 @@ public class RequestForExecution implements ByteSerializable, Message {
     private Header header;
     private long instrumentId;
     private RequestForExecutionReason reason;
-    public static final int byteLength = 21;
+    public static final int byteLength = 29;
     
     public RequestForExecution(Header header, long instrumentId, RequestForExecutionReason reason) {
         this.header = header;
@@ -26,8 +26,8 @@ public class RequestForExecution implements ByteSerializable, Message {
     
     public RequestForExecution(byte[] bytes, int offset) {
         this.header = new Header(bytes, offset);
-        this.instrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 16);
-        this.reason = RequestForExecutionReason.getRequestForExecutionReason(bytes, offset + 20);
+        this.instrumentId = BendecUtils.uInt32FromByteArray(bytes, offset + 24);
+        this.reason = RequestForExecutionReason.getRequestForExecutionReason(bytes, offset + 28);
     }
     
     public RequestForExecution(byte[] bytes) {

@@ -7,13 +7,14 @@ import java.nio.ByteBuffer;
 /**
  * <h2>OrderModify</h2>
  * <p>Order modified.</p>
- * <p>Byte length: 71</p>
+ * <p>Byte length: 72</p>
  * <p>Header header - Message header. | size 42</p>
  * <p>ElementId > long (u32) instrumentId - ID of financial instrument. | size 4</p>
  * <p>PublicOrderId > BigInteger (u64) publicOrderId - Order identifier (ID). | size 8</p>
  * <p>Price > long (i64) price - New order price. | size 8</p>
  * <p>Quantity > BigInteger (u64) quantity - New order quantity. | size 8</p>
  * <p>PriorityFlag priorityFlag - Priority loss flag. | size 1</p>
+ * <p>OrderSide side - Order side. | size 1</p>
  */
 public class OrderModify implements ByteSerializable, Message {
     private Header header;
@@ -22,15 +23,17 @@ public class OrderModify implements ByteSerializable, Message {
     private long price;
     private BigInteger quantity;
     private PriorityFlag priorityFlag;
-    public static final int byteLength = 71;
+    private OrderSide side;
+    public static final int byteLength = 72;
     
-    public OrderModify(Header header, long instrumentId, BigInteger publicOrderId, long price, BigInteger quantity, PriorityFlag priorityFlag) {
+    public OrderModify(Header header, long instrumentId, BigInteger publicOrderId, long price, BigInteger quantity, PriorityFlag priorityFlag, OrderSide side) {
         this.header = header;
         this.instrumentId = instrumentId;
         this.publicOrderId = publicOrderId;
         this.price = price;
         this.quantity = quantity;
         this.priorityFlag = priorityFlag;
+        this.side = side;
     }
     
     public OrderModify(byte[] bytes, int offset) {
@@ -40,6 +43,7 @@ public class OrderModify implements ByteSerializable, Message {
         this.price = BendecUtils.int64FromByteArray(bytes, offset + 54);
         this.quantity = BendecUtils.uInt64FromByteArray(bytes, offset + 62);
         this.priorityFlag = PriorityFlag.getPriorityFlag(bytes, offset + 70);
+        this.side = OrderSide.getOrderSide(bytes, offset + 71);
     }
     
     public OrderModify(byte[] bytes) {
@@ -92,6 +96,13 @@ public class OrderModify implements ByteSerializable, Message {
     }
     
     /**
+     * @return Order side.
+     */
+    public OrderSide getSide() {
+        return this.side;
+    }
+    
+    /**
      * @param header Message header.
      */
     public void setHeader(Header header) {
@@ -133,6 +144,13 @@ public class OrderModify implements ByteSerializable, Message {
         this.priorityFlag = priorityFlag;
     }
     
+    /**
+     * @param side Order side.
+     */
+    public void setSide(OrderSide side) {
+        this.side = side;
+    }
+    
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -142,6 +160,7 @@ public class OrderModify implements ByteSerializable, Message {
         buffer.put(BendecUtils.int64ToByteArray(this.price));
         buffer.put(BendecUtils.uInt64ToByteArray(this.quantity));
         priorityFlag.toBytes(buffer);
+        side.toBytes(buffer);
         return buffer.array();
     }
     
@@ -153,6 +172,7 @@ public class OrderModify implements ByteSerializable, Message {
         buffer.put(BendecUtils.int64ToByteArray(this.price));
         buffer.put(BendecUtils.uInt64ToByteArray(this.quantity));
         priorityFlag.toBytes(buffer);
+        side.toBytes(buffer);
     }
     
     @Override
@@ -162,7 +182,8 @@ public class OrderModify implements ByteSerializable, Message {
         publicOrderId,
         price,
         quantity,
-        priorityFlag);
+        priorityFlag,
+        side);
     }
     
     @Override
@@ -174,6 +195,7 @@ public class OrderModify implements ByteSerializable, Message {
             ", price=" + price +
             ", quantity=" + quantity +
             ", priorityFlag=" + priorityFlag +
+            ", side=" + side +
             "}";
     }
 }

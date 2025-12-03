@@ -100,7 +100,7 @@ const marketDataTypes = {
     },
     enumConversionError,
     forEachType: attachAll([attachArrayNewtypeImpl, ([generated, context, meta]) => {
-      const filter = ["MsgType", "Header", "Login"];
+      const filter = ["MsgType", "Header", "Login", "MessageFilter"];
       if (filter.includes(context.name)) {
         return attachBytesValidator([generated, context, meta]);
       } else {

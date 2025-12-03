@@ -10,9 +10,13 @@ import java.nio.ByteBuffer;
  */
 public enum ProductIdentificationType {
     /**
+     * Not applicable
+     */
+    NOTAPPLICABLE(1),
+    /**
      * Financial instrument's ISIN.
      */
-    ISIN(1);
+    ISIN(2);
     
     private final int value;
     private final int byteLength = 1;
