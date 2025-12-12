@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
  * <p>MicCode > String (u8[]) marketId - Market structure's Market Identifier Code (MIC) as specified in ISO 10383. | size 4</p>
  * <p>ElementId > long (u32) marketStructureId - ID of the financial instrument's market segment. | size 4</p>
  * <p>TradingSessionEvent tradingSessionEvent - Identifies an event related to the trading status of a trading session. | size 1</p>
- * <p>Date > long (u32) date - The date of this event. | size 4</p>
+ * <p>Date > long (u32) date - Date of the business session when provided and 0 for StartOfTechnicalSession and EndOfTechnicalSession events. | size 4</p>
  */
 public class TradingSessionStatus implements ByteSerializable, Message {
     private Header header;
@@ -74,7 +74,7 @@ public class TradingSessionStatus implements ByteSerializable, Message {
     }
     
     /**
-     * @return The date of this event.
+     * @return Date of the business session when provided and 0 for StartOfTechnicalSession and EndOfTechnicalSession events.
      */
     public long getDate() {
         return this.date;
@@ -109,7 +109,7 @@ public class TradingSessionStatus implements ByteSerializable, Message {
     }
     
     /**
-     * @param date The date of this event.
+     * @param date Date of the business session when provided and 0 for StartOfTechnicalSession and EndOfTechnicalSession events.
      */
     public void setDate(long date) {
         this.date = date;

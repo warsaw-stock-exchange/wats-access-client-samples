@@ -1,5 +1,9 @@
 # Changes history for WATS Access Client Rust sample code
 
+## 1.7.1
+
+* **Change:** Message definitions (contract) updated to version 1.7.1
+
 ## 1.7.0
 
 * **Change:** Message definitions (contract) updated to version 1.7.0

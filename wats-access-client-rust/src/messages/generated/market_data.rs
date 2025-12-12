@@ -266,8 +266,11 @@ pub enum AuctionType {
   AuctionVolatilityStatic = 0x0005,
   /// Volatility auction after dynamic collars breach.
   AuctionVolatilityDynamic = 0x0006,
+  /// Additional volatility auction after static collar breach. It can be activated independently or as an extension of the previous AuctionVolatilityStatic phase.
   AuctionExtendedVolatilityStatic = 0x0007,
+  /// Additional volatility auction after dynamic collar breach. It can be activated independently or as an extension of the previous AuctionVolatilityDynamic phase.
   AuctionExtendedVolatilityDynamic = 0x0008,
+  /// A phase triggered whenever an instrument’s changes its status from RegulatorySuspension or MarketOperationSuspension before entering into continuous phase.
   UnsuspensionAuction = 0x0009,
 }
 impl Default for AuctionType {
@@ -1339,10 +1342,6 @@ pub enum InstrumentStatus {
   HybridKnockout = 0x0009,
   /// Hybrid knockout by issuer.
   HybridKnockoutByIssuer = 0x000a,
-  /// Start of distribution from external source.
-  DistributionStart = 0x000c,
-  /// End of distribution from external source.
-  DistributionEnd = 0x000d,
 }
 impl Default for InstrumentStatus {
   fn default() -> Self {
@@ -1362,8 +1361,6 @@ impl std::convert::TryFrom<u8> for InstrumentStatus {
       0x0008 => Ok(Self::HybridNoQuotes),
       0x0009 => Ok(Self::HybridKnockout),
       0x000a => Ok(Self::HybridKnockoutByIssuer),
-      0x000c => Ok(Self::DistributionStart),
-      0x000d => Ok(Self::DistributionEnd),
       other => Err(InvalidVariant::new(other as u32, "InstrumentStatus")),
     }
   }
@@ -1379,7 +1376,7 @@ pub enum TradingPhaseType {
   ContinuousRefPriceTime = 0x0002,
   /// Trade at last.
   ContinuousLastAuctionTime = 0x0003,
-  /// Auction opening.
+  /// Opening auction.
   AuctionOpening = 0x0004,
   /// Block transaction, exact matching.
   BlockExactMatching = 0x0005,
@@ -1387,17 +1384,17 @@ pub enum TradingPhaseType {
   NoTradingClosed = 0x0006,
   /// Uncrossing.
   Uncrossing = 0x0007,
-  /// Auction closing.
+  /// Closing auction.
   AuctionClosing = 0x0008,
-  /// Auction intraday.
+  /// Intraday auction.
   AuctionIntraday = 0x0009,
-  /// Auction volatility static.
+  /// Volatility auction after static collars breach.
   AuctionVolatilityStatic = 0x000a,
-  /// Auction volatility dynamic.
+  /// Volatility auction after dynamic collars breach.
   AuctionVolatilityDynamic = 0x000b,
-  /// Auction extended volatility static.
+  /// Additional volatility auction after static collar breach. It can be activated independently or as an extension of the previous AuctionVolatilityStatic phase.
   AuctionExtendedVolatilityStatic = 0x000c,
-  /// Auction extended volatility dynamic.
+  /// Additional volatility auction after dynamic collar breach. It can be activated independently or as an extension of the previous AuctionVolatilityDynamic phase.
   AuctionExtendedVolatilityDynamic = 0x000d,
   /// Early Monitoring
   NoTradingEarlyMonitoring = 0x000e,
@@ -1409,7 +1406,7 @@ pub enum TradingPhaseType {
   HybridBuyOnly = 0x0011,
   /// Hybrid pre trade phase
   HybridPreTrade = 0x0012,
-  /// Auction after suspension
+  /// A phase triggered whenever an instrument’s changes its status from RegulatorySuspension or MarketOperationSuspension before entering into continuous phase.
   UnsuspensionAuction = 0x0013,
   /// Initial public offering phase
   Ipo = 0x0014,
@@ -1417,6 +1414,8 @@ pub enum TradingPhaseType {
   TenderOffer = 0x0015,
   /// Hybrid pre trade BuyOnly phase
   HybridPreTradeBuyOnly = 0x0016,
+  /// Instrument distribution phase
+  Distribution = 0x0017,
 }
 impl Default for TradingPhaseType {
   fn default() -> Self {
@@ -1449,6 +1448,7 @@ impl std::convert::TryFrom<u8> for TradingPhaseType {
       0x0014 => Ok(Self::Ipo),
       0x0015 => Ok(Self::TenderOffer),
       0x0016 => Ok(Self::HybridPreTradeBuyOnly),
+      0x0017 => Ok(Self::Distribution),
       other => Err(InvalidVariant::new(other as u32, "TradingPhaseType")),
     }
   }
@@ -3297,7 +3297,7 @@ pub struct TradingSessionStatus {
   pub market_structure_id: ElementId,
   /// Identifies an event related to the trading status of a trading session.
   pub trading_session_event: TradingSessionEvent,
-  /// The date of this event.
+  /// Date of the business session when provided and 0 for StartOfTechnicalSession and EndOfTechnicalSession events.
   pub date: Date,
 }
 

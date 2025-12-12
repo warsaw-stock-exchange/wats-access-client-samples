@@ -33,8 +33,17 @@ public enum AuctionType {
      * Volatility auction after dynamic collars breach.
      */
     AUCTIONVOLATILITYDYNAMIC(6),
+    /**
+     * Additional volatility auction after static collar breach. It can be activated independently or as an extension of the previous AuctionVolatilityStatic phase.
+     */
     AUCTIONEXTENDEDVOLATILITYSTATIC(7),
+    /**
+     * Additional volatility auction after dynamic collar breach. It can be activated independently or as an extension of the previous AuctionVolatilityDynamic phase.
+     */
     AUCTIONEXTENDEDVOLATILITYDYNAMIC(8),
+    /**
+     * A phase triggered whenever an instrument’s changes its status from RegulatorySuspension or MarketOperationSuspension before entering into continuous phase.
+     */
     UNSUSPENSIONAUCTION(9);
     
     private final int value;

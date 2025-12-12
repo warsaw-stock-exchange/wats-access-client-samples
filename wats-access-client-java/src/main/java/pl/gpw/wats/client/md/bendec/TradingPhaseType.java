@@ -22,7 +22,7 @@ public enum TradingPhaseType {
      */
     CONTINUOUSLASTAUCTIONTIME(3),
     /**
-     * Auction opening.
+     * Opening auction.
      */
     AUCTIONOPENING(4),
     /**
@@ -38,27 +38,27 @@ public enum TradingPhaseType {
      */
     UNCROSSING(7),
     /**
-     * Auction closing.
+     * Closing auction.
      */
     AUCTIONCLOSING(8),
     /**
-     * Auction intraday.
+     * Intraday auction.
      */
     AUCTIONINTRADAY(9),
     /**
-     * Auction volatility static.
+     * Volatility auction after static collars breach.
      */
     AUCTIONVOLATILITYSTATIC(10),
     /**
-     * Auction volatility dynamic.
+     * Volatility auction after dynamic collars breach.
      */
     AUCTIONVOLATILITYDYNAMIC(11),
     /**
-     * Auction extended volatility static.
+     * Additional volatility auction after static collar breach. It can be activated independently or as an extension of the previous AuctionVolatilityStatic phase.
      */
     AUCTIONEXTENDEDVOLATILITYSTATIC(12),
     /**
-     * Auction extended volatility dynamic.
+     * Additional volatility auction after dynamic collar breach. It can be activated independently or as an extension of the previous AuctionVolatilityDynamic phase.
      */
     AUCTIONEXTENDEDVOLATILITYDYNAMIC(13),
     /**
@@ -82,7 +82,7 @@ public enum TradingPhaseType {
      */
     HYBRIDPRETRADE(18),
     /**
-     * Auction after suspension
+     * A phase triggered whenever an instrument’s changes its status from RegulatorySuspension or MarketOperationSuspension before entering into continuous phase.
      */
     UNSUSPENSIONAUCTION(19),
     /**
@@ -96,7 +96,11 @@ public enum TradingPhaseType {
     /**
      * Hybrid pre trade BuyOnly phase
      */
-    HYBRIDPRETRADEBUYONLY(22);
+    HYBRIDPRETRADEBUYONLY(22),
+    /**
+     * Instrument distribution phase
+     */
+    DISTRIBUTION(23);
     
     private final int value;
     private final int byteLength = 1;

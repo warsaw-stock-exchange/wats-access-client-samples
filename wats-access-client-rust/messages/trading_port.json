@@ -1,5 +1,5 @@
 {
-  "version": 1135,
+  "version": 1136,
   "typeDefinitions": [
     {
       "kind": "Primitive",
@@ -4810,7 +4810,7 @@
         {
           "name": "date",
           "type": "Date",
-          "description": "The date for this event."
+          "description": "Date of the business session when provided and 0 for StartOfTechnicalSession and EndOfTechnicalSession events."
         },
         {
           "name": "tradingSessionEvent",

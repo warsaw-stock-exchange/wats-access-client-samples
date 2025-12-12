@@ -1,6 +1,6 @@
 {
   "$schema": "./schema.json",
-  "version": 2084,
+  "version": 2087,
   "typeDefinitions": {
     "marketData": [
       {
@@ -305,15 +305,18 @@
           ],
           [
             "AuctionExtendedVolatilityStatic",
-            7
+            7,
+            "Additional volatility auction after static collar breach. It can be activated independently or as an extension of the previous AuctionVolatilityStatic phase."
           ],
           [
             "AuctionExtendedVolatilityDynamic",
-            8
+            8,
+            "Additional volatility auction after dynamic collar breach. It can be activated independently or as an extension of the previous AuctionVolatilityDynamic phase."
           ],
           [
             "UnsuspensionAuction",
-            9
+            9,
+            "A phase triggered whenever an instrument’s changes its status from RegulatorySuspension or MarketOperationSuspension before entering into continuous phase."
           ]
         ]
       },
@@ -1791,16 +1794,6 @@
             "HybridKnockoutByIssuer",
             10,
             "Hybrid knockout by issuer."
-          ],
-          [
-            "DistributionStart",
-            12,
-            "Start of distribution from external source."
-          ],
-          [
-            "DistributionEnd",
-            13,
-            "End of distribution from external source."
           ]
         ]
       },
@@ -1828,7 +1821,7 @@
           [
             "AuctionOpening",
             4,
-            "Auction opening."
+            "Opening auction."
           ],
           [
             "BlockExactMatching",
@@ -1848,32 +1841,32 @@
           [
             "AuctionClosing",
             8,
-            "Auction closing."
+            "Closing auction."
           ],
           [
             "AuctionIntraday",
             9,
-            "Auction intraday."
+            "Intraday auction."
           ],
           [
             "AuctionVolatilityStatic",
             10,
-            "Auction volatility static."
+            "Volatility auction after static collars breach."
           ],
           [
             "AuctionVolatilityDynamic",
             11,
-            "Auction volatility dynamic."
+            "Volatility auction after dynamic collars breach."
           ],
           [
             "AuctionExtendedVolatilityStatic",
             12,
-            "Auction extended volatility static."
+            "Additional volatility auction after static collar breach. It can be activated independently or as an extension of the previous AuctionVolatilityStatic phase."
           ],
           [
             "AuctionExtendedVolatilityDynamic",
             13,
-            "Auction extended volatility dynamic."
+            "Additional volatility auction after dynamic collar breach. It can be activated independently or as an extension of the previous AuctionVolatilityDynamic phase."
           ],
           [
             "NoTradingEarlyMonitoring",
@@ -1903,7 +1896,7 @@
           [
             "UnsuspensionAuction",
             19,
-            "Auction after suspension"
+            "A phase triggered whenever an instrument’s changes its status from RegulatorySuspension or MarketOperationSuspension before entering into continuous phase."
           ],
           [
             "Ipo",
@@ -1919,6 +1912,11 @@
             "HybridPreTradeBuyOnly",
             22,
             "Hybrid pre trade BuyOnly phase"
+          ],
+          [
+            "Distribution",
+            23,
+            "Instrument distribution phase"
           ]
         ]
       },
@@ -4735,7 +4733,7 @@
           {
             "name": "date",
             "type": "Date",
-            "description": "The date of this event."
+            "description": "Date of the business session when provided and 0 for StartOfTechnicalSession and EndOfTechnicalSession events."
           }
         ]
       },

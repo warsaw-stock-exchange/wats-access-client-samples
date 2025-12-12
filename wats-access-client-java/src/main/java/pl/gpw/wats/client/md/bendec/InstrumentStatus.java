@@ -44,15 +44,7 @@ public enum InstrumentStatus {
     /**
      * Hybrid knockout by issuer.
      */
-    HYBRIDKNOCKOUTBYISSUER(10),
-    /**
-     * Start of distribution from external source.
-     */
-    DISTRIBUTIONSTART(12),
-    /**
-     * End of distribution from external source.
-     */
-    DISTRIBUTIONEND(13);
+    HYBRIDKNOCKOUTBYISSUER(10);
     
     private final int value;
     private final int byteLength = 1;

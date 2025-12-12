@@ -347,7 +347,8 @@ enum class TradingPhaseType: uint8_t {
     UnsuspensionAuction = 19,
     Ipo = 20,
     TenderOffer = 21,
-    HybridPreTradeBuyOnly = 22
+    HybridPreTradeBuyOnly = 22,
+    Distribution = 23
 };
 
 static const std::map<std::string, TradingPhaseType> Name2TradingPhaseType {
@@ -372,7 +373,8 @@ static const std::map<std::string, TradingPhaseType> Name2TradingPhaseType {
     { "UnsuspensionAuction", TradingPhaseType::UnsuspensionAuction },
     { "Ipo", TradingPhaseType::Ipo },
     { "TenderOffer", TradingPhaseType::TenderOffer },
-    { "HybridPreTradeBuyOnly", TradingPhaseType::HybridPreTradeBuyOnly }
+    { "HybridPreTradeBuyOnly", TradingPhaseType::HybridPreTradeBuyOnly },
+    { "Distribution", TradingPhaseType::Distribution }
 };
 
 static const std::map<TradingPhaseType, std::string> TradingPhaseType2Name {
@@ -397,7 +399,8 @@ static const std::map<TradingPhaseType, std::string> TradingPhaseType2Name {
     { TradingPhaseType::UnsuspensionAuction, "UnsuspensionAuction" },
     { TradingPhaseType::Ipo, "Ipo" },
     { TradingPhaseType::TenderOffer, "TenderOffer" },
-    { TradingPhaseType::HybridPreTradeBuyOnly, "HybridPreTradeBuyOnly" }
+    { TradingPhaseType::HybridPreTradeBuyOnly, "HybridPreTradeBuyOnly" },
+    { TradingPhaseType::Distribution, "Distribution" }
 };
 
 
@@ -410,9 +413,7 @@ enum class InstrumentStatus: uint8_t {
     RegulatorySuspension = 6,
     HybridNoQuotes = 8,
     HybridKnockout = 9,
-    HybridKnockoutByIssuer = 10,
-    DistributionStart = 12,
-    DistributionEnd = 13
+    HybridKnockoutByIssuer = 10
 };
 
 static const std::map<std::string, InstrumentStatus> Name2InstrumentStatus {
@@ -424,9 +425,7 @@ static const std::map<std::string, InstrumentStatus> Name2InstrumentStatus {
     { "RegulatorySuspension", InstrumentStatus::RegulatorySuspension },
     { "HybridNoQuotes", InstrumentStatus::HybridNoQuotes },
     { "HybridKnockout", InstrumentStatus::HybridKnockout },
-    { "HybridKnockoutByIssuer", InstrumentStatus::HybridKnockoutByIssuer },
-    { "DistributionStart", InstrumentStatus::DistributionStart },
-    { "DistributionEnd", InstrumentStatus::DistributionEnd }
+    { "HybridKnockoutByIssuer", InstrumentStatus::HybridKnockoutByIssuer }
 };
 
 static const std::map<InstrumentStatus, std::string> InstrumentStatus2Name {
@@ -438,9 +437,7 @@ static const std::map<InstrumentStatus, std::string> InstrumentStatus2Name {
     { InstrumentStatus::RegulatorySuspension, "RegulatorySuspension" },
     { InstrumentStatus::HybridNoQuotes, "HybridNoQuotes" },
     { InstrumentStatus::HybridKnockout, "HybridKnockout" },
-    { InstrumentStatus::HybridKnockoutByIssuer, "HybridKnockoutByIssuer" },
-    { InstrumentStatus::DistributionStart, "DistributionStart" },
-    { InstrumentStatus::DistributionEnd, "DistributionEnd" }
+    { InstrumentStatus::HybridKnockoutByIssuer, "HybridKnockoutByIssuer" }
 };
 
 

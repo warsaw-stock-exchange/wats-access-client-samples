@@ -4827,7 +4827,7 @@ pub struct TradingSessionStatus {
   pub header: Header,
   /// Market structure's Market Identifier Code (MIC) as specified in ISO 10383.
   pub market_id: MicCode,
-  /// The date for this event.
+  /// Date of the business session when provided and 0 for StartOfTechnicalSession and EndOfTechnicalSession events.
   pub date: Date,
   /// Identifies an event related to the trading status of a trading session.
   pub trading_session_event: TradingSessionEvent,
