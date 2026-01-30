@@ -25,21 +25,21 @@ public enum TradingSessionEvent {
      * End of trading session MIC.
      */
     ENDOFTRADINGSESSIONMIC(4);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, TradingSessionEvent> TYPES = new HashMap<>();
     static {
         for (TradingSessionEvent type : TradingSessionEvent.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     TradingSessionEvent(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get TradingSessionEvent by attribute
      * @param val
@@ -48,13 +48,13 @@ public enum TradingSessionEvent {
     public static TradingSessionEvent getTradingSessionEvent(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get TradingSessionEvent int value
      * @return int value
      */
     public int getTradingSessionEventValue() {
-        return value; 
+        return value;
     }
     
     /**

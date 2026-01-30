@@ -17,21 +17,21 @@ public enum NominalValueType {
      * Indicates that the security has a constant nominal value.
      */
     CONSTANT(2);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, NominalValueType> TYPES = new HashMap<>();
     static {
         for (NominalValueType type : NominalValueType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     NominalValueType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get NominalValueType by attribute
      * @param val
@@ -40,13 +40,13 @@ public enum NominalValueType {
     public static NominalValueType getNominalValueType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get NominalValueType int value
      * @return int value
      */
     public int getNominalValueTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

@@ -21,21 +21,21 @@ public enum ExerciseType {
      * Not applicable
      */
     NA(3);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, ExerciseType> TYPES = new HashMap<>();
     static {
         for (ExerciseType type : ExerciseType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     ExerciseType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get ExerciseType by attribute
      * @param val
@@ -44,13 +44,13 @@ public enum ExerciseType {
     public static ExerciseType getExerciseType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get ExerciseType int value
      * @return int value
      */
     public int getExerciseTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

@@ -17,21 +17,21 @@ public enum BidOfferUpdateType {
      * Tender Offer.
      */
     TENDEROFFER(2);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, BidOfferUpdateType> TYPES = new HashMap<>();
     static {
         for (BidOfferUpdateType type : BidOfferUpdateType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     BidOfferUpdateType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get BidOfferUpdateType by attribute
      * @param val
@@ -40,13 +40,13 @@ public enum BidOfferUpdateType {
     public static BidOfferUpdateType getBidOfferUpdateType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get BidOfferUpdateType int value
      * @return int value
      */
     public int getBidOfferUpdateTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

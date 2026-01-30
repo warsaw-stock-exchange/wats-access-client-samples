@@ -21,7 +21,7 @@ public class AuctionSummary implements ByteSerializable, Message {
     private BigInteger quantity;
     private AuctionType auctionType;
     public static final int byteLength = 63;
-    
+
     public AuctionSummary(Header header, long instrumentId, long price, BigInteger quantity, AuctionType auctionType) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -79,7 +79,7 @@ public class AuctionSummary implements ByteSerializable, Message {
     public AuctionType getAuctionType() {
         return this.auctionType;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -114,7 +114,7 @@ public class AuctionSummary implements ByteSerializable, Message {
     public void setAuctionType(AuctionType auctionType) {
         this.auctionType = auctionType;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -126,7 +126,7 @@ public class AuctionSummary implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
@@ -134,7 +134,7 @@ public class AuctionSummary implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt64ToByteArray(this.quantity));
         auctionType.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

@@ -39,7 +39,7 @@ public class MassQuote implements ByteSerializable, Message {
     private String interestedParty;
     private String quoteId;
     public static final int byteLength = 1208;
-    
+
     public MassQuote(Header header, int stpId, Capacity capacity, String account, AccountType accountType, OrderFlags flags, MifidFields mifidFields, String memo, String clearingMemberCode, ClearingIdentifier clearingMemberClearingIdentifier, Quotes quotes, int feeStructureId, String interestedParty, String quoteId) {
         this.header = header;
         this.stpId = stpId;
@@ -172,7 +172,7 @@ public class MassQuote implements ByteSerializable, Message {
     public String getQuoteId() {
         return this.quoteId;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -264,7 +264,7 @@ public class MassQuote implements ByteSerializable, Message {
     public void setQuoteId(String quoteId) {
         this.quoteId = quoteId;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -285,7 +285,7 @@ public class MassQuote implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt8ToByteArray(this.stpId));
@@ -302,7 +302,7 @@ public class MassQuote implements ByteSerializable, Message {
         buffer.put(BendecUtils.stringToByteArray(this.interestedParty, 8));
         buffer.put(BendecUtils.stringToByteArray(this.quoteId, 20));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

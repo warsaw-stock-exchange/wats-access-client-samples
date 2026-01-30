@@ -25,21 +25,21 @@ public enum TcrStatus {
      * Cancelled.
      */
     CANCELLED(4);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, TcrStatus> TYPES = new HashMap<>();
     static {
         for (TcrStatus type : TcrStatus.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     TcrStatus(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get TcrStatus by attribute
      * @param val
@@ -48,13 +48,13 @@ public enum TcrStatus {
     public static TcrStatus getTcrStatus(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get TcrStatus int value
      * @return int value
      */
     public int getTcrStatusValue() {
-        return value; 
+        return value;
     }
     
     /**

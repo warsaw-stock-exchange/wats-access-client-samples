@@ -21,21 +21,21 @@ public enum IndexUnderlyingType {
      * Reference Rate.
      */
     REFERENCERATE(3);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, IndexUnderlyingType> TYPES = new HashMap<>();
     static {
         for (IndexUnderlyingType type : IndexUnderlyingType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     IndexUnderlyingType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get IndexUnderlyingType by attribute
      * @param val
@@ -44,13 +44,13 @@ public enum IndexUnderlyingType {
     public static IndexUnderlyingType getIndexUnderlyingType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get IndexUnderlyingType int value
      * @return int value
      */
     public int getIndexUnderlyingTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

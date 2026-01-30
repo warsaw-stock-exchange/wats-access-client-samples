@@ -17,21 +17,21 @@ public enum TradeType {
      * Block trade.
      */
     BLOCKTRADE(38);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, TradeType> TYPES = new HashMap<>();
     static {
         for (TradeType type : TradeType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     TradeType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get TradeType by attribute
      * @param val
@@ -40,13 +40,13 @@ public enum TradeType {
     public static TradeType getTradeType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get TradeType int value
      * @return int value
      */
     public int getTradeTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

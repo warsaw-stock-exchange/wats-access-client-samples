@@ -49,21 +49,21 @@ public enum MassCancelRejectionReason {
      * Request not allowed on sponsored connection.
      */
     REQUESTNOTALLOWEDONSPONSOREDCONNECTION(2025);
-    
+
     private final int value;
     private final int byteLength = 2;
-    
+
     private static final Map<Integer, MassCancelRejectionReason> TYPES = new HashMap<>();
     static {
         for (MassCancelRejectionReason type : MassCancelRejectionReason.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     MassCancelRejectionReason(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get MassCancelRejectionReason by attribute
      * @param val
@@ -72,13 +72,13 @@ public enum MassCancelRejectionReason {
     public static MassCancelRejectionReason getMassCancelRejectionReason(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get MassCancelRejectionReason int value
      * @return int value
      */
     public int getMassCancelRejectionReasonValue() {
-        return value; 
+        return value;
     }
     
     /**

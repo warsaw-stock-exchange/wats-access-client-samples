@@ -93,21 +93,21 @@ public enum ExecTypeReason {
      * Notification of Hybrid order activation.
      */
     HYBRIDACTIVATED(21);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, ExecTypeReason> TYPES = new HashMap<>();
     static {
         for (ExecTypeReason type : ExecTypeReason.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     ExecTypeReason(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get ExecTypeReason by attribute
      * @param val
@@ -116,13 +116,13 @@ public enum ExecTypeReason {
     public static ExecTypeReason getExecTypeReason(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get ExecTypeReason int value
      * @return int value
      */
     public int getExecTypeReasonValue() {
-        return value; 
+        return value;
     }
     
     /**

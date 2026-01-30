@@ -33,7 +33,7 @@ public class OrderExecute implements ByteSerializable, Message {
     private OrderSide side;
     private String clientOrderId;
     public static final int byteLength = 88;
-    
+
     public OrderExecute(Header header, long instrumentId, BigInteger orderId, long tradeId, long price, BigInteger quantity, BigInteger leavesQty, LiquidityIndicator liquidityIndicator, Currency currency, OrderSide side, String clientOrderId) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -145,7 +145,7 @@ public class OrderExecute implements ByteSerializable, Message {
     public String getClientOrderId() {
         return this.clientOrderId;
     }
-    
+
     /**
      * @param header Header.
      */
@@ -222,7 +222,7 @@ public class OrderExecute implements ByteSerializable, Message {
     public void setClientOrderId(String clientOrderId) {
         this.clientOrderId = clientOrderId;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -240,7 +240,7 @@ public class OrderExecute implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
@@ -254,7 +254,7 @@ public class OrderExecute implements ByteSerializable, Message {
         side.toBytes(buffer);
         buffer.put(BendecUtils.stringToByteArray(this.clientOrderId, 20));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

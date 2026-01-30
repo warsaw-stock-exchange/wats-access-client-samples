@@ -33,7 +33,7 @@ public class Header implements ByteSerializable {
     private int sessionId;
     private int streamId;
     public static final int byteLength = 42;
-    
+
     public Header(int length, MsgType msgType, int version, long seqNum, BigInteger timestamp, BigInteger sourceTimestamp, boolean isEncrypted, BigInteger encryptionOffset, long encryptionKeyId, int sessionId, int streamId) {
         this.length = length;
         this.msgType = msgType;
@@ -145,7 +145,7 @@ public class Header implements ByteSerializable {
     public int getStreamId() {
         return this.streamId;
     }
-    
+
     /**
      * @param length Message length.
      */
@@ -222,7 +222,7 @@ public class Header implements ByteSerializable {
     public void setStreamId(int streamId) {
         this.streamId = streamId;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -240,7 +240,7 @@ public class Header implements ByteSerializable {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt16ToByteArray(this.length));
         msgType.toBytes(buffer);
@@ -254,7 +254,7 @@ public class Header implements ByteSerializable {
         buffer.put(BendecUtils.uInt16ToByteArray(this.sessionId));
         buffer.put(BendecUtils.uInt8ToByteArray(this.streamId));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(length,

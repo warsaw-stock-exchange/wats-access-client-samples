@@ -21,21 +21,21 @@ public enum MmtBenchmarkReferencePriceIndicator {
      * - = No Benchmark or Reference Price Trade
      */
     NOBENCHMARKORREFERENCEPRICETRADE(3);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, MmtBenchmarkReferencePriceIndicator> TYPES = new HashMap<>();
     static {
         for (MmtBenchmarkReferencePriceIndicator type : MmtBenchmarkReferencePriceIndicator.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     MmtBenchmarkReferencePriceIndicator(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get MmtBenchmarkReferencePriceIndicator by attribute
      * @param val
@@ -44,13 +44,13 @@ public enum MmtBenchmarkReferencePriceIndicator {
     public static MmtBenchmarkReferencePriceIndicator getMmtBenchmarkReferencePriceIndicator(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get MmtBenchmarkReferencePriceIndicator int value
      * @return int value
      */
     public int getMmtBenchmarkReferencePriceIndicatorValue() {
-        return value; 
+        return value;
     }
     
     /**

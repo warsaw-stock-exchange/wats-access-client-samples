@@ -173,21 +173,21 @@ public enum MsgType {
      * A message to relay test scenario information
      */
     TESTEVENT(8192);
-    
+
     private final int value;
     private final int byteLength = 2;
-    
+
     private static final Map<Integer, MsgType> TYPES = new HashMap<>();
     static {
         for (MsgType type : MsgType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     MsgType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get MsgType by attribute
      * @param val
@@ -196,13 +196,13 @@ public enum MsgType {
     public static MsgType getMsgType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get MsgType int value
      * @return int value
      */
     public int getMsgTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

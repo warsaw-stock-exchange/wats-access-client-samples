@@ -21,7 +21,7 @@ public class QuoteOrderResponse implements ByteSerializable {
     private OrderStatus status;
     private OrderRejectionReason reason;
     public static final int byteLength = 23;
-    
+
     public QuoteOrderResponse(long instrumentId, BigInteger bidOrderId, BigInteger askOrderId, OrderStatus status, OrderRejectionReason reason) {
         this.instrumentId = instrumentId;
         this.bidOrderId = bidOrderId;
@@ -79,7 +79,7 @@ public class QuoteOrderResponse implements ByteSerializable {
     public OrderRejectionReason getReason() {
         return this.reason;
     }
-    
+
     /**
      * @param instrumentId ID of the instrument being traded.
      */
@@ -114,7 +114,7 @@ public class QuoteOrderResponse implements ByteSerializable {
     public void setReason(OrderRejectionReason reason) {
         this.reason = reason;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -126,7 +126,7 @@ public class QuoteOrderResponse implements ByteSerializable {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
         buffer.put(BendecUtils.uInt64ToByteArray(this.bidOrderId));
@@ -134,7 +134,7 @@ public class QuoteOrderResponse implements ByteSerializable {
         status.toBytes(buffer);
         reason.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(instrumentId,

@@ -19,7 +19,7 @@ public class ReplayRequest implements ByteSerializable, ReplayMessage {
     private long endSeqNum;
     private int streamId;
     public static final int byteLength = 13;
-    
+
     public ReplayRequest(ReplayHeader header, long seqNum, long endSeqNum, int streamId) {
         this.header = header;
         this.seqNum = seqNum;
@@ -68,7 +68,7 @@ public class ReplayRequest implements ByteSerializable, ReplayMessage {
     public int getStreamId() {
         return this.streamId;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -96,7 +96,7 @@ public class ReplayRequest implements ByteSerializable, ReplayMessage {
     public void setStreamId(int streamId) {
         this.streamId = streamId;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -107,14 +107,14 @@ public class ReplayRequest implements ByteSerializable, ReplayMessage {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.seqNum));
         buffer.put(BendecUtils.uInt32ToByteArray(this.endSeqNum));
         buffer.put(BendecUtils.uInt8ToByteArray(this.streamId));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

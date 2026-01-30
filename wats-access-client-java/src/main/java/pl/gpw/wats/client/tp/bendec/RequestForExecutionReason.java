@@ -11,21 +11,21 @@ import java.nio.ByteBuffer;
 public enum RequestForExecutionReason {
     PASSIVEQUOTE(1),
     AGGRESSIVEQUOTE(2);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, RequestForExecutionReason> TYPES = new HashMap<>();
     static {
         for (RequestForExecutionReason type : RequestForExecutionReason.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     RequestForExecutionReason(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get RequestForExecutionReason by attribute
      * @param val
@@ -34,13 +34,13 @@ public enum RequestForExecutionReason {
     public static RequestForExecutionReason getRequestForExecutionReason(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get RequestForExecutionReason int value
      * @return int value
      */
     public int getRequestForExecutionReasonValue() {
-        return value; 
+        return value;
     }
     
     /**

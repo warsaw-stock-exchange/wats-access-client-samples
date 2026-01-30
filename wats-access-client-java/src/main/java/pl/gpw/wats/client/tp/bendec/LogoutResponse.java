@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 public class LogoutResponse implements ByteSerializable, Message {
     private Header header;
     public static final int byteLength = 24;
-    
+
     public LogoutResponse(Header header) {
         this.header = header;
     }
@@ -35,14 +35,14 @@ public class LogoutResponse implements ByteSerializable, Message {
     public Header getHeader() {
         return this.header;
     }
-    
+
     /**
      * @param header Header.
      */
     public void setHeader(Header header) {
         this.header = header;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -50,11 +50,11 @@ public class LogoutResponse implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header);

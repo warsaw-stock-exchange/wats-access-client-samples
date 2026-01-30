@@ -37,7 +37,7 @@ public class TradingPhaseScheduleEntry implements ByteSerializable, Message {
     private long extDynamicCollarVolatilityAuctionId;
     private long clatId;
     public static final int byteLength = 82;
-    
+
     public TradingPhaseScheduleEntry(Header header, long tradingScheduleId, long tradingPhaseId, int tradingPhaseSettlementCycle, int tradingPhaseMaxBlockSettlementCycle, long staticCollarVolatilityAuctionId, long dynamicCollarVolatilityAuctionId, BigInteger tradingPhaseStartTime, TradingPhaseType tradingPhaseType, boolean uncrossing, long extStaticCollarVolatilityAuctionId, long extDynamicCollarVolatilityAuctionId, long clatId) {
         this.header = header;
         this.tradingScheduleId = tradingScheduleId;
@@ -167,7 +167,7 @@ public class TradingPhaseScheduleEntry implements ByteSerializable, Message {
     public long getClatId() {
         return this.clatId;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -258,7 +258,7 @@ public class TradingPhaseScheduleEntry implements ByteSerializable, Message {
     public void setClatId(long clatId) {
         this.clatId = clatId;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -278,7 +278,7 @@ public class TradingPhaseScheduleEntry implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.tradingScheduleId));
@@ -294,7 +294,7 @@ public class TradingPhaseScheduleEntry implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt32ToByteArray(this.extDynamicCollarVolatilityAuctionId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.clatId));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

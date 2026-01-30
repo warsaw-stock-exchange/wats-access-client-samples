@@ -33,21 +33,21 @@ public enum IndexType {
      * WSE strategy index of leverage type.
      */
     L(6);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, IndexType> TYPES = new HashMap<>();
     static {
         for (IndexType type : IndexType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     IndexType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get IndexType by attribute
      * @param val
@@ -56,13 +56,13 @@ public enum IndexType {
     public static IndexType getIndexType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get IndexType int value
      * @return int value
      */
     public int getIndexTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

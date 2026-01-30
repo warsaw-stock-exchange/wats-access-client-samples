@@ -31,7 +31,7 @@ public class IndexPortfolioEntry implements ByteSerializable, Message {
     private BigInteger instrumentPacket;
     private boolean suspended;
     public static final int byteLength = 101;
-    
+
     public IndexPortfolioEntry(Header header, long id, long indexId, IndexPortfolioEntryPresenceFlags presenceFlags, long instrumentId, PublicProductIdentification publicProductIdentification, String mic, Currency currency, BigInteger instrumentPacket, boolean suspended) {
         this.header = header;
         this.id = id;
@@ -134,7 +134,7 @@ public class IndexPortfolioEntry implements ByteSerializable, Message {
     public boolean getSuspended() {
         return this.suspended;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -204,7 +204,7 @@ public class IndexPortfolioEntry implements ByteSerializable, Message {
     public void setSuspended(boolean suspended) {
         this.suspended = suspended;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -221,7 +221,7 @@ public class IndexPortfolioEntry implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.id));
@@ -234,7 +234,7 @@ public class IndexPortfolioEntry implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt64ToByteArray(this.instrumentPacket));
         buffer.put(BendecUtils.booleanToByteArray(this.suspended));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

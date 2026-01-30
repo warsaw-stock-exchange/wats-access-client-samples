@@ -45,21 +45,21 @@ public enum InstrumentStatus {
      * Hybrid knockout by issuer.
      */
     HYBRIDKNOCKOUTBYISSUER(10);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, InstrumentStatus> TYPES = new HashMap<>();
     static {
         for (InstrumentStatus type : InstrumentStatus.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     InstrumentStatus(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get InstrumentStatus by attribute
      * @param val
@@ -68,13 +68,13 @@ public enum InstrumentStatus {
     public static InstrumentStatus getInstrumentStatus(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get InstrumentStatus int value
      * @return int value
      */
     public int getInstrumentStatusValue() {
-        return value; 
+        return value;
     }
     
     /**

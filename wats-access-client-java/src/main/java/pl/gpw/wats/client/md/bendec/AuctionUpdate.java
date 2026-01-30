@@ -31,7 +31,7 @@ public class AuctionUpdate implements ByteSerializable, Message {
     private long bestBuyLevel;
     private BigInteger bestBuyLevelQuantity;
     public static final int byteLength = 110;
-    
+
     public AuctionUpdate(Header header, long instrumentId, long indicativeMatchingPrice, BigInteger indicativeMatchingVolume, BigInteger totalSellQuantityAtImp, BigInteger totalBuyQuantityAtImp, long bestSellLevel, BigInteger bestSellLevelQuantity, long bestBuyLevel, BigInteger bestBuyLevelQuantity) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -134,7 +134,7 @@ public class AuctionUpdate implements ByteSerializable, Message {
     public BigInteger getBestBuyLevelQuantity() {
         return this.bestBuyLevelQuantity;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -204,7 +204,7 @@ public class AuctionUpdate implements ByteSerializable, Message {
     public void setBestBuyLevelQuantity(BigInteger bestBuyLevelQuantity) {
         this.bestBuyLevelQuantity = bestBuyLevelQuantity;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -221,7 +221,7 @@ public class AuctionUpdate implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
@@ -234,7 +234,7 @@ public class AuctionUpdate implements ByteSerializable, Message {
         buffer.put(BendecUtils.int64ToByteArray(this.bestBuyLevel));
         buffer.put(BendecUtils.uInt64ToByteArray(this.bestBuyLevelQuantity));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

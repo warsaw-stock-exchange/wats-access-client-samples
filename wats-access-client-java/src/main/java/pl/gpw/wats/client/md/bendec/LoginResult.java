@@ -29,21 +29,21 @@ public enum LoginResult {
      * Other errors.
      */
     OTHER(5);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, LoginResult> TYPES = new HashMap<>();
     static {
         for (LoginResult type : LoginResult.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     LoginResult(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get LoginResult by attribute
      * @param val
@@ -52,13 +52,13 @@ public enum LoginResult {
     public static LoginResult getLoginResult(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get LoginResult int value
      * @return int value
      */
     public int getLoginResultValue() {
-        return value; 
+        return value;
     }
     
     /**

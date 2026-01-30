@@ -21,7 +21,7 @@ public class TradingSessionStatus implements ByteSerializable, Message {
     private TradingSessionEvent tradingSessionEvent;
     private long date;
     public static final int byteLength = 55;
-    
+
     public TradingSessionStatus(Header header, String marketId, long marketStructureId, TradingSessionEvent tradingSessionEvent, long date) {
         this.header = header;
         this.marketId = marketId;
@@ -79,7 +79,7 @@ public class TradingSessionStatus implements ByteSerializable, Message {
     public long getDate() {
         return this.date;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -114,7 +114,7 @@ public class TradingSessionStatus implements ByteSerializable, Message {
     public void setDate(long date) {
         this.date = date;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -126,7 +126,7 @@ public class TradingSessionStatus implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.stringToByteArray(this.marketId, 4));
@@ -134,7 +134,7 @@ public class TradingSessionStatus implements ByteSerializable, Message {
         tradingSessionEvent.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.date));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

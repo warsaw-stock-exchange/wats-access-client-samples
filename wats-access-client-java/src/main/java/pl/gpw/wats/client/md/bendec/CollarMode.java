@@ -17,21 +17,21 @@ public enum CollarMode {
      * Order price collar.
      */
     ORDERPRICECOLLAR(2);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, CollarMode> TYPES = new HashMap<>();
     static {
         for (CollarMode type : CollarMode.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     CollarMode(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get CollarMode by attribute
      * @param val
@@ -40,13 +40,13 @@ public enum CollarMode {
     public static CollarMode getCollarMode(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get CollarMode int value
      * @return int value
      */
     public int getCollarModeValue() {
-        return value; 
+        return value;
     }
     
     /**

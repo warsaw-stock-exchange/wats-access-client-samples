@@ -21,21 +21,21 @@ public enum ClearingIdentifier {
      * Custom clearing identifier.
      */
     CUSTOM(68);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, ClearingIdentifier> TYPES = new HashMap<>();
     static {
         for (ClearingIdentifier type : ClearingIdentifier.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     ClearingIdentifier(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get ClearingIdentifier by attribute
      * @param val
@@ -44,13 +44,13 @@ public enum ClearingIdentifier {
     public static ClearingIdentifier getClearingIdentifier(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get ClearingIdentifier int value
      * @return int value
      */
     public int getClearingIdentifierValue() {
-        return value; 
+        return value;
     }
     
     /**

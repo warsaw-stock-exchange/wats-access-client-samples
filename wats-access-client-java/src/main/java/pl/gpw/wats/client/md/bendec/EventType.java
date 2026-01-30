@@ -21,21 +21,21 @@ public enum EventType {
      * End of test scenario
      */
     SCENARIOEND(3);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, EventType> TYPES = new HashMap<>();
     static {
         for (EventType type : EventType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     EventType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get EventType by attribute
      * @param val
@@ -44,13 +44,13 @@ public enum EventType {
     public static EventType getEventType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get EventType int value
      * @return int value
      */
     public int getEventTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

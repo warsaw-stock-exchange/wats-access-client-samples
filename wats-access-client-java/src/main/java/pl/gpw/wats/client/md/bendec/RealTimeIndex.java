@@ -41,7 +41,7 @@ public class RealTimeIndex implements ByteSerializable, Message {
     private long midSpreadIndex;
     private long differenceCentralSpread;
     public static final int byteLength = 130;
-    
+
     public RealTimeIndex(Header header, long instrumentId, IndexLevelCode indexLevelCode, int numOfActiveInstruments, long indIndexOpeningPortfolio, long indexValue, long pctChangeIndexValPrevSession, long sessionLow, long sessionHigh, RealTimeIndexPresenceFlags presenceFlags, long tradingValue, long indexValueBid, long indexValueAsk, long midSpreadIndex, long differenceCentralSpread) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -189,7 +189,7 @@ public class RealTimeIndex implements ByteSerializable, Message {
     public long getDifferenceCentralSpread() {
         return this.differenceCentralSpread;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -294,7 +294,7 @@ public class RealTimeIndex implements ByteSerializable, Message {
     public void setDifferenceCentralSpread(long differenceCentralSpread) {
         this.differenceCentralSpread = differenceCentralSpread;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -316,7 +316,7 @@ public class RealTimeIndex implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
@@ -334,7 +334,7 @@ public class RealTimeIndex implements ByteSerializable, Message {
         buffer.put(BendecUtils.int64ToByteArray(this.midSpreadIndex));
         buffer.put(BendecUtils.int64ToByteArray(this.differenceCentralSpread));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

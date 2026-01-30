@@ -43,7 +43,7 @@ public class InstrumentSummary implements ByteSerializable, Message {
     private long minPrice;
     private boolean isCorrection;
     public static final int byteLength = 137;
-    
+
     public InstrumentSummary(Header header, long instrumentId, long lastTradedPrice, long closingPrice, ClosingPriceType closingPriceType, long adjustedClosingPrice, AdjustedClosingPriceReason adjustedClosingPriceReason, long pctChange, long vwap, BigInteger noTrades, BigInteger totalVolume, long totalValue, long openingPrice, long maxPrice, long minPrice, boolean isCorrection) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -200,7 +200,7 @@ public class InstrumentSummary implements ByteSerializable, Message {
     public boolean getIsCorrection() {
         return this.isCorrection;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -312,7 +312,7 @@ public class InstrumentSummary implements ByteSerializable, Message {
     public void setIsCorrection(boolean isCorrection) {
         this.isCorrection = isCorrection;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -335,7 +335,7 @@ public class InstrumentSummary implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
@@ -354,7 +354,7 @@ public class InstrumentSummary implements ByteSerializable, Message {
         buffer.put(BendecUtils.int64ToByteArray(this.minPrice));
         buffer.put(BendecUtils.booleanToByteArray(this.isCorrection));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

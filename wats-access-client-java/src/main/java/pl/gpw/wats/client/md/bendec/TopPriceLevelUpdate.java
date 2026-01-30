@@ -23,7 +23,7 @@ public class TopPriceLevelUpdate implements ByteSerializable, Message {
     private OrderSide side;
     private int orderCount;
     public static final int byteLength = 65;
-    
+
     public TopPriceLevelUpdate(Header header, long instrumentId, long price, BigInteger quantity, OrderSide side, int orderCount) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -90,7 +90,7 @@ public class TopPriceLevelUpdate implements ByteSerializable, Message {
     public int getOrderCount() {
         return this.orderCount;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -132,7 +132,7 @@ public class TopPriceLevelUpdate implements ByteSerializable, Message {
     public void setOrderCount(int orderCount) {
         this.orderCount = orderCount;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -145,7 +145,7 @@ public class TopPriceLevelUpdate implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
@@ -154,7 +154,7 @@ public class TopPriceLevelUpdate implements ByteSerializable, Message {
         side.toBytes(buffer);
         buffer.put(BendecUtils.uInt16ToByteArray(this.orderCount));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

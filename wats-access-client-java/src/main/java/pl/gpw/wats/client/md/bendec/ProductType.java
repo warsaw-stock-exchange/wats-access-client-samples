@@ -38,21 +38,21 @@ public enum ProductType {
      */
     STRUCTUREDPRODUCT(7),
     TRACKER(9);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, ProductType> TYPES = new HashMap<>();
     static {
         for (ProductType type : ProductType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     ProductType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get ProductType by attribute
      * @param val
@@ -61,13 +61,13 @@ public enum ProductType {
     public static ProductType getProductType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get ProductType int value
      * @return int value
      */
     public int getProductTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

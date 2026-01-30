@@ -29,21 +29,21 @@ public enum CouponType {
      * Indexed coupon.
      */
     INDEXED(5);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, CouponType> TYPES = new HashMap<>();
     static {
         for (CouponType type : CouponType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     CouponType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get CouponType by attribute
      * @param val
@@ -52,13 +52,13 @@ public enum CouponType {
     public static CouponType getCouponType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get CouponType int value
      * @return int value
      */
     public int getCouponTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

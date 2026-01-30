@@ -31,7 +31,7 @@ public class TcrParty implements ByteSerializable {
     private String interestedParty;
     private String memo;
     public static final int byteLength = 82;
-    
+
     public TcrParty(OrderFlags flags, MifidFields mifidFields, String clearingMemberCode, ClearingIdentifier clearingMemberClearingIdentifier, String account, AccountType accountType, Capacity orderCapacity, int feeStructureId, String interestedParty, String memo) {
         this.flags = flags;
         this.mifidFields = mifidFields;
@@ -134,7 +134,7 @@ public class TcrParty implements ByteSerializable {
     public String getMemo() {
         return this.memo;
     }
-    
+
     /**
      * @param flags Flags raised on an order.
      */
@@ -204,7 +204,7 @@ public class TcrParty implements ByteSerializable {
     public void setMemo(String memo) {
         this.memo = memo;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -221,7 +221,7 @@ public class TcrParty implements ByteSerializable {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         flags.toBytes(buffer);
         mifidFields.toBytes(buffer);
@@ -234,7 +234,7 @@ public class TcrParty implements ByteSerializable {
         buffer.put(BendecUtils.stringToByteArray(this.interestedParty, 8));
         buffer.put(BendecUtils.stringToByteArray(this.memo, 18));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(flags,

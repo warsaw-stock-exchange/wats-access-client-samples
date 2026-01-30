@@ -33,21 +33,21 @@ public enum OrderStatus {
      * Order expired (Not applicable to mass quotes).
      */
     EXPIRED(6);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, OrderStatus> TYPES = new HashMap<>();
     static {
         for (OrderStatus type : OrderStatus.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     OrderStatus(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get OrderStatus by attribute
      * @param val
@@ -56,13 +56,13 @@ public enum OrderStatus {
     public static OrderStatus getOrderStatus(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get OrderStatus int value
      * @return int value
      */
     public int getOrderStatusValue() {
-        return value; 
+        return value;
     }
     
     /**

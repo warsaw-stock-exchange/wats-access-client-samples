@@ -21,21 +21,21 @@ public enum AlgorithmicTradeIndicator {
      * Algorithmic trade.
      */
     ALGORITHMICTRADE(3);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, AlgorithmicTradeIndicator> TYPES = new HashMap<>();
     static {
         for (AlgorithmicTradeIndicator type : AlgorithmicTradeIndicator.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     AlgorithmicTradeIndicator(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get AlgorithmicTradeIndicator by attribute
      * @param val
@@ -44,13 +44,13 @@ public enum AlgorithmicTradeIndicator {
     public static AlgorithmicTradeIndicator getAlgorithmicTradeIndicator(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get AlgorithmicTradeIndicator int value
      * @return int value
      */
     public int getAlgorithmicTradeIndicatorValue() {
-        return value; 
+        return value;
     }
     
     /**

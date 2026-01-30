@@ -17,21 +17,21 @@ public enum ExpressionType {
      * Absolute value.
      */
     ABSOLUTEVALUE(2);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, ExpressionType> TYPES = new HashMap<>();
     static {
         for (ExpressionType type : ExpressionType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     ExpressionType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get ExpressionType by attribute
      * @param val
@@ -40,13 +40,13 @@ public enum ExpressionType {
     public static ExpressionType getExpressionType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get ExpressionType int value
      * @return int value
      */
     public int getExpressionTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

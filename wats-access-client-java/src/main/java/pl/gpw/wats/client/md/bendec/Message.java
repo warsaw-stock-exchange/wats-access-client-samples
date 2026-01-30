@@ -14,11 +14,11 @@ public interface Message {
     static MsgType getMsgType(byte[] bytes) {
         return MsgType.getMsgType(bytes, 2);
     }
-    
+
     static Optional<Message> createObject(byte[] bytes) {
         return createObject(getMsgType(bytes), bytes);
     }
-    
+
     static Optional<Message> createObject(MsgType type, byte[] bytes) {
         switch (type) {
             case HEARTBEAT:

@@ -21,21 +21,21 @@ public enum MmtModificationIndicator {
      * - = New Trade
      */
     NEWTRADE(3);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, MmtModificationIndicator> TYPES = new HashMap<>();
     static {
         for (MmtModificationIndicator type : MmtModificationIndicator.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     MmtModificationIndicator(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get MmtModificationIndicator by attribute
      * @param val
@@ -44,13 +44,13 @@ public enum MmtModificationIndicator {
     public static MmtModificationIndicator getMmtModificationIndicator(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get MmtModificationIndicator int value
      * @return int value
      */
     public int getMmtModificationIndicatorValue() {
-        return value; 
+        return value;
     }
     
     /**

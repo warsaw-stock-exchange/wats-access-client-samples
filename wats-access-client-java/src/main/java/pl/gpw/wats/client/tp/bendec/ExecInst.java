@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 public class ExecInst {
     private int value;
     private final int byteLength = 1;
-    
+
     public ExecInst(int value) {
         this.value = value;
     }
@@ -23,7 +23,7 @@ public class ExecInst {
     public void add(ExecInstOptions flag) {
         this.value = this.value | flag.getOptionValue();
     }
-    
+
     public void remove(ExecInstOptions flag) {
         this.value = this.value ^ flag.getOptionValue();
     }
@@ -66,11 +66,11 @@ public class ExecInst {
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
     }
-    
+
     public enum ExecInstOptions {
         NONE(0),
         CANCELONCONNECTIONLOSS(1);
-        
+
         private final int optionValue;
         private static final Map<Integer, ExecInstOptions> TYPES = new HashMap<>();
         static {
@@ -78,7 +78,7 @@ public class ExecInst {
                 TYPES.put(type.optionValue, type);
             }
         }
-        
+
         /**
          * Get ExecInstOptions by attribute
          * @param val
@@ -87,11 +87,11 @@ public class ExecInst {
         public static ExecInstOptions getExecInst(int val) {
             return TYPES.get(val);
         }
-        
+
         ExecInstOptions(int newValue) {
             this.optionValue = newValue;
         }
-        
+
         public int getOptionValue() {
             return optionValue;
         }

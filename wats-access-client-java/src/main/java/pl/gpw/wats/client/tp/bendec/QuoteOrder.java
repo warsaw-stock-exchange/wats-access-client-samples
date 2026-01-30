@@ -15,7 +15,7 @@ public class QuoteOrder implements ByteSerializable {
     private long price;
     private BigInteger quantity;
     public static final int byteLength = 16;
-    
+
     public QuoteOrder(long price, BigInteger quantity) {
         this.price = price;
         this.quantity = quantity;
@@ -46,7 +46,7 @@ public class QuoteOrder implements ByteSerializable {
     public BigInteger getQuantity() {
         return this.quantity;
     }
-    
+
     /**
      * @param price Indicates the price of the given order.
      */
@@ -60,7 +60,7 @@ public class QuoteOrder implements ByteSerializable {
     public void setQuantity(BigInteger quantity) {
         this.quantity = quantity;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -69,12 +69,12 @@ public class QuoteOrder implements ByteSerializable {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.int64ToByteArray(this.price));
         buffer.put(BendecUtils.uInt64ToByteArray(this.quantity));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(price,

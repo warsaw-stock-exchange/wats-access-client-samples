@@ -17,7 +17,7 @@ public class TestEvent implements ByteSerializable, Message {
     private String scenarioName;
     private EventType eventType;
     public static final int byteLength = 225;
-    
+
     public TestEvent(Header header, String scenarioName, EventType eventType) {
         this.header = header;
         this.scenarioName = scenarioName;
@@ -57,7 +57,7 @@ public class TestEvent implements ByteSerializable, Message {
     public EventType getEventType() {
         return this.eventType;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -78,7 +78,7 @@ public class TestEvent implements ByteSerializable, Message {
     public void setEventType(EventType eventType) {
         this.eventType = eventType;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -88,13 +88,13 @@ public class TestEvent implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.stringToByteArray(this.scenarioName, 200));
         eventType.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

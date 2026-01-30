@@ -233,21 +233,21 @@ public enum ProductSubtype {
      * Warrant with Knock Out
      */
     WARRANTWITHKNOCKOUT(56);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, ProductSubtype> TYPES = new HashMap<>();
     static {
         for (ProductSubtype type : ProductSubtype.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     ProductSubtype(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get ProductSubtype by attribute
      * @param val
@@ -256,13 +256,13 @@ public enum ProductSubtype {
     public static ProductSubtype getProductSubtype(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get ProductSubtype int value
      * @return int value
      */
     public int getProductSubtypeValue() {
-        return value; 
+        return value;
     }
     
     /**

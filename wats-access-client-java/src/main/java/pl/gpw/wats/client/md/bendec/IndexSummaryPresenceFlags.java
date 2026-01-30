@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 public class IndexSummaryPresenceFlags {
     private int value;
     private final int byteLength = 1;
-    
+
     public IndexSummaryPresenceFlags(int value) {
         this.value = value;
     }
@@ -23,7 +23,7 @@ public class IndexSummaryPresenceFlags {
     public void add(IndexSummaryPresenceFlagsOptions flag) {
         this.value = this.value | flag.getOptionValue();
     }
-    
+
     public void remove(IndexSummaryPresenceFlagsOptions flag) {
         this.value = this.value ^ flag.getOptionValue();
     }
@@ -56,11 +56,11 @@ public class IndexSummaryPresenceFlags {
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
     }
-    
+
     public enum IndexSummaryPresenceFlagsOptions {
         NONE(0),
         HASSESSIONAVG(1);
-        
+
         private final int optionValue;
         private static final Map<Integer, IndexSummaryPresenceFlagsOptions> TYPES = new HashMap<>();
         static {
@@ -68,7 +68,7 @@ public class IndexSummaryPresenceFlags {
                 TYPES.put(type.optionValue, type);
             }
         }
-        
+
         /**
          * Get IndexSummaryPresenceFlagsOptions by attribute
          * @param val
@@ -77,11 +77,11 @@ public class IndexSummaryPresenceFlags {
         public static IndexSummaryPresenceFlagsOptions getIndexSummaryPresenceFlags(int val) {
             return TYPES.get(val);
         }
-        
+
         IndexSummaryPresenceFlagsOptions(int newValue) {
             this.optionValue = newValue;
         }
-        
+
         public int getOptionValue() {
             return optionValue;
         }

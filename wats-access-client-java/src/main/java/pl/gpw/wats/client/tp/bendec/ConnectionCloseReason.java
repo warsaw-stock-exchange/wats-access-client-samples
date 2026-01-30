@@ -41,21 +41,21 @@ public enum ConnectionCloseReason {
      * Service closed the connection because of an internal operation (e.g. grace period end).
      */
     DISCONNECT(8);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, ConnectionCloseReason> TYPES = new HashMap<>();
     static {
         for (ConnectionCloseReason type : ConnectionCloseReason.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     ConnectionCloseReason(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get ConnectionCloseReason by attribute
      * @param val
@@ -64,13 +64,13 @@ public enum ConnectionCloseReason {
     public static ConnectionCloseReason getConnectionCloseReason(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get ConnectionCloseReason int value
      * @return int value
      */
     public int getConnectionCloseReasonValue() {
-        return value; 
+        return value;
     }
     
     /**

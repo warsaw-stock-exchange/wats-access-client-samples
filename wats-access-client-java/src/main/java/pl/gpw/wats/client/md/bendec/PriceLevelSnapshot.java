@@ -25,7 +25,7 @@ public class PriceLevelSnapshot implements ByteSerializable, Message {
     private PriceLevel[] buy;
     private PriceLevel[] sell;
     public static final int byteLength = 359;
-    
+
     public PriceLevelSnapshot(Header header, long instrumentId, int maxDepth, int mmBuyQuoteLevel, int mmSellQuoteLevel, PriceLevel[] buy, PriceLevel[] sell) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -107,7 +107,7 @@ public class PriceLevelSnapshot implements ByteSerializable, Message {
     public PriceLevel[] getSell() {
         return this.sell;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -156,7 +156,7 @@ public class PriceLevelSnapshot implements ByteSerializable, Message {
     public void setSell(PriceLevel[] sell) {
         this.sell = sell;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -174,7 +174,7 @@ public class PriceLevelSnapshot implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
@@ -188,7 +188,7 @@ public class PriceLevelSnapshot implements ByteSerializable, Message {
             sell[i].toBytes(buffer);
         }
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

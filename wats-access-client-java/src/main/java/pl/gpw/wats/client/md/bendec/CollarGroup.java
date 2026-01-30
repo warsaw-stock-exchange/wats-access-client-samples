@@ -23,7 +23,7 @@ public class CollarGroup implements ByteSerializable, Message {
     private long tradeStaticCollarTableId;
     private long tradeDynamicCollarTableId;
     public static final int byteLength = 62;
-    
+
     public CollarGroup(Header header, long id, long orderStaticCollarTableId, long orderDynamicCollarTableId, long tradeStaticCollarTableId, long tradeDynamicCollarTableId) {
         this.header = header;
         this.id = id;
@@ -90,7 +90,7 @@ public class CollarGroup implements ByteSerializable, Message {
     public long getTradeDynamicCollarTableId() {
         return this.tradeDynamicCollarTableId;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -132,7 +132,7 @@ public class CollarGroup implements ByteSerializable, Message {
     public void setTradeDynamicCollarTableId(long tradeDynamicCollarTableId) {
         this.tradeDynamicCollarTableId = tradeDynamicCollarTableId;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -145,7 +145,7 @@ public class CollarGroup implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.id));
@@ -154,7 +154,7 @@ public class CollarGroup implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt32ToByteArray(this.tradeStaticCollarTableId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.tradeDynamicCollarTableId));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

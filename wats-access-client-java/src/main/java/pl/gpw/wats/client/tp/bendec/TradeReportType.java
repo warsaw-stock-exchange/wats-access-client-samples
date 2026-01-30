@@ -33,21 +33,21 @@ public enum TradeReportType {
      * Trade Break
      */
     TRADEBREAK(8);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, TradeReportType> TYPES = new HashMap<>();
     static {
         for (TradeReportType type : TradeReportType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     TradeReportType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get TradeReportType by attribute
      * @param val
@@ -56,13 +56,13 @@ public enum TradeReportType {
     public static TradeReportType getTradeReportType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get TradeReportType int value
      * @return int value
      */
     public int getTradeReportTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

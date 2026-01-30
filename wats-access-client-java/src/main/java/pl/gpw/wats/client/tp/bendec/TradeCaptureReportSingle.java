@@ -45,7 +45,7 @@ public class TradeCaptureReportSingle implements ByteSerializable, Message {
     private String counterpartyCode;
     private TcrParty tcrParty;
     public static final int byteLength = 206;
-    
+
     public TradeCaptureReportSingle(Header header, long instrumentId, String tradeReportId, BigInteger secondaryTradeReportId, long tradeId, TradeReportTransType tradeReportTransType, TradeReportType tradeReportType, TradeType tradeType, AlgorithmicTradeIndicator algorithmicTradeIndicator, ExecType execType, String tradeReportRefId, BigInteger lastQty, long lastPx, long settlementDate, OrderSide side, String counterpartyCode, TcrParty tcrParty) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -211,7 +211,7 @@ public class TradeCaptureReportSingle implements ByteSerializable, Message {
     public TcrParty getTcrParty() {
         return this.tcrParty;
     }
-    
+
     /**
      * @param header Header.
      */
@@ -330,7 +330,7 @@ public class TradeCaptureReportSingle implements ByteSerializable, Message {
     public void setTcrParty(TcrParty tcrParty) {
         this.tcrParty = tcrParty;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -354,7 +354,7 @@ public class TradeCaptureReportSingle implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
@@ -374,7 +374,7 @@ public class TradeCaptureReportSingle implements ByteSerializable, Message {
         buffer.put(BendecUtils.stringToByteArray(this.counterpartyCode, 16));
         tcrParty.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

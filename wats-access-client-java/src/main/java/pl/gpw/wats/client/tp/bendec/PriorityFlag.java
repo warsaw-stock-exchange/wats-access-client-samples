@@ -17,21 +17,21 @@ public enum PriorityFlag {
      * The priority flag was retained.
      */
     RETAINED(2);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, PriorityFlag> TYPES = new HashMap<>();
     static {
         for (PriorityFlag type : PriorityFlag.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     PriorityFlag(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get PriorityFlag by attribute
      * @param val
@@ -40,13 +40,13 @@ public enum PriorityFlag {
     public static PriorityFlag getPriorityFlag(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get PriorityFlag int value
      * @return int value
      */
     public int getPriorityFlagValue() {
-        return value; 
+        return value;
     }
     
     /**

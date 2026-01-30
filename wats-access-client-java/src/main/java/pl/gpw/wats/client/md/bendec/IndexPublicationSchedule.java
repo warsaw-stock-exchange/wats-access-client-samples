@@ -21,21 +21,21 @@ public enum IndexPublicationSchedule {
      * Index is quoted on closing.
      */
     CLOSING(3);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, IndexPublicationSchedule> TYPES = new HashMap<>();
     static {
         for (IndexPublicationSchedule type : IndexPublicationSchedule.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     IndexPublicationSchedule(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get IndexPublicationSchedule by attribute
      * @param val
@@ -44,13 +44,13 @@ public enum IndexPublicationSchedule {
     public static IndexPublicationSchedule getIndexPublicationSchedule(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get IndexPublicationSchedule int value
      * @return int value
      */
     public int getIndexPublicationScheduleValue() {
-        return value; 
+        return value;
     }
     
     /**

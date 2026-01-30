@@ -19,7 +19,7 @@ public class TickTableEntry implements ByteSerializable, Message {
     private long lowerBound;
     private long tickTableId;
     public static final int byteLength = 62;
-    
+
     public TickTableEntry(Header header, long tickSize, long lowerBound, long tickTableId) {
         this.header = header;
         this.tickSize = tickSize;
@@ -68,7 +68,7 @@ public class TickTableEntry implements ByteSerializable, Message {
     public long getTickTableId() {
         return this.tickTableId;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -96,7 +96,7 @@ public class TickTableEntry implements ByteSerializable, Message {
     public void setTickTableId(long tickTableId) {
         this.tickTableId = tickTableId;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -107,14 +107,14 @@ public class TickTableEntry implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.int64ToByteArray(this.tickSize));
         buffer.put(BendecUtils.int64ToByteArray(this.lowerBound));
         buffer.put(BendecUtils.uInt32ToByteArray(this.tickTableId));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

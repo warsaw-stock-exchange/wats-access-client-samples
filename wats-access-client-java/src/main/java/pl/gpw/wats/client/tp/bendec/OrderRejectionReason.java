@@ -421,21 +421,21 @@ public enum OrderRejectionReason {
      * Rejected due to kill switch activation.
      */
     REJECTEDDUETOKILLSWITCHACTIVATION(7022);
-    
+
     private final int value;
     private final int byteLength = 2;
-    
+
     private static final Map<Integer, OrderRejectionReason> TYPES = new HashMap<>();
     static {
         for (OrderRejectionReason type : OrderRejectionReason.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     OrderRejectionReason(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get OrderRejectionReason by attribute
      * @param val
@@ -444,13 +444,13 @@ public enum OrderRejectionReason {
     public static OrderRejectionReason getOrderRejectionReason(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get OrderRejectionReason int value
      * @return int value
      */
     public int getOrderRejectionReasonValue() {
-        return value; 
+        return value;
     }
     
     /**

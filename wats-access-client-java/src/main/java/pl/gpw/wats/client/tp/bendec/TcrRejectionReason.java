@@ -233,21 +233,21 @@ public enum TcrRejectionReason {
      * Trading on BLOCK and CROSS instruments is not alllowed, because linked CLOB instrument has not been traded yet.
      */
     NOTRADEFORCLOBREFERENCEINSTRUMENT(2035);
-    
+
     private final int value;
     private final int byteLength = 2;
-    
+
     private static final Map<Integer, TcrRejectionReason> TYPES = new HashMap<>();
     static {
         for (TcrRejectionReason type : TcrRejectionReason.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     TcrRejectionReason(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get TcrRejectionReason by attribute
      * @param val
@@ -256,13 +256,13 @@ public enum TcrRejectionReason {
     public static TcrRejectionReason getTcrRejectionReason(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get TcrRejectionReason int value
      * @return int value
      */
     public int getTcrRejectionReasonValue() {
-        return value; 
+        return value;
     }
     
     /**

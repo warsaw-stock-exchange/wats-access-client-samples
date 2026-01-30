@@ -27,7 +27,7 @@ public class OrderCollars implements ByteSerializable, Message {
     private long lowerAsk;
     private long upperAsk;
     public static final int byteLength = 87;
-    
+
     public OrderCollars(Header header, long instrumentId, CollarType collarType, long price, long lowerBid, long upperBid, long lowerAsk, long upperAsk) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -112,7 +112,7 @@ public class OrderCollars implements ByteSerializable, Message {
     public long getUpperAsk() {
         return this.upperAsk;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -168,7 +168,7 @@ public class OrderCollars implements ByteSerializable, Message {
     public void setUpperAsk(long upperAsk) {
         this.upperAsk = upperAsk;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -183,7 +183,7 @@ public class OrderCollars implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
@@ -194,7 +194,7 @@ public class OrderCollars implements ByteSerializable, Message {
         buffer.put(BendecUtils.int64ToByteArray(this.lowerAsk));
         buffer.put(BendecUtils.int64ToByteArray(this.upperAsk));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

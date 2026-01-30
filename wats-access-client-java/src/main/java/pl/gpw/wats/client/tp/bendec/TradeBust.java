@@ -15,7 +15,7 @@ public class TradeBust implements ByteSerializable, Message {
     private Header header;
     private long tradeId;
     public static final int byteLength = 28;
-    
+
     public TradeBust(Header header, long tradeId) {
         this.header = header;
         this.tradeId = tradeId;
@@ -46,7 +46,7 @@ public class TradeBust implements ByteSerializable, Message {
     public long getTradeId() {
         return this.tradeId;
     }
-    
+
     /**
      * @param header Header.
      */
@@ -60,7 +60,7 @@ public class TradeBust implements ByteSerializable, Message {
     public void setTradeId(long tradeId) {
         this.tradeId = tradeId;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -69,12 +69,12 @@ public class TradeBust implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.tradeId));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

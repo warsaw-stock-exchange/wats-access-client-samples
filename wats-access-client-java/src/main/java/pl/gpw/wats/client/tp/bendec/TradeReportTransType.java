@@ -21,21 +21,21 @@ public enum TradeReportTransType {
      * Replace.
      */
     REPLACE(3);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, TradeReportTransType> TYPES = new HashMap<>();
     static {
         for (TradeReportTransType type : TradeReportTransType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     TradeReportTransType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get TradeReportTransType by attribute
      * @param val
@@ -44,13 +44,13 @@ public enum TradeReportTransType {
     public static TradeReportTransType getTradeReportTransType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get TradeReportTransType int value
      * @return int value
      */
     public int getTradeReportTransTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

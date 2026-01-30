@@ -11,21 +11,21 @@ import java.nio.ByteBuffer;
 public enum CommandResult {
     SUCCESS(1),
     FAILURE(2);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, CommandResult> TYPES = new HashMap<>();
     static {
         for (CommandResult type : CommandResult.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     CommandResult(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get CommandResult by attribute
      * @param val
@@ -34,13 +34,13 @@ public enum CommandResult {
     public static CommandResult getCommandResult(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get CommandResult int value
      * @return int value
      */
     public int getCommandResultValue() {
-        return value; 
+        return value;
     }
     
     /**

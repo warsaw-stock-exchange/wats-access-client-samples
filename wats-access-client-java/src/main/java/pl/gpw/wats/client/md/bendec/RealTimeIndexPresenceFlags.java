@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 public class RealTimeIndexPresenceFlags {
     private int value;
     private final int byteLength = 1;
-    
+
     public RealTimeIndexPresenceFlags(int value) {
         this.value = value;
     }
@@ -23,7 +23,7 @@ public class RealTimeIndexPresenceFlags {
     public void add(RealTimeIndexPresenceFlagsOptions flag) {
         this.value = this.value | flag.getOptionValue();
     }
-    
+
     public void remove(RealTimeIndexPresenceFlagsOptions flag) {
         this.value = this.value ^ flag.getOptionValue();
     }
@@ -56,7 +56,7 @@ public class RealTimeIndexPresenceFlags {
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
     }
-    
+
     public enum RealTimeIndexPresenceFlagsOptions {
         NONE(0),
         HASTRADINGVALUE(1),
@@ -64,7 +64,7 @@ public class RealTimeIndexPresenceFlags {
         HASINDEXVALUEASK(4),
         HASMIDSPREADINDEX(8),
         HASDIFFERENCECENTRALSPREAD(16);
-        
+
         private final int optionValue;
         private static final Map<Integer, RealTimeIndexPresenceFlagsOptions> TYPES = new HashMap<>();
         static {
@@ -72,7 +72,7 @@ public class RealTimeIndexPresenceFlags {
                 TYPES.put(type.optionValue, type);
             }
         }
-        
+
         /**
          * Get RealTimeIndexPresenceFlagsOptions by attribute
          * @param val
@@ -81,11 +81,11 @@ public class RealTimeIndexPresenceFlags {
         public static RealTimeIndexPresenceFlagsOptions getRealTimeIndexPresenceFlags(int val) {
             return TYPES.get(val);
         }
-        
+
         RealTimeIndexPresenceFlagsOptions(int newValue) {
             this.optionValue = newValue;
         }
-        
+
         public int getOptionValue() {
             return optionValue;
         }

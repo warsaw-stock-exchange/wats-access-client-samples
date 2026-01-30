@@ -17,7 +17,7 @@ public class Reject implements ByteSerializable, Message {
     private long refSeqNum;
     private RejectReason rejectReason;
     public static final int byteLength = 29;
-    
+
     public Reject(Header header, long refSeqNum, RejectReason rejectReason) {
         this.header = header;
         this.refSeqNum = refSeqNum;
@@ -57,7 +57,7 @@ public class Reject implements ByteSerializable, Message {
     public RejectReason getRejectReason() {
         return this.rejectReason;
     }
-    
+
     /**
      * @param header Header.
      */
@@ -78,7 +78,7 @@ public class Reject implements ByteSerializable, Message {
     public void setRejectReason(RejectReason rejectReason) {
         this.rejectReason = rejectReason;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -88,13 +88,13 @@ public class Reject implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.refSeqNum));
         rejectReason.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

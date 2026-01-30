@@ -41,21 +41,21 @@ public enum TimeInForce {
      * A Good Till Time order must be filled before timestamp provided in `Expire` field or canceled within the day of submission.
      */
     GTT(8);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, TimeInForce> TYPES = new HashMap<>();
     static {
         for (TimeInForce type : TimeInForce.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     TimeInForce(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get TimeInForce by attribute
      * @param val
@@ -64,13 +64,13 @@ public enum TimeInForce {
     public static TimeInForce getTimeInForce(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get TimeInForce int value
      * @return int value
      */
     public int getTimeInForceValue() {
-        return value; 
+        return value;
     }
     
     /**

@@ -19,7 +19,7 @@ public class OrderCancel implements ByteSerializable, Message {
     private MifidFields mifidFields;
     private String clientOrderId;
     public static final int byteLength = 67;
-    
+
     public OrderCancel(Header header, BigInteger orderId, MifidFields mifidFields, String clientOrderId) {
         this.header = header;
         this.orderId = orderId;
@@ -68,7 +68,7 @@ public class OrderCancel implements ByteSerializable, Message {
     public String getClientOrderId() {
         return this.clientOrderId;
     }
-    
+
     /**
      * @param header Header.
      */
@@ -96,7 +96,7 @@ public class OrderCancel implements ByteSerializable, Message {
     public void setClientOrderId(String clientOrderId) {
         this.clientOrderId = clientOrderId;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -107,14 +107,14 @@ public class OrderCancel implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt64ToByteArray(this.orderId));
         mifidFields.toBytes(buffer);
         buffer.put(BendecUtils.stringToByteArray(this.clientOrderId, 20));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

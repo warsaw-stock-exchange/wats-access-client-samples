@@ -25,7 +25,7 @@ public class OrderAdd implements ByteSerializable, Message {
     private BigInteger quantity;
     private boolean mmQuote;
     public static final int byteLength = 72;
-    
+
     public OrderAdd(Header header, BigInteger publicOrderId, long instrumentId, OrderSide side, long price, BigInteger quantity, boolean mmQuote) {
         this.header = header;
         this.publicOrderId = publicOrderId;
@@ -101,7 +101,7 @@ public class OrderAdd implements ByteSerializable, Message {
     public boolean getMmQuote() {
         return this.mmQuote;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -150,7 +150,7 @@ public class OrderAdd implements ByteSerializable, Message {
     public void setMmQuote(boolean mmQuote) {
         this.mmQuote = mmQuote;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -164,7 +164,7 @@ public class OrderAdd implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt64ToByteArray(this.publicOrderId));
@@ -174,7 +174,7 @@ public class OrderAdd implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt64ToByteArray(this.quantity));
         buffer.put(BendecUtils.booleanToByteArray(this.mmQuote));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

@@ -35,7 +35,7 @@ public class IndexSummary implements ByteSerializable, Message {
     private long closingCapitalisationPortfolio;
     private long indIndexOpeningPortfolio;
     public static final int byteLength = 119;
-    
+
     public IndexSummary(Header header, long instrumentId, long openingIndexValue, long sessionLow, long sessionHigh, long closingIndexValue, IndexSummaryPresenceFlags presenceFlags, long sessionAvg, long pctChangeIndexValPrevSession, long pctChangeIndexValPrevYear, long closingCapitalisationPortfolio, long indIndexOpeningPortfolio) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -156,7 +156,7 @@ public class IndexSummary implements ByteSerializable, Message {
     public long getIndIndexOpeningPortfolio() {
         return this.indIndexOpeningPortfolio;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -240,7 +240,7 @@ public class IndexSummary implements ByteSerializable, Message {
     public void setIndIndexOpeningPortfolio(long indIndexOpeningPortfolio) {
         this.indIndexOpeningPortfolio = indIndexOpeningPortfolio;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -259,7 +259,7 @@ public class IndexSummary implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
@@ -274,7 +274,7 @@ public class IndexSummary implements ByteSerializable, Message {
         buffer.put(BendecUtils.int64ToByteArray(this.closingCapitalisationPortfolio));
         buffer.put(BendecUtils.int64ToByteArray(this.indIndexOpeningPortfolio));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

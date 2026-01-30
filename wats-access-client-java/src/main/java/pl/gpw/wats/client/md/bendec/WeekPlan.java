@@ -17,7 +17,7 @@ public class WeekPlan implements ByteSerializable, Message {
     private long calendarId;
     private boolean[] weekdays;
     public static final int byteLength = 53;
-    
+
     public WeekPlan(Header header, long calendarId, boolean[] weekdays) {
         this.header = header;
         this.calendarId = calendarId;
@@ -60,7 +60,7 @@ public class WeekPlan implements ByteSerializable, Message {
     public boolean[] getWeekdays() {
         return this.weekdays;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -81,7 +81,7 @@ public class WeekPlan implements ByteSerializable, Message {
     public void setWeekdays(boolean[] weekdays) {
         this.weekdays = weekdays;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -93,7 +93,7 @@ public class WeekPlan implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.calendarId));
@@ -101,7 +101,7 @@ public class WeekPlan implements ByteSerializable, Message {
             buffer.put(BendecUtils.booleanToByteArray(this.weekdays[i]));
         }
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

@@ -53,21 +53,21 @@ public enum MmtTradingMode {
      * 7 = Trade Reporting (Systematic Internaliser)
      */
     TRADEREPORTINGSYSTEMATICINTERNALISER(11);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, MmtTradingMode> TYPES = new HashMap<>();
     static {
         for (MmtTradingMode type : MmtTradingMode.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     MmtTradingMode(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get MmtTradingMode by attribute
      * @param val
@@ -76,13 +76,13 @@ public enum MmtTradingMode {
     public static MmtTradingMode getMmtTradingMode(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get MmtTradingMode int value
      * @return int value
      */
     public int getMmtTradingModeValue() {
-        return value; 
+        return value;
     }
     
     /**

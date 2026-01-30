@@ -37,21 +37,21 @@ public enum MmtMarketMechanism {
      * 7 = Any other including Hybrid
      */
     OTHER(7);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, MmtMarketMechanism> TYPES = new HashMap<>();
     static {
         for (MmtMarketMechanism type : MmtMarketMechanism.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     MmtMarketMechanism(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get MmtMarketMechanism by attribute
      * @param val
@@ -60,13 +60,13 @@ public enum MmtMarketMechanism {
     public static MmtMarketMechanism getMmtMarketMechanism(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get MmtMarketMechanism int value
      * @return int value
      */
     public int getMmtMarketMechanismValue() {
-        return value; 
+        return value;
     }
     
     /**

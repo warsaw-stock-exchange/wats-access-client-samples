@@ -25,7 +25,7 @@ public class TradeCaptureReportResponse implements ByteSerializable, Message {
     private TcrStatus status;
     private TcrRejectionReason reason;
     public static final int byteLength = 64;
-    
+
     public TradeCaptureReportResponse(Header header, long instrumentId, long tradeId, String tradeReportId, BigInteger secondaryTradeReportId, TcrStatus status, TcrRejectionReason reason) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -101,7 +101,7 @@ public class TradeCaptureReportResponse implements ByteSerializable, Message {
     public TcrRejectionReason getReason() {
         return this.reason;
     }
-    
+
     /**
      * @param header Header.
      */
@@ -150,7 +150,7 @@ public class TradeCaptureReportResponse implements ByteSerializable, Message {
     public void setReason(TcrRejectionReason reason) {
         this.reason = reason;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -164,7 +164,7 @@ public class TradeCaptureReportResponse implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
@@ -174,7 +174,7 @@ public class TradeCaptureReportResponse implements ByteSerializable, Message {
         status.toBytes(buffer);
         reason.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

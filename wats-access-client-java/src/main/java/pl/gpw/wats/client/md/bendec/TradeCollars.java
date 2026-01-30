@@ -23,7 +23,7 @@ public class TradeCollars implements ByteSerializable, Message {
     private long lower;
     private long upper;
     public static final int byteLength = 71;
-    
+
     public TradeCollars(Header header, long instrumentId, CollarType collarType, long price, long lower, long upper) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -90,7 +90,7 @@ public class TradeCollars implements ByteSerializable, Message {
     public long getUpper() {
         return this.upper;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -132,7 +132,7 @@ public class TradeCollars implements ByteSerializable, Message {
     public void setUpper(long upper) {
         this.upper = upper;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -145,7 +145,7 @@ public class TradeCollars implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
@@ -154,7 +154,7 @@ public class TradeCollars implements ByteSerializable, Message {
         buffer.put(BendecUtils.int64ToByteArray(this.lower));
         buffer.put(BendecUtils.int64ToByteArray(this.upper));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

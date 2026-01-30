@@ -25,21 +25,21 @@ public enum MmtOrdinaryTradeIndicator {
      * N = Price is currently not available but pending
      */
     PRICEPENDING(4);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, MmtOrdinaryTradeIndicator> TYPES = new HashMap<>();
     static {
         for (MmtOrdinaryTradeIndicator type : MmtOrdinaryTradeIndicator.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     MmtOrdinaryTradeIndicator(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get MmtOrdinaryTradeIndicator by attribute
      * @param val
@@ -48,13 +48,13 @@ public enum MmtOrdinaryTradeIndicator {
     public static MmtOrdinaryTradeIndicator getMmtOrdinaryTradeIndicator(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get MmtOrdinaryTradeIndicator int value
      * @return int value
      */
     public int getMmtOrdinaryTradeIndicatorValue() {
-        return value; 
+        return value;
     }
     
     /**

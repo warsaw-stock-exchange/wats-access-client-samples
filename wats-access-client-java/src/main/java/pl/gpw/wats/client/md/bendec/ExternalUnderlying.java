@@ -29,7 +29,7 @@ public class ExternalUnderlying implements ByteSerializable, Message {
     private Currency nominalCurrency;
     private Currency tradingCurrency;
     public static final int byteLength = 155;
-    
+
     public ExternalUnderlying(Header header, long externalUnderlyingId, String productIdentification, ProductIdentificationType productIdentificationType, String productCode, String productName, String mic, Currency nominalCurrency, Currency tradingCurrency) {
         this.header = header;
         this.externalUnderlyingId = externalUnderlyingId;
@@ -123,7 +123,7 @@ public class ExternalUnderlying implements ByteSerializable, Message {
     public Currency getTradingCurrency() {
         return this.tradingCurrency;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -186,7 +186,7 @@ public class ExternalUnderlying implements ByteSerializable, Message {
     public void setTradingCurrency(Currency tradingCurrency) {
         this.tradingCurrency = tradingCurrency;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -202,7 +202,7 @@ public class ExternalUnderlying implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.externalUnderlyingId));
@@ -214,7 +214,7 @@ public class ExternalUnderlying implements ByteSerializable, Message {
         nominalCurrency.toBytes(buffer);
         tradingCurrency.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

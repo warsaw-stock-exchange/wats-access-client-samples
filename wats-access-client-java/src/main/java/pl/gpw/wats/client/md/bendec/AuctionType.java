@@ -45,21 +45,21 @@ public enum AuctionType {
      * A phase triggered whenever an instrument’s changes its status from RegulatorySuspension or MarketOperationSuspension before entering into continuous phase.
      */
     UNSUSPENSIONAUCTION(9);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, AuctionType> TYPES = new HashMap<>();
     static {
         for (AuctionType type : AuctionType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     AuctionType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get AuctionType by attribute
      * @param val
@@ -68,13 +68,13 @@ public enum AuctionType {
     public static AuctionType getAuctionType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get AuctionType int value
      * @return int value
      */
     public int getAuctionTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

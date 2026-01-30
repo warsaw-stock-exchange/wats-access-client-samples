@@ -17,7 +17,7 @@ public class Quote implements ByteSerializable {
     private QuoteOrder bid;
     private QuoteOrder ask;
     public static final int byteLength = 36;
-    
+
     public Quote(long instrumentId, QuoteOrder bid, QuoteOrder ask) {
         this.instrumentId = instrumentId;
         this.bid = bid;
@@ -57,7 +57,7 @@ public class Quote implements ByteSerializable {
     public QuoteOrder getAsk() {
         return this.ask;
     }
-    
+
     /**
      * @param instrumentId ID of the instrument being traded.
      */
@@ -78,7 +78,7 @@ public class Quote implements ByteSerializable {
     public void setAsk(QuoteOrder ask) {
         this.ask = ask;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -88,13 +88,13 @@ public class Quote implements ByteSerializable {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
         bid.toBytes(buffer);
         ask.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(instrumentId,

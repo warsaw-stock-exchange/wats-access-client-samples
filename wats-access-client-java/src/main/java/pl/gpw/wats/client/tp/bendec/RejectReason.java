@@ -57,21 +57,21 @@ public enum RejectReason {
      * GapFill seqNum should be higher than current seqNum
      */
     INVALIDGAPFILLSEQNUM(11);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, RejectReason> TYPES = new HashMap<>();
     static {
         for (RejectReason type : RejectReason.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     RejectReason(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get RejectReason by attribute
      * @param val
@@ -80,13 +80,13 @@ public enum RejectReason {
     public static RejectReason getRejectReason(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get RejectReason int value
      * @return int value
      */
     public int getRejectReasonValue() {
-        return value; 
+        return value;
     }
     
     /**

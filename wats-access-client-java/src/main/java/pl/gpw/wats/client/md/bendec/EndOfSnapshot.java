@@ -15,7 +15,7 @@ public class EndOfSnapshot implements ByteSerializable, Message {
     private Header header;
     private long lastSeqNum;
     public static final int byteLength = 46;
-    
+
     public EndOfSnapshot(Header header, long lastSeqNum) {
         this.header = header;
         this.lastSeqNum = lastSeqNum;
@@ -46,7 +46,7 @@ public class EndOfSnapshot implements ByteSerializable, Message {
     public long getLastSeqNum() {
         return this.lastSeqNum;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -60,7 +60,7 @@ public class EndOfSnapshot implements ByteSerializable, Message {
     public void setLastSeqNum(long lastSeqNum) {
         this.lastSeqNum = lastSeqNum;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -69,12 +69,12 @@ public class EndOfSnapshot implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.lastSeqNum));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

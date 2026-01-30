@@ -25,21 +25,21 @@ public enum ChangeIndicator {
      * Not Applicable.
      */
     NOTAPPLICABLE(4);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, ChangeIndicator> TYPES = new HashMap<>();
     static {
         for (ChangeIndicator type : ChangeIndicator.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     ChangeIndicator(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get ChangeIndicator by attribute
      * @param val
@@ -48,13 +48,13 @@ public enum ChangeIndicator {
     public static ChangeIndicator getChangeIndicator(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get ChangeIndicator int value
      * @return int value
      */
     public int getChangeIndicatorValue() {
-        return value; 
+        return value;
     }
     
     /**

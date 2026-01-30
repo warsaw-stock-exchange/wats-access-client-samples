@@ -21,7 +21,7 @@ public class Header implements ByteSerializable {
     private BigInteger timestamp;
     private BigInteger sourceTimestamp;
     public static final int byteLength = 24;
-    
+
     public Header(int length, MsgType msgType, long seqNum, BigInteger timestamp, BigInteger sourceTimestamp) {
         this.length = length;
         this.msgType = msgType;
@@ -79,7 +79,7 @@ public class Header implements ByteSerializable {
     public BigInteger getSourceTimestamp() {
         return this.sourceTimestamp;
     }
-    
+
     /**
      * @param length Total length of the message.
      */
@@ -114,7 +114,7 @@ public class Header implements ByteSerializable {
     public void setSourceTimestamp(BigInteger sourceTimestamp) {
         this.sourceTimestamp = sourceTimestamp;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -126,7 +126,7 @@ public class Header implements ByteSerializable {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt16ToByteArray(this.length));
         msgType.toBytes(buffer);
@@ -134,7 +134,7 @@ public class Header implements ByteSerializable {
         buffer.put(BendecUtils.uInt64ToByteArray(this.timestamp));
         buffer.put(BendecUtils.uInt64ToByteArray(this.sourceTimestamp));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(length,

@@ -17,21 +17,21 @@ public enum MmtAlgorithmicIndicator {
      * - = No Algorithmic Trade
      */
     NOALGORITHMICTRADE(2);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, MmtAlgorithmicIndicator> TYPES = new HashMap<>();
     static {
         for (MmtAlgorithmicIndicator type : MmtAlgorithmicIndicator.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     MmtAlgorithmicIndicator(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get MmtAlgorithmicIndicator by attribute
      * @param val
@@ -40,13 +40,13 @@ public enum MmtAlgorithmicIndicator {
     public static MmtAlgorithmicIndicator getMmtAlgorithmicIndicator(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get MmtAlgorithmicIndicator int value
      * @return int value
      */
     public int getMmtAlgorithmicIndicatorValue() {
-        return value; 
+        return value;
     }
     
     /**

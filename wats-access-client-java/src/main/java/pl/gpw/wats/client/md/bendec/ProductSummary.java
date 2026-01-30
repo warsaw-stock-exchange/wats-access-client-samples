@@ -17,7 +17,7 @@ import java.nio.ByteBuffer;
  * <p>ProductIdentification > String (u8[]) productIdentification - Product identification, e.g. ISIN number. | size 30</p>
  * <p>ElementId > long (u32) productId - ID of the product. | size 4</p>
  * <p>MicCode > String (u8[]) mic - Market structure's Market Identifier Code (MIC) as specified in ISO 10383. | size 4</p>
- * <p>Number > long (i64) AccumulatedInterest - Accumulated interest on the bonds or for mortgage-backed bonds on the day of settling the transaction. | size 8</p>
+ * <p>Number > long (i64) accumulatedInterest - Accumulated interest on the bonds or for mortgage-backed bonds on the day of settling the transaction. | size 8</p>
  * <p>Number > long (i64) interestRate - Interest rate is determined on the basis of WIBOR/WIBID/WIRON rates for each expiration date of options and futures. | size 8</p>
  * <p>Currency currency - Price currency (e.g. USD). | size 2</p>
  * <p>Date > long (u32) sessionDate - Stock Exchange session date. | size 4</p>
@@ -53,7 +53,7 @@ public class ProductSummary implements ByteSerializable, Message {
     private String productIdentification;
     private long productId;
     private String mic;
-    private long AccumulatedInterest;
+    private long accumulatedInterest;
     private long interestRate;
     private Currency currency;
     private long sessionDate;
@@ -79,8 +79,8 @@ public class ProductSummary implements ByteSerializable, Message {
     private QuotationSystem quotationSystem;
     private boolean liquiditySupportPge;
     public static final int byteLength = 671;
-    
-    public ProductSummary(Header header, SingleInstrumentSummary clobInstrument, SingleInstrumentSummary crossInstrument, SingleInstrumentSummary blockInstrument, SingleInstrumentSummary hybridInstrument, ProductIdentificationType productIdentificationType, String productIdentification, long productId, String mic, long AccumulatedInterest, long interestRate, Currency currency, long sessionDate, long tradingValueCurrency, InstrumentStatus status, int sector, int market, ChangeIndicator markerPriceChange, boolean lowerLiquidity, long multiplier, long dividendRate, long delta, long gamma, long rho, long theta, long vega, long volatility, long optionsStrikePrice, boolean dividend, boolean subscriptionRight, boolean interimDividendRight, boolean split, QuotationSystem quotationSystem, boolean liquiditySupportPge) {
+
+    public ProductSummary(Header header, SingleInstrumentSummary clobInstrument, SingleInstrumentSummary crossInstrument, SingleInstrumentSummary blockInstrument, SingleInstrumentSummary hybridInstrument, ProductIdentificationType productIdentificationType, String productIdentification, long productId, String mic, long accumulatedInterest, long interestRate, Currency currency, long sessionDate, long tradingValueCurrency, InstrumentStatus status, int sector, int market, ChangeIndicator markerPriceChange, boolean lowerLiquidity, long multiplier, long dividendRate, long delta, long gamma, long rho, long theta, long vega, long volatility, long optionsStrikePrice, boolean dividend, boolean subscriptionRight, boolean interimDividendRight, boolean split, QuotationSystem quotationSystem, boolean liquiditySupportPge) {
         this.header = header;
         this.clobInstrument = clobInstrument;
         this.crossInstrument = crossInstrument;
@@ -90,7 +90,7 @@ public class ProductSummary implements ByteSerializable, Message {
         this.productIdentification = productIdentification;
         this.productId = productId;
         this.mic = mic;
-        this.AccumulatedInterest = AccumulatedInterest;
+        this.accumulatedInterest = accumulatedInterest;
         this.interestRate = interestRate;
         this.currency = currency;
         this.sessionDate = sessionDate;
@@ -127,7 +127,7 @@ public class ProductSummary implements ByteSerializable, Message {
         this.productIdentification = BendecUtils.stringFromByteArray(bytes, offset + 519, 30);
         this.productId = BendecUtils.uInt32FromByteArray(bytes, offset + 549);
         this.mic = BendecUtils.stringFromByteArray(bytes, offset + 553, 4);
-        this.AccumulatedInterest = BendecUtils.int64FromByteArray(bytes, offset + 557);
+        this.accumulatedInterest = BendecUtils.int64FromByteArray(bytes, offset + 557);
         this.interestRate = BendecUtils.int64FromByteArray(bytes, offset + 565);
         this.currency = Currency.getCurrency(bytes, offset + 573);
         this.sessionDate = BendecUtils.uInt32FromByteArray(bytes, offset + 575);
@@ -228,7 +228,7 @@ public class ProductSummary implements ByteSerializable, Message {
      * @return Accumulated interest on the bonds or for mortgage-backed bonds on the day of settling the transaction.
      */
     public long getAccumulatedInterest() {
-        return this.AccumulatedInterest;
+        return this.accumulatedInterest;
     }
     
     /**
@@ -398,7 +398,7 @@ public class ProductSummary implements ByteSerializable, Message {
     public boolean getLiquiditySupportPge() {
         return this.liquiditySupportPge;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -463,10 +463,10 @@ public class ProductSummary implements ByteSerializable, Message {
     }
     
     /**
-     * @param AccumulatedInterest Accumulated interest on the bonds or for mortgage-backed bonds on the day of settling the transaction.
+     * @param accumulatedInterest Accumulated interest on the bonds or for mortgage-backed bonds on the day of settling the transaction.
      */
-    public void setAccumulatedInterest(long AccumulatedInterest) {
-        this.AccumulatedInterest = AccumulatedInterest;
+    public void setAccumulatedInterest(long accumulatedInterest) {
+        this.accumulatedInterest = accumulatedInterest;
     }
     
     /**
@@ -636,7 +636,7 @@ public class ProductSummary implements ByteSerializable, Message {
     public void setLiquiditySupportPge(boolean liquiditySupportPge) {
         this.liquiditySupportPge = liquiditySupportPge;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -649,7 +649,7 @@ public class ProductSummary implements ByteSerializable, Message {
         buffer.put(BendecUtils.stringToByteArray(this.productIdentification, 30));
         buffer.put(BendecUtils.uInt32ToByteArray(this.productId));
         buffer.put(BendecUtils.stringToByteArray(this.mic, 4));
-        buffer.put(BendecUtils.int64ToByteArray(this.AccumulatedInterest));
+        buffer.put(BendecUtils.int64ToByteArray(this.accumulatedInterest));
         buffer.put(BendecUtils.int64ToByteArray(this.interestRate));
         currency.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.sessionDate));
@@ -677,7 +677,7 @@ public class ProductSummary implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         clobInstrument.toBytes(buffer);
@@ -688,7 +688,7 @@ public class ProductSummary implements ByteSerializable, Message {
         buffer.put(BendecUtils.stringToByteArray(this.productIdentification, 30));
         buffer.put(BendecUtils.uInt32ToByteArray(this.productId));
         buffer.put(BendecUtils.stringToByteArray(this.mic, 4));
-        buffer.put(BendecUtils.int64ToByteArray(this.AccumulatedInterest));
+        buffer.put(BendecUtils.int64ToByteArray(this.accumulatedInterest));
         buffer.put(BendecUtils.int64ToByteArray(this.interestRate));
         currency.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.sessionDate));
@@ -714,7 +714,7 @@ public class ProductSummary implements ByteSerializable, Message {
         quotationSystem.toBytes(buffer);
         buffer.put(BendecUtils.booleanToByteArray(this.liquiditySupportPge));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,
@@ -726,7 +726,7 @@ public class ProductSummary implements ByteSerializable, Message {
         productIdentification,
         productId,
         mic,
-        AccumulatedInterest,
+        accumulatedInterest,
         interestRate,
         currency,
         sessionDate,
@@ -765,7 +765,7 @@ public class ProductSummary implements ByteSerializable, Message {
             ", productIdentification=" + productIdentification +
             ", productId=" + productId +
             ", mic=" + mic +
-            ", AccumulatedInterest=" + AccumulatedInterest +
+            ", accumulatedInterest=" + accumulatedInterest +
             ", interestRate=" + interestRate +
             ", currency=" + currency +
             ", sessionDate=" + sessionDate +

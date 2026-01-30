@@ -17,21 +17,21 @@ public enum MmtAgencyCrossTradeIndicator {
      * - = No Agency Cross Trade
      */
     NOAGENCYCROSSTRADE(2);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, MmtAgencyCrossTradeIndicator> TYPES = new HashMap<>();
     static {
         for (MmtAgencyCrossTradeIndicator type : MmtAgencyCrossTradeIndicator.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     MmtAgencyCrossTradeIndicator(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get MmtAgencyCrossTradeIndicator by attribute
      * @param val
@@ -40,13 +40,13 @@ public enum MmtAgencyCrossTradeIndicator {
     public static MmtAgencyCrossTradeIndicator getMmtAgencyCrossTradeIndicator(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get MmtAgencyCrossTradeIndicator int value
      * @return int value
      */
     public int getMmtAgencyCrossTradeIndicatorValue() {
-        return value; 
+        return value;
     }
     
     /**

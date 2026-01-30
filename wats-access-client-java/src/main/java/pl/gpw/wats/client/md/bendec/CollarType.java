@@ -11,21 +11,21 @@ import java.nio.ByteBuffer;
 public enum CollarType {
     STATIC(1),
     DYNAMIC(2);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, CollarType> TYPES = new HashMap<>();
     static {
         for (CollarType type : CollarType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     CollarType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get CollarType by attribute
      * @param val
@@ -34,13 +34,13 @@ public enum CollarType {
     public static CollarType getCollarType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get CollarType int value
      * @return int value
      */
     public int getCollarTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

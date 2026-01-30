@@ -33,21 +33,21 @@ public enum ExecType {
      * Trade Cancel.
      */
     TRADECANCEL(17);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, ExecType> TYPES = new HashMap<>();
     static {
         for (ExecType type : ExecType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     ExecType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get ExecType by attribute
      * @param val
@@ -56,13 +56,13 @@ public enum ExecType {
     public static ExecType getExecType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get ExecType int value
      * @return int value
      */
     public int getExecTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

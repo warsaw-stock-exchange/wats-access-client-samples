@@ -19,7 +19,7 @@ public class OrderCancel implements ByteSerializable, Message {
     private BigInteger publicOrderId;
     private OrderSide side;
     public static final int byteLength = 55;
-    
+
     public OrderCancel(Header header, long instrumentId, BigInteger publicOrderId, OrderSide side) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -68,7 +68,7 @@ public class OrderCancel implements ByteSerializable, Message {
     public OrderSide getSide() {
         return this.side;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -96,7 +96,7 @@ public class OrderCancel implements ByteSerializable, Message {
     public void setSide(OrderSide side) {
         this.side = side;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -107,14 +107,14 @@ public class OrderCancel implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
         buffer.put(BendecUtils.uInt64ToByteArray(this.publicOrderId));
         side.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

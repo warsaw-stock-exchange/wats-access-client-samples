@@ -37,21 +37,21 @@ public enum TargetPartyRole {
      * Investment decision maker.
      */
     INVESTMENTDECISIONMAKER(122);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, TargetPartyRole> TYPES = new HashMap<>();
     static {
         for (TargetPartyRole type : TargetPartyRole.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     TargetPartyRole(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get TargetPartyRole by attribute
      * @param val
@@ -60,13 +60,13 @@ public enum TargetPartyRole {
     public static TargetPartyRole getTargetPartyRole(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get TargetPartyRole int value
      * @return int value
      */
     public int getTargetPartyRoleValue() {
-        return value; 
+        return value;
     }
     
     /**

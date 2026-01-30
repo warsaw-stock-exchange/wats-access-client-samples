@@ -85,7 +85,7 @@ public class Trade implements ByteSerializable, Message {
     private MmtPostTradeDeferralReason mmtPostTradeDeferralReason;
     private MmtPostTradeDeferralType mmtPostTradeDeferralType;
     public static final int byteLength = 220;
-    
+
     public Trade(Header header, long instrumentId, long settlementValue, long settlementDate, BigInteger tradingTimestamp, PublicProductIdentification publicProductIdentification, long price, Currency priceCurrency, PriceExpressionType priceNotation, BigInteger quantity, long nominalValue, Currency nominalCurrency, String mic, BigInteger publicationTimestamp, long tradeId, boolean tradeToBeCleared, long pctChange, long vwap, BigInteger noTrades, BigInteger totalVolume, long totalValue, long openingPrice, long maxPrice, long minPrice, MmtMarketMechanism mmtMarketMechanism, MmtTradingMode mmtTradingMode, MmtTransactionCategory mmtTransactionCategory, MmtNegotiationIndicator mmtNegotiationIndicator, MmtAgencyCrossTradeIndicator mmtAgencyCrossTradeIndicator, MmtModificationIndicator mmtModificationIndicator, MmtBenchmarkReferencePriceIndicator mmtBenchmarkReferencePriceIndicator, MmtSpecialDividendIndicator mmtSpecialDividendIndicator, MmtOffBookAutomatedIndicator mmtOffBookAutomatedIndicator, MmtOrdinaryTradeIndicator mmtOrdinaryTradeIndicator, MmtAlgorithmicIndicator mmtAlgorithmicIndicator, MmtPostTradeDeferralReason mmtPostTradeDeferralReason, MmtPostTradeDeferralType mmtPostTradeDeferralType) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -431,7 +431,7 @@ public class Trade implements ByteSerializable, Message {
     public MmtPostTradeDeferralType getMmtPostTradeDeferralType() {
         return this.mmtPostTradeDeferralType;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -690,7 +690,7 @@ public class Trade implements ByteSerializable, Message {
     public void setMmtPostTradeDeferralType(MmtPostTradeDeferralType mmtPostTradeDeferralType) {
         this.mmtPostTradeDeferralType = mmtPostTradeDeferralType;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -734,7 +734,7 @@ public class Trade implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
@@ -774,7 +774,7 @@ public class Trade implements ByteSerializable, Message {
         mmtPostTradeDeferralReason.toBytes(buffer);
         mmtPostTradeDeferralType.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

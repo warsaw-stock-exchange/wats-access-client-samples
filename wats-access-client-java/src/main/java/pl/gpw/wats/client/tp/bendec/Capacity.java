@@ -21,21 +21,21 @@ public enum Capacity {
      * Riskless Principal (mapped to MTCH)
      */
     RISKLESSPRINCIPAL(3);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, Capacity> TYPES = new HashMap<>();
     static {
         for (Capacity type : Capacity.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     Capacity(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get Capacity by attribute
      * @param val
@@ -44,13 +44,13 @@ public enum Capacity {
     public static Capacity getCapacity(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get Capacity int value
      * @return int value
      */
     public int getCapacityValue() {
-        return value; 
+        return value;
     }
     
     /**

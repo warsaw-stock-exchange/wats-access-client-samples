@@ -15,7 +15,7 @@ public class LoginResponse implements ByteSerializable, Message {
     private Header header;
     private LoginResult result;
     public static final int byteLength = 43;
-    
+
     public LoginResponse(Header header, LoginResult result) {
         this.header = header;
         this.result = result;
@@ -46,7 +46,7 @@ public class LoginResponse implements ByteSerializable, Message {
     public LoginResult getResult() {
         return this.result;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -60,7 +60,7 @@ public class LoginResponse implements ByteSerializable, Message {
     public void setResult(LoginResult result) {
         this.result = result;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -69,12 +69,12 @@ public class LoginResponse implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         result.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

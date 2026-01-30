@@ -15,7 +15,7 @@ public class ConnectionClose implements ByteSerializable, Message {
     private Header header;
     private ConnectionCloseReason reason;
     public static final int byteLength = 25;
-    
+
     public ConnectionClose(Header header, ConnectionCloseReason reason) {
         this.header = header;
         this.reason = reason;
@@ -46,7 +46,7 @@ public class ConnectionClose implements ByteSerializable, Message {
     public ConnectionCloseReason getReason() {
         return this.reason;
     }
-    
+
     /**
      * @param header Header.
      */
@@ -60,7 +60,7 @@ public class ConnectionClose implements ByteSerializable, Message {
     public void setReason(ConnectionCloseReason reason) {
         this.reason = reason;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -69,12 +69,12 @@ public class ConnectionClose implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         reason.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

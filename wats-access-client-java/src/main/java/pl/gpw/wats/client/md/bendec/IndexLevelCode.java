@@ -41,21 +41,21 @@ public enum IndexLevelCode {
      * Index value without opening.
      */
     VALUEWITHOUTOPENING(8);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, IndexLevelCode> TYPES = new HashMap<>();
     static {
         for (IndexLevelCode type : IndexLevelCode.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     IndexLevelCode(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get IndexLevelCode by attribute
      * @param val
@@ -64,13 +64,13 @@ public enum IndexLevelCode {
     public static IndexLevelCode getIndexLevelCode(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get IndexLevelCode int value
      * @return int value
      */
     public int getIndexLevelCodeValue() {
-        return value; 
+        return value;
     }
     
     /**

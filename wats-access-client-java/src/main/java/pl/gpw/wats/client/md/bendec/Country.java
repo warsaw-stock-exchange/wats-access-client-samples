@@ -1005,21 +1005,21 @@ public enum Country {
      * Zambia
      */
     ZMB(894);
-    
+
     private final int value;
     private final int byteLength = 2;
-    
+
     private static final Map<Integer, Country> TYPES = new HashMap<>();
     static {
         for (Country type : Country.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     Country(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get Country by attribute
      * @param val
@@ -1028,13 +1028,13 @@ public enum Country {
     public static Country getCountry(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get Country int value
      * @return int value
      */
     public int getCountryValue() {
-        return value; 
+        return value;
     }
     
     /**

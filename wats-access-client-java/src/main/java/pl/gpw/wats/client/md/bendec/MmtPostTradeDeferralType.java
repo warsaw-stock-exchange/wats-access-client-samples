@@ -37,21 +37,21 @@ public enum MmtPostTradeDeferralType {
      * - = Not applicable / No relevant deferral or enrichment type
      */
     NOTAPPLICABLE(7);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, MmtPostTradeDeferralType> TYPES = new HashMap<>();
     static {
         for (MmtPostTradeDeferralType type : MmtPostTradeDeferralType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     MmtPostTradeDeferralType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get MmtPostTradeDeferralType by attribute
      * @param val
@@ -60,13 +60,13 @@ public enum MmtPostTradeDeferralType {
     public static MmtPostTradeDeferralType getMmtPostTradeDeferralType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get MmtPostTradeDeferralType int value
      * @return int value
      */
     public int getMmtPostTradeDeferralTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

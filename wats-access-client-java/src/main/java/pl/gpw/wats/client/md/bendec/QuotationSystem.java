@@ -25,21 +25,21 @@ public enum QuotationSystem {
      * Single price quotation system with two fixings.
      */
     SINGLEPRICETWOFIXINGS(4);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, QuotationSystem> TYPES = new HashMap<>();
     static {
         for (QuotationSystem type : QuotationSystem.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     QuotationSystem(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get QuotationSystem by attribute
      * @param val
@@ -48,13 +48,13 @@ public enum QuotationSystem {
     public static QuotationSystem getQuotationSystem(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get QuotationSystem int value
      * @return int value
      */
     public int getQuotationSystemValue() {
-        return value; 
+        return value;
     }
     
     /**

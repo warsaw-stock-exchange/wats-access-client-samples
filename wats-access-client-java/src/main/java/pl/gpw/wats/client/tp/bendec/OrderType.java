@@ -33,21 +33,21 @@ public enum OrderType {
      * Stop loss order type.
      */
     STOPLOSS(6);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, OrderType> TYPES = new HashMap<>();
     static {
         for (OrderType type : OrderType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     OrderType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get OrderType by attribute
      * @param val
@@ -56,13 +56,13 @@ public enum OrderType {
     public static OrderType getOrderType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get OrderType int value
      * @return int value
      */
     public int getOrderTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

@@ -17,21 +17,21 @@ public enum CalendarExceptionType {
      * The day is open for trading.
      */
     OPEN(2);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, CalendarExceptionType> TYPES = new HashMap<>();
     static {
         for (CalendarExceptionType type : CalendarExceptionType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     CalendarExceptionType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get CalendarExceptionType by attribute
      * @param val
@@ -40,13 +40,13 @@ public enum CalendarExceptionType {
     public static CalendarExceptionType getCalendarExceptionType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get CalendarExceptionType int value
      * @return int value
      */
     public int getCalendarExceptionTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

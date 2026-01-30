@@ -13,21 +13,21 @@ public enum ReplayMsgType {
      * Replay service request
      */
     REPLAYREQUEST(1);
-    
+
     private final int value;
     private final int byteLength = 2;
-    
+
     private static final Map<Integer, ReplayMsgType> TYPES = new HashMap<>();
     static {
         for (ReplayMsgType type : ReplayMsgType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     ReplayMsgType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get ReplayMsgType by attribute
      * @param val
@@ -36,13 +36,13 @@ public enum ReplayMsgType {
     public static ReplayMsgType getReplayMsgType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get ReplayMsgType int value
      * @return int value
      */
     public int getReplayMsgTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

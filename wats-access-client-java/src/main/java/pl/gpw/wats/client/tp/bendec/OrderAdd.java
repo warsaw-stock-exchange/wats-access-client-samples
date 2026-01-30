@@ -57,7 +57,7 @@ public class OrderAdd implements ByteSerializable, Message {
     private int feeStructureId;
     private String interestedParty;
     public static final int byteLength = 175;
-    
+
     public OrderAdd(Header header, int stpId, long instrumentId, OrderType orderType, TimeInForce timeInForce, OrderSide side, long price, long triggerPrice, BigInteger quantity, BigInteger displayQty, Capacity capacity, String account, AccountType accountType, OrderFlags flags, MifidFields mifidFields, BigInteger expire, String memo, String clientOrderId, String clearingMemberCode, ClearingIdentifier clearingMemberClearingIdentifier, ExecInst execInst, int feeStructureId, String interestedParty) {
         this.header = header;
         this.stpId = stpId;
@@ -277,7 +277,7 @@ public class OrderAdd implements ByteSerializable, Message {
     public String getInterestedParty() {
         return this.interestedParty;
     }
-    
+
     /**
      * @param header Header.
      */
@@ -438,7 +438,7 @@ public class OrderAdd implements ByteSerializable, Message {
     public void setInterestedParty(String interestedParty) {
         this.interestedParty = interestedParty;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -468,7 +468,7 @@ public class OrderAdd implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt8ToByteArray(this.stpId));
@@ -494,7 +494,7 @@ public class OrderAdd implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt8ToByteArray(this.feeStructureId));
         buffer.put(BendecUtils.stringToByteArray(this.interestedParty, 8));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

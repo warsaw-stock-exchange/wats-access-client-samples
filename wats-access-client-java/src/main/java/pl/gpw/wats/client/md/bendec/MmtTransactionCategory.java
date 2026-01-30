@@ -29,21 +29,21 @@ public enum MmtTransactionCategory {
      * - = None apply (a standard trade for the Market Mechanism and Trading Mode)
      */
     NONE(5);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, MmtTransactionCategory> TYPES = new HashMap<>();
     static {
         for (MmtTransactionCategory type : MmtTransactionCategory.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     MmtTransactionCategory(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get MmtTransactionCategory by attribute
      * @param val
@@ -52,13 +52,13 @@ public enum MmtTransactionCategory {
     public static MmtTransactionCategory getMmtTransactionCategory(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get MmtTransactionCategory int value
      * @return int value
      */
     public int getMmtTransactionCategoryValue() {
-        return value; 
+        return value;
     }
     
     /**

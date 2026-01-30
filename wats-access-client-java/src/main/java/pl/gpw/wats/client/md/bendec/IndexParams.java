@@ -43,7 +43,7 @@ public class IndexParams implements ByteSerializable, Message {
     private Currency currency;
     private long dateValidity;
     public static final int byteLength = 187;
-    
+
     public IndexParams(Header header, long instrumentId, long indexBaseValue, long indexBaseCapitalisation, long indexBaseDate, long correctionCoefficient, int numOfComponents, IndexPublicationSchedule indexPublicationSchedule, IndexType indexType, IndexParamsPresenceFlags presenceFlags, int daysSinceLastPublication, int numberOfDividends, IndexUnderlyings indexUnderlyings, int publicationOrder, Currency currency, long dateValidity) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -200,7 +200,7 @@ public class IndexParams implements ByteSerializable, Message {
     public long getDateValidity() {
         return this.dateValidity;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -312,7 +312,7 @@ public class IndexParams implements ByteSerializable, Message {
     public void setDateValidity(long dateValidity) {
         this.dateValidity = dateValidity;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -335,7 +335,7 @@ public class IndexParams implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
@@ -354,7 +354,7 @@ public class IndexParams implements ByteSerializable, Message {
         currency.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.dateValidity));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

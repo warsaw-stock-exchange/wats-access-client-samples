@@ -19,7 +19,7 @@ public class CalendarException implements ByteSerializable, Message {
     private long calendarExceptionDate;
     private CalendarExceptionType calendarExceptionType;
     public static final int byteLength = 51;
-    
+
     public CalendarException(Header header, long calendarId, long calendarExceptionDate, CalendarExceptionType calendarExceptionType) {
         this.header = header;
         this.calendarId = calendarId;
@@ -68,7 +68,7 @@ public class CalendarException implements ByteSerializable, Message {
     public CalendarExceptionType getCalendarExceptionType() {
         return this.calendarExceptionType;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -96,7 +96,7 @@ public class CalendarException implements ByteSerializable, Message {
     public void setCalendarExceptionType(CalendarExceptionType calendarExceptionType) {
         this.calendarExceptionType = calendarExceptionType;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -107,14 +107,14 @@ public class CalendarException implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.calendarId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.calendarExceptionDate));
         calendarExceptionType.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

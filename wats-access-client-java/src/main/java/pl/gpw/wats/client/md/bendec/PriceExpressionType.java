@@ -21,21 +21,21 @@ public enum PriceExpressionType {
      * Price expressed as percentage.
      */
     PERCENTAGE(2);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, PriceExpressionType> TYPES = new HashMap<>();
     static {
         for (PriceExpressionType type : PriceExpressionType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     PriceExpressionType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get PriceExpressionType by attribute
      * @param val
@@ -44,13 +44,13 @@ public enum PriceExpressionType {
     public static PriceExpressionType getPriceExpressionType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get PriceExpressionType int value
      * @return int value
      */
     public int getPriceExpressionTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

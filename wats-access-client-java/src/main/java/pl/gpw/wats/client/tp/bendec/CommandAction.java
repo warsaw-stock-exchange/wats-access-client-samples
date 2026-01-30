@@ -12,21 +12,21 @@ public enum CommandAction {
     CHANGETOHYBRIDBUYONLY(1),
     CHANGETOKNOCKOUT(2),
     REVOKEKNOCKOUT(3);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, CommandAction> TYPES = new HashMap<>();
     static {
         for (CommandAction type : CommandAction.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     CommandAction(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get CommandAction by attribute
      * @param val
@@ -35,13 +35,13 @@ public enum CommandAction {
     public static CommandAction getCommandAction(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get CommandAction int value
      * @return int value
      */
     public int getCommandActionValue() {
-        return value; 
+        return value;
     }
     
     /**

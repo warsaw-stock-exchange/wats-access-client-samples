@@ -21,21 +21,21 @@ public enum UsIndicator {
      * Trading restricted due to US Regulation S with Rule 144A.
      */
     REGULATIONSPLUSRULE144A(3);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, UsIndicator> TYPES = new HashMap<>();
     static {
         for (UsIndicator type : UsIndicator.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     UsIndicator(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get UsIndicator by attribute
      * @param val
@@ -44,13 +44,13 @@ public enum UsIndicator {
     public static UsIndicator getUsIndicator(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get UsIndicator int value
      * @return int value
      */
     public int getUsIndicatorValue() {
-        return value; 
+        return value;
     }
     
     /**

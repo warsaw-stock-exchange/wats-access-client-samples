@@ -15,7 +15,7 @@ public class IndexUnderlying implements ByteSerializable {
     private PublicProductIdentification productIdentification;
     private IndexUnderlyingType indexUnderlyingType;
     public static final int byteLength = 32;
-    
+
     public IndexUnderlying(PublicProductIdentification productIdentification, IndexUnderlyingType indexUnderlyingType) {
         this.productIdentification = productIdentification;
         this.indexUnderlyingType = indexUnderlyingType;
@@ -46,7 +46,7 @@ public class IndexUnderlying implements ByteSerializable {
     public IndexUnderlyingType getIndexUnderlyingType() {
         return this.indexUnderlyingType;
     }
-    
+
     /**
      * @param productIdentification Product Identification.
      */
@@ -60,7 +60,7 @@ public class IndexUnderlying implements ByteSerializable {
     public void setIndexUnderlyingType(IndexUnderlyingType indexUnderlyingType) {
         this.indexUnderlyingType = indexUnderlyingType;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -69,12 +69,12 @@ public class IndexUnderlying implements ByteSerializable {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         productIdentification.toBytes(buffer);
         indexUnderlyingType.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(productIdentification,

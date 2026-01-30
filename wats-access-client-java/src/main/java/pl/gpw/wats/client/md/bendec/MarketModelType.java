@@ -41,21 +41,21 @@ public enum MarketModelType {
      * Redistribution
      */
     REDISTRIBUTION(8);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, MarketModelType> TYPES = new HashMap<>();
     static {
         for (MarketModelType type : MarketModelType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     MarketModelType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get MarketModelType by attribute
      * @param val
@@ -64,13 +64,13 @@ public enum MarketModelType {
     public static MarketModelType getMarketModelType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get MarketModelType int value
      * @return int value
      */
     public int getMarketModelTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

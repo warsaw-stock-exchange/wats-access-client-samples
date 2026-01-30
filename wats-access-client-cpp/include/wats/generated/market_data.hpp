@@ -3523,7 +3523,7 @@ struct ProductSummary {
     ProductIdentification productIdentification;
     ElementId productId;
     MicCode mic;
-    Number AccumulatedInterest;
+    Number accumulatedInterest;
     Number interestRate;
     Currency currency;
     Date sessionDate;
@@ -3618,7 +3618,7 @@ struct PositionReport {
     PublicProductIdentification publicProductIdentification;
     PosType posType;
     uint32_t openPositions;
-    TradeId tradeID;
+    TradeId tradeId;
 
     friend std::ostream &operator << (std::ostream &, const PositionReport &);
 };

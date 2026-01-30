@@ -21,21 +21,21 @@ public enum OptionType {
      * Put option.
      */
     PUT(3);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, OptionType> TYPES = new HashMap<>();
     static {
         for (OptionType type : OptionType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     OptionType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get OptionType by attribute
      * @param val
@@ -44,13 +44,13 @@ public enum OptionType {
     public static OptionType getOptionType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get OptionType int value
      * @return int value
      */
     public int getOptionTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

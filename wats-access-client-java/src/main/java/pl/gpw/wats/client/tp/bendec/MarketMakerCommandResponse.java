@@ -19,7 +19,7 @@ public class MarketMakerCommandResponse implements ByteSerializable, Message {
     private CommandResult result;
     private CommandRejectionCode rejectionCode;
     public static final int byteLength = 31;
-    
+
     public MarketMakerCommandResponse(Header header, long refId, CommandResult result, CommandRejectionCode rejectionCode) {
         this.header = header;
         this.refId = refId;
@@ -68,7 +68,7 @@ public class MarketMakerCommandResponse implements ByteSerializable, Message {
     public CommandRejectionCode getRejectionCode() {
         return this.rejectionCode;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -96,7 +96,7 @@ public class MarketMakerCommandResponse implements ByteSerializable, Message {
     public void setRejectionCode(CommandRejectionCode rejectionCode) {
         this.rejectionCode = rejectionCode;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -107,14 +107,14 @@ public class MarketMakerCommandResponse implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.refId));
         result.toBytes(buffer);
         rejectionCode.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

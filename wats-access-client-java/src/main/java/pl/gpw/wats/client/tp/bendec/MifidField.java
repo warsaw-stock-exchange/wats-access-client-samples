@@ -15,7 +15,7 @@ public class MifidField implements ByteSerializable {
     private long shortCode;
     private PartyRoleQualifier qualifier;
     public static final int byteLength = 5;
-    
+
     public MifidField(long shortCode, PartyRoleQualifier qualifier) {
         this.shortCode = shortCode;
         this.qualifier = qualifier;
@@ -46,7 +46,7 @@ public class MifidField implements ByteSerializable {
     public PartyRoleQualifier getQualifier() {
         return this.qualifier;
     }
-    
+
     /**
      * @param shortCode Short code of MiFID participant.
      */
@@ -60,7 +60,7 @@ public class MifidField implements ByteSerializable {
     public void setQualifier(PartyRoleQualifier qualifier) {
         this.qualifier = qualifier;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -69,12 +69,12 @@ public class MifidField implements ByteSerializable {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt32ToByteArray(this.shortCode));
         qualifier.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(shortCode,

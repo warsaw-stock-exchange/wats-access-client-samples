@@ -25,21 +25,21 @@ public enum LiquidityIndicator {
      * Not applicable
      */
     NOTAPPLICABLE(4);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, LiquidityIndicator> TYPES = new HashMap<>();
     static {
         for (LiquidityIndicator type : LiquidityIndicator.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     LiquidityIndicator(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get LiquidityIndicator by attribute
      * @param val
@@ -48,13 +48,13 @@ public enum LiquidityIndicator {
     public static LiquidityIndicator getLiquidityIndicator(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get LiquidityIndicator int value
      * @return int value
      */
     public int getLiquidityIndicatorValue() {
-        return value; 
+        return value;
     }
     
     /**

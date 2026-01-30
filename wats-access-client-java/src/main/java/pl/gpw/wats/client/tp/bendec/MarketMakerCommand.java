@@ -17,7 +17,7 @@ public class MarketMakerCommand implements ByteSerializable, Message {
     private long instrumentId;
     private CommandAction action;
     public static final int byteLength = 29;
-    
+
     public MarketMakerCommand(Header header, long instrumentId, CommandAction action) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -57,7 +57,7 @@ public class MarketMakerCommand implements ByteSerializable, Message {
     public CommandAction getAction() {
         return this.action;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -78,7 +78,7 @@ public class MarketMakerCommand implements ByteSerializable, Message {
     public void setAction(CommandAction action) {
         this.action = action;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -88,13 +88,13 @@ public class MarketMakerCommand implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
         action.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

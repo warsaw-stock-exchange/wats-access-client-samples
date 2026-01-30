@@ -37,21 +37,21 @@ public enum MmtPostTradeDeferralReason {
      * 6 = Non-Immediate Publication : Deferrals of ILQD and LRGS (for RTS 2 use only)
      */
     NONIMMEDIATEPUBLICATIONILQDANDLRGS(7);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, MmtPostTradeDeferralReason> TYPES = new HashMap<>();
     static {
         for (MmtPostTradeDeferralReason type : MmtPostTradeDeferralReason.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     MmtPostTradeDeferralReason(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get MmtPostTradeDeferralReason by attribute
      * @param val
@@ -60,13 +60,13 @@ public enum MmtPostTradeDeferralReason {
     public static MmtPostTradeDeferralReason getMmtPostTradeDeferralReason(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get MmtPostTradeDeferralReason int value
      * @return int value
      */
     public int getMmtPostTradeDeferralReasonValue() {
-        return value; 
+        return value;
     }
     
     /**

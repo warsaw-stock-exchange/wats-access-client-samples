@@ -27,7 +27,7 @@ public class OrderMassCancel implements ByteSerializable, Message {
     private MifidField executingTrader;
     private String clientOrderId;
     public static final int byteLength = 63;
-    
+
     public OrderMassCancel(Header header, MassCancelRequestType massCancelRequestType, TargetPartyRole targetPartyRole, long targetPartyId, long marketSegmentId, long instrumentId, MifidField executingTrader, String clientOrderId) {
         this.header = header;
         this.massCancelRequestType = massCancelRequestType;
@@ -109,7 +109,7 @@ public class OrderMassCancel implements ByteSerializable, Message {
     public String getClientOrderId() {
         return this.clientOrderId;
     }
-    
+
     /**
      * @param header Header.
      */
@@ -162,7 +162,7 @@ public class OrderMassCancel implements ByteSerializable, Message {
     public void setClientOrderId(String clientOrderId) {
         this.clientOrderId = clientOrderId;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -177,7 +177,7 @@ public class OrderMassCancel implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         massCancelRequestType.toBytes(buffer);
@@ -188,7 +188,7 @@ public class OrderMassCancel implements ByteSerializable, Message {
         executingTrader.toBytes(buffer);
         buffer.put(BendecUtils.stringToByteArray(this.clientOrderId, 20));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

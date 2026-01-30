@@ -19,7 +19,7 @@ public class AccruedInterestTableEntry implements ByteSerializable, Message {
     private long accruedInterestTableEntryDate;
     private long accruedInterestTableEntryValue;
     public static final int byteLength = 58;
-    
+
     public AccruedInterestTableEntry(Header header, long productId, long accruedInterestTableEntryDate, long accruedInterestTableEntryValue) {
         this.header = header;
         this.productId = productId;
@@ -65,7 +65,7 @@ public class AccruedInterestTableEntry implements ByteSerializable, Message {
     public long getAccruedInterestTableEntryValue() {
         return this.accruedInterestTableEntryValue;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -90,7 +90,7 @@ public class AccruedInterestTableEntry implements ByteSerializable, Message {
     public void setAccruedInterestTableEntryValue(long accruedInterestTableEntryValue) {
         this.accruedInterestTableEntryValue = accruedInterestTableEntryValue;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -101,14 +101,14 @@ public class AccruedInterestTableEntry implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.productId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.accruedInterestTableEntryDate));
         buffer.put(BendecUtils.int64ToByteArray(this.accruedInterestTableEntryValue));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

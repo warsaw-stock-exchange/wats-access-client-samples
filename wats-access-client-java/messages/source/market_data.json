@@ -1,6 +1,6 @@
 {
   "$schema": "./schema.json",
-  "version": 2087,
+  "version": 2088,
   "typeDefinitions": {
     "marketData": [
       {
@@ -6188,7 +6188,7 @@
             "description": "Market structure's Market Identifier Code (MIC) as specified in ISO 10383."
           },
           {
-            "name": "AccumulatedInterest",
+            "name": "accumulatedInterest",
             "type": "Number",
             "description": "Accumulated interest on the bonds or for mortgage-backed bonds on the day of settling the transaction."
           },
@@ -7179,7 +7179,7 @@
             "description": "Number of open positions."
           },
           {
-            "name": "tradeID",
+            "name": "tradeId",
             "type": "TradeId",
             "description": "Trade ID."
           }

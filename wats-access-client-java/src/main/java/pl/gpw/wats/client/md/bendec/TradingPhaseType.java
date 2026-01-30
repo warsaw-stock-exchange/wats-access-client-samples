@@ -101,21 +101,21 @@ public enum TradingPhaseType {
      * Instrument distribution phase
      */
     DISTRIBUTION(23);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, TradingPhaseType> TYPES = new HashMap<>();
     static {
         for (TradingPhaseType type : TradingPhaseType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     TradingPhaseType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get TradingPhaseType by attribute
      * @param val
@@ -124,13 +124,13 @@ public enum TradingPhaseType {
     public static TradingPhaseType getTradingPhaseType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get TradingPhaseType int value
      * @return int value
      */
     public int getTradingPhaseTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

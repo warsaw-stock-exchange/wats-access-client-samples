@@ -21,21 +21,21 @@ public enum OrderBookEventType {
      * Order book resend end (resend is done)
      */
     RESENDEND(3);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, OrderBookEventType> TYPES = new HashMap<>();
     static {
         for (OrderBookEventType type : OrderBookEventType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     OrderBookEventType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get OrderBookEventType by attribute
      * @param val
@@ -44,13 +44,13 @@ public enum OrderBookEventType {
     public static OrderBookEventType getOrderBookEventType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get OrderBookEventType int value
      * @return int value
      */
     public int getOrderBookEventTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

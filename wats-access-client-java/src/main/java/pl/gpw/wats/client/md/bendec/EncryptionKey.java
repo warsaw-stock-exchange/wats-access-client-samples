@@ -17,7 +17,7 @@ public class EncryptionKey implements ByteSerializable, Message {
     private long id;
     private String secretKey;
     public static final int byteLength = 78;
-    
+
     public EncryptionKey(Header header, long id, String secretKey) {
         this.header = header;
         this.id = id;
@@ -57,7 +57,7 @@ public class EncryptionKey implements ByteSerializable, Message {
     public String getSecretKey() {
         return this.secretKey;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -78,7 +78,7 @@ public class EncryptionKey implements ByteSerializable, Message {
     public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -88,13 +88,13 @@ public class EncryptionKey implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.id));
         buffer.put(BendecUtils.stringToByteArray(this.secretKey, 32));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

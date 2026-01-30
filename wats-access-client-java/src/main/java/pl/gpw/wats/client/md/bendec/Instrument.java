@@ -135,7 +135,7 @@ public class Instrument implements ByteSerializable, Message {
     private int valueAtRisk;
     private long externalUnderlyingId;
     public static final int byteLength = 741;
-    
+
     public Instrument(Header header, long instrumentId, ProductType productType, ProductSubtype productSubtype, long firstTradingDate, long lastTradingDate, long productId, Currency currency, long icebergMinValue, long lotSize, PriceExpressionType priceExpressionType, long calendarId, long marketStructureId, long tickTableId, long referenceInstrumentId, long collarGroupId, long tradingScheduleId, String description, String mic, long nominalValue, NominalValueType nominalValueType, long multiplier, long strikePrice, Currency strikePriceCurrency, String productIdentification, ProductIdentificationType productIdentificationType, long settlementCalendarId, CouponType bondCouponType, long preTradeCheckMinPrice, long preTradeCheckMaxPrice, BigInteger preTradeCheckMinQuantity, BigInteger preTradeCheckMaxQuantity, long preTradeCheckMaxValue, long preTradeCheckMinValue, boolean liquidity, MarketModelType marketModelType, String issuer, Country issuerRegCountry, long underlyingInstrumentId, String productCode, String cfi, String fisn, BigInteger issueSize, Currency nominalCurrency, UsIndicator usIndicator, long expiryDate, int versionNumber, SettlementType settlementType, OptionType optionType, ExerciseType exerciseType, String productName, long referencePrice, InstrumentStatus status, long initialPhaseId, long thresholdMax, long thresholdMin, LeverageFlag isLeverage, long accruedInterestValue, String kid, long kidIssueDate, int valueAtRisk, long externalUnderlyingId) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -706,7 +706,7 @@ public class Instrument implements ByteSerializable, Message {
     public long getExternalUnderlyingId() {
         return this.externalUnderlyingId;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -1140,7 +1140,7 @@ public class Instrument implements ByteSerializable, Message {
     public void setExternalUnderlyingId(long externalUnderlyingId) {
         this.externalUnderlyingId = externalUnderlyingId;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -1209,7 +1209,7 @@ public class Instrument implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
@@ -1274,7 +1274,7 @@ public class Instrument implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt8ToByteArray(this.valueAtRisk));
         buffer.put(BendecUtils.uInt32ToByteArray(this.externalUnderlyingId));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

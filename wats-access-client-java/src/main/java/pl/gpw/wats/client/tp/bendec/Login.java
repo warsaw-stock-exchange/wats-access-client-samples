@@ -23,7 +23,7 @@ public class Login implements ByteSerializable, Message {
     private long nextExpectedSeqNum;
     private long lastSentSeqNum;
     public static final int byteLength = 44;
-    
+
     public Login(Header header, int version, String token, int connectionId, long nextExpectedSeqNum, long lastSentSeqNum) {
         this.header = header;
         this.version = version;
@@ -90,7 +90,7 @@ public class Login implements ByteSerializable, Message {
     public long getLastSentSeqNum() {
         return this.lastSentSeqNum;
     }
-    
+
     /**
      * @param header Header.
      */
@@ -132,7 +132,7 @@ public class Login implements ByteSerializable, Message {
     public void setLastSentSeqNum(long lastSentSeqNum) {
         this.lastSentSeqNum = lastSentSeqNum;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -145,7 +145,7 @@ public class Login implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt16ToByteArray(this.version));
@@ -154,7 +154,7 @@ public class Login implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt32ToByteArray(this.nextExpectedSeqNum));
         buffer.put(BendecUtils.uInt32ToByteArray(this.lastSentSeqNum));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

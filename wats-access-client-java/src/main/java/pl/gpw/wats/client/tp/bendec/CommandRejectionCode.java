@@ -26,21 +26,21 @@ public enum CommandRejectionCode {
     EXCHANGECLOSED(3002),
     FIRMNOTAUTHORIZEDTOQUOTEINSTRUMENT(3009),
     COMMANDNOTALLOWEDINCURRENTSTATE(3020);
-    
+
     private final int value;
     private final int byteLength = 2;
-    
+
     private static final Map<Integer, CommandRejectionCode> TYPES = new HashMap<>();
     static {
         for (CommandRejectionCode type : CommandRejectionCode.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     CommandRejectionCode(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get CommandRejectionCode by attribute
      * @param val
@@ -49,13 +49,13 @@ public enum CommandRejectionCode {
     public static CommandRejectionCode getCommandRejectionCode(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get CommandRejectionCode int value
      * @return int value
      */
     public int getCommandRejectionCodeValue() {
-        return value; 
+        return value;
     }
     
     /**

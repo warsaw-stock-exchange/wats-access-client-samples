@@ -17,21 +17,21 @@ public enum ProductIdentificationType {
      * Financial instrument's ISIN.
      */
     ISIN(2);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, ProductIdentificationType> TYPES = new HashMap<>();
     static {
         for (ProductIdentificationType type : ProductIdentificationType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     ProductIdentificationType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get ProductIdentificationType by attribute
      * @param val
@@ -40,13 +40,13 @@ public enum ProductIdentificationType {
     public static ProductIdentificationType getProductIdentificationType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get ProductIdentificationType int value
      * @return int value
      */
     public int getProductIdentificationTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

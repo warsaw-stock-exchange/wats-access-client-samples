@@ -14,11 +14,11 @@ public interface ReplayMessage {
     static ReplayMsgType getReplayMsgType(byte[] bytes) {
         return ReplayMsgType.getReplayMsgType(bytes, 2);
     }
-    
+
     static Optional<ReplayMessage> createObject(byte[] bytes) {
         return createObject(getReplayMsgType(bytes), bytes);
     }
-    
+
     static Optional<ReplayMessage> createObject(ReplayMsgType type, byte[] bytes) {
         switch (type) {
             case REPLAYREQUEST:

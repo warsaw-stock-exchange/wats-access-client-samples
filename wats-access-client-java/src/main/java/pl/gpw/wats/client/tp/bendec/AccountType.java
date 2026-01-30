@@ -21,21 +21,21 @@ public enum AccountType {
      * House trader.
      */
     HOUSE(3);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, AccountType> TYPES = new HashMap<>();
     static {
         for (AccountType type : AccountType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     AccountType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get AccountType by attribute
      * @param val
@@ -44,13 +44,13 @@ public enum AccountType {
     public static AccountType getAccountType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get AccountType int value
      * @return int value
      */
     public int getAccountTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

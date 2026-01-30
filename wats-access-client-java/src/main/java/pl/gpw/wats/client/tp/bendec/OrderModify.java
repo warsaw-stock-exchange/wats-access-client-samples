@@ -29,7 +29,7 @@ public class OrderModify implements ByteSerializable, Message {
     private MifidFields mifidFields;
     private String clientOrderId;
     public static final int byteLength = 107;
-    
+
     public OrderModify(Header header, BigInteger orderId, long price, long triggerPrice, BigInteger quantity, BigInteger displayQty, BigInteger expire, MifidFields mifidFields, String clientOrderId) {
         this.header = header;
         this.orderId = orderId;
@@ -123,7 +123,7 @@ public class OrderModify implements ByteSerializable, Message {
     public String getClientOrderId() {
         return this.clientOrderId;
     }
-    
+
     /**
      * @param header Header.
      */
@@ -186,7 +186,7 @@ public class OrderModify implements ByteSerializable, Message {
     public void setClientOrderId(String clientOrderId) {
         this.clientOrderId = clientOrderId;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -202,7 +202,7 @@ public class OrderModify implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt64ToByteArray(this.orderId));
@@ -214,7 +214,7 @@ public class OrderModify implements ByteSerializable, Message {
         mifidFields.toBytes(buffer);
         buffer.put(BendecUtils.stringToByteArray(this.clientOrderId, 20));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

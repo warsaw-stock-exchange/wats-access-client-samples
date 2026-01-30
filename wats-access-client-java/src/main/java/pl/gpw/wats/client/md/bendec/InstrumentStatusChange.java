@@ -23,7 +23,7 @@ public class InstrumentStatusChange implements ByteSerializable, Message {
     private InstrumentStatus status;
     private boolean stressedMarket;
     public static final int byteLength = 53;
-    
+
     public InstrumentStatusChange(Header header, long instrumentId, long tradingPhaseId, TradingPhaseType tradingPhaseType, InstrumentStatus status, boolean stressedMarket) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -90,7 +90,7 @@ public class InstrumentStatusChange implements ByteSerializable, Message {
     public boolean getStressedMarket() {
         return this.stressedMarket;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -132,7 +132,7 @@ public class InstrumentStatusChange implements ByteSerializable, Message {
     public void setStressedMarket(boolean stressedMarket) {
         this.stressedMarket = stressedMarket;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -145,7 +145,7 @@ public class InstrumentStatusChange implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
@@ -154,7 +154,7 @@ public class InstrumentStatusChange implements ByteSerializable, Message {
         status.toBytes(buffer);
         buffer.put(BendecUtils.booleanToByteArray(this.stressedMarket));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

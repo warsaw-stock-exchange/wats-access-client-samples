@@ -31,7 +31,7 @@ public class CollarTableEntry implements ByteSerializable, Message {
     private long collarUpperAsk;
     private long collarLowerAsk;
     public static final int byteLength = 96;
-    
+
     public CollarTableEntry(Header header, long collarTableId, CollarMode collarMode, ExpressionType collarExpression, long collarLowerBound, long collarValue, long collarLowerBid, long collarUpperBid, long collarUpperAsk, long collarLowerAsk) {
         this.header = header;
         this.collarTableId = collarTableId;
@@ -134,7 +134,7 @@ public class CollarTableEntry implements ByteSerializable, Message {
     public long getCollarLowerAsk() {
         return this.collarLowerAsk;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -204,7 +204,7 @@ public class CollarTableEntry implements ByteSerializable, Message {
     public void setCollarLowerAsk(long collarLowerAsk) {
         this.collarLowerAsk = collarLowerAsk;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -221,7 +221,7 @@ public class CollarTableEntry implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.collarTableId));
@@ -234,7 +234,7 @@ public class CollarTableEntry implements ByteSerializable, Message {
         buffer.put(BendecUtils.int64ToByteArray(this.collarUpperAsk));
         buffer.put(BendecUtils.int64ToByteArray(this.collarLowerAsk));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

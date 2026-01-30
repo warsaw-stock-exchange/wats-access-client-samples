@@ -17,21 +17,21 @@ public enum MmtSpecialDividendIndicator {
      * - = No Special Dividend Trade
      */
     NOSPECIALDIVIDENDTRADE(2);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, MmtSpecialDividendIndicator> TYPES = new HashMap<>();
     static {
         for (MmtSpecialDividendIndicator type : MmtSpecialDividendIndicator.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     MmtSpecialDividendIndicator(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get MmtSpecialDividendIndicator by attribute
      * @param val
@@ -40,13 +40,13 @@ public enum MmtSpecialDividendIndicator {
     public static MmtSpecialDividendIndicator getMmtSpecialDividendIndicator(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get MmtSpecialDividendIndicator int value
      * @return int value
      */
     public int getMmtSpecialDividendIndicatorValue() {
-        return value; 
+        return value;
     }
     
     /**

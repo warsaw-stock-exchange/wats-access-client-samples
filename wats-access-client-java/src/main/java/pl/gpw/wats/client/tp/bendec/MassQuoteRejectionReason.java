@@ -109,21 +109,21 @@ public enum MassQuoteRejectionReason {
      * LiquidityProvisionActivity flag (within mifidFields.flags) in binary Mass Quote meesage must be always set to 1.
      */
     LIQUIDITYPROVISIONACTIVITYFLAGNOTSETFORMASSQUOTE(1212);
-    
+
     private final int value;
     private final int byteLength = 2;
-    
+
     private static final Map<Integer, MassQuoteRejectionReason> TYPES = new HashMap<>();
     static {
         for (MassQuoteRejectionReason type : MassQuoteRejectionReason.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     MassQuoteRejectionReason(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get MassQuoteRejectionReason by attribute
      * @param val
@@ -132,13 +132,13 @@ public enum MassQuoteRejectionReason {
     public static MassQuoteRejectionReason getMassQuoteRejectionReason(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get MassQuoteRejectionReason int value
      * @return int value
      */
     public int getMassQuoteRejectionReasonValue() {
-        return value; 
+        return value;
     }
     
     /**

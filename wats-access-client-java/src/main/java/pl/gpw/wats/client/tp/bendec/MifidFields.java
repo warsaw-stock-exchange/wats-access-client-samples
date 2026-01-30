@@ -17,7 +17,7 @@ public class MifidFields implements ByteSerializable {
     private MifidField executingTrader;
     private MifidField investmentDecisionMaker;
     public static final int byteLength = 15;
-    
+
     public MifidFields(MifidField client, MifidField executingTrader, MifidField investmentDecisionMaker) {
         this.client = client;
         this.executingTrader = executingTrader;
@@ -57,7 +57,7 @@ public class MifidFields implements ByteSerializable {
     public MifidField getInvestmentDecisionMaker() {
         return this.investmentDecisionMaker;
     }
-    
+
     /**
      * @param client MifidField of Client.
      */
@@ -78,7 +78,7 @@ public class MifidFields implements ByteSerializable {
     public void setInvestmentDecisionMaker(MifidField investmentDecisionMaker) {
         this.investmentDecisionMaker = investmentDecisionMaker;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -88,13 +88,13 @@ public class MifidFields implements ByteSerializable {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         client.toBytes(buffer);
         executingTrader.toBytes(buffer);
         investmentDecisionMaker.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(client,

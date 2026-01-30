@@ -29,7 +29,7 @@ public class OrderAddResponse implements ByteSerializable, Message {
     private ExecTypeReason execTypeReason;
     private String clientOrderId;
     public static final int byteLength = 80;
-    
+
     public OrderAddResponse(Header header, BigInteger orderId, BigInteger publicOrderId, BigInteger displayQty, BigInteger filled, OrderStatus status, OrderRejectionReason reason, ExecTypeReason execTypeReason, String clientOrderId) {
         this.header = header;
         this.orderId = orderId;
@@ -123,7 +123,7 @@ public class OrderAddResponse implements ByteSerializable, Message {
     public String getClientOrderId() {
         return this.clientOrderId;
     }
-    
+
     /**
      * @param header Header.
      */
@@ -186,7 +186,7 @@ public class OrderAddResponse implements ByteSerializable, Message {
     public void setClientOrderId(String clientOrderId) {
         this.clientOrderId = clientOrderId;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -202,7 +202,7 @@ public class OrderAddResponse implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt64ToByteArray(this.orderId));
@@ -214,7 +214,7 @@ public class OrderAddResponse implements ByteSerializable, Message {
         execTypeReason.toBytes(buffer);
         buffer.put(BendecUtils.stringToByteArray(this.clientOrderId, 20));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

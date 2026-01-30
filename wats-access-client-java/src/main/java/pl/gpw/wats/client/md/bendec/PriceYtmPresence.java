@@ -11,19 +11,19 @@ import java.nio.ByteBuffer;
 public class PriceYtmPresence {
     private int value;
     private final int byteLength = 2;
-    
+
     public PriceYtmPresence(int value) {
         this.value = value;
     }
 
     public PriceYtmPresence(byte[] bytes, int offset) {
-        this(BendecUtils.uInt8FromByteArray(bytes, offset));
+        this(BendecUtils.uInt16FromByteArray(bytes, offset));
     }
 
     public void add(PriceYtmPresenceOptions flag) {
         this.value = this.value | flag.getOptionValue();
     }
-    
+
     public void remove(PriceYtmPresenceOptions flag) {
         this.value = this.value ^ flag.getOptionValue();
     }
@@ -56,7 +56,7 @@ public class PriceYtmPresence {
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt16ToByteArray(this.value));
     }
-    
+
     public enum PriceYtmPresenceOptions {
         /**
          * No values provided.
@@ -86,7 +86,7 @@ public class PriceYtmPresence {
          * Ask YTM was not provided due to the absence of its calculation.
          */
         YTMASKNOCALC(32);
-        
+
         private final int optionValue;
         private static final Map<Integer, PriceYtmPresenceOptions> TYPES = new HashMap<>();
         static {
@@ -94,7 +94,7 @@ public class PriceYtmPresence {
                 TYPES.put(type.optionValue, type);
             }
         }
-        
+
         /**
          * Get PriceYtmPresenceOptions by attribute
          * @param val
@@ -103,11 +103,11 @@ public class PriceYtmPresence {
         public static PriceYtmPresenceOptions getPriceYtmPresence(int val) {
             return TYPES.get(val);
         }
-        
+
         PriceYtmPresenceOptions(int newValue) {
             this.optionValue = newValue;
         }
-        
+
         public int getOptionValue() {
             return optionValue;
         }

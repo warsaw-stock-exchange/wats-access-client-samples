@@ -15,7 +15,7 @@ public class PublicProductIdentification implements ByteSerializable {
     private String productIdentification;
     private ProductIdentificationType productIdentificationType;
     public static final int byteLength = 31;
-    
+
     public PublicProductIdentification(String productIdentification, ProductIdentificationType productIdentificationType) {
         this.productIdentification = productIdentification;
         this.productIdentificationType = productIdentificationType;
@@ -46,7 +46,7 @@ public class PublicProductIdentification implements ByteSerializable {
     public ProductIdentificationType getProductIdentificationType() {
         return this.productIdentificationType;
     }
-    
+
     /**
      * @param productIdentification Product identification, for example its ISIN code.
      */
@@ -60,7 +60,7 @@ public class PublicProductIdentification implements ByteSerializable {
     public void setProductIdentificationType(ProductIdentificationType productIdentificationType) {
         this.productIdentificationType = productIdentificationType;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -69,12 +69,12 @@ public class PublicProductIdentification implements ByteSerializable {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.stringToByteArray(this.productIdentification, 30));
         productIdentificationType.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(productIdentification,

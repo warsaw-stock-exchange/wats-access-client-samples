@@ -29,7 +29,7 @@ public class OrderMassCancelResponse implements ByteSerializable, Message {
     private MassCancelRejectionReason reason;
     private String clientOrderId;
     public static final int byteLength = 72;
-    
+
     public OrderMassCancelResponse(Header header, BigInteger totalAffectedOrders, MassCancelRequestType massCancelRequestType, BigInteger massCancelId, TargetPartyRole targetPartyRole, long targetPartyId, long marketSegmentId, MassCancelRejectionReason reason, String clientOrderId) {
         this.header = header;
         this.totalAffectedOrders = totalAffectedOrders;
@@ -123,7 +123,7 @@ public class OrderMassCancelResponse implements ByteSerializable, Message {
     public String getClientOrderId() {
         return this.clientOrderId;
     }
-    
+
     /**
      * @param header Header.
      */
@@ -186,7 +186,7 @@ public class OrderMassCancelResponse implements ByteSerializable, Message {
     public void setClientOrderId(String clientOrderId) {
         this.clientOrderId = clientOrderId;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -202,7 +202,7 @@ public class OrderMassCancelResponse implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt64ToByteArray(this.totalAffectedOrders));
@@ -214,7 +214,7 @@ public class OrderMassCancelResponse implements ByteSerializable, Message {
         reason.toBytes(buffer);
         buffer.put(BendecUtils.stringToByteArray(this.clientOrderId, 20));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

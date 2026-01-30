@@ -17,7 +17,7 @@ public class RequestForExecution implements ByteSerializable, Message {
     private long instrumentId;
     private RequestForExecutionReason reason;
     public static final int byteLength = 29;
-    
+
     public RequestForExecution(Header header, long instrumentId, RequestForExecutionReason reason) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -57,7 +57,7 @@ public class RequestForExecution implements ByteSerializable, Message {
     public RequestForExecutionReason getReason() {
         return this.reason;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -78,7 +78,7 @@ public class RequestForExecution implements ByteSerializable, Message {
     public void setReason(RequestForExecutionReason reason) {
         this.reason = reason;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -88,13 +88,13 @@ public class RequestForExecution implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
         reason.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

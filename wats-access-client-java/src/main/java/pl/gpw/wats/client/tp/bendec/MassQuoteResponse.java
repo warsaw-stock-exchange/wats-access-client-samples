@@ -23,7 +23,7 @@ public class MassQuoteResponse implements ByteSerializable, Message {
     private MassQuoteRejectionReason reason;
     private int feeStructureId;
     public static final int byteLength = 727;
-    
+
     public MassQuoteResponse(Header header, BigInteger massQuoteId, QuoteOrderResponses responses, MassQuoteStatus status, MassQuoteRejectionReason reason, int feeStructureId) {
         this.header = header;
         this.massQuoteId = massQuoteId;
@@ -90,7 +90,7 @@ public class MassQuoteResponse implements ByteSerializable, Message {
     public int getFeeStructureId() {
         return this.feeStructureId;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -132,7 +132,7 @@ public class MassQuoteResponse implements ByteSerializable, Message {
     public void setFeeStructureId(int feeStructureId) {
         this.feeStructureId = feeStructureId;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -145,7 +145,7 @@ public class MassQuoteResponse implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt64ToByteArray(this.massQuoteId));
@@ -154,7 +154,7 @@ public class MassQuoteResponse implements ByteSerializable, Message {
         reason.toBytes(buffer);
         buffer.put(BendecUtils.uInt8ToByteArray(this.feeStructureId));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

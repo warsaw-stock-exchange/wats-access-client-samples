@@ -17,21 +17,21 @@ public enum OrderSide {
      * Sell order.
      */
     SELL(2);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, OrderSide> TYPES = new HashMap<>();
     static {
         for (OrderSide type : OrderSide.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     OrderSide(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get OrderSide by attribute
      * @param val
@@ -40,13 +40,13 @@ public enum OrderSide {
     public static OrderSide getOrderSide(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get OrderSide int value
      * @return int value
      */
     public int getOrderSideValue() {
-        return value; 
+        return value;
     }
     
     /**

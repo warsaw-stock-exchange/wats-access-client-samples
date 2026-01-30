@@ -21,21 +21,21 @@ public enum MassCancelRequestType {
      * Cancel orders for a market segment.
      */
     CANCELORDERSFORMARKETSEGMENT(9);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, MassCancelRequestType> TYPES = new HashMap<>();
     static {
         for (MassCancelRequestType type : MassCancelRequestType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     MassCancelRequestType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get MassCancelRequestType by attribute
      * @param val
@@ -44,13 +44,13 @@ public enum MassCancelRequestType {
     public static MassCancelRequestType getMassCancelRequestType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get MassCancelRequestType int value
      * @return int value
      */
     public int getMassCancelRequestTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

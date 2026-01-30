@@ -41,21 +41,21 @@ public enum MmtNegotiationIndicator {
      * 6 = Pre-Trade Transparency Waivers of ILQD and SIZE (for RTS 1 only)
      */
     PRETRADETRANSPARENCYWAIVERSILQDANDSIZE(8);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, MmtNegotiationIndicator> TYPES = new HashMap<>();
     static {
         for (MmtNegotiationIndicator type : MmtNegotiationIndicator.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     MmtNegotiationIndicator(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get MmtNegotiationIndicator by attribute
      * @param val
@@ -64,13 +64,13 @@ public enum MmtNegotiationIndicator {
     public static MmtNegotiationIndicator getMmtNegotiationIndicator(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get MmtNegotiationIndicator int value
      * @return int value
      */
     public int getMmtNegotiationIndicatorValue() {
-        return value; 
+        return value;
     }
     
     /**

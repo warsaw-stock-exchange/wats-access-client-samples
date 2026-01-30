@@ -21,21 +21,21 @@ public enum PosType {
      * End-of-Day Qty.
      */
     FIN(3);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, PosType> TYPES = new HashMap<>();
     static {
         for (PosType type : PosType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     PosType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get PosType by attribute
      * @param val
@@ -44,13 +44,13 @@ public enum PosType {
     public static PosType getPosType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get PosType int value
      * @return int value
      */
     public int getPosTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

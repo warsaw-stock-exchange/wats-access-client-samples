@@ -33,21 +33,21 @@ public enum PriceUpdateType {
      * The fixing YTM (i.e. yield to maturity) appropriately placed in the value field as the average YTM, valueBid as the bid YTM, and valueAsk as the ask YTM.
      */
     FIXINGYTM(6);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, PriceUpdateType> TYPES = new HashMap<>();
     static {
         for (PriceUpdateType type : PriceUpdateType.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     PriceUpdateType(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get PriceUpdateType by attribute
      * @param val
@@ -56,13 +56,13 @@ public enum PriceUpdateType {
     public static PriceUpdateType getPriceUpdateType(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get PriceUpdateType int value
      * @return int value
      */
     public int getPriceUpdateTypeValue() {
-        return value; 
+        return value;
     }
     
     /**

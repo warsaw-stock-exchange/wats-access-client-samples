@@ -49,7 +49,7 @@ public class SingleInstrumentSummary implements ByteSerializable {
     private long endTradingDate;
     private long lastTradeDate;
     public static final int byteLength = 119;
-    
+
     public SingleInstrumentSummary(long instrumentId, MarketModelType marketModelType, long lastTradedPrice, long closingPrice, ClosingPriceType closingPriceType, long adjustedClosingPrice, AdjustedClosingPriceReason adjustedClosingPriceReason, long pctChange, long vwap, BigInteger noTrades, BigInteger totalVolume, long totalValue, long openingPrice, long maxPrice, long minPrice, long settlementPrice, long settlementValue, long endTradingDate, long lastTradeDate) {
         this.instrumentId = instrumentId;
         this.marketModelType = marketModelType;
@@ -233,7 +233,7 @@ public class SingleInstrumentSummary implements ByteSerializable {
     public long getLastTradeDate() {
         return this.lastTradeDate;
     }
-    
+
     /**
      * @param instrumentId Identifier of the instrument.
      */
@@ -366,7 +366,7 @@ public class SingleInstrumentSummary implements ByteSerializable {
     public void setLastTradeDate(long lastTradeDate) {
         this.lastTradeDate = lastTradeDate;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -392,7 +392,7 @@ public class SingleInstrumentSummary implements ByteSerializable {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
         marketModelType.toBytes(buffer);
@@ -414,7 +414,7 @@ public class SingleInstrumentSummary implements ByteSerializable {
         buffer.put(BendecUtils.uInt32ToByteArray(this.endTradingDate));
         buffer.put(BendecUtils.uInt32ToByteArray(this.lastTradeDate));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(instrumentId,

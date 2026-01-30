@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 public class IndexPortfolioEntryPresenceFlags {
     private int value;
     private final int byteLength = 1;
-    
+
     public IndexPortfolioEntryPresenceFlags(int value) {
         this.value = value;
     }
@@ -23,7 +23,7 @@ public class IndexPortfolioEntryPresenceFlags {
     public void add(IndexPortfolioEntryPresenceFlagsOptions flag) {
         this.value = this.value | flag.getOptionValue();
     }
-    
+
     public void remove(IndexPortfolioEntryPresenceFlagsOptions flag) {
         this.value = this.value ^ flag.getOptionValue();
     }
@@ -56,11 +56,11 @@ public class IndexPortfolioEntryPresenceFlags {
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
     }
-    
+
     public enum IndexPortfolioEntryPresenceFlagsOptions {
         NONE(0),
         HASINSTRUMENTID(1);
-        
+
         private final int optionValue;
         private static final Map<Integer, IndexPortfolioEntryPresenceFlagsOptions> TYPES = new HashMap<>();
         static {
@@ -68,7 +68,7 @@ public class IndexPortfolioEntryPresenceFlags {
                 TYPES.put(type.optionValue, type);
             }
         }
-        
+
         /**
          * Get IndexPortfolioEntryPresenceFlagsOptions by attribute
          * @param val
@@ -77,11 +77,11 @@ public class IndexPortfolioEntryPresenceFlags {
         public static IndexPortfolioEntryPresenceFlagsOptions getIndexPortfolioEntryPresenceFlags(int val) {
             return TYPES.get(val);
         }
-        
+
         IndexPortfolioEntryPresenceFlagsOptions(int newValue) {
             this.optionValue = newValue;
         }
-        
+
         public int getOptionValue() {
             return optionValue;
         }

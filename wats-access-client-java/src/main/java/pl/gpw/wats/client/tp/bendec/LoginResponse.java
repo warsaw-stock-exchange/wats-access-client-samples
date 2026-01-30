@@ -21,7 +21,7 @@ public class LoginResponse implements ByteSerializable, Message {
     private long lastReplaySeqNum;
     private int sessionId;
     public static final int byteLength = 35;
-    
+
     public LoginResponse(Header header, LoginResult result, long nextExpectedSeqNum, long lastReplaySeqNum, int sessionId) {
         this.header = header;
         this.result = result;
@@ -79,7 +79,7 @@ public class LoginResponse implements ByteSerializable, Message {
     public int getSessionId() {
         return this.sessionId;
     }
-    
+
     /**
      * @param header Header.
      */
@@ -114,7 +114,7 @@ public class LoginResponse implements ByteSerializable, Message {
     public void setSessionId(int sessionId) {
         this.sessionId = sessionId;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -126,7 +126,7 @@ public class LoginResponse implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         result.toBytes(buffer);
@@ -134,7 +134,7 @@ public class LoginResponse implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt32ToByteArray(this.lastReplaySeqNum));
         buffer.put(BendecUtils.uInt16ToByteArray(this.sessionId));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

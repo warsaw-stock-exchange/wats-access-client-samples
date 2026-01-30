@@ -25,7 +25,7 @@ public class PriceUpdate implements ByteSerializable, Message {
     private long valueBid;
     private long valueAsk;
     public static final int byteLength = 73;
-    
+
     public PriceUpdate(Header header, long instrumentId, PriceUpdateType priceUpdateType, PriceYtmPresence priceYtmPresence, long value, long valueBid, long valueAsk) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -101,7 +101,7 @@ public class PriceUpdate implements ByteSerializable, Message {
     public long getValueAsk() {
         return this.valueAsk;
     }
-    
+
     /**
      * @param header Message Header.
      */
@@ -150,7 +150,7 @@ public class PriceUpdate implements ByteSerializable, Message {
     public void setValueAsk(long valueAsk) {
         this.valueAsk = valueAsk;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -164,7 +164,7 @@ public class PriceUpdate implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
@@ -174,7 +174,7 @@ public class PriceUpdate implements ByteSerializable, Message {
         buffer.put(BendecUtils.int64ToByteArray(this.valueBid));
         buffer.put(BendecUtils.int64ToByteArray(this.valueAsk));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

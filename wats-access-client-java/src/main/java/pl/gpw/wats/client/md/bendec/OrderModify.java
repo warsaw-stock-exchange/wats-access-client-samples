@@ -25,7 +25,7 @@ public class OrderModify implements ByteSerializable, Message {
     private PriorityFlag priorityFlag;
     private OrderSide side;
     public static final int byteLength = 72;
-    
+
     public OrderModify(Header header, long instrumentId, BigInteger publicOrderId, long price, BigInteger quantity, PriorityFlag priorityFlag, OrderSide side) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -101,7 +101,7 @@ public class OrderModify implements ByteSerializable, Message {
     public OrderSide getSide() {
         return this.side;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -150,7 +150,7 @@ public class OrderModify implements ByteSerializable, Message {
     public void setSide(OrderSide side) {
         this.side = side;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -164,7 +164,7 @@ public class OrderModify implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
@@ -174,7 +174,7 @@ public class OrderModify implements ByteSerializable, Message {
         priorityFlag.toBytes(buffer);
         side.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 public class MessageFilter {
     private int value;
     private final int byteLength = 1;
-    
+
     public MessageFilter(int value) {
         this.value = value;
     }
@@ -23,7 +23,7 @@ public class MessageFilter {
     public void add(MessageFilterOptions flag) {
         this.value = this.value | flag.getOptionValue();
     }
-    
+
     public void remove(MessageFilterOptions flag) {
         this.value = this.value ^ flag.getOptionValue();
     }
@@ -56,7 +56,7 @@ public class MessageFilter {
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
     }
-    
+
     public enum MessageFilterOptions {
         /**
          * Disable trades and ref_data.
@@ -70,7 +70,7 @@ public class MessageFilter {
          * Enable ref_data.
          */
         REFDATA(2);
-        
+
         private final int optionValue;
         private static final Map<Integer, MessageFilterOptions> TYPES = new HashMap<>();
         static {
@@ -78,7 +78,7 @@ public class MessageFilter {
                 TYPES.put(type.optionValue, type);
             }
         }
-        
+
         /**
          * Get MessageFilterOptions by attribute
          * @param val
@@ -87,11 +87,11 @@ public class MessageFilter {
         public static MessageFilterOptions getMessageFilter(int val) {
             return TYPES.get(val);
         }
-        
+
         MessageFilterOptions(int newValue) {
             this.optionValue = newValue;
         }
-        
+
         public int getOptionValue() {
             return optionValue;
         }

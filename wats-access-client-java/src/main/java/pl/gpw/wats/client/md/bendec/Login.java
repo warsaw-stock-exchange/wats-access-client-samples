@@ -19,7 +19,7 @@ public class Login implements ByteSerializable, Message {
     private String token;
     private MessageFilter filter;
     public static final int byteLength = 53;
-    
+
     public Login(Header header, int connectionId, String token, MessageFilter filter) {
         this.header = header;
         this.connectionId = connectionId;
@@ -68,7 +68,7 @@ public class Login implements ByteSerializable, Message {
     public MessageFilter getFilter() {
         return this.filter;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -96,7 +96,7 @@ public class Login implements ByteSerializable, Message {
     public void setFilter(MessageFilter filter) {
         this.filter = filter;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -107,14 +107,14 @@ public class Login implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt16ToByteArray(this.connectionId));
         buffer.put(BendecUtils.stringToByteArray(this.token, 8));
         filter.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

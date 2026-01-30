@@ -25,7 +25,7 @@ public class BidOfferUpdate implements ByteSerializable, Message {
     private long bidOrders;
     private long offerOrders;
     public static final int byteLength = 53;
-    
+
     public BidOfferUpdate(Header header, long instrumentId, BidOfferUpdateType updateType, BigInteger totalBidSize, BigInteger totalOfferSize, long bidOrders, long offerOrders) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -101,7 +101,7 @@ public class BidOfferUpdate implements ByteSerializable, Message {
     public long getOfferOrders() {
         return this.offerOrders;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -150,7 +150,7 @@ public class BidOfferUpdate implements ByteSerializable, Message {
     public void setOfferOrders(long offerOrders) {
         this.offerOrders = offerOrders;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -164,7 +164,7 @@ public class BidOfferUpdate implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
@@ -174,7 +174,7 @@ public class BidOfferUpdate implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt32ToByteArray(this.bidOrders));
         buffer.put(BendecUtils.uInt32ToByteArray(this.offerOrders));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

@@ -17,7 +17,7 @@ public class OrderBookEvent implements ByteSerializable, Message {
     private long instrumentId;
     private OrderBookEventType eventType;
     public static final int byteLength = 47;
-    
+
     public OrderBookEvent(Header header, long instrumentId, OrderBookEventType eventType) {
         this.header = header;
         this.instrumentId = instrumentId;
@@ -57,7 +57,7 @@ public class OrderBookEvent implements ByteSerializable, Message {
     public OrderBookEventType getEventType() {
         return this.eventType;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -78,7 +78,7 @@ public class OrderBookEvent implements ByteSerializable, Message {
     public void setEventType(OrderBookEventType eventType) {
         this.eventType = eventType;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -88,13 +88,13 @@ public class OrderBookEvent implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.instrumentId));
         eventType.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

@@ -15,7 +15,7 @@ public class Quotes implements ByteSerializable {
     private int count;
     private Quote[] items;
     public static final int byteLength = 1081;
-    
+
     public Quotes(int count, Quote[] items) {
         this.count = count;
         this.items = items;
@@ -49,7 +49,7 @@ public class Quotes implements ByteSerializable {
     public Quote[] getItems() {
         return this.items;
     }
-    
+
     /**
      * @param count How many quotes this message contains.
      */
@@ -63,7 +63,7 @@ public class Quotes implements ByteSerializable {
     public void setItems(Quote[] items) {
         this.items = items;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -74,14 +74,14 @@ public class Quotes implements ByteSerializable {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt8ToByteArray(this.count));
         for(int i = 0; i < items.length; i++) {
             items[i].toBytes(buffer);
         }
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(count,

@@ -25,7 +25,7 @@ public class News implements ByteSerializable, Message {
     private int total;
     private String text;
     public static final int byteLength = 932;
-    
+
     public News(Header header, long marketStructureId, long newsId, String title, int entryNumber, int total, String text) {
         this.header = header;
         this.marketStructureId = marketStructureId;
@@ -101,7 +101,7 @@ public class News implements ByteSerializable, Message {
     public String getText() {
         return this.text;
     }
-    
+
     /**
      * @param header Message header
      */
@@ -150,7 +150,7 @@ public class News implements ByteSerializable, Message {
     public void setText(String text) {
         this.text = text;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -164,7 +164,7 @@ public class News implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.marketStructureId));
@@ -174,7 +174,7 @@ public class News implements ByteSerializable, Message {
         buffer.put(BendecUtils.uInt8ToByteArray(this.total));
         buffer.put(BendecUtils.stringToByteArray(this.text, 800));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

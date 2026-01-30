@@ -23,7 +23,7 @@ public class MarketStructure implements ByteSerializable, Message {
     private String name;
     private MarketModelType marketModelType;
     public static final int byteLength = 105;
-    
+
     public MarketStructure(Header header, long id, long parentId, String mic, String name, MarketModelType marketModelType) {
         this.header = header;
         this.id = id;
@@ -90,7 +90,7 @@ public class MarketStructure implements ByteSerializable, Message {
     public MarketModelType getMarketModelType() {
         return this.marketModelType;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -132,7 +132,7 @@ public class MarketStructure implements ByteSerializable, Message {
     public void setMarketModelType(MarketModelType marketModelType) {
         this.marketModelType = marketModelType;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -145,7 +145,7 @@ public class MarketStructure implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.id));
@@ -154,7 +154,7 @@ public class MarketStructure implements ByteSerializable, Message {
         buffer.put(BendecUtils.stringToByteArray(this.name, 50));
         marketModelType.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

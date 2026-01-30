@@ -17,21 +17,21 @@ public enum MassQuoteStatus {
      * Mass quote rejected.
      */
     REJECTED(2);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, MassQuoteStatus> TYPES = new HashMap<>();
     static {
         for (MassQuoteStatus type : MassQuoteStatus.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     MassQuoteStatus(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get MassQuoteStatus by attribute
      * @param val
@@ -40,13 +40,13 @@ public enum MassQuoteStatus {
     public static MassQuoteStatus getMassQuoteStatus(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get MassQuoteStatus int value
      * @return int value
      */
     public int getMassQuoteStatusValue() {
-        return value; 
+        return value;
     }
     
     /**

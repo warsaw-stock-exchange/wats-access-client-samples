@@ -6,6 +6,6 @@
     "gen-java": "node ./messages/generator/generateJava"
   },
   "dependencies": {
-    "bendec": "0.50.0"
+    "bendec": "0.55.0"
   }
 }

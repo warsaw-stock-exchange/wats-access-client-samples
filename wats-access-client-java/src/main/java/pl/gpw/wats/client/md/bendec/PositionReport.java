@@ -12,22 +12,22 @@ import java.nio.ByteBuffer;
  * <p>PublicProductIdentification publicProductIdentification - Product identification, for example its ISIN number. | size 31</p>
  * <p>PosType posType - Type of quantity returned. | size 1</p>
  * <p>u32 > long openPositions - Number of open positions. | size 4</p>
- * <p>TradeId > long (u32) tradeID - Trade ID. | size 4</p>
+ * <p>TradeId > long (u32) tradeId - Trade ID. | size 4</p>
  */
 public class PositionReport implements ByteSerializable, Message {
     private Header header;
     private PublicProductIdentification publicProductIdentification;
     private PosType posType;
     private long openPositions;
-    private long tradeID;
+    private long tradeId;
     public static final int byteLength = 82;
-    
-    public PositionReport(Header header, PublicProductIdentification publicProductIdentification, PosType posType, long openPositions, long tradeID) {
+
+    public PositionReport(Header header, PublicProductIdentification publicProductIdentification, PosType posType, long openPositions, long tradeId) {
         this.header = header;
         this.publicProductIdentification = publicProductIdentification;
         this.posType = posType;
         this.openPositions = openPositions;
-        this.tradeID = tradeID;
+        this.tradeId = tradeId;
     }
     
     public PositionReport(byte[] bytes, int offset) {
@@ -35,7 +35,7 @@ public class PositionReport implements ByteSerializable, Message {
         this.publicProductIdentification = new PublicProductIdentification(bytes, offset + 42);
         this.posType = PosType.getPosType(bytes, offset + 73);
         this.openPositions = BendecUtils.uInt32FromByteArray(bytes, offset + 74);
-        this.tradeID = BendecUtils.uInt32FromByteArray(bytes, offset + 78);
+        this.tradeId = BendecUtils.uInt32FromByteArray(bytes, offset + 78);
     }
     
     public PositionReport(byte[] bytes) {
@@ -76,10 +76,10 @@ public class PositionReport implements ByteSerializable, Message {
     /**
      * @return Trade ID.
      */
-    public long getTradeID() {
-        return this.tradeID;
+    public long getTradeId() {
+        return this.tradeId;
     }
-    
+
     /**
      * @param header Message Header.
      */
@@ -109,12 +109,12 @@ public class PositionReport implements ByteSerializable, Message {
     }
     
     /**
-     * @param tradeID Trade ID.
+     * @param tradeId Trade ID.
      */
-    public void setTradeID(long tradeID) {
-        this.tradeID = tradeID;
+    public void setTradeId(long tradeId) {
+        this.tradeId = tradeId;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -122,26 +122,26 @@ public class PositionReport implements ByteSerializable, Message {
         publicProductIdentification.toBytes(buffer);
         posType.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.openPositions));
-        buffer.put(BendecUtils.uInt32ToByteArray(this.tradeID));
+        buffer.put(BendecUtils.uInt32ToByteArray(this.tradeId));
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         publicProductIdentification.toBytes(buffer);
         posType.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.openPositions));
-        buffer.put(BendecUtils.uInt32ToByteArray(this.tradeID));
+        buffer.put(BendecUtils.uInt32ToByteArray(this.tradeId));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,
         publicProductIdentification,
         posType,
         openPositions,
-        tradeID);
+        tradeId);
     }
     
     @Override
@@ -151,7 +151,7 @@ public class PositionReport implements ByteSerializable, Message {
             ", publicProductIdentification=" + publicProductIdentification +
             ", posType=" + posType +
             ", openPositions=" + openPositions +
-            ", tradeID=" + tradeID +
+            ", tradeId=" + tradeId +
             "}";
     }
 }

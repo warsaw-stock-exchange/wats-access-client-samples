@@ -23,7 +23,7 @@ public class PriceLevel implements ByteSerializable {
     private BigInteger quantity;
     private int orderCount;
     public static final int byteLength = 31;
-    
+
     public PriceLevel(boolean isEncrypted, BigInteger encryptionOffset, long encryptionKeyId, long price, BigInteger quantity, int orderCount) {
         this.isEncrypted = isEncrypted;
         this.encryptionOffset = encryptionOffset;
@@ -90,7 +90,7 @@ public class PriceLevel implements ByteSerializable {
     public int getOrderCount() {
         return this.orderCount;
     }
-    
+
     /**
      * @param isEncrypted A boolean value specifying whether the level is encrypted.
      */
@@ -132,7 +132,7 @@ public class PriceLevel implements ByteSerializable {
     public void setOrderCount(int orderCount) {
         this.orderCount = orderCount;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -145,7 +145,7 @@ public class PriceLevel implements ByteSerializable {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.booleanToByteArray(this.isEncrypted));
         buffer.put(BendecUtils.uInt64ToByteArray(this.encryptionOffset));
@@ -154,7 +154,7 @@ public class PriceLevel implements ByteSerializable {
         buffer.put(BendecUtils.uInt64ToByteArray(this.quantity));
         buffer.put(BendecUtils.uInt16ToByteArray(this.orderCount));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(isEncrypted,

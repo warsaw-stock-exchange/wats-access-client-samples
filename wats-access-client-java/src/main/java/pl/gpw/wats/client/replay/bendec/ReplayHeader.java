@@ -15,7 +15,7 @@ public class ReplayHeader implements ByteSerializable {
     private int length;
     private ReplayMsgType replayMsgType;
     public static final int byteLength = 4;
-    
+
     public ReplayHeader(int length, ReplayMsgType replayMsgType) {
         this.length = length;
         this.replayMsgType = replayMsgType;
@@ -46,7 +46,7 @@ public class ReplayHeader implements ByteSerializable {
     public ReplayMsgType getReplayMsgType() {
         return this.replayMsgType;
     }
-    
+
     /**
      * @param length Message length.
      */
@@ -60,7 +60,7 @@ public class ReplayHeader implements ByteSerializable {
     public void setReplayMsgType(ReplayMsgType replayMsgType) {
         this.replayMsgType = replayMsgType;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -69,12 +69,12 @@ public class ReplayHeader implements ByteSerializable {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt16ToByteArray(this.length));
         replayMsgType.toBytes(buffer);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(length,

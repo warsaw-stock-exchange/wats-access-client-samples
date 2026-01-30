@@ -729,21 +729,21 @@ public enum Currency {
      * The codes assigned for transactions where no currency is involved
      */
     XXX(999);
-    
+
     private final int value;
     private final int byteLength = 2;
-    
+
     private static final Map<Integer, Currency> TYPES = new HashMap<>();
     static {
         for (Currency type : Currency.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     Currency(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get Currency by attribute
      * @param val
@@ -752,13 +752,13 @@ public enum Currency {
     public static Currency getCurrency(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get Currency int value
      * @return int value
      */
     public int getCurrencyValue() {
-        return value; 
+        return value;
     }
     
     /**

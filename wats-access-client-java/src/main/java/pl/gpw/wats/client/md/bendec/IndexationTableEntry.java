@@ -19,7 +19,7 @@ public class IndexationTableEntry implements ByteSerializable, Message {
     private long indexationTableEntryDate;
     private long indexationTableEntryValue;
     public static final int byteLength = 58;
-    
+
     public IndexationTableEntry(Header header, long productId, long indexationTableEntryDate, long indexationTableEntryValue) {
         this.header = header;
         this.productId = productId;
@@ -68,7 +68,7 @@ public class IndexationTableEntry implements ByteSerializable, Message {
     public long getIndexationTableEntryValue() {
         return this.indexationTableEntryValue;
     }
-    
+
     /**
      * @param header Message header.
      */
@@ -96,7 +96,7 @@ public class IndexationTableEntry implements ByteSerializable, Message {
     public void setIndexationTableEntryValue(long indexationTableEntryValue) {
         this.indexationTableEntryValue = indexationTableEntryValue;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -107,14 +107,14 @@ public class IndexationTableEntry implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt32ToByteArray(this.productId));
         buffer.put(BendecUtils.uInt32ToByteArray(this.indexationTableEntryDate));
         buffer.put(BendecUtils.int64ToByteArray(this.indexationTableEntryValue));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

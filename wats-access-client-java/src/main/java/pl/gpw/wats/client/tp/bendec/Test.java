@@ -15,7 +15,7 @@ public class Test implements ByteSerializable, Message {
     private Header header;
     private BigInteger targetTimestamp;
     public static final int byteLength = 32;
-    
+
     public Test(Header header, BigInteger targetTimestamp) {
         this.header = header;
         this.targetTimestamp = targetTimestamp;
@@ -46,7 +46,7 @@ public class Test implements ByteSerializable, Message {
     public BigInteger getTargetTimestamp() {
         return this.targetTimestamp;
     }
-    
+
     /**
      * @param header Header.
      */
@@ -60,7 +60,7 @@ public class Test implements ByteSerializable, Message {
     public void setTargetTimestamp(BigInteger targetTimestamp) {
         this.targetTimestamp = targetTimestamp;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -69,12 +69,12 @@ public class Test implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt64ToByteArray(this.targetTimestamp));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,

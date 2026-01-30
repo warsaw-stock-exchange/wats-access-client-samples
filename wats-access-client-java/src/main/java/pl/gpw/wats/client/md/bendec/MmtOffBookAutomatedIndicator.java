@@ -21,21 +21,21 @@ public enum MmtOffBookAutomatedIndicator {
      * Q = Off Book Automated
      */
     OFFBOOKAUTOMATED(3);
-    
+
     private final int value;
     private final int byteLength = 1;
-    
+
     private static final Map<Integer, MmtOffBookAutomatedIndicator> TYPES = new HashMap<>();
     static {
         for (MmtOffBookAutomatedIndicator type : MmtOffBookAutomatedIndicator.values()) {
             TYPES.put(type.value, type);
         }
     }
-    
+
     MmtOffBookAutomatedIndicator(int newValue) {
         value = newValue;
     }
-    
+
     /**
      * Get MmtOffBookAutomatedIndicator by attribute
      * @param val
@@ -44,13 +44,13 @@ public enum MmtOffBookAutomatedIndicator {
     public static MmtOffBookAutomatedIndicator getMmtOffBookAutomatedIndicator(int val) {
         return TYPES.get(val);
     }
-    
+
     /**
      * Get MmtOffBookAutomatedIndicator int value
      * @return int value
      */
     public int getMmtOffBookAutomatedIndicatorValue() {
-        return value; 
+        return value;
     }
     
     /**

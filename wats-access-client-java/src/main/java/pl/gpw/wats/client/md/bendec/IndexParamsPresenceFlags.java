@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 public class IndexParamsPresenceFlags {
     private int value;
     private final int byteLength = 1;
-    
+
     public IndexParamsPresenceFlags(int value) {
         this.value = value;
     }
@@ -23,7 +23,7 @@ public class IndexParamsPresenceFlags {
     public void add(IndexParamsPresenceFlagsOptions flag) {
         this.value = this.value | flag.getOptionValue();
     }
-    
+
     public void remove(IndexParamsPresenceFlagsOptions flag) {
         this.value = this.value ^ flag.getOptionValue();
     }
@@ -56,12 +56,12 @@ public class IndexParamsPresenceFlags {
     void toBytes(ByteBuffer buffer) {
         buffer.put(BendecUtils.uInt8ToByteArray(this.value));
     }
-    
+
     public enum IndexParamsPresenceFlagsOptions {
         NONE(0),
         HASDAYSSINCELASTPUBLICATION(1),
         HASNUMBEROFDIVIDENDS(2);
-        
+
         private final int optionValue;
         private static final Map<Integer, IndexParamsPresenceFlagsOptions> TYPES = new HashMap<>();
         static {
@@ -69,7 +69,7 @@ public class IndexParamsPresenceFlags {
                 TYPES.put(type.optionValue, type);
             }
         }
-        
+
         /**
          * Get IndexParamsPresenceFlagsOptions by attribute
          * @param val
@@ -78,11 +78,11 @@ public class IndexParamsPresenceFlags {
         public static IndexParamsPresenceFlagsOptions getIndexParamsPresenceFlags(int val) {
             return TYPES.get(val);
         }
-        
+
         IndexParamsPresenceFlagsOptions(int newValue) {
             this.optionValue = newValue;
         }
-        
+
         public int getOptionValue() {
             return optionValue;
         }

@@ -25,7 +25,7 @@ public class OrderModifyResponse implements ByteSerializable, Message {
     private OrderRejectionReason reason;
     private String clientOrderId;
     public static final int byteLength = 64;
-    
+
     public OrderModifyResponse(Header header, BigInteger orderId, BigInteger filled, OrderStatus status, PriorityFlag priorityFlag, OrderRejectionReason reason, String clientOrderId) {
         this.header = header;
         this.orderId = orderId;
@@ -101,7 +101,7 @@ public class OrderModifyResponse implements ByteSerializable, Message {
     public String getClientOrderId() {
         return this.clientOrderId;
     }
-    
+
     /**
      * @param header Header.
      */
@@ -150,7 +150,7 @@ public class OrderModifyResponse implements ByteSerializable, Message {
     public void setClientOrderId(String clientOrderId) {
         this.clientOrderId = clientOrderId;
     }
-    
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(this.byteLength);
@@ -164,7 +164,7 @@ public class OrderModifyResponse implements ByteSerializable, Message {
         return buffer.array();
     }
     
-    @Override  
+    @Override
     public void toBytes(ByteBuffer buffer) {
         header.toBytes(buffer);
         buffer.put(BendecUtils.uInt64ToByteArray(this.orderId));
@@ -174,7 +174,7 @@ public class OrderModifyResponse implements ByteSerializable, Message {
         reason.toBytes(buffer);
         buffer.put(BendecUtils.stringToByteArray(this.clientOrderId, 20));
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(header,
