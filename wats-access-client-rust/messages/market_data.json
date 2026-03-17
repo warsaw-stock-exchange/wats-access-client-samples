@@ -1,6 +1,6 @@
 {
   "$schema": "./schema.json",
-  "version": 2088,
+  "version": 2089,
   "typeDefinitions": {
     "marketData": [
       {
@@ -6233,7 +6233,7 @@
           {
             "name": "markerPriceChange",
             "type": "ChangeIndicator",
-            "description": "The field contains the market of the percentage change of the instrument closing price from the current session in relation to the reference price.",
+            "description": "The field contains the direction of the percentage change in the instrument closing price from the current session in relation to the reference price.",
             "$metadata": {
               "isEncrypted": true
             }
@@ -6700,7 +6700,7 @@
           [
             "NonPriceFormingTrade",
             2,
-            "I = Non-Price Forming Trade (formerly defined as a Technical Trade)"
+            "T = Non-Price Forming Trade (formerly defined as a Technical Trade)"
           ],
           [
             "TradeNotContributingToPriceDiscovery",

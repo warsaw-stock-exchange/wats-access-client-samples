@@ -14,7 +14,7 @@ public enum MmtOrdinaryTradeIndicator {
      */
     PLAINVANILLATRADE(1),
     /**
-     * I = Non-Price Forming Trade (formerly defined as a Technical Trade)
+     * T = Non-Price Forming Trade (formerly defined as a Technical Trade)
      */
     NONPRICEFORMINGTRADE(2),
     /**

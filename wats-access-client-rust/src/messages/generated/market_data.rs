@@ -4042,7 +4042,7 @@ pub struct ProductSummary {
   pub sector: u16,
   /// Defines the market the instrument belongs to. The field assumes were described in the WATS Market Data documentation.
   pub market: u8,
-  /// The field contains the market of the percentage change of the instrument closing price from the current session in relation to the reference price.
+  /// The field contains the direction of the percentage change in the instrument closing price from the current session in relation to the reference price.
   pub marker_price_change: ChangeIndicator,
   /// The positive field value (true) informs if the company was qualified to Lower Liquidity Space. A negative value has the opposite meaning.
   pub lower_liquidity: bool,
@@ -4419,7 +4419,7 @@ impl std::convert::TryFrom<u8> for MmtOffBookAutomatedIndicator {
 pub enum MmtOrdinaryTradeIndicator {
   /// P = Plain-Vanilla Trade
   PlainVanillaTrade = 0x0001,
-  /// I = Non-Price Forming Trade (formerly defined as a Technical Trade)
+  /// T = Non-Price Forming Trade (formerly defined as a Technical Trade)
   NonPriceFormingTrade = 0x0002,
   /// J = Trade not contributing to the price discovery process (formerly defined as a Technical Trade)
   TradeNotContributingToPriceDiscovery = 0x0003,

@@ -25,7 +25,7 @@ import java.nio.ByteBuffer;
  * <p>InstrumentStatus status - Financial instrument status. | size 1</p>
  * <p>u16 > int sector - Defines the sector of the economy that the company belongs to. Possible values for shares, the field assumes were described in the WATS Market Data documentation. | size 2</p>
  * <p>u8 > int market - Defines the market the instrument belongs to. The field assumes were described in the WATS Market Data documentation. | size 1</p>
- * <p>ChangeIndicator markerPriceChange - The field contains the market of the percentage change of the instrument closing price from the current session in relation to the reference price. | size 1</p>
+ * <p>ChangeIndicator markerPriceChange - The field contains the direction of the percentage change in the instrument closing price from the current session in relation to the reference price. | size 1</p>
  * <p>bool > boolean lowerLiquidity - The positive field value (true) informs if the company was qualified to Lower Liquidity Space. A negative value has the opposite meaning. | size 1</p>
  * <p>Number > long (i64) multiplier - Instrument multiplier. | size 8</p>
  * <p>Number > long (i64) dividendRate - Dividend rate for the company is given on the basis of dividends paid by companies being the base instrument for futures and options. | size 8</p>
@@ -281,7 +281,7 @@ public class ProductSummary implements ByteSerializable, Message {
     }
     
     /**
-     * @return The field contains the market of the percentage change of the instrument closing price from the current session in relation to the reference price.
+     * @return The field contains the direction of the percentage change in the instrument closing price from the current session in relation to the reference price.
      */
     public ChangeIndicator getMarkerPriceChange() {
         return this.markerPriceChange;
@@ -519,7 +519,7 @@ public class ProductSummary implements ByteSerializable, Message {
     }
     
     /**
-     * @param markerPriceChange The field contains the market of the percentage change of the instrument closing price from the current session in relation to the reference price.
+     * @param markerPriceChange The field contains the direction of the percentage change in the instrument closing price from the current session in relation to the reference price.
      */
     public void setMarkerPriceChange(ChangeIndicator markerPriceChange) {
         this.markerPriceChange = markerPriceChange;
