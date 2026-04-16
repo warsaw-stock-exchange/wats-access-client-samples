@@ -1,5 +1,5 @@
 {
-  "version": 1136,
+  "version": 1137,
   "typeDefinitions": [
     {
       "kind": "Primitive",
@@ -4594,6 +4594,41 @@
           "MmCannotRevokeMarketOperationKnockOut",
           1314,
           "Market Maker's attempt to revoke Market Operation's knock-out on an instrument."
+        ],
+        [
+          "KnockOutOrRevokeKnockOutOperationsNotAllowedDuringInstrumentSuspension",
+          1315,
+          "Cannot knockout or revoke knockout for suspended instrument."
+        ],
+        [
+          "RevokeKnockOutOperationsNotAllowedOnceBarrierIsReached",
+          1316,
+          "Revoke knockout cannot be submitted once knock-out barrier has been reached."
+        ],
+        [
+          "MMCommandNotAllowedForSelectedMarketModel",
+          1317,
+          "Market maker command not allowed for selected market model."
+        ],
+        [
+          "RevokeKnockOutOperationsNotAllowedForActiveInstrument",
+          1318,
+          "Revoke hybrid knockout command is not applicable for active instruments."
+        ],
+        [
+          "RequestNotAllowedForBlockInstrument",
+          2026,
+          "BLOCK instrument cannot be put in hybrid knockout"
+        ],
+        [
+          "RequestNotAllowedForClobInstrument",
+          2027,
+          "CLOB instrument cannot be put in hybrid knockout"
+        ],
+        [
+          "RequestNotAllowedForCrossInstrument",
+          2028,
+          "CROSS instrument cannot be put in hybrid knockout"
         ],
         [
           "ExchangeClosed",

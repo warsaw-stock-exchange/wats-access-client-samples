@@ -23,6 +23,34 @@ public enum CommandRejectionCode {
      * Market Maker's attempt to revoke Market Operation's knock-out on an instrument.
      */
     MMCANNOTREVOKEMARKETOPERATIONKNOCKOUT(1314),
+    /**
+     * Cannot knockout or revoke knockout for suspended instrument.
+     */
+    KNOCKOUTORREVOKEKNOCKOUTOPERATIONSNOTALLOWEDDURINGINSTRUMENTSUSPENSION(1315),
+    /**
+     * Revoke knockout cannot be submitted once knock-out barrier has been reached.
+     */
+    REVOKEKNOCKOUTOPERATIONSNOTALLOWEDONCEBARRIERISREACHED(1316),
+    /**
+     * Market maker command not allowed for selected market model.
+     */
+    MMCOMMANDNOTALLOWEDFORSELECTEDMARKETMODEL(1317),
+    /**
+     * Revoke hybrid knockout command is not applicable for active instruments.
+     */
+    REVOKEKNOCKOUTOPERATIONSNOTALLOWEDFORACTIVEINSTRUMENT(1318),
+    /**
+     * BLOCK instrument cannot be put in hybrid knockout
+     */
+    REQUESTNOTALLOWEDFORBLOCKINSTRUMENT(2026),
+    /**
+     * CLOB instrument cannot be put in hybrid knockout
+     */
+    REQUESTNOTALLOWEDFORCLOBINSTRUMENT(2027),
+    /**
+     * CROSS instrument cannot be put in hybrid knockout
+     */
+    REQUESTNOTALLOWEDFORCROSSINSTRUMENT(2028),
     EXCHANGECLOSED(3002),
     FIRMNOTAUTHORIZEDTOQUOTEINSTRUMENT(3009),
     COMMANDNOTALLOWEDINCURRENTSTATE(3020);

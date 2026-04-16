@@ -4504,6 +4504,20 @@ pub enum CommandRejectionCode {
   InstrumentAlreadyKnockedOut = 0x0521,
   /// Market Maker's attempt to revoke Market Operation's knock-out on an instrument.
   MmCannotRevokeMarketOperationKnockOut = 0x0522,
+  /// Cannot knockout or revoke knockout for suspended instrument.
+  KnockOutOrRevokeKnockOutOperationsNotAllowedDuringInstrumentSuspension = 0x0523,
+  /// Revoke knockout cannot be submitted once knock-out barrier has been reached.
+  RevokeKnockOutOperationsNotAllowedOnceBarrierIsReached = 0x0524,
+  /// Market maker command not allowed for selected market model.
+  MMCommandNotAllowedForSelectedMarketModel = 0x0525,
+  /// Revoke hybrid knockout command is not applicable for active instruments.
+  RevokeKnockOutOperationsNotAllowedForActiveInstrument = 0x0526,
+  /// BLOCK instrument cannot be put in hybrid knockout
+  RequestNotAllowedForBlockInstrument = 0x07ea,
+  /// CLOB instrument cannot be put in hybrid knockout
+  RequestNotAllowedForClobInstrument = 0x07eb,
+  /// CROSS instrument cannot be put in hybrid knockout
+  RequestNotAllowedForCrossInstrument = 0x07ec,
   ExchangeClosed = 0x0bba,
   FirmNotAuthorizedToQuoteInstrument = 0x0bc1,
   CommandNotAllowedInCurrentState = 0x0bcc,
@@ -4522,6 +4536,13 @@ impl std::convert::TryFrom<u16> for CommandRejectionCode {
       0x0518 => Ok(Self::FirmNotAuthorizedForMmCommand),
       0x0521 => Ok(Self::InstrumentAlreadyKnockedOut),
       0x0522 => Ok(Self::MmCannotRevokeMarketOperationKnockOut),
+      0x0523 => Ok(Self::KnockOutOrRevokeKnockOutOperationsNotAllowedDuringInstrumentSuspension),
+      0x0524 => Ok(Self::RevokeKnockOutOperationsNotAllowedOnceBarrierIsReached),
+      0x0525 => Ok(Self::MMCommandNotAllowedForSelectedMarketModel),
+      0x0526 => Ok(Self::RevokeKnockOutOperationsNotAllowedForActiveInstrument),
+      0x07ea => Ok(Self::RequestNotAllowedForBlockInstrument),
+      0x07eb => Ok(Self::RequestNotAllowedForClobInstrument),
+      0x07ec => Ok(Self::RequestNotAllowedForCrossInstrument),
       0x0bba => Ok(Self::ExchangeClosed),
       0x0bc1 => Ok(Self::FirmNotAuthorizedToQuoteInstrument),
       0x0bcc => Ok(Self::CommandNotAllowedInCurrentState),
@@ -4537,6 +4558,13 @@ impl CommandRejectionCodeInt {
   pub const FirmNotAuthorizedForMmCommand: u16 = 0x0518;
   pub const InstrumentAlreadyKnockedOut: u16 = 0x0521;
   pub const MmCannotRevokeMarketOperationKnockOut: u16 = 0x0522;
+  pub const KnockOutOrRevokeKnockOutOperationsNotAllowedDuringInstrumentSuspension: u16 = 0x0523;
+  pub const RevokeKnockOutOperationsNotAllowedOnceBarrierIsReached: u16 = 0x0524;
+  pub const MMCommandNotAllowedForSelectedMarketModel: u16 = 0x0525;
+  pub const RevokeKnockOutOperationsNotAllowedForActiveInstrument: u16 = 0x0526;
+  pub const RequestNotAllowedForBlockInstrument: u16 = 0x07ea;
+  pub const RequestNotAllowedForClobInstrument: u16 = 0x07eb;
+  pub const RequestNotAllowedForCrossInstrument: u16 = 0x07ec;
   pub const ExchangeClosed: u16 = 0x0bba;
   pub const FirmNotAuthorizedToQuoteInstrument: u16 = 0x0bc1;
   pub const CommandNotAllowedInCurrentState: u16 = 0x0bcc;
@@ -4550,7 +4578,7 @@ impl BytesValidator for CommandRejectionCode {
     unsafe fn is_valid(bytes: &[u8]) -> bool {
       debug_assert_eq!(bytes.len(), std::mem::size_of::<Self>());
       let disc = std::convert::TryInto::try_into(bytes).map(u16::from_le_bytes).unwrap_unchecked();
-  matches!(disc, CommandRejectionCodeInt::Other | CommandRejectionCodeInt::UnknownInstrument | CommandRejectionCodeInt::FirmNotAuthorizedForMmCommand | CommandRejectionCodeInt::InstrumentAlreadyKnockedOut | CommandRejectionCodeInt::MmCannotRevokeMarketOperationKnockOut | CommandRejectionCodeInt::ExchangeClosed | CommandRejectionCodeInt::FirmNotAuthorizedToQuoteInstrument | CommandRejectionCodeInt::CommandNotAllowedInCurrentState)
+  matches!(disc, CommandRejectionCodeInt::Other | CommandRejectionCodeInt::UnknownInstrument | CommandRejectionCodeInt::FirmNotAuthorizedForMmCommand | CommandRejectionCodeInt::InstrumentAlreadyKnockedOut | CommandRejectionCodeInt::MmCannotRevokeMarketOperationKnockOut | CommandRejectionCodeInt::KnockOutOrRevokeKnockOutOperationsNotAllowedDuringInstrumentSuspension | CommandRejectionCodeInt::RevokeKnockOutOperationsNotAllowedOnceBarrierIsReached | CommandRejectionCodeInt::MMCommandNotAllowedForSelectedMarketModel | CommandRejectionCodeInt::RevokeKnockOutOperationsNotAllowedForActiveInstrument | CommandRejectionCodeInt::RequestNotAllowedForBlockInstrument | CommandRejectionCodeInt::RequestNotAllowedForClobInstrument | CommandRejectionCodeInt::RequestNotAllowedForCrossInstrument | CommandRejectionCodeInt::ExchangeClosed | CommandRejectionCodeInt::FirmNotAuthorizedToQuoteInstrument | CommandRejectionCodeInt::CommandNotAllowedInCurrentState)
     }
   }
 
