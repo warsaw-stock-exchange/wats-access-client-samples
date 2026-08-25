@@ -39,7 +39,6 @@ if(BUILD_TESTS)
     add_library(wats STATIC
         ${WATS_SRC}/decrypt.cpp
         ${WATS_SRC}/omd.cpp
-        ${WATS_SRC}/dmd.cpp
         ${WATS_SRC}/bbo.cpp
         ${WATS_SRC}/btp.cpp
     )

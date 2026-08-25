@@ -1,5 +1,5 @@
 {
-  "version": 1137,
+  "version": 1138,
   "typeDefinitions": [
     {
       "kind": "Primitive",
@@ -827,6 +827,11 @@
           "InvalidClearingMemberCodeLength",
           1085,
           "Clearing Member code must be 4-digit number in case of custom codes and 20-char string in case of LEI."
+        ],
+        [
+          "OperationUnsuccessfulRetryNeeded",
+          1086,
+          "Operation could not be completed successfully due to a temporary lock. Resending the request is advised."
         ],
         [
           "MassQuoteNotAllowedForSelectedMarketModel",

@@ -2,7 +2,6 @@
 #define WATS_HPP
 
 #include "omd.hpp"
-#include "dmd.hpp"
 #include "bbo.hpp"
 #include "btp.hpp"
 

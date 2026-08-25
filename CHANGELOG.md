@@ -1,5 +1,9 @@
 # Changes history for WATS Access Clients and Documentation
 
+## 1.7.16
+
+* **Change:** Message definitions (contract) updated to version 1.7.16
+
 ## 1.7.6
 
 * **Change:** Message definitions (contract) updated to version 1.7.6

@@ -290,6 +290,10 @@ public enum OrderRejectionReason {
      */
     INVALIDCLEARINGMEMBERCODELENGTH(1085),
     /**
+     * Operation could not be completed successfully due to a temporary lock. Resending the request is advised.
+     */
+    OPERATIONUNSUCCESSFULRETRYNEEDED(1086),
+    /**
      * Mass Quote not allowed for selected Market Model.
      */
     MASSQUOTENOTALLOWEDFORSELECTEDMARKETMODEL(1201),
